@@ -544,82 +544,66 @@ body.fade-out {
 </footer>
 
 <script>
-
 const root = document.documentElement;
 
-/* ================= NAV ================= */
+/* ================= ELEMENTS ================= */
 const menuBtn = document.getElementById("menuBtn");
 const mobileMenu = document.getElementById("mobileMenu");
 const backdrop = document.getElementById("backdrop");
 
-/* ================= THEME ================= */
 const themeToggle = document.getElementById("themeToggle");
 const navLogo = document.getElementById("navLogo");
 const sunIcon = document.getElementById("sunIcon");
 const moonIcon = document.getElementById("moonIcon");
 
-/* ================= DROPDOWN ================= */
 const servicesBtn = document.getElementById("servicesBtn");
 const servicesDropdown = document.getElementById("servicesDropdown");
 
-let servicesOpen = false;
-
 /* ================= MOBILE MENU ================= */
-if (menuBtn && mobileMenu && backdrop){
-
-  menuBtn.onclick = () => {
-
+if (menuBtn && mobileMenu && backdrop) {
+  menuBtn.addEventListener("click", () => {
     mobileMenu.classList.toggle("open");
     backdrop.classList.toggle("show");
-
-  };
-
-  backdrop.onclick = () => {
-
-    mobileMenu.classList.remove("open");
-    backdrop.classList.remove("show");
-
-  };
-
-  document.querySelectorAll('#mobileMenu a').forEach(link => {
-
-    link.addEventListener("click", () => {
-
-      mobileMenu.classList.remove("open");
-      backdrop.classList.remove("show");
-
-    });
-
   });
 
+  backdrop.addEventListener("click", () => {
+    mobileMenu.classList.remove("open");
+    backdrop.classList.remove("show");
+  });
+
+  document.querySelectorAll("#mobileMenu a").forEach(link => {
+    link.addEventListener("click", () => {
+      mobileMenu.classList.remove("open");
+      backdrop.classList.remove("show");
+    });
+  });
 }
 
 /* ================= THEME SYSTEM ================= */
-function updateTheme(){
-
+function updateTheme() {
   const isDark = root.classList.contains("dark-mode");
 
-  if (navLogo){
-
+  if (navLogo) {
     navLogo.src = isDark
       ? "Novyra Navigation Bar (Dark Theme).png"
       : "Novyra Navigation Bar (Light Theme).png";
-
   }
 
-  if (sunIcon && moonIcon){
-
+  if (sunIcon && moonIcon) {
     sunIcon.style.opacity = isDark ? "0" : "1";
     moonIcon.style.opacity = isDark ? "1" : "0";
-
   }
-
 }
 
-if (themeToggle){
+/* Load saved theme */
+if (localStorage.getItem("novyra-theme") === "dark") {
+  root.classList.add("dark-mode");
+}
+updateTheme();
 
-  themeToggle.onclick = () => {
-
+/* Toggle theme */
+if (themeToggle) {
+  themeToggle.addEventListener("click", () => {
     root.classList.toggle("dark-mode");
 
     localStorage.setItem(
@@ -628,82 +612,53 @@ if (themeToggle){
     );
 
     updateTheme();
-
-  };
-
+  });
 }
 
-/* ================= LOAD SAVED THEME ================= */
-if (localStorage.getItem("novyra-theme") === "dark"){
+/* ================= SERVICES DROPDOWN ================= */
+let servicesOpen = false;
 
-  root.classList.add("dark-mode");
-
-}
-
-updateTheme();
-
-/* ================= DROPDOWN ================= */
-if (servicesBtn && servicesDropdown){
-
+if (servicesBtn && servicesDropdown) {
   servicesBtn.addEventListener("click", (e) => {
-
     e.stopPropagation();
-
     servicesOpen = !servicesOpen;
-
     servicesDropdown.classList.toggle("open", servicesOpen);
-
   });
 
   document.addEventListener("click", () => {
-
     servicesOpen = false;
-
     servicesDropdown.classList.remove("open");
-
   });
 
-  document.querySelectorAll('#servicesDropdown a').forEach(link => {
-
+  document.querySelectorAll("#servicesDropdown a").forEach(link => {
     link.addEventListener("click", () => {
-
       servicesOpen = false;
-
       servicesDropdown.classList.remove("open");
-
     });
-
   });
-
 }
 
-<script>
-const links = document.querySelectorAll('a');
+/* ================= VIEW TRANSITION NAV ================= */
+const links = document.querySelectorAll("a");
 
 function isInternalLink(href) {
-  return href && href.startsWith('https://www.novyra.co.za/');
+  return href && href.startsWith("https://www.novyra.co.za/");
 }
 
 links.forEach(link => {
-  const href = link.getAttribute('href');
+  const href = link.getAttribute("href");
 
   if (!isInternalLink(href)) return;
 
-  link.addEventListener('click', (e) => {
+  link.addEventListener("click", (e) => {
     e.preventDefault();
 
-    // Check if browser supports View Transitions
     if (document.startViewTransition) {
-
       document.startViewTransition(() => {
         window.location.href = href;
       });
-
     } else {
-
-      // fallback fade
-      document.body.classList.add('fade-out');
-
+      document.body.classList.add("fade-out");
       setTimeout(() => {
         window.location.href = href;
       }, 250);
@@ -711,12 +666,9 @@ links.forEach(link => {
   });
 });
 
-// fade-in on load (fallback)
 window.addEventListener("load", () => {
   document.body.classList.remove("fade-out");
 });
-</script>
-  
 </script>
 
 </body>
