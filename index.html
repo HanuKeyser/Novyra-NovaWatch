@@ -156,23 +156,6 @@ html.dark-mode .service-card:hover{
   background:rgba(59,130,246,0.1);
 }
 
-/* ================= DROPDOWN ================= */
-.dropdown{
-  max-height:0;
-  opacity:0;
-  overflow:hidden;
-  pointer-events:none;
-  transform: translateY(-5px);
-  transition: all .3s ease;
-}
-
-.dropdown.open{
-  max-height:300px;
-  opacity:1;
-  pointer-events:auto;
-  transform: translateY(0);
-}
-
 /* ================= NAV BACKDROP ================= */
 #backdrop{
   position:fixed;
@@ -197,8 +180,33 @@ html.dark-mode .service-card:hover{
   transition:.3s ease;
 }
 
-  #servicesDropdown {
-  z-index: 50;
+#servicesDropdown {
+  position: absolute;
+  top: 52px;
+  left: 0;
+  width: 220px;
+
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+
+  padding: 10px;
+
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+
+  transition: all 0.25s ease;
+  z-index: 60;
+}
+
+#servicesDropdown.open {
+  opacity: 1;
+  transform: translateY(6px);
+  pointer-events: auto;
 }
   
 </style>
@@ -232,7 +240,7 @@ html.dark-mode .service-card:hover{
     Creative Services ▾
   </button>
 
-  <div id="servicesDropdown" class="dropdown absolute top-10 left-0 w-56 glass-card p-3 space-y-2 text-sm">
+  <div id="servicesDropdown" class="space-y-2 text-sm">
     <a href="https://www.novyra.co.za/creative-services/social-media-management/" class="block nav-link">Social Media Management</a>
     <a href="https://www.novyra.co.za/creative-services/content-creation/" class="block nav-link">Content Creation</a>
     <a href="https://www.novyra.co.za/creative-services/branding/" class="block nav-link">Branding</a>
@@ -269,30 +277,47 @@ html.dark-mode .service-card:hover{
 
   </div>
 
-  <div id="mobileMenu" class="dropdown md:hidden mt-3">
-    <div class="max-w-screen-xl mx-auto px-6">
-      <div class="glass-card p-6 flex flex-col gap-3 text-sm">
+<div id="mobileMenu" class="dropdown md:hidden mt-3">
+  <div class="max-w-screen-xl mx-auto px-6">
+    <div class="glass-card p-6 flex flex-col gap-3 text-sm">
 
-        <a href="#home" class="nav-link">Home</a>
-        <a href="#about" class="nav-link">About</a>
-        <a href="#coming-soon" class="nav-link">Coming Soon</a>
-        <div class="flex flex-col gap-2">
-  <span class="opacity-60 text-xs uppercase">Creative Services</span>
+      <a href="#home" class="nav-link">Home</a>
+      <a href="#about" class="nav-link">About</a>
+      <a href="#coming-soon" class="nav-link">Coming Soon</a>
 
-  <a href="https://www.novyra.co.za/creative-services/social-media-management/" class="nav-link">Social Media Management</a>
-  <a href="https://www.novyra.co.za/creative-services/content-creation/" class="nav-link">Content Creation</a>
-  <a href="https://www.novyra.co.za/creative-services/branding/" class="nav-link">Branding</a>
-  <a href="https://www.novyra.co.za/creative-services/marketing-materials/" class="nav-link">Marketing Materials</a>
-</div>
+      <!-- Creative Services (mobile - simple list style) -->
+      <div class="flex flex-col gap-1 pl-4 border-l border-white/10">
 
-        <a href="https://www.novyra.co.za/contact-us/"
-           class="px-4 py-2 rounded-xl bg-blue-500 text-white text-center">
-          Contact Us
+        <a class="nav-link opacity-60 text-xs pointer-events-none">
+          Creative Services
+        </a>
+
+        <a href="https://www.novyra.co.za/creative-services/social-media-management/" class="nav-link">
+          Social Media Management
+        </a>
+
+        <a href="https://www.novyra.co.za/creative-services/content-creation/" class="nav-link">
+          Content Creation
+        </a>
+
+        <a href="https://www.novyra.co.za/creative-services/branding/" class="nav-link">
+          Branding
+        </a>
+
+        <a href="https://www.novyra.co.za/creative-services/marketing-materials/" class="nav-link">
+          Marketing Materials
         </a>
 
       </div>
+
+      <a href="https://www.novyra.co.za/contact-us/"
+         class="px-4 py-2 rounded-xl bg-blue-500 text-white text-center">
+        Contact Us
+      </a>
+
     </div>
   </div>
+</div>
 
 </header>
 
@@ -654,66 +679,81 @@ const video = document.getElementById("heroVideo");
 const videoSource = document.getElementById("videoSource");
 let playCount = 0;
 
+/* ================= SERVICES DROPDOWN ================= */
+const servicesBtn = document.getElementById("servicesBtn");
+const servicesDropdown = document.getElementById("servicesDropdown");
+let servicesOpen = false;
+
 /* ================= MOBILE MENU ================= */
-menuBtn.onclick = () => {
-  mobileMenu.classList.toggle("open");
-  backdrop.classList.toggle("show");
-};
+if (menuBtn && mobileMenu && backdrop) {
+  menuBtn.onclick = () => {
+    mobileMenu.classList.toggle("open");
+    backdrop.classList.toggle("show");
+  };
 
-backdrop.onclick = () => {
-  mobileMenu.classList.remove("open");
-  backdrop.classList.remove("show");
-};
-
-/* close mobile menu on anchor click */
-document.querySelectorAll('a[href^="#"]').forEach(link => {
-  link.addEventListener("click", () => {
+  backdrop.onclick = () => {
     mobileMenu.classList.remove("open");
     backdrop.classList.remove("show");
+  };
+
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener("click", () => {
+      mobileMenu.classList.remove("open");
+      backdrop.classList.remove("show");
+    });
   });
-});
+}
 
 /* ================= VIDEO CONTROL ================= */
-video.addEventListener("ended", () => {
-  playCount++;
-  if (playCount < 2) {
-    video.currentTime = 0;
-    video.play();
-  }
-});
+if (video) {
+  video.addEventListener("ended", () => {
+    playCount++;
+    if (playCount < 2) {
+      video.currentTime = 0;
+      video.play();
+    }
+  });
+}
 
 /* ================= THEME SYSTEM ================= */
-function updateTheme(){
+function updateTheme() {
 
   const isDark = root.classList.contains("dark-mode");
 
-  navLogo.src = isDark
-    ? "Novyra Navigation Bar (Dark Theme).png"
-    : "Novyra Navigation Bar (Light Theme).png";
+  if (navLogo) {
+    navLogo.src = isDark
+      ? "Novyra Navigation Bar (Dark Theme).png"
+      : "Novyra Navigation Bar (Light Theme).png";
+  }
 
-  videoSource.src = isDark
-    ? "Novyra Logo Reveal Landscape (Dark Theme).mp4"
-    : "Novyra Logo Reveal Landscape (Light Theme).mp4";
+  if (videoSource && video) {
+    videoSource.src = isDark
+      ? "Novyra Logo Reveal Landscape (Dark Theme).mp4"
+      : "Novyra Logo Reveal Landscape (Light Theme).mp4";
 
-  video.load();
-  video.play();
+    video.load();
+    video.play();
+    playCount = 0;
+  }
 
-  playCount = 0;
-
-  sunIcon.style.opacity = isDark ? "0" : "1";
-  moonIcon.style.opacity = isDark ? "1" : "0";
+  if (sunIcon && moonIcon) {
+    sunIcon.style.opacity = isDark ? "0" : "1";
+    moonIcon.style.opacity = isDark ? "1" : "0";
+  }
 }
 
-themeToggle.onclick = () => {
-  root.classList.toggle("dark-mode");
+if (themeToggle) {
+  themeToggle.onclick = () => {
+    root.classList.toggle("dark-mode");
 
-  localStorage.setItem(
-    "novyra-theme",
-    root.classList.contains("dark-mode") ? "dark" : "light"
-  );
+    localStorage.setItem(
+      "novyra-theme",
+      root.classList.contains("dark-mode") ? "dark" : "light"
+    );
 
-  updateTheme();
-};
+    updateTheme();
+  };
+}
 
 /* load saved theme */
 if (localStorage.getItem("novyra-theme") === "dark") {
@@ -722,23 +762,30 @@ if (localStorage.getItem("novyra-theme") === "dark") {
 
 updateTheme();
 
-  const servicesBtn = document.getElementById("servicesBtn");
-const servicesDropdown = document.getElementById("servicesDropdown");
+/* ================= SERVICES DROPDOWN ================= */
+if (servicesBtn && servicesDropdown) {
 
-let servicesOpen = false;
+  servicesBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    servicesOpen = !servicesOpen;
+    servicesDropdown.classList.toggle("open", servicesOpen);
+  });
 
-servicesBtn?.addEventListener("click", (e) => {
-  e.stopPropagation();
-  servicesOpen = !servicesOpen;
-  servicesDropdown.classList.toggle("open", servicesOpen);
-});
+  /* close when clicking outside */
+  document.addEventListener("click", () => {
+    servicesOpen = false;
+    servicesDropdown.classList.remove("open");
+  });
 
-/* close when clicking outside */
-document.addEventListener("click", () => {
-  servicesOpen = false;
-  servicesDropdown.classList.remove("open");
-});
-  
+  /* close on link click */
+  document.querySelectorAll('#servicesDropdown a').forEach(link => {
+    link.addEventListener("click", () => {
+      servicesOpen = false;
+      servicesDropdown.classList.remove("open");
+    });
+  });
+}
+
 </script>
 
 </body>
