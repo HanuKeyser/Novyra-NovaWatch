@@ -249,6 +249,20 @@ html:not(.dark-mode) #servicesDropdown .nav-link:hover {
   color: #3b82f6;
 }
 
+body {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+body.fade-out {
+  opacity: 0;
+}
+
+/* Optional smoother feel for View Transitions */
+@view-transition {
+  navigation: auto;
+}
+  
 </style>
 </head>
 
@@ -842,6 +856,46 @@ if (servicesBtn && servicesDropdown) {
     });
   });
 }
+
+<script>
+const links = document.querySelectorAll('a');
+
+function isInternalLink(href) {
+  return href && href.startsWith('https://www.novyra.co.za/');
+}
+
+links.forEach(link => {
+  const href = link.getAttribute('href');
+
+  if (!isInternalLink(href)) return;
+
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    // Check if browser supports View Transitions
+    if (document.startViewTransition) {
+
+      document.startViewTransition(() => {
+        window.location.href = href;
+      });
+
+    } else {
+
+      // fallback fade
+      document.body.classList.add('fade-out');
+
+      setTimeout(() => {
+        window.location.href = href;
+      }, 250);
+    }
+  });
+});
+
+// fade-in on load (fallback)
+window.addEventListener("load", () => {
+  document.body.classList.remove("fade-out");
+});
+</script>
   
 </script>
 
