@@ -80,7 +80,6 @@ html.dark-mode .glass-card{
   cursor: default;
 }
 
-/* BLUE GRADIENT FRAME */
 .about-card::before{
   content: "";
   position: absolute;
@@ -89,7 +88,6 @@ html.dark-mode .glass-card{
   border-radius: 20px;
   background: linear-gradient(135deg, #3b82f6, #93c5fd);
 
-  /* creates the border effect */
   -webkit-mask: 
     linear-gradient(#000 0 0) content-box, 
     linear-gradient(#000 0 0);
@@ -99,11 +97,6 @@ html.dark-mode .glass-card{
   pointer-events: none;
 }
 
-html.dark-mode .about-card{
-  background: rgba(255,255,255,0.05);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-}
-  
 html.dark-mode .about-card{
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.08);
@@ -133,13 +126,12 @@ html.dark-mode .service-card{
   box-shadow: 0 10px 30px rgba(0,0,0,0.35);
 }
 
-/* DARK MODE HOVER OVERRIDE */
 html.dark-mode .service-card:hover{
   transform: translateY(-6px);
   box-shadow: 0 18px 55px rgba(147, 197, 253, 0.22);
   border: 1px solid rgba(147, 197, 253, 0.45);
 }
-  
+
 /* ================= NAV ================= */
 .nav-link{
   padding:6px 10px;
@@ -180,17 +172,19 @@ html.dark-mode .service-card:hover{
   transition:.3s ease;
 }
 
+/* ================= DROPDOWN (UPDATED DARK VERSION) ================= */
 #servicesDropdown {
   position: absolute;
   top: 52px;
   left: 0;
-  width: 220px;
+  width: 240px;
 
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  /* DARKER + MORE PREMIUM */
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.25);
   border-radius: 16px;
 
   padding: 10px;
@@ -201,8 +195,22 @@ html.dark-mode .service-card:hover{
 
   transition: all 0.25s ease;
   z-index: 60;
+
+  box-shadow: 0 20px 45px rgba(0,0,0,0.45);
 }
 
+/* DROPDOWN LINKS */
+#servicesDropdown .nav-link {
+  color: rgba(255, 255, 255, 0.85);
+  display: block;
+}
+
+#servicesDropdown .nav-link:hover {
+  color: #93c5fd;
+  background: rgba(59, 130, 246, 0.15);
+}
+
+/* OPEN STATE */
 #servicesDropdown.open {
   opacity: 1;
   transform: translateY(6px);
@@ -220,12 +228,12 @@ html.dark-mode .service-card:hover{
 }
 
 #mobileMenu.open {
-  max-height: 500px; /* enough to show content */
+  max-height: 500px;
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
 }
-  
+
 </style>
 </head>
 
@@ -241,30 +249,44 @@ html.dark-mode .service-card:hover{
 
       <div class="h-16 px-6 glass-card flex items-center justify-between">
 
+        <!-- LOGO -->
         <img
           id="navLogo"
           src="Novyra Navigation Bar (Dark Theme).png"
           class="h-10 md:h-12 w-auto"
         >
 
+        <!-- DESKTOP NAV -->
         <div class="hidden md:flex items-center gap-1 text-sm">
 
           <a href="#home" class="nav-link">Home</a>
           <a href="#about" class="nav-link">About</a>
           <a href="#coming-soon" class="nav-link">Coming Soon</a>
-          <div class="relative">
-  <button id="servicesBtn" class="nav-link">
-    Creative Services ⮟
-  </button>
 
-  <div id="servicesDropdown" class="space-y-2 text-sm">
-    <a href="https://www.novyra.co.za/creative-services/social-media-management/" class="block nav-link">Social Media Management</a>
-    <a href="https://www.novyra.co.za/creative-services/content-creation/" class="block nav-link">Content Creation</a>
-    <a href="https://www.novyra.co.za/creative-services/branding/" class="block nav-link">Branding</a>
-    <a href="https://www.novyra.co.za/creative-services/marketing-materials/" class="block nav-link">Marketing Materials</a>
-  </div>
-</div>
+          <!-- CREATIVE SERVICES (FIXED) -->
+          <div class="relative flex items-center">
 
+            <!-- MAIN SCROLL LINK -->
+            <a href="#creative-services" class="nav-link">
+              Creative Services
+            </a>
+
+            <!-- DROPDOWN TOGGLE ONLY -->
+            <button id="servicesBtn" class="nav-link px-1">
+              ⮟
+            </button>
+
+            <!-- DROPDOWN -->
+            <div id="servicesDropdown" class="space-y-2 text-sm">
+              <a href="https://www.novyra.co.za/creative-services/social-media-management/" class="block nav-link">Social Media Management</a>
+              <a href="https://www.novyra.co.za/creative-services/content-creation/" class="block nav-link">Content Creation</a>
+              <a href="https://www.novyra.co.za/creative-services/branding/" class="block nav-link">Branding</a>
+              <a href="https://www.novyra.co.za/creative-services/marketing-materials/" class="block nav-link">Marketing Materials</a>
+            </div>
+
+          </div>
+
+          <!-- CONTACT -->
           <a href="https://www.novyra.co.za/contact-us/"
              class="px-5 py-2 rounded-2xl bg-blue-500 text-white">
             Contact Us
@@ -272,12 +294,14 @@ html.dark-mode .service-card:hover{
 
         </div>
 
+        <!-- MOBILE MENU BUTTON -->
         <button id="menuBtn" class="md:hidden text-xl">☰</button>
 
       </div>
 
     </nav>
 
+    <!-- THEME TOGGLE -->
     <button id="themeToggle"
       class="h-16 w-16 glass-card flex items-center justify-center relative overflow-hidden">
 
@@ -294,47 +318,48 @@ html.dark-mode .service-card:hover{
 
   </div>
 
-<div id="mobileMenu" class="dropdown md:hidden mt-3">
-  <div class="max-w-screen-xl mx-auto px-6">
-    <div class="glass-card p-6 flex flex-col gap-3 text-sm">
+  <!-- MOBILE MENU -->
+  <div id="mobileMenu" class="dropdown md:hidden mt-3">
 
-      <a href="#home" class="nav-link">Home</a>
-      <a href="#about" class="nav-link">About</a>
-      <a href="#coming-soon" class="nav-link">Coming Soon</a>
+    <div class="max-w-screen-xl mx-auto px-6">
 
-      <!-- Creative Services (mobile - simple list style) -->
-      <div class="flex flex-col gap-2 pl-4 border-l border-white/10">
+      <div class="glass-card p-6 flex flex-col gap-3 text-sm">
 
-<div class="nav-link opacity-70 text-sm">
-  Creative Services
-</div>
+        <a href="#home" class="nav-link">Home</a>
+        <a href="#about" class="nav-link">About</a>
+        <a href="#coming-soon" class="nav-link">Coming Soon</a>
 
-        <a href="https://www.novyra.co.za/creative-services/social-media-management/" class="nav-link">
+        <!-- MOBILE: INLINE (FIXED) -->
+        <a href="#creative-services" class="nav-link">
+          Creative Services
+        </a>
+
+        <!-- SERVICE LINKS -->
+        <a href="https://www.novyra.co.za/creative-services/social-media-management/" class="nav-link pl-4">
           Social Media Management
         </a>
 
-        <a href="https://www.novyra.co.za/creative-services/content-creation/" class="nav-link">
+        <a href="https://www.novyra.co.za/creative-services/content-creation/" class="nav-link pl-4">
           Content Creation
         </a>
 
-        <a href="https://www.novyra.co.za/creative-services/branding/" class="nav-link">
+        <a href="https://www.novyra.co.za/creative-services/branding/" class="nav-link pl-4">
           Branding
         </a>
 
-        <a href="https://www.novyra.co.za/creative-services/marketing-materials/" class="nav-link">
+        <a href="https://www.novyra.co.za/creative-services/marketing-materials/" class="nav-link pl-4">
           Marketing Materials
         </a>
 
+        <!-- CONTACT -->
+        <a href="https://www.novyra.co.za/contact-us/"
+           class="px-4 py-2 rounded-xl bg-blue-500 text-white text-center">
+          Contact Us
+        </a>
+
       </div>
-
-      <a href="https://www.novyra.co.za/contact-us/"
-         class="px-4 py-2 rounded-xl bg-blue-500 text-white text-center">
-        Contact Us
-      </a>
-
     </div>
   </div>
-</div>
 
 </header>
 
