@@ -208,6 +208,23 @@ html.dark-mode .service-card:hover{
   transform: translateY(6px);
   pointer-events: auto;
 }
+
+/* ================= MOBILE MENU ================= */
+#mobileMenu {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+#mobileMenu.open {
+  max-height: 500px; /* enough to show content */
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
   
 </style>
 </head>
@@ -237,7 +254,7 @@ html.dark-mode .service-card:hover{
           <a href="#coming-soon" class="nav-link">Coming Soon</a>
           <div class="relative">
   <button id="servicesBtn" class="nav-link">
-    Creative Services ▾
+    Creative Services ⮟
   </button>
 
   <div id="servicesDropdown" class="space-y-2 text-sm">
@@ -286,11 +303,11 @@ html.dark-mode .service-card:hover{
       <a href="#coming-soon" class="nav-link">Coming Soon</a>
 
       <!-- Creative Services (mobile - simple list style) -->
-      <div class="flex flex-col gap-1 pl-4 border-l border-white/10">
+      <div class="flex flex-col gap-2 pl-4 border-l border-white/10">
 
-        <a class="nav-link opacity-60 text-xs pointer-events-none">
-          Creative Services
-        </a>
+<div class="nav-link opacity-70 text-sm">
+  Creative Services
+</div>
 
         <a href="https://www.novyra.co.za/creative-services/social-media-management/" class="nav-link">
           Social Media Management
