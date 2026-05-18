@@ -166,59 +166,6 @@ html.dark-mode .service-card{
   transition:.3s ease;
 }
 
-/* ================= MODALS FIX (IMPORTANT) ================= */
-
-/* base modal hidden state */
-.modal{
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(0.97);
-
-  transition: all 0.25s ease;
-  z-index: 70;
-}
-
-/* modal visible */
-.modal.open{
-  opacity: 1;
-  pointer-events: auto;
-  transform: scale(1);
-}
-
-/* BACKDROP FOR MODALS */
-#modalBackdrop{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.55);
-  opacity:0;
-  pointer-events:none;
-  transition:.3s ease;
-  z-index:60;
-}
-
-#modalBackdrop.open{
-  opacity:1;
-  pointer-events:auto;
-}
-
-/* ================= BLUR EFFECT ================= */
-body.modal-active > *:not(.modal):not(#modalBackdrop){
-  filter: blur(6px);
-  pointer-events: none;
-  transition: filter .3s ease;
-}
-
-/* ================= BODY LOCK ================= */
-body.modal-active{
-  overflow: hidden;
-}
-
 </style>
 </head>
 
@@ -498,37 +445,37 @@ html.dark-mode .marquee-content{
       </div>
 
       <!-- RIGHT CARDS -->
-      <div class="md:col-span-7 grid sm:grid-cols-2 gap-6">
+<div class="md:col-span-7 grid sm:grid-cols-2 gap-6">
 
-        <div class="about-card p-6 cursor-pointer" onclick="openModal('modal-who')">
-          <h4 class="text-lg font-semibold mb-2">Who We Are</h4>
-          <p class="text-sm opacity-70 leading-relaxed">
-            Full-service marketing agency building structured brand, design, and growth systems.
-          </p>
-        </div>
+  <div class="about-card p-6">
+    <h4 class="text-lg font-semibold mb-2">Who We Are</h4>
+    <p class="text-sm opacity-70 leading-relaxed">
+      Full-service marketing agency building structured brand, design, and growth systems.
+    </p>
+  </div>
 
-        <div class="about-card p-6 cursor-pointer" onclick="openModal('modal-why')">
-          <h4 class="text-lg font-semibold mb-2">What We Do</h4>
-          <p class="text-sm opacity-70 leading-relaxed">
-            We analyse, strategise, design, and execute marketing through a structured process.
-          </p>
-        </div>
+  <div class="about-card p-6">
+    <h4 class="text-lg font-semibold mb-2">What We Do</h4>
+    <p class="text-sm opacity-70 leading-relaxed">
+      We analyse, strategise, design, and execute marketing through a structured process.
+    </p>
+  </div>
 
-        <div class="about-card p-6 cursor-pointer" onclick="openModal('modal-strategy')">
-          <h4 class="text-lg font-semibold mb-2">How We Work</h4>
-          <p class="text-sm opacity-70 leading-relaxed">
-            We analyse, strategise, design, and execute marketing through a structured process.
-          </p>
-        </div>
+  <div class="about-card p-6">
+    <h4 class="text-lg font-semibold mb-2">How We Work</h4>
+    <p class="text-sm opacity-70 leading-relaxed">
+      We build structured marketing systems that combine strategy, design, and execution.
+    </p>
+  </div>
 
-        <div class="about-card p-6 bg-black text-white dark:bg-white/10 dark:text-white cursor-pointer" onclick="openModal('modal-growth')">
-          <h4 class="text-lg font-semibold mb-2">Why Novyra</h4>
-          <p class="text-sm opacity-80 leading-relaxed">
-            We unify branding and marketing to create clarity, consistency, and growth.
-          </p>
-        </div>
+  <div class="about-card p-6">
+    <h4 class="text-lg font-semibold mb-2">Why Novyra</h4>
+    <p class="text-sm opacity-70 leading-relaxed">
+      We unify branding and marketing to create clarity, consistency, and growth.
+    </p>
+  </div>
 
-      </div>
+</div>
 
     </div>
 
@@ -636,123 +583,6 @@ html.dark-mode .marquee-content{
 <footer class="text-center py-6 text-sm" style="color: var(--footer-text);">
   © 2026 Novyra. All rights reserved.
 </footer>
-
-
-<!-- MODAL BACKDROP -->
-<div id="modalBackdrop" class="fixed inset-0 bg-black/50 opacity-0 pointer-events-none transition duration-300 z-[60]"></div>
-
-<!-- MODALS -->
-
-<!-- Who We Are -->
-<div id="modal-who" class="modal fixed inset-0 flex items-center justify-center opacity-0 pointer-events-none transition duration-300 z-[70]">
-  <div class="glass-card max-w-2xl w-full mx-6 p-10 relative">
-    <button class="absolute top-4 right-4 text-xl" onclick="closeModal()">✕</button>
-
-    <h2 class="text-3xl font-bold mb-6">Who We Are</h2>
-
-    <p class="opacity-70 leading-relaxed mb-4">
-      Novyra is a full-service marketing agency that helps businesses build, manage, and grow their brand presence across digital platforms.
-    </p>
-
-    <p class="opacity-70 leading-relaxed mb-4">
-      We combine branding, web design, marketing strategy, and campaign execution into one structured system. This allows businesses to operate with consistency across every customer touchpoint instead of working with disconnected service providers.
-    </p>
-
-    <p class="opacity-70 leading-relaxed mb-4">
-      Our work is focused on building practical marketing foundations that help companies communicate clearly, present themselves professionally, and attract the right audience.
-    </p>
-    
-    <p class="opacity-70 leading-relaxed">
-      Novyra works as a single partner for businesses that want both creative output and structured marketing direction in one place.
-    </p>
-  </div>
-</div>
-
-<!-- How We Work -->
-<div id="modal-why" class="modal fixed inset-0 flex items-center justify-center opacity-0 pointer-events-none transition duration-300 z-[70]">
-  <div class="glass-card max-w-2xl w-full mx-6 p-10 relative">
-    <button class="absolute top-4 right-4 text-xl" onclick="closeModal()">✕</button>
-
-    <h2 class="text-3xl font-bold mb-6">How We Work</h2>
-
-    <p class="opacity-70 leading-relaxed mb-4">
-      Most agencies focus on surface-level visuals. Novyra focuses on systems that actually move business metrics.
-      We build brands that are engineered for conversion, retention, and long-term authority.
-    </p>
-
-    <p class="opacity-70 leading-relaxed mb-4">
-      Instead of one-off creative work, we design ecosystems — where content, design, and marketing work together
-      to continuously generate attention and revenue.
-    </p>
-
-    <p class="opacity-70 leading-relaxed">
-      This is why brands choose us: not for decoration, but for direction, structure, and growth clarity.
-    </p>
-  </div>
-</div>
-
-<!-- What We Do -->
-<div id="modal-strategy" class="modal fixed inset-0 flex items-center justify-center opacity-0 pointer-events-none transition duration-300 z-[70]">
-  <div class="glass-card max-w-2xl w-full mx-6 p-10 relative">
-    <button class="absolute top-4 right-4 text-xl" onclick="closeModal()">✕</button>
-
-<h2 class="text-3xl font-bold mb-6">What We Do</h2>
-
-<p class="opacity-70 leading-relaxed mb-6">
-  Novyra covers the core areas required to build and grow a modern digital brand.
-</p>
-
-<h3 class="text-xl font-semibold mb-3">Branding and Identity</h3>
-<p class="opacity-70 leading-relaxed mb-6">
-  We develop complete brand identities including logo design direction, visual systems, typography, colour usage, and brand guidelines. This ensures a consistent and professional appearance across all platforms.
-</p>
-
-<h3 class="text-xl font-semibold mb-3">Website Design and Development</h3>
-<p class="opacity-70 leading-relaxed mb-6">
-  We design and build responsive websites that are structured, easy to navigate, and aligned with the brand identity. The focus is on clarity, usability, and performance across all devices.
-</p>
-
-<h3 class="text-xl font-semibold mb-3">Marketing Strategy</h3>
-<p class="opacity-70 leading-relaxed mb-6">
-  We define how a business should position itself in the market. This includes understanding the target audience, refining messaging, and planning how the brand should communicate across different channels.
-</p>
-
-<h3 class="text-xl font-semibold mb-3">Content and Campaign Direction</h3>
-<p class="opacity-70 leading-relaxed mb-6">
-  We help structure how content should look and feel across social media, advertising, and digital platforms. This ensures all communication is consistent and aligned with the brand strategy.
-</p>
-
-<h3 class="text-xl font-semibold mb-3">Digital Marketing Execution</h3>
-<p class="opacity-70 leading-relaxed">
-  We support ongoing marketing activities such as campaign rollout, content distribution planning, and digital visibility support to maintain consistent brand presence.
-</p>
-  </div>
-</div>
-
-<!-- Why Novyra -->
-<div id="modal-growth" class="modal fixed inset-0 flex items-center justify-center opacity-0 pointer-events-none transition duration-300 z-[70]">
-  <div class="glass-card max-w-2xl w-full mx-6 p-10 relative">
-    <button class="absolute top-4 right-4 text-xl" onclick="closeModal()">✕</button>
-
-    <h2 class="text-3xl font-bold mb-6">Why Novyra</h2>
-
-    <p class="opacity-70 leading-relaxed mb-4">
-      Novyra is built for businesses that want more than isolated design work or occasional marketing support.
-    </p>
-
-    <p class="opacity-70 leading-relaxed mb-4">
-      Most companies struggle with inconsistent branding, unclear messaging, and disconnected marketing channels. We solve this by bringing everything into one structured system.
-    </p>
-    
-    <p class="opacity-70 leading-relaxed mb-4">
-      Clients work with Novyra when they need a clear brand identity, a professional digital presence, and a marketing structure that supports long-term growth.
-    </p>
-
-    <p class="opacity-70 leading-relaxed">
-      The outcome is a brand that looks consistent, communicates clearly, and operates with a defined direction across all digital platforms.
-    </p>
-  </div>
-</div>
   
 <script>
 
@@ -773,9 +603,6 @@ const moonIcon = document.getElementById("moonIcon");
 const video = document.getElementById("heroVideo");
 const videoSource = document.getElementById("videoSource");
 let playCount = 0;
-
-/* ================= MODALS ================= */
-const modalBackdrop = document.getElementById("modalBackdrop");
 
 /* ================= MOBILE MENU ================= */
 menuBtn.onclick = () => {
@@ -844,54 +671,6 @@ if (localStorage.getItem("novyra-theme") === "dark") {
 }
 
 updateTheme();
-
-/* ================= MODAL SYSTEM ================= */
-function openModal(id){
-
-  // close all first
-  document.querySelectorAll(".modal").forEach(m => {
-    m.classList.remove("open");
-  });
-
-  const modal = document.getElementById(id);
-  if (!modal) return;
-
-  modal.classList.add("open");
-  modalBackdrop.classList.add("open");
-  document.body.classList.add("modal-active");
-}
-
-function closeModal(){
-
-  document.querySelectorAll(".modal").forEach(m => {
-    m.classList.remove("open");
-  });
-
-  modalBackdrop.classList.remove("open");
-  document.body.classList.remove("modal-active");
-}
-
-/* ================= CLOSE ON OUTSIDE CLICK ================= */
-document.addEventListener("click", (e) => {
-
-  const activeModal = document.querySelector(".modal.open");
-  if (!activeModal) return;
-
-  const modalBox = activeModal.querySelector(".glass-card");
-
-  // ignore clicks inside modal
-  if (modalBox && modalBox.contains(e.target)) return;
-
-  // ignore clicks on cards that open modals (prevents instant close on open)
-  if (e.target.closest("[onclick^='openModal']")) return;
-
-  closeModal();
-});
-
-/* ================= ESC KEY ================= */
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") closeModal();
-});
 
 </script>
 
