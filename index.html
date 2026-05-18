@@ -731,172 +731,172 @@ html.dark-mode .marquee-content{
 </footer>
   
 <script>
+document.addEventListener("DOMContentLoaded", () => {
 
-const root = document.documentElement;
+  const root = document.documentElement;
 
-/* ================= NAV ================= */
-const menuBtn = document.getElementById("menuBtn");
-const mobileMenu = document.getElementById("mobileMenu");
-const backdrop = document.getElementById("backdrop");
+  /* ================= NAV ================= */
+  const menuBtn = document.getElementById("menuBtn");
+  const mobileMenu = document.getElementById("mobileMenu");
+  const backdrop = document.getElementById("backdrop");
 
-/* ================= THEME ================= */
-const themeToggle = document.getElementById("themeToggle");
-const navLogo = document.getElementById("navLogo");
-const sunIcon = document.getElementById("sunIcon");
-const moonIcon = document.getElementById("moonIcon");
+  /* ================= THEME ================= */
+  const themeToggle = document.getElementById("themeToggle");
+  const navLogo = document.getElementById("navLogo");
+  const sunIcon = document.getElementById("sunIcon");
+  const moonIcon = document.getElementById("moonIcon");
 
-/* ================= VIDEO ================= */
-const video = document.getElementById("heroVideo");
-const videoSource = document.getElementById("videoSource");
-let playCount = 0;
+  /* ================= VIDEO ================= */
+  const video = document.getElementById("heroVideo");
+  const videoSource = document.getElementById("videoSource");
+  let playCount = 0;
 
-/* ================= SERVICES DROPDOWN ================= */
-const servicesBtn = document.getElementById("servicesBtn");
-const servicesDropdown = document.getElementById("servicesDropdown");
-let servicesOpen = false;
+  /* ================= SERVICES DROPDOWN ================= */
+  const servicesBtn = document.getElementById("servicesBtn");
+  const servicesDropdown = document.getElementById("servicesDropdown");
+  let servicesOpen = false;
 
-/* ================= MOBILE MENU ================= */
-if (menuBtn && mobileMenu && backdrop) {
-  menuBtn.onclick = () => {
-    mobileMenu.classList.toggle("open");
-    backdrop.classList.toggle("show");
-  };
+  /* ================= MOBILE MENU ================= */
+  if (menuBtn && mobileMenu && backdrop) {
 
-  backdrop.onclick = () => {
-    mobileMenu.classList.remove("open");
-    backdrop.classList.remove("show");
-  };
+    menuBtn.addEventListener("click", () => {
+      mobileMenu.classList.toggle("open");
+      backdrop.classList.toggle("show");
+    });
 
-  document.querySelectorAll('#mobileMenu a').forEach(link => {
-    link.addEventListener("click", () => {
+    backdrop.addEventListener("click", () => {
       mobileMenu.classList.remove("open");
       backdrop.classList.remove("show");
     });
-  });
-}
 
-/* ================= VIDEO CONTROL ================= */
-if (video) {
-  video.addEventListener("ended", () => {
-    playCount++;
-    if (playCount < 2) {
-      video.currentTime = 0;
-      video.play();
+    document.querySelectorAll('#mobileMenu a').forEach(link => {
+      link.addEventListener("click", () => {
+        mobileMenu.classList.remove("open");
+        backdrop.classList.remove("show");
+      });
+    });
+  }
+
+  /* ================= VIDEO CONTROL ================= */
+  if (video) {
+    video.addEventListener("ended", () => {
+      playCount++;
+
+      if (playCount < 2) {
+        video.currentTime = 0;
+        video.play();
+      }
+    });
+  }
+
+  /* ================= THEME SYSTEM ================= */
+  function updateTheme() {
+    const isDark = root.classList.contains("dark-mode");
+
+    if (navLogo) {
+      navLogo.src = isDark
+        ? "Novyra Navigation Bar (Dark Theme).png"
+        : "Novyra Navigation Bar (Light Theme).png";
     }
-  });
-}
 
-/* ================= THEME SYSTEM ================= */
-function updateTheme() {
+    if (video && videoSource) {
+      videoSource.src = isDark
+        ? "Novyra Logo Reveal Landscape (Dark Theme).mp4"
+        : "Novyra Logo Reveal Landscape (Light Theme).mp4";
 
-  const isDark = root.classList.contains("dark-mode");
+      video.load();
+      video.play().catch(() => {});
+      playCount = 0;
+    }
 
-  if (navLogo) {
-    navLogo.src = isDark
-      ? "Novyra Navigation Bar (Dark Theme).png"
-      : "Novyra Navigation Bar (Light Theme).png";
+    if (sunIcon && moonIcon) {
+      sunIcon.style.opacity = isDark ? "0" : "1";
+      moonIcon.style.opacity = isDark ? "1" : "0";
+    }
   }
 
-  if (videoSource && video) {
-    videoSource.src = isDark
-      ? "Novyra Logo Reveal Landscape (Dark Theme).mp4"
-      : "Novyra Logo Reveal Landscape (Light Theme).mp4";
+  if (themeToggle) {
+    themeToggle.addEventListener("click", () => {
+      root.classList.toggle("dark-mode");
 
-    video.load();
-    video.play();
-    playCount = 0;
+      localStorage.setItem(
+        "novyra-theme",
+        root.classList.contains("dark-mode") ? "dark" : "light"
+      );
+
+      updateTheme();
+    });
   }
 
-  if (sunIcon && moonIcon) {
-    sunIcon.style.opacity = isDark ? "0" : "1";
-    moonIcon.style.opacity = isDark ? "1" : "0";
+  /* load saved theme */
+  if (localStorage.getItem("novyra-theme") === "dark") {
+    root.classList.add("dark-mode");
   }
-}
 
-if (themeToggle) {
-  themeToggle.onclick = () => {
-    root.classList.toggle("dark-mode");
+  updateTheme();
 
-    localStorage.setItem(
-      "novyra-theme",
-      root.classList.contains("dark-mode") ? "dark" : "light"
-    );
+  /* ================= SERVICES DROPDOWN ================= */
+  if (servicesBtn && servicesDropdown) {
 
-    updateTheme();
-  };
-}
+    servicesBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      servicesOpen = !servicesOpen;
+      servicesDropdown.classList.toggle("open", servicesOpen);
+    });
 
-/* load saved theme */
-if (localStorage.getItem("novyra-theme") === "dark") {
-  root.classList.add("dark-mode");
-}
-
-updateTheme();
-
-/* ================= SERVICES DROPDOWN ================= */
-if (servicesBtn && servicesDropdown) {
-
-  servicesBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    servicesOpen = !servicesOpen;
-    servicesDropdown.classList.toggle("open", servicesOpen);
-  });
-
-  /* close when clicking outside */
-  document.addEventListener("click", () => {
-    servicesOpen = false;
-    servicesDropdown.classList.remove("open");
-  });
-
-  /* close on link click */
-  document.querySelectorAll('#servicesDropdown a').forEach(link => {
-    link.addEventListener("click", () => {
+    document.addEventListener("click", () => {
       servicesOpen = false;
       servicesDropdown.classList.remove("open");
     });
-  });
-}
 
-<script>
-const links = document.querySelectorAll('a');
-
-function isInternalLink(href) {
-  return href && href.startsWith('https://www.novyra.co.za/');
-}
-
-links.forEach(link => {
-  const href = link.getAttribute('href');
-
-  if (!isInternalLink(href)) return;
-
-  link.addEventListener('click', (e) => {
-    e.preventDefault();
-
-    // Check if browser supports View Transitions
-    if (document.startViewTransition) {
-
-      document.startViewTransition(() => {
-        window.location.href = href;
+    document.querySelectorAll('#servicesDropdown a').forEach(link => {
+      link.addEventListener("click", () => {
+        servicesOpen = false;
+        servicesDropdown.classList.remove("open");
       });
+    });
+  }
 
-    } else {
+  /* ================= PAGE TRANSITIONS ================= */
+  const links = document.querySelectorAll("a");
 
-      // fallback fade
-      document.body.classList.add('fade-out');
+  function isInternalLink(href) {
+    if (!href) return false;
 
-      setTimeout(() => {
-        window.location.href = href;
-      }, 250);
-    }
+    return (
+      href.startsWith("/") ||
+      href.includes("novyra.co.za")
+    );
+  }
+
+  links.forEach(link => {
+    const href = link.getAttribute("href");
+
+    if (!isInternalLink(href)) return;
+
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      if (document.startViewTransition) {
+        document.startViewTransition(() => {
+          window.location.href = href;
+        });
+      } else {
+        document.body.classList.add("fade-out");
+
+        setTimeout(() => {
+          window.location.href = href;
+        }, 250);
+      }
+    });
   });
-});
 
-// fade-in on load (fallback)
-window.addEventListener("load", () => {
-  document.body.classList.remove("fade-out");
+  /* fade-in fallback */
+  window.addEventListener("load", () => {
+    document.body.classList.remove("fade-out");
+  });
+
 });
-</script>
-  
 </script>
 
 </body>
