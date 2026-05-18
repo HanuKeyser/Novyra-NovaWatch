@@ -71,15 +71,39 @@ html.dark-mode .glass-card{
 
 /* ================= ABOUT CARD ================= */
 .about-card{
+  position: relative;
   background: rgba(255,255,255,0.45);
   backdrop-filter: blur(6px);
   border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.25);
   box-shadow: 0 8px 25px rgba(0,0,0,0.08);
   transition: .3s ease;
-  cursor: pointer;
+  cursor: default;
 }
 
+/* BLUE GRADIENT FRAME */
+.about-card::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #3b82f6, #93c5fd);
+
+  /* creates the border effect */
+  -webkit-mask: 
+    linear-gradient(#000 0 0) content-box, 
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+
+  pointer-events: none;
+}
+
+html.dark-mode .about-card{
+  background: rgba(255,255,255,0.05);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+  
 html.dark-mode .about-card{
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.08);
