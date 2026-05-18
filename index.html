@@ -713,7 +713,7 @@ if (menuBtn && mobileMenu && backdrop) {
     backdrop.classList.remove("show");
   };
 
-  document.querySelectorAll('a[href^="#"]').forEach(link => {
+  document.querySelectorAll('#mobileMenu a').forEach(link => {
     link.addEventListener("click", () => {
       mobileMenu.classList.remove("open");
       backdrop.classList.remove("show");
@@ -803,6 +803,12 @@ if (servicesBtn && servicesDropdown) {
   });
 }
 
+  menuBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  mobileMenu.classList.toggle("open");
+  backdrop.classList.toggle("show");
+});
+  
 </script>
 
 </body>
