@@ -197,6 +197,10 @@ html.dark-mode .service-card:hover{
   transition:.3s ease;
 }
 
+  #servicesDropdown {
+  z-index: 50;
+}
+  
 </style>
 </head>
 
@@ -223,7 +227,18 @@ html.dark-mode .service-card:hover{
           <a href="#home" class="nav-link">Home</a>
           <a href="#about" class="nav-link">About</a>
           <a href="#coming-soon" class="nav-link">Coming Soon</a>
-          <a href="#creative-services" class="nav-link">Creative Services</a>
+          <div class="relative">
+  <button id="servicesBtn" class="nav-link">
+    Creative Services ▾
+  </button>
+
+  <div id="servicesDropdown" class="dropdown absolute top-10 left-0 w-56 glass-card p-3 space-y-2 text-sm">
+    <a href="https://www.novyra.co.za/creative-services/social-media-management/" class="block nav-link">Social Media Management</a>
+    <a href="https://www.novyra.co.za/creative-services/content-creation/" class="block nav-link">Content Creation</a>
+    <a href="https://www.novyra.co.za/creative-services/branding/" class="block nav-link">Branding</a>
+    <a href="https://www.novyra.co.za/creative-services/marketing-materials/" class="block nav-link">Marketing Materials</a>
+  </div>
+</div>
 
           <a href="https://www.novyra.co.za/contact-us/"
              class="px-5 py-2 rounded-2xl bg-blue-500 text-white">
@@ -261,7 +276,14 @@ html.dark-mode .service-card:hover{
         <a href="#home" class="nav-link">Home</a>
         <a href="#about" class="nav-link">About</a>
         <a href="#coming-soon" class="nav-link">Coming Soon</a>
-        <a href="#creative-services" class="nav-link">Creative Services</a>
+        <div class="flex flex-col gap-2">
+  <span class="opacity-60 text-xs uppercase">Creative Services</span>
+
+  <a href="https://www.novyra.co.za/creative-services/social-media-management/" class="nav-link">Social Media Management</a>
+  <a href="https://www.novyra.co.za/creative-services/content-creation/" class="nav-link">Content Creation</a>
+  <a href="https://www.novyra.co.za/creative-services/branding/" class="nav-link">Branding</a>
+  <a href="https://www.novyra.co.za/creative-services/marketing-materials/" class="nav-link">Marketing Materials</a>
+</div>
 
         <a href="https://www.novyra.co.za/contact-us/"
            class="px-4 py-2 rounded-xl bg-blue-500 text-white text-center">
@@ -700,6 +722,23 @@ if (localStorage.getItem("novyra-theme") === "dark") {
 
 updateTheme();
 
+  const servicesBtn = document.getElementById("servicesBtn");
+const servicesDropdown = document.getElementById("servicesDropdown");
+
+let servicesOpen = false;
+
+servicesBtn?.addEventListener("click", (e) => {
+  e.stopPropagation();
+  servicesOpen = !servicesOpen;
+  servicesDropdown.classList.toggle("open", servicesOpen);
+});
+
+/* close when clicking outside */
+document.addEventListener("click", () => {
+  servicesOpen = false;
+  servicesDropdown.classList.remove("open");
+});
+  
 </script>
 
 </body>
