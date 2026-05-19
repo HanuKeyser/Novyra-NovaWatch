@@ -80,7 +80,6 @@ html.dark-mode .glass-card{
   cursor: default;
 }
 
-/* BLUE GRADIENT FRAME */
 .about-card::before{
   content: "";
   position: absolute;
@@ -89,7 +88,6 @@ html.dark-mode .glass-card{
   border-radius: 20px;
   background: linear-gradient(135deg, #3b82f6, #93c5fd);
 
-  /* creates the border effect */
   -webkit-mask: 
     linear-gradient(#000 0 0) content-box, 
     linear-gradient(#000 0 0);
@@ -99,11 +97,6 @@ html.dark-mode .glass-card{
   pointer-events: none;
 }
 
-html.dark-mode .about-card{
-  background: rgba(255,255,255,0.05);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-}
-  
 html.dark-mode .about-card{
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.08);
@@ -133,6 +126,12 @@ html.dark-mode .service-card{
   box-shadow: 0 10px 30px rgba(0,0,0,0.35);
 }
 
+html.dark-mode .service-card:hover{
+  transform: translateY(-6px);
+  box-shadow: 0 18px 55px rgba(147, 197, 253, 0.22);
+  border: 1px solid rgba(147, 197, 253, 0.45);
+}
+
 /* ================= NAV ================= */
 .nav-link{
   padding:6px 10px;
@@ -147,23 +146,6 @@ html.dark-mode .service-card{
 .nav-link.active{
   color:#3b82f6;
   background:rgba(59,130,246,0.1);
-}
-
-/* ================= DROPDOWN ================= */
-.dropdown{
-  max-height:0;
-  opacity:0;
-  overflow:hidden;
-  pointer-events:none;
-  transform: translateY(-5px);
-  transition: all .3s ease;
-}
-
-.dropdown.open{
-  max-height:300px;
-  opacity:1;
-  pointer-events:auto;
-  transform: translateY(0);
 }
 
 /* ================= NAV BACKDROP ================= */
@@ -190,6 +172,97 @@ html.dark-mode .service-card{
   transition:.3s ease;
 }
 
+/* ================= DROPDOWN (FINAL PREMIUM VERSION) ================= */
+#servicesDropdown {
+  position: absolute;
+  top: 52px;
+  left: 0;
+  width: 250px;
+
+  /* BASE (LIGHT MODE SAFE TOO) */
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  border-radius: 16px;
+
+  padding: 10px;
+
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+
+  transition: all 0.25s ease;
+  z-index: 60;
+
+  box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+}
+
+/* DROPDOWN LINKS */
+#servicesDropdown .nav-link {
+  color: rgba(255, 255, 255, 0.85);
+  display: block;
+}
+
+#servicesDropdown .nav-link:hover {
+  color: #93c5fd;
+  background: rgba(59, 130, 246, 0.18);
+}
+
+/* OPEN STATE */
+#servicesDropdown.open {
+  opacity: 1;
+  transform: translateY(6px);
+  pointer-events: auto;
+}
+
+/* ================= MOBILE MENU ================= */
+#mobileMenu {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+#mobileMenu.open {
+  max-height: 500px;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* ================= OPTIONAL LIGHT MODE OVERRIDE ================= */
+html:not(.dark-mode) #servicesDropdown {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+html:not(.dark-mode) #servicesDropdown .nav-link {
+  color: rgb(15 23 42);
+}
+
+html:not(.dark-mode) #servicesDropdown .nav-link:hover {
+  background: rgba(59, 130, 246, 0.08);
+  color: #3b82f6;
+}
+
+body {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+body.fade-out {
+  opacity: 0;
+}
+
+/* Optional smoother feel for View Transitions */
+@view-transition {
+  navigation: auto;
+}
+  
 </style>
 </head>
 
@@ -205,32 +278,60 @@ html.dark-mode .service-card{
 
       <div class="h-16 px-6 glass-card flex items-center justify-between">
 
+        <!-- LOGO -->
         <img
           id="navLogo"
           src="Novyra Navigation Bar (Dark Theme).png"
           class="h-10 md:h-12 w-auto"
         >
 
-        <div class="hidden md:flex items-center gap-1 text-sm">
+        <!-- DESKTOP NAV -->
+        <div class="hidden md:flex items-center gap-2 text-sm">
 
           <a href="#home" class="nav-link">Home</a>
           <a href="#about" class="nav-link">About</a>
           <a href="#coming-soon" class="nav-link">Coming Soon</a>
-          <a href="#creative-services" class="nav-link">Creative Services</a>
 
+          <!-- CREATIVE SERVICES (FIXED + TIGHT SPACING) -->
+          <div class="relative flex items-center gap-0">
+
+            <!-- MAIN LINK -->
+            <a href="#creative-services" class="nav-link pr-1">
+              Creative Services
+            </a>
+
+            <!-- DROPDOWN TOGGLE (CLOSER NOW) -->
+            <button id="servicesBtn"
+              class="nav-link px-1 leading-none flex items-center justify-center">
+              <span class="text-[12px]">⮟</span>
+            </button>
+
+            <!-- DROPDOWN -->
+            <div id="servicesDropdown" class="space-y-2 text-sm">
+              <a href="https://www.novyra.co.za/creative-services/social-media-management/" class="block nav-link">Social Media Management</a>
+              <a href="https://www.novyra.co.za/creative-services/content-creation/" class="block nav-link">Content Creation</a>
+              <a href="https://www.novyra.co.za/creative-services/branding/" class="block nav-link">Branding</a>
+              <a href="https://www.novyra.co.za/creative-services/marketing-materials/" class="block nav-link">Marketing Materials</a>
+            </div>
+
+          </div>
+
+          <!-- CONTACT -->
           <a href="https://www.novyra.co.za/contact-us/"
-             class="px-5 py-2 rounded-2xl bg-blue-500 text-white">
+             class="px-5 py-2 rounded-2xl bg-blue-500 text-white ml-2">
             Contact Us
           </a>
 
         </div>
 
+        <!-- MOBILE MENU BUTTON -->
         <button id="menuBtn" class="md:hidden text-xl">☰</button>
 
       </div>
 
     </nav>
 
+    <!-- THEME TOGGLE -->
     <button id="themeToggle"
       class="h-16 w-16 glass-card flex items-center justify-center relative overflow-hidden">
 
@@ -247,15 +348,39 @@ html.dark-mode .service-card{
 
   </div>
 
+  <!-- MOBILE MENU -->
   <div id="mobileMenu" class="dropdown md:hidden mt-3">
+
     <div class="max-w-screen-xl mx-auto px-6">
+
       <div class="glass-card p-6 flex flex-col gap-3 text-sm">
 
         <a href="#home" class="nav-link">Home</a>
         <a href="#about" class="nav-link">About</a>
         <a href="#coming-soon" class="nav-link">Coming Soon</a>
-        <a href="#creative-services" class="nav-link">Creative Services</a>
 
+        <!-- MOBILE -->
+        <a href="#creative-services" class="nav-link">
+          Creative Services
+        </a>
+
+        <a href="https://www.novyra.co.za/creative-services/social-media-management/" class="nav-link pl-4">
+           - Social Media Management
+        </a>
+
+        <a href="https://www.novyra.co.za/creative-services/content-creation/" class="nav-link pl-4">
+           - Content Creation
+        </a>
+
+        <a href="https://www.novyra.co.za/creative-services/branding/" class="nav-link pl-4">
+           - Branding
+        </a>
+
+        <a href="https://www.novyra.co.za/creative-services/marketing-materials/" class="nav-link pl-4">
+           - Marketing Materials
+        </a>
+
+        <!-- CONTACT -->
         <a href="https://www.novyra.co.za/contact-us/"
            class="px-4 py-2 rounded-xl bg-blue-500 text-white text-center">
           Contact Us
@@ -324,9 +449,11 @@ html.dark-mode .service-card{
 
   <!-- Hidden Logo -->
   <img src="Novyra Logo.png" alt="Novyra Logo" class="hidden-assets">
+  <img src="AeroStack Digital Signature.png" alt="AeroStack Digital Logo" class="hidden-assets">
 
   <!-- Hidden Signature GIF -->
   <img src="Novyra Signature.gif" alt="Novyra Signature" class="hidden-assets">
+  <img src="AeroStack Digital Signature.gif" alt="AeroStack Digital Signature" class="hidden-assets">
 
     <style>
     .hidden-assets {
@@ -396,7 +523,7 @@ html.dark-mode .marquee-content{
 </style>
   
 <!-- ABOUT -->
-<section id="about" class="scroll-mt-28 px-6 md:px-10 py-10 md:py-12">
+<section id="about" class="scroll-mt-28 px-6 md:px-10 py-10 md:py-10">
 
   <div class="max-w-7xl mx-auto">
 
@@ -454,7 +581,7 @@ html.dark-mode .marquee-content{
           <div class="mt-8 flex gap-8">
 
             <div>
-              <p class="text-lg font-bold">Novyra is not a word with history - it is a word with intention.</p>
+              <p class="text-base font-bold">Novyra is not a word with history - it is a word with intention.</p>
             </div>
 
           </div>
@@ -499,94 +626,100 @@ html.dark-mode .marquee-content{
 </section>
   
 <!-- CREATIVE SERVICES -->
-<section id="creative-services" class="scroll-mt-28 px-6 md:px-10 py-20">
+<section id="creative-services" class="scroll-mt-28 px-6 md:px-10 py-10 md:py-12">
 
   <div class="max-w-7xl mx-auto">
 
-    <div class="text-left mb-12">
+<!-- HEADER -->
+<div class="mb-12 text-center">
 
-      <h2 class="text-3xl md:text-5xl font-bold mb-4">
-        Creative Services
-      </h2>
+  <h2 class="text-3xl md:text-5xl font-bold mb-4">
+    Our Services
+  </h2>
 
-      <p class="text-base md:text-lg opacity-70 max-w-3xl">
-        A showcase of our creative and strategic services designed to build strong, modern, and high-performing brands.
-      </p>
+<p class="text-base md:text-lg opacity-70 leading-relaxed w-full max-w-5xl mx-auto">
+  We offer a focused range of marketing and design services built to help your brand grow, stay consistent, and stand out across digital and physical platforms, delivering clear, impactful, and professional results.
+</p>
+
+</div>
 
     </div>
 
+    <!-- TOP ROW (3 CARDS) -->
     <div class="grid md:grid-cols-3 gap-6">
 
-      <div class="service-card p-6 flex flex-col justify-between">
-        <div>
-          <h3 class="text-xl font-semibold mb-3">
-            Brand Design
-          </h3>
-
-          <p class="opacity-70 text-sm leading-relaxed">
-            Strategic and visually impactful brand identities designed to create recognition, consistency, and long-term business growth across all digital and physical platforms.
-          </p>
-        </div>
+      <div class="service-card p-6">
+        <h3 class="text-xl font-semibold mb-3">Social Media Management</h3>
+        <p class="opacity-70 text-sm mb-4 leading-relaxed">
+          Consistent, strategic management of your social platforms to keep your brand active, visible, growing.
+        </p>
+        <ul class="text-sm opacity-80 space-y-1">
+          <li>✔ Platform management</li>
+          <li>✔ Content creation</li>
+          <li>✔ Content planning</li>
+          <li>✔ Scheduling</li>
+          <li>✔ Performance tracking</li>
+        </ul>
       </div>
 
-      <div class="service-card p-6 flex flex-col justify-between">
-        <div>
-          <h3 class="text-xl font-semibold mb-3">
-            Content Creation
-          </h3>
-
-          <p class="opacity-70 text-sm leading-relaxed">
-            Professional digital content crafted to increase engagement, strengthen brand communication, and improve audience interaction across multiple social media platforms.
-          </p>
-        </div>
+      <div class="service-card p-6">
+        <h3 class="text-xl font-semibold mb-3">Content Creation</h3>
+        <p class="opacity-70 text-sm mb-4 leading-relaxed">
+          High-quality visuals and messaging designed to capture attention and communicate your brand.
+        </p>
+        <ul class="text-sm opacity-80 space-y-1">
+          <li>✔ Graphics design</li>
+          <li>✔ Short-form videos</li>
+          <li>✔ Caption writing</li>
+          <li>✔ Visual consistency</li>
+          <li>✔ Creative direction</li>
+        </ul>
       </div>
 
-      <div class="service-card p-6 flex flex-col justify-between">
-        <div>
-          <h3 class="text-xl font-semibold mb-3">
-            Digital & Physical Marketing Material
-          </h3>
-
-          <p class="opacity-70 text-sm leading-relaxed">
-            High-quality marketing assets designed for both digital platforms and printed promotional campaigns to maintain a strong and professional brand presence.
-          </p>
-        </div>
+      <div class="service-card p-6">
+        <h3 class="text-xl font-semibold mb-3">Branding</h3>
+        <p class="opacity-70 text-sm mb-4 leading-relaxed">
+          Build a strong, recognisable identity that reflects your business and resonates with your audience.
+        </p>
+        <ul class="text-sm opacity-80 space-y-1">
+          <li>✔ Logo design</li>
+          <li>✔ Brand identity</li>
+          <li>✔ Brand guidelines</li>
+          <li>✔ Rebranding</li>
+          <li>✔ Brand positioning</li>
+        </ul>
       </div>
 
-      <div class="service-card p-6 flex flex-col justify-between">
-        <div>
-          <h3 class="text-xl font-semibold mb-3">
-            Logo Designs
-          </h3>
+    </div>
 
-          <p class="opacity-70 text-sm leading-relaxed">
-            Modern and memorable logo designs created to establish a strong, recognizable, and professional visual identity for growing businesses and brands.
-          </p>
-        </div>
+    <!-- BOTTOM ROW (2 CARDS) -->
+    <div class="grid md:grid-cols-2 gap-6 mt-6">
+
+      <div class="service-card p-6">
+        <h3 class="text-xl font-semibold mb-3">Marketing Materials</h3>
+        <p class="opacity-70 text-sm mb-4 leading-relaxed">
+          Professionally designed materials that enhance your brand presence across print and digital touchpoints.
+        </p>
+        <ul class="text-sm opacity-80 space-y-1">
+          <li>✔ Business cards</li>
+          <li>✔ Email signatures</li>
+          <li>✔ Brochures</li>
+          <li>✔ Flyers & posters</li>
+          <li>✔ Banners & signage</li>
+        </ul>
       </div>
 
-      <div class="service-card p-6 flex flex-col justify-between">
-        <div>
-          <h3 class="text-xl font-semibold mb-3">
-            Social Media Marketing
-          </h3>
-
-          <p class="opacity-70 text-sm leading-relaxed">
-            Performance-focused social media strategies designed to grow visibility, improve engagement, and increase customer reach across major digital platforms.
-          </p>
-        </div>
-      </div>
-
-      <div class="service-card p-6 flex flex-col justify-between">
-        <div>
-          <h3 class="text-xl font-semibold mb-3">
-            Web Design
-          </h3>
-
-          <p class="opacity-70 text-sm leading-relaxed">
-            Responsive and modern websites built to deliver strong user experiences, professional branding, and high-performing digital presence for businesses.
-          </p>
-        </div>
+      <div class="service-card p-6">
+        <h3 class="text-xl font-semibold mb-3">Marketing Strategy</h3>
+        <p class="opacity-70 text-sm mb-4 leading-relaxed">
+          Data-driven planning to guide your marketing efforts and help your brand grow with purpose.
+        </p>
+        <ul class="text-sm opacity-80 space-y-1">
+          <li>✔ Campaign planning</li>
+          <li>✔ Content strategy</li>
+          <li>✔ Audience targeting</li>
+          <li>✔ Growth planning</li>
+        </ul>
       </div>
 
     </div>
@@ -600,93 +733,172 @@ html.dark-mode .marquee-content{
 </footer>
   
 <script>
+document.addEventListener("DOMContentLoaded", () => {
 
-const root = document.documentElement;
+  const root = document.documentElement;
 
-/* ================= NAV ================= */
-const menuBtn = document.getElementById("menuBtn");
-const mobileMenu = document.getElementById("mobileMenu");
-const backdrop = document.getElementById("backdrop");
+  /* ================= NAV ================= */
+  const menuBtn = document.getElementById("menuBtn");
+  const mobileMenu = document.getElementById("mobileMenu");
+  const backdrop = document.getElementById("backdrop");
 
-/* ================= THEME ================= */
-const themeToggle = document.getElementById("themeToggle");
-const navLogo = document.getElementById("navLogo");
-const sunIcon = document.getElementById("sunIcon");
-const moonIcon = document.getElementById("moonIcon");
+  /* ================= THEME ================= */
+  const themeToggle = document.getElementById("themeToggle");
+  const navLogo = document.getElementById("navLogo");
+  const sunIcon = document.getElementById("sunIcon");
+  const moonIcon = document.getElementById("moonIcon");
 
-/* ================= VIDEO ================= */
-const video = document.getElementById("heroVideo");
-const videoSource = document.getElementById("videoSource");
-let playCount = 0;
+  /* ================= VIDEO ================= */
+  const video = document.getElementById("heroVideo");
+  const videoSource = document.getElementById("videoSource");
+  let playCount = 0;
 
-/* ================= MOBILE MENU ================= */
-menuBtn.onclick = () => {
-  mobileMenu.classList.toggle("open");
-  backdrop.classList.toggle("show");
-};
+  /* ================= SERVICES DROPDOWN ================= */
+  const servicesBtn = document.getElementById("servicesBtn");
+  const servicesDropdown = document.getElementById("servicesDropdown");
+  let servicesOpen = false;
 
-backdrop.onclick = () => {
-  mobileMenu.classList.remove("open");
-  backdrop.classList.remove("show");
-};
+  /* ================= MOBILE MENU ================= */
+  if (menuBtn && mobileMenu && backdrop) {
 
-/* close mobile menu on anchor click */
-document.querySelectorAll('a[href^="#"]').forEach(link => {
-  link.addEventListener("click", () => {
-    mobileMenu.classList.remove("open");
-    backdrop.classList.remove("show");
-  });
-});
+    menuBtn.addEventListener("click", () => {
+      mobileMenu.classList.toggle("open");
+      backdrop.classList.toggle("show");
+    });
 
-/* ================= VIDEO CONTROL ================= */
-video.addEventListener("ended", () => {
-  playCount++;
-  if (playCount < 2) {
-    video.currentTime = 0;
-    video.play();
+    backdrop.addEventListener("click", () => {
+      mobileMenu.classList.remove("open");
+      backdrop.classList.remove("show");
+    });
+
+    document.querySelectorAll('#mobileMenu a').forEach(link => {
+      link.addEventListener("click", () => {
+        mobileMenu.classList.remove("open");
+        backdrop.classList.remove("show");
+      });
+    });
   }
-});
 
-/* ================= THEME SYSTEM ================= */
-function updateTheme(){
+  /* ================= VIDEO CONTROL ================= */
+  if (video) {
+    video.addEventListener("ended", () => {
+      playCount++;
 
-  const isDark = root.classList.contains("dark-mode");
+      if (playCount < 2) {
+        video.currentTime = 0;
+        video.play();
+      }
+    });
+  }
 
-  navLogo.src = isDark
-    ? "Novyra Navigation Bar (Dark Theme).png"
-    : "Novyra Navigation Bar (Light Theme).png";
+  /* ================= THEME SYSTEM ================= */
+  function updateTheme() {
+    const isDark = root.classList.contains("dark-mode");
 
-  videoSource.src = isDark
-    ? "Novyra Logo Reveal Landscape (Dark Theme).mp4"
-    : "Novyra Logo Reveal Landscape (Light Theme).mp4";
+    if (navLogo) {
+      navLogo.src = isDark
+        ? "Novyra Navigation Bar (Dark Theme).png"
+        : "Novyra Navigation Bar (Light Theme).png";
+    }
 
-  video.load();
-  video.play();
+    if (video && videoSource) {
+      videoSource.src = isDark
+        ? "Novyra Logo Reveal Landscape (Dark Theme).mp4"
+        : "Novyra Logo Reveal Landscape (Light Theme).mp4";
 
-  playCount = 0;
+      video.load();
+      video.play().catch(() => {});
+      playCount = 0;
+    }
 
-  sunIcon.style.opacity = isDark ? "0" : "1";
-  moonIcon.style.opacity = isDark ? "1" : "0";
-}
+    if (sunIcon && moonIcon) {
+      sunIcon.style.opacity = isDark ? "0" : "1";
+      moonIcon.style.opacity = isDark ? "1" : "0";
+    }
+  }
 
-themeToggle.onclick = () => {
-  root.classList.toggle("dark-mode");
+  if (themeToggle) {
+    themeToggle.addEventListener("click", () => {
+      root.classList.toggle("dark-mode");
 
-  localStorage.setItem(
-    "novyra-theme",
-    root.classList.contains("dark-mode") ? "dark" : "light"
-  );
+      localStorage.setItem(
+        "novyra-theme",
+        root.classList.contains("dark-mode") ? "dark" : "light"
+      );
+
+      updateTheme();
+    });
+  }
+
+  /* load saved theme */
+  if (localStorage.getItem("novyra-theme") === "dark") {
+    root.classList.add("dark-mode");
+  }
 
   updateTheme();
-};
 
-/* load saved theme */
-if (localStorage.getItem("novyra-theme") === "dark") {
-  root.classList.add("dark-mode");
-}
+  /* ================= SERVICES DROPDOWN ================= */
+  if (servicesBtn && servicesDropdown) {
 
-updateTheme();
+    servicesBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      servicesOpen = !servicesOpen;
+      servicesDropdown.classList.toggle("open", servicesOpen);
+    });
 
+    document.addEventListener("click", () => {
+      servicesOpen = false;
+      servicesDropdown.classList.remove("open");
+    });
+
+    document.querySelectorAll('#servicesDropdown a').forEach(link => {
+      link.addEventListener("click", () => {
+        servicesOpen = false;
+        servicesDropdown.classList.remove("open");
+      });
+    });
+  }
+
+  /* ================= PAGE TRANSITIONS ================= */
+  const links = document.querySelectorAll("a");
+
+  function isInternalLink(href) {
+    if (!href) return false;
+
+    return (
+      href.startsWith("/") ||
+      href.includes("novyra.co.za")
+    );
+  }
+
+  links.forEach(link => {
+    const href = link.getAttribute("href");
+
+    if (!isInternalLink(href)) return;
+
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      if (document.startViewTransition) {
+        document.startViewTransition(() => {
+          window.location.href = href;
+        });
+      } else {
+        document.body.classList.add("fade-out");
+
+        setTimeout(() => {
+          window.location.href = href;
+        }, 250);
+      }
+    });
+  });
+
+  /* fade-in fallback */
+  window.addEventListener("load", () => {
+    document.body.classList.remove("fade-out");
+  });
+
+});
 </script>
 
 </body>
