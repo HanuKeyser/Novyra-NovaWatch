@@ -279,6 +279,65 @@ body.fade-out {
 @view-transition {
   navigation: auto;
 }
+
+/* ================= NOVYRA CONTACT STYLES ================= */
+
+/* Glass Card Base */
+.glass-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-radius: 24px;
+  transition: all 0.3s ease;
+}
+
+/* Hover lift */
+.glass-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(59, 130, 246, 0.35);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+/* Smooth buttons */
+button,
+a {
+  transition: all 0.25s ease;
+}
+
+/* Primary hover glow */
+.bg-blue-500:hover {
+  box-shadow: 0 0 25px rgba(59, 130, 246, 0.45);
+}
+
+/* Social card hover glow overlay support */
+.group:hover .group-hover\:opacity-100 {
+  opacity: 1;
+}
+
+/* Floating animation (optional hero feel) */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0px); }
+}
+
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Input focus styling */
+input:focus,
+textarea:focus {
+  outline: none;
+  border: 1px solid rgba(59, 130, 246, 0.6);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+/* Smooth page feel */
+html {
+  scroll-behavior: smooth;
+}
   
 </style>
 </head>
@@ -510,8 +569,10 @@ body.fade-out {
 
           <div class="flex flex-col gap-4">
 
-            <!-- ================= INSTAGRAM ================= -->
-            <a href="#"
+            <!-- INSTAGRAM -->
+            <a href="https://www.instagram.com/novyra.co.za/"
+               target="_blank"
+               rel="noopener noreferrer"
                class="group relative overflow-hidden rounded-2xl glass-card p-5 transition duration-300 hover:scale-[1.02]">
 
               <div class="absolute inset-0 bg-gradient-to-r from-pink-500/20 via-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition"></div>
@@ -520,37 +581,24 @@ body.fade-out {
 
                 <div class="flex items-center gap-4">
 
-                  <!-- ICON -->
                   <div class="w-10 h-10 rounded-xl bg-pink-500/15 flex items-center justify-center opacity-100">
-
                     <svg xmlns="http://www.w3.org/2000/svg"
                          width="20"
                          height="20"
                          viewBox="0 0 24 24"
-                         fill="#ffffff"
-                         class="opacity-100">
-
+                         fill="#ffffff">
                       <path d="M7.75 2C4.574 2 2 4.574 2 7.75v8.5C2 19.426 4.574 22 7.75 22h8.5C19.426 22 22 19.426 22 16.25v-8.5C22 4.574 19.426 2 16.25 2h-8.5zm0 2h8.5A3.75 3.75 0 0 1 20 7.75v8.5A3.75 3.75 0 0 1 16.25 20h-8.5A3.75 3.75 0 0 1 4 16.25v-8.5A3.75 3.75 0 0 1 7.75 4zm9.5 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zM12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/>
-
                     </svg>
-
                   </div>
 
                   <div>
-                    <p class="text-sm opacity-50 uppercase tracking-widest">
-                      Instagram
-                    </p>
-
-                    <p class="text-lg font-semibold">
-                      Visual Identity
-                    </p>
+                    <p class="text-sm opacity-50 uppercase tracking-widest">Instagram</p>
+                    <p class="text-lg font-semibold">@novyra.co.za</p>
                   </div>
 
                 </div>
 
-                <div class="text-xl opacity-60 group-hover:translate-x-1 transition">
-                  →
-                </div>
+                <div class="text-xl opacity-60 group-hover:translate-x-1 transition">→</div>
 
               </div>
 
@@ -560,8 +608,10 @@ body.fade-out {
 
             </a>
 
-            <!-- ================= LINKEDIN ================= -->
-            <a href="#"
+            <!-- LINKEDIN -->
+            <a href="https://www.linkedin.com/company/novyramarketing/"
+               target="_blank"
+               rel="noopener noreferrer"
                class="group relative overflow-hidden rounded-2xl glass-card p-5 transition duration-300 hover:scale-[1.02]">
 
               <div class="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition"></div>
@@ -570,37 +620,24 @@ body.fade-out {
 
                 <div class="flex items-center gap-4">
 
-<!-- ICON -->
-<div class="w-10 h-10 rounded-xl bg-blue-500/15 flex items-center justify-center opacity-100">
-
-  <svg xmlns="http://www.w3.org/2000/svg"
-       width="20"
-       height="20"
-       viewBox="0 0 24 24"
-       fill="#ffffff"
-       class="opacity-100">
-
-    <path d="M6.94 8.5H3.56V20h3.38V8.5zM5.25 7.06c1.08 0 1.75-.72 1.75-1.62-.02-.92-.67-1.62-1.73-1.62S3.5 4.52 3.5 5.44c0 .9.69 1.62 1.73 1.62zM20.5 20h-3.38v-6.1c0-1.53-.55-2.58-1.92-2.58-1.05 0-1.67.7-1.94 1.38-.1.24-.13.58-.13.92V20H9.75s.04-10.5 0-11.5h3.38v1.63c.45-.69 1.25-1.67 3.04-1.67 2.22 0 3.88 1.45 3.88 4.56V20z"/>
-
-  </svg>
-
-</div>
+                  <div class="w-10 h-10 rounded-xl bg-blue-500/15 flex items-center justify-center opacity-100">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         width="20"
+                         height="20"
+                         viewBox="0 0 24 24"
+                         fill="#ffffff">
+                      <path d="M6.94 8.5H3.56V20h3.38V8.5zM5.25 7.06c1.08 0 1.75-.72 1.75-1.62-.02-.92-.67-1.62-1.73-1.62S3.5 4.52 3.5 5.44c0 .9.69 1.62 1.73 1.62zM20.5 20h-3.38v-6.1c0-1.53-.55-2.58-1.92-2.58-1.05 0-1.67.7-1.94 1.38-.1.24-.13.58-.13.92V20H9.75V8h3.38v1.63c.45-.69 1.25-1.67 3.04-1.67 2.22 0 3.88 1.45 3.88 4.56V20z"/>
+                    </svg>
+                  </div>
 
                   <div>
-                    <p class="text-sm opacity-50 uppercase tracking-widest">
-                      LinkedIn
-                    </p>
-
-                    <p class="text-lg font-semibold">
-                      Business Network
-                    </p>
+                    <p class="text-sm opacity-50 uppercase tracking-widest">LinkedIn</p>
+                    <p class="text-lg font-semibold">Novyra Marketing</p>
                   </div>
 
                 </div>
 
-                <div class="text-xl opacity-60 group-hover:translate-x-1 transition">
-                  →
-                </div>
+                <div class="text-xl opacity-60 group-hover:translate-x-1 transition">→</div>
 
               </div>
 
@@ -627,45 +664,34 @@ body.fade-out {
           Your email app will open with your message pre-filled.
         </p>
 
-        <!-- ================= FORM ================= -->
         <form action="mailto:info@novyra.co.za?subject=Novyra%20Website%20Enquiry"
               method="get"
               enctype="text/plain"
               class="space-y-5">
 
-          <!-- NAME -->
           <input type="text"
                  name="name"
                  placeholder="Your Name"
-                 required
                  class="w-full px-5 py-3 rounded-2xl glass-card outline-none" />
 
-          <!-- COMPANY -->
           <input type="text"
                  name="company"
                  placeholder="Company Name (Optional)"
                  class="w-full px-5 py-3 rounded-2xl glass-card outline-none" />
 
-          <!-- EMAIL -->
           <input type="email"
                  name="email"
                  placeholder="Your Email"
-                 required
                  class="w-full px-5 py-3 rounded-2xl glass-card outline-none" />
 
-          <!-- MESSAGE -->
           <textarea name="message"
                     rows="6"
                     placeholder="Your Message..."
-                    required
                     class="w-full px-5 py-3 rounded-2xl glass-card outline-none resize-none"></textarea>
 
-          <!-- BUTTON -->
           <button type="submit"
                   class="w-full px-6 py-3 rounded-2xl bg-blue-500 text-white hover:bg-blue-600 transition font-semibold">
-
             Send Message
-
           </button>
 
         </form>
@@ -678,62 +704,71 @@ body.fade-out {
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
 
       <!-- GENERAL -->
-      <div class="glass-card p-6 rounded-2xl hover:scale-[1.02] transition">
+      <div class="glass-card p-6 rounded-2xl hover:scale-[1.02] transition flex flex-col">
 
         <p class="uppercase tracking-widest text-xs opacity-50 mb-2">
           General
         </p>
 
         <a href="mailto:info@novyra.co.za"
-           class="text-lg font-semibold hover:text-blue-500 transition block mb-2">
-
+           class="text-lg font-semibold hover:text-blue-500 transition block mb-3">
           info@novyra.co.za
-
         </a>
 
-        <p class="text-sm opacity-60 leading-relaxed">
-          General enquiries, support requests, and company information.
+        <p class="text-sm opacity-60 mb-6">
+          General enquiries and company information.
         </p>
+
+        <a href="mailto:info@novyra.co.za?subject=Message%20from%20Website%20for%20General"
+           class="mt-auto inline-flex justify-center px-5 py-3 rounded-2xl bg-blue-500 text-white hover:bg-blue-600 transition">
+          Send Email
+        </a>
 
       </div>
 
       <!-- SALES -->
-      <div class="glass-card p-6 rounded-2xl hover:scale-[1.02] transition">
+      <div class="glass-card p-6 rounded-2xl hover:scale-[1.02] transition flex flex-col">
 
         <p class="uppercase tracking-widest text-xs opacity-50 mb-2">
           Sales
         </p>
 
         <a href="mailto:sales@novyra.co.za"
-           class="text-lg font-semibold hover:text-blue-500 transition block mb-2">
-
+           class="text-lg font-semibold hover:text-blue-500 transition block mb-3">
           sales@novyra.co.za
-
         </a>
 
-        <p class="text-sm opacity-60 leading-relaxed">
+        <p class="text-sm opacity-60 mb-6">
           Quotes, project inquiries, and service pricing discussions.
         </p>
+
+        <a href="mailto:sales@novyra.co.za?subject=Message%20from%20Website%20for%20Sales"
+           class="mt-auto inline-flex justify-center px-5 py-3 rounded-2xl bg-blue-500 text-white hover:bg-blue-600 transition">
+          Send Email
+        </a>
 
       </div>
 
       <!-- FINANCE -->
-      <div class="glass-card p-6 rounded-2xl hover:scale-[1.02] transition">
+      <div class="glass-card p-6 rounded-2xl hover:scale-[1.02] transition flex flex-col">
 
         <p class="uppercase tracking-widest text-xs opacity-50 mb-2">
           Finance
         </p>
 
         <a href="mailto:finance@novyra.co.za"
-           class="text-lg font-semibold hover:text-blue-500 transition block mb-2">
-
+           class="text-lg font-semibold hover:text-blue-500 transition block mb-3">
           finance@novyra.co.za
-
         </a>
 
-        <p class="text-sm opacity-60 leading-relaxed">
+        <p class="text-sm opacity-60 mb-6">
           Invoices, payments, billing queries, and account support.
         </p>
+
+        <a href="mailto:finance@novyra.co.za?subject=Message%20from%20Website%20for%20Finance"
+           class="mt-auto inline-flex justify-center px-5 py-3 rounded-2xl bg-blue-500 text-white hover:bg-blue-600 transition">
+          Send Email
+        </a>
 
       </div>
 
@@ -877,6 +912,31 @@ links.forEach(link => {
 window.addEventListener("load", () => {
   document.body.classList.remove("fade-out");
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+
+  const form = document.querySelector("form");
+  const button = form?.querySelector("button");
+
+  if (!form || !button) return;
+
+  form.addEventListener("submit", function () {
+
+    // Button loading state
+    button.innerText = "Opening Email...";
+    button.style.opacity = "0.8";
+    button.style.transform = "scale(0.98)";
+
+    setTimeout(() => {
+      button.innerText = "Send Message";
+      button.style.opacity = "1";
+      button.style.transform = "scale(1)";
+    }, 2500);
+
+  });
+
+});
+
 </script>
 
 </body>
