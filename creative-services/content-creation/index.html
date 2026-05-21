@@ -692,173 +692,51 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const root = document.documentElement;
 
-  /* ================= KEY ================= */
+  /* ================= CART KEY ================= */
   const CART_KEY = "novyra-cart";
 
   /* ================= ELEMENTS ================= */
-  const menuBtn = document.getElementById("menuBtn");
-  const mobileMenu = document.getElementById("mobileMenu");
-  const backdrop = document.getElementById("backdrop");
-
-  const themeToggle = document.getElementById("themeToggle");
-  const navLogo = document.getElementById("navLogo");
-  const sunIcon = document.getElementById("sunIcon");
-  const moonIcon = document.getElementById("moonIcon");
-
-  const servicesBtn = document.getElementById("servicesBtn");
-  const servicesDropdown = document.getElementById("servicesDropdown");
-
   const cartBtn = document.getElementById("cartBtn");
   const cartModal = document.getElementById("cartModal");
   const closeCart = document.getElementById("closeCart");
   const checkoutBtn = document.getElementById("checkoutBtn");
-
   const cartContent = document.getElementById("cartContent");
   const cartCount = document.getElementById("cartCount");
 
-  /* ================= CART STATE ================= */
-  let cart = {
-    package: null,
-    extras: []
-  };
+  /* ================= GLOBAL CART ================= */
+  let cart = { package: null, extras: [] };
 
-  /* ================= LOAD CART ================= */
+  /* ================= LOAD ================= */
   function loadCart() {
     try {
       const saved = localStorage.getItem(CART_KEY);
       if (!saved) return;
 
       const parsed = JSON.parse(saved);
+
       cart.package = parsed.package || null;
       cart.extras = Array.isArray(parsed.extras) ? parsed.extras : [];
-    } catch (err) {
+
+    } catch (e) {
       cart = { package: null, extras: [] };
     }
   }
 
-  /* ================= SAVE CART ================= */
+  /* ================= SAVE ================= */
   function saveCart() {
     localStorage.setItem(CART_KEY, JSON.stringify(cart));
-    updateCartCount();
+    updateCount();
   }
 
   /* ================= COUNT ================= */
-  function updateCartCount() {
+  function updateCount() {
     if (!cartCount) return;
 
-    const totalItems =
-      (cart.package ? 1 : 0) + cart.extras.length;
-
-    cartCount.textContent = totalItems;
+    const total = (cart.package ? 1 : 0) + cart.extras.length;
+    cartCount.textContent = total;
   }
 
-  /* ================= MOBILE MENU ================= */
-  if (menuBtn && mobileMenu && backdrop) {
-    menuBtn.addEventListener("click", () => {
-      mobileMenu.classList.toggle("open");
-      backdrop.classList.toggle("show");
-    });
-
-    backdrop.addEventListener("click", () => {
-      mobileMenu.classList.remove("open");
-      backdrop.classList.remove("show");
-    });
-  }
-
-  /* ================= THEME ================= */
-  function updateTheme() {
-    const isDark = root.classList.contains("dark-mode");
-
-    if (navLogo) {
-      navLogo.src = isDark
-        ? "Novyra Navigation Bar (Dark Theme).png"
-        : "Novyra Navigation Bar (Light Theme).png";
-    }
-
-    if (sunIcon && moonIcon) {
-      sunIcon.style.opacity = isDark ? "0" : "1";
-      moonIcon.style.opacity = isDark ? "1" : "0";
-    }
-  }
-
-  const savedTheme = localStorage.getItem("novyra-theme");
-  if (savedTheme === "dark") root.classList.add("dark-mode");
-  updateTheme();
-
-  themeToggle?.addEventListener("click", () => {
-    root.classList.toggle("dark-mode");
-
-    localStorage.setItem(
-      "novyra-theme",
-      root.classList.contains("dark-mode") ? "dark" : "light"
-    );
-
-    updateTheme();
-  });
-
-  /* ================= SERVICES DROPDOWN ================= */
-  let servicesOpen = false;
-
-  servicesBtn?.addEventListener("click", (e) => {
-    e.stopPropagation();
-    servicesOpen = !servicesOpen;
-    servicesDropdown?.classList.toggle("open", servicesOpen);
-  });
-
-  document.addEventListener("click", () => {
-    servicesOpen = false;
-    servicesDropdown?.classList.remove("open");
-  });
-
-  /* ================= PACKAGE + EXTRAS ================= */
-  document.addEventListener("click", (e) => {
-
-    /* ---------- PACKAGE ---------- */
-    const pkgBtn = e.target.closest(".select-btn");
-
-    if (pkgBtn) {
-      const name = pkgBtn.dataset.name;
-      const price = Number(pkgBtn.dataset.price);
-
-      if (cart.package && cart.package.name === name) {
-        cart.package = null;
-        pkgBtn.classList.remove("active-package");
-      } else {
-        document.querySelectorAll(".select-btn")
-          .forEach(b => b.classList.remove("active-package"));
-
-        cart.package = { name, price };
-        pkgBtn.classList.add("active-package");
-      }
-
-      saveCart();
-      return;
-    }
-
-    /* ---------- EXTRAS ---------- */
-    const extraBtn = e.target.closest(".extra-btn");
-
-    if (extraBtn) {
-      const name = extraBtn.dataset.name;
-      const price = Number(extraBtn.dataset.price);
-
-      const index = cart.extras.findIndex(e => e.name === name);
-
-      if (index > -1) {
-        cart.extras.splice(index, 1);
-        extraBtn.classList.remove("active");
-        extraBtn.textContent = "Add Option";
-      } else {
-        cart.extras.push({ name, price });
-        extraBtn.classList.add("active");
-        extraBtn.textContent = "Added";
-      }
-
-      saveCart();
-    }
-  });
-
-  /* ================= CART RENDER ================= */
+  /* ================= RENDER CART ================= */
   function renderCart() {
     if (!cartContent) return;
 
@@ -868,10 +746,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (cart.package) {
       total += cart.package.price;
       html += `
-        <div>
-          <strong>Package:</strong><br>
-          ${cart.package.name} - R${cart.package.price}
-        </div>
+        <div><strong>Package:</strong><br>
+        ${cart.package.name} - R${cart.package.price}</div>
       `;
     } else {
       html += `<div>No package selected</div>`;
@@ -879,12 +755,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (cart.extras.length) {
       html += `<div class="mt-3"><strong>Extras:</strong><br>`;
-
       cart.extras.forEach(ex => {
         total += ex.price;
         html += `• ${ex.name} - R${ex.price}<br>`;
       });
-
       html += `</div>`;
     }
 
@@ -897,7 +771,7 @@ document.addEventListener("DOMContentLoaded", () => {
     cartContent.innerHTML = html;
   }
 
-  /* ================= MODAL ================= */
+  /* ================= OPEN / CLOSE ================= */
   function openCart() {
     renderCart();
     cartModal?.classList.remove("hidden");
@@ -916,18 +790,57 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target === cartModal) closeCartModal();
   });
 
-  /* ================= RESTORE UI ================= */
-  function restoreUIState() {
+  /* ================= PACKAGE SELECT ================= */
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".select-btn");
+
+    if (!btn) return;
+
+    const name = btn.dataset.name;
+    const price = Number(btn.dataset.price);
+
+    if (cart.package?.name === name) {
+      cart.package = null;
+    } else {
+      cart.package = { name, price };
+    }
+
+    saveCart();
+    syncUI();
+  });
+
+  /* ================= EXTRAS ================= */
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".extra-btn");
+    if (!btn) return;
+
+    const name = btn.dataset.name;
+    const price = Number(btn.dataset.price);
+
+    const index = cart.extras.findIndex(x => x.name === name);
+
+    if (index > -1) {
+      cart.extras.splice(index, 1);
+    } else {
+      cart.extras.push({ name, price });
+    }
+
+    saveCart();
+    syncUI();
+  });
+
+  /* ================= SYNC UI ================= */
+  function syncUI() {
 
     document.querySelectorAll(".select-btn").forEach(btn => {
       btn.classList.toggle(
         "active-package",
-        cart.package && btn.dataset.name === cart.package.name
+        cart.package?.name === btn.dataset.name
       );
     });
 
     document.querySelectorAll(".extra-btn").forEach(btn => {
-      const exists = cart.extras.find(e => e.name === btn.dataset.name);
+      const exists = cart.extras.find(x => x.name === btn.dataset.name);
 
       if (exists) {
         btn.classList.add("active");
@@ -938,19 +851,17 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    updateCartCount();
+    updateCount();
   }
 
   /* ================= CHECKOUT ================= */
-  function checkoutCart() {
-
+  function checkout() {
     if (!cart.package) {
       alert("Please select a package first.");
       return;
     }
 
-    let body = `Hey Novyra Team,%0D%0A%0D%0A`;
-    body += `I would like to request a content package:%0D%0A%0D%0A`;
+    let body = `Hey Novyra,%0D%0A%0D%0ARequest:%0D%0A%0D%0A`;
 
     body += `PACKAGE:%0D%0A${cart.package.name} - R${cart.package.price}%0D%0A%0D%0A`;
     body += `EXTRAS:%0D%0A`;
@@ -958,24 +869,21 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!cart.extras.length) {
       body += `None%0D%0A`;
     } else {
-      cart.extras.forEach(ex => {
-        body += `- ${ex.name} - R${ex.price}%0D%0A`;
+      cart.extras.forEach(e => {
+        body += `- ${e.name} - R${e.price}%0D%0A`;
       });
     }
 
-    const mailUrl =
-      `mailto:sales@novyra.co.za?subject=Content%20Package%20Request&body=${body}`;
-
-    window.location.href = mailUrl;
+    window.location.href =
+      `mailto:sales@novyra.co.za?subject=Quote Request&body=${body}`;
   }
 
-  checkoutBtn?.addEventListener("click", checkoutCart);
+  checkoutBtn?.addEventListener("click", checkout);
 
-  /* ================= INIT ================= */
+  /* ================= INIT (IMPORTANT FIX) ================= */
   function init() {
     loadCart();
-    updateCartCount();
-    restoreUIState();
+    syncUI();   // <- THIS is what fixes cross-page mismatch
   }
 
   window.addEventListener("pageshow", init);
@@ -983,12 +891,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   init();
 
-  /* ================= SYNC ACROSS PAGES ================= */
+  /* ================= CROSS PAGE SYNC ================= */
   window.addEventListener("storage", (e) => {
     if (e.key === CART_KEY) {
       loadCart();
-      updateCartCount();
-      restoreUIState();
+      syncUI();
     }
   });
 
