@@ -772,29 +772,11 @@ const cartModal = document.getElementById("cartModal");
 const closeCart = document.getElementById("closeCart");
 const checkoutBtn = document.getElementById("checkoutBtn");
 
-/* ================= SAFE CART INIT ================= */
+/* ================= CART (SESSION ONLY - NO LOCALSTORAGE) ================= */
 let cart = {
   package: null,
   extras: []
 };
-
-try {
-  const saved = JSON.parse(localStorage.getItem("novyra-cart"));
-  if (saved && typeof saved === "object") {
-    cart = {
-      package: saved.package || null,
-      extras: Array.isArray(saved.extras) ? saved.extras : []
-    };
-  }
-} catch (e) {
-  console.warn("Cart reset due to corrupted storage");
-}
-
-/* ================= SAVE CART ================= */
-function saveCart() {
-  localStorage.setItem("novyra-cart", JSON.stringify(cart));
-  updateCartCount();
-}
 
 /* ================= CART COUNT ================= */
 function updateCartCount() {
@@ -806,6 +788,11 @@ function updateCartCount() {
     (Array.isArray(cart.extras) ? cart.extras.length : 0);
 
   el.textContent = total;
+}
+
+/* ================= SAVE CART (SESSION ONLY) ================= */
+function saveCart() {
+  updateCartCount();
 }
 
 /* ================= MOBILE MENU ================= */
