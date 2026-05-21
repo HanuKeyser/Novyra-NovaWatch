@@ -781,7 +781,7 @@ let cart = {
 /* ================= LOAD CART ================= */
 function loadCart() {
   try {
-    const saved = localStorage.getItem("novyra-cart");
+    const saved = localStorage.getItem(CART_KEY)
     if (!saved) return;
 
     const parsed = JSON.parse(saved);
@@ -794,7 +794,7 @@ function loadCart() {
 
 /* ================= SAVE CART ================= */
 function saveCart() {
-  localStorage.setItem("novyra-cart", JSON.stringify(cart));
+  localStorage.setItem(CART_KEY, JSON.stringify(cart))
   updateCartCount();
 }
 
@@ -855,41 +855,37 @@ themeToggle?.addEventListener("click", () => {
   updateTheme();
 });
 
-/* ================= SERVICES DROPDOWN (FIXED) ================= */
+/* ================= SERVICES DROPDOWN ================= */
+let servicesOpen = false;
+
 servicesBtn?.addEventListener("click", (e) => {
   e.stopPropagation();
-  servicesDropdown?.classList.toggle("open");
+  servicesOpen = !servicesOpen;
+  servicesDropdown.classList.toggle("open", servicesOpen);
 });
 
-document.addEventListener("click", (e) => {
-  if (
-    servicesDropdown &&
-    !servicesDropdown.contains(e.target) &&
-    e.target !== servicesBtn
-  ) {
-    servicesDropdown.classList.remove("open");
-  }
+document.addEventListener("click", () => {
+  servicesOpen = false;
+  servicesDropdown?.classList.remove("open");
 });
 
 /* ================= CART LOGIC ================= */
 document.addEventListener("click", (e) => {
 
-  /* ===== PACKAGE SELECT (FIXED) ===== */
+  /* ===== PACKAGE SELECT ===== */
   const pkgBtn = e.target.closest(".select-btn");
   if (pkgBtn) {
 
     const name = pkgBtn.dataset.name;
     const price = Number(pkgBtn.dataset.price);
 
-    const isSame =
-      cart.package && cart.package.name === name;
-
-    document.querySelectorAll(".select-btn")
-      .forEach(b => b.classList.remove("active-package"));
-
-    if (isSame) {
+    if (cart.package && cart.package.name === name) {
       cart.package = null;
+      pkgBtn.classList.remove("active-package");
     } else {
+      document.querySelectorAll(".select-btn")
+        .forEach(b => b.classList.remove("active-package"));
+
       cart.package = { name, price };
       pkgBtn.classList.add("active-package");
     }
@@ -994,7 +990,7 @@ function restoreUIState() {
   updateCartCount();
 }
 
-/* ================= CHECKOUT (FIXED) ================= */
+/* ================= CHECKOUT ================= */
 function checkoutCart() {
 
   if (!cart.package) {
@@ -1017,9 +1013,8 @@ function checkoutCart() {
 
   body = encodeURIComponent(body);
 
-  window.open(
-    `mailto:sales@novyra.co.za?subject=New%20Quote%20Request%20From%20Website&body=${body}`
-  );
+  window.location.href =
+    `mailto:sales@novyra.co.za?subject=New%20Quote%20Request%20From%20Website&body=${body}`;
 }
 
 /* ================= EVENTS ================= */
@@ -1038,7 +1033,13 @@ function initCart() {
   restoreUIState();
 }
 
+/* Run on page load (including back/forward navigation) */
 window.addEventListener("pageshow", initCart);
+
+/* Run when user returns to tab / page refocus */
+window.addEventListener("focus", initCart);
+
+/* Initial run */
 initCart();
 
 /* ================= SYNC BETWEEN PAGES ================= */
@@ -1048,8 +1049,6 @@ window.addEventListener("storage", (e) => {
     updateCartCount();
     restoreUIState();
   }
-});
-
 });
 </script>
 
