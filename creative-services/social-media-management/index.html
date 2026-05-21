@@ -1032,11 +1032,11 @@ let cart = {
     body += `I would like a quote for:%0D%0A%0D%0A`;
 
     /* ===== PACKAGE ===== */
-    body += `PACKAGE:%0D%0A`;
+    body += `Package:%0D%0A`;
     body += `${cart.socialMedia.name} - R${cart.socialMedia.price}%0D%0A%0D%0A`;
 
     /* ===== EXTRAS ===== */
-    body += `EXTRAS:%0D%0A`;
+    body += `Extras:%0D%0A`;
 
     if (!cart.extras.length) {
 
@@ -1051,7 +1051,7 @@ let cart = {
     }
 
     window.location.href =
-      `mailto:sales@novyra.co.za?subject=Quote Request&body=${body}`;
+      `mailto:sales@novyra.co.za?subject=Quote Request from Website&body=${body}`;
   }
 
   checkoutBtn?.addEventListener("click", checkoutCart);
