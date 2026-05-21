@@ -980,7 +980,7 @@ document.addEventListener("DOMContentLoaded", () => {
     /* ===== SOCIAL MEDIA ===== */
     if (cart.socialMedia) {
 
-      body += `SOCIAL MEDIA PACKAGE:%0D%0A`;
+      body += `Social Media Package:%0D%0A`;
       body += `${cart.socialMedia.name} - R${cart.socialMedia.price}%0D%0A%0D%0A`;
 
     }
@@ -988,13 +988,13 @@ document.addEventListener("DOMContentLoaded", () => {
     /* ===== CONTENT CREATION ===== */
     if (cart.contentCreation) {
 
-      body += `CONTENT CREATION PACKAGE:%0D%0A`;
+      body += `Content Creation Package:%0D%0A`;
       body += `${cart.contentCreation.name} - R${cart.contentCreation.price}%0D%0A%0D%0A`;
 
     }
 
     /* ===== EXTRAS ===== */
-    body += `EXTRAS:%0D%0A`;
+    body += `Extras:%0D%0A`;
 
     if (!cart.extras.length) {
 
@@ -1011,7 +1011,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     window.location.href =
-      `mailto:sales@novyra.co.za?subject=Quote Request&body=${body}`;
+      `mailto:sales@novyra.co.za?subject=Quote Request from Website&body=${body}`;
 
   }
 
