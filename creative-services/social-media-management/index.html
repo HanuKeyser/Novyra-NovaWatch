@@ -750,6 +750,16 @@ html.dark-mode .extra-item{
 </footer>
 
 <script>
+const CART_KEY = "novyra-cart";
+const SESSION_KEY = "novyra-session-init";
+
+/* ===== SESSION START DETECTION ===== */
+if (!sessionStorage.getItem(SESSION_KEY)) {
+  // new tab/session → clear cart once
+  localStorage.removeItem(CART_KEY);
+  sessionStorage.setItem(SESSION_KEY, "true");
+}
+  
 document.addEventListener("DOMContentLoaded", () => {
 
 const root = document.documentElement;
@@ -781,7 +791,7 @@ let cart = {
 /* ================= LOAD / SAVE ================= */
 function loadCart() {
   try {
-    const saved = sessionStorage.getItem("novyra-cart");
+    const saved = localStorage.getItem("novyra-cart");
     if (!saved) return;
 
     const parsed = JSON.parse(saved);
@@ -793,7 +803,7 @@ function loadCart() {
 }
 
 function saveCart() {
-  sessionStorage.setItem("novyra-cart", JSON.stringify(cart));
+  localStorage.setItem("novyra-cart", JSON.stringify(cart));
   updateCartCount();
 }
 
