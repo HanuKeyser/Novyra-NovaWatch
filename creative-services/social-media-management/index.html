@@ -772,28 +772,26 @@ const cartModal = document.getElementById("cartModal");
 const closeCart = document.getElementById("closeCart");
 const checkoutBtn = document.getElementById("checkoutBtn");
 
-/* ================= CART (SESSION STORAGE) ================= */
+/* ================= CART ================= */
 let cart = {
   package: null,
   extras: []
 };
 
-/* ================= LOAD CART ================= */
+/* ================= LOAD / SAVE ================= */
 function loadCart() {
   try {
     const saved = sessionStorage.getItem("novyra-cart");
     if (!saved) return;
 
     const parsed = JSON.parse(saved);
-
     cart.package = parsed.package || null;
     cart.extras = Array.isArray(parsed.extras) ? parsed.extras : [];
-  } catch (e) {
+  } catch {
     cart = { package: null, extras: [] };
   }
 }
 
-/* ================= SAVE CART ================= */
 function saveCart() {
   sessionStorage.setItem("novyra-cart", JSON.stringify(cart));
   updateCartCount();
@@ -804,11 +802,8 @@ function updateCartCount() {
   const el = document.getElementById("cartCount");
   if (!el) return;
 
-  const total =
-    (cart.package ? 1 : 0) +
-    (Array.isArray(cart.extras) ? cart.extras.length : 0);
-
-  el.textContent = total;
+  el.textContent =
+    (cart.package ? 1 : 0) + cart.extras.length;
 }
 
 /* ================= MOBILE MENU ================= */
@@ -828,16 +823,12 @@ if (menuBtn && mobileMenu && backdrop) {
 function updateTheme() {
   const isDark = root.classList.contains("dark-mode");
 
-  if (navLogo) {
-    navLogo.src = isDark
-      ? "Novyra Navigation Bar (Dark Theme).png"
-      : "Novyra Navigation Bar (Light Theme).png";
-  }
+  navLogo.src = isDark
+    ? "Novyra Navigation Bar (Dark Theme).png"
+    : "Novyra Navigation Bar (Light Theme).png";
 
-  if (sunIcon && moonIcon) {
-    sunIcon.style.opacity = isDark ? "0" : "1";
-    moonIcon.style.opacity = isDark ? "1" : "0";
-  }
+  sunIcon.style.opacity = isDark ? "0" : "1";
+  moonIcon.style.opacity = isDark ? "1" : "0";
 }
 
 if (localStorage.getItem("novyra-theme") === "dark") {
@@ -845,144 +836,156 @@ if (localStorage.getItem("novyra-theme") === "dark") {
 }
 updateTheme();
 
-if (themeToggle) {
-  themeToggle.addEventListener("click", () => {
-    root.classList.toggle("dark-mode");
+themeToggle?.addEventListener("click", () => {
+  root.classList.toggle("dark-mode");
 
-    localStorage.setItem(
-      "novyra-theme",
-      root.classList.contains("dark-mode") ? "dark" : "light"
-    );
+  localStorage.setItem(
+    "novyra-theme",
+    root.classList.contains("dark-mode") ? "dark" : "light"
+  );
 
-    updateTheme();
-  });
-}
+  updateTheme();
+});
 
 /* ================= SERVICES DROPDOWN ================= */
 let servicesOpen = false;
 
-if (servicesBtn && servicesDropdown) {
-  servicesBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    servicesOpen = !servicesOpen;
-    servicesDropdown.classList.toggle("open", servicesOpen);
-  });
-
-  document.addEventListener("click", () => {
-    servicesOpen = false;
-    servicesDropdown.classList.remove("open");
-  });
-}
-
-/* ================= PACKAGE SELECT ================= */
-document.addEventListener("click", (e) => {
-  const btn = e.target.closest(".select-btn");
-  if (!btn) return;
-
-  document.querySelectorAll(".select-btn").forEach(b => {
-    b.classList.remove("active-package");
-  });
-
-  btn.classList.add("active-package");
-
-  cart.package = {
-    name: btn.dataset.name,
-    price: Number(btn.dataset.price)
-  };
-
-  saveCart();
+servicesBtn?.addEventListener("click", (e) => {
+  e.stopPropagation();
+  servicesOpen = !servicesOpen;
+  servicesDropdown.classList.toggle("open", servicesOpen);
 });
 
-/* ================= EXTRAS ================= */
+document.addEventListener("click", () => {
+  servicesOpen = false;
+  servicesDropdown?.classList.remove("open");
+});
+
+/* ================= CART LOGIC (FIXED CLEAN VERSION) ================= */
 document.addEventListener("click", (e) => {
-  const btn = e.target.closest(".extra-btn");
-  if (!btn) return;
 
-  const name = btn.dataset.name;
-  const price = Number(btn.dataset.price);
+  /* ===== PACKAGE SELECT (TOGGLE FIXED) ===== */
+  const pkgBtn = e.target.closest(".select-btn");
+  if (pkgBtn) {
 
-  if (!Array.isArray(cart.extras)) cart.extras = [];
+    const name = pkgBtn.dataset.name;
+    const price = Number(pkgBtn.dataset.price);
 
-  const exists = cart.extras.find(ex => ex.name === name);
+    // TOGGLE OFF if same package clicked
+    if (cart.package && cart.package.name === name) {
+      cart.package = null;
+      pkgBtn.classList.remove("active-package");
+    } else {
+      document.querySelectorAll(".select-btn")
+        .forEach(b => b.classList.remove("active-package"));
 
-  if (exists) {
-    cart.extras = cart.extras.filter(ex => ex.name !== name);
-    btn.classList.remove("active");
-    btn.textContent = "Add Option";
-  } else {
-    cart.extras.push({ name, price });
-    btn.classList.add("active");
-    btn.textContent = "Added";
+      cart.package = { name, price };
+      pkgBtn.classList.add("active-package");
+    }
+
+    saveCart();
+    return;
   }
 
-  saveCart();
+  /* ===== EXTRAS TOGGLE ===== */
+  const extraBtn = e.target.closest(".extra-btn");
+  if (extraBtn) {
+
+    const name = extraBtn.dataset.name;
+    const price = Number(extraBtn.dataset.price);
+
+    const index = cart.extras.findIndex(e => e.name === name);
+
+    if (index > -1) {
+      cart.extras.splice(index, 1);
+      extraBtn.classList.remove("active");
+      extraBtn.textContent = "Add Option";
+    } else {
+      cart.extras.push({ name, price });
+      extraBtn.classList.add("active");
+      extraBtn.textContent = "Added";
+    }
+
+    saveCart();
+  }
 });
 
 /* ================= CART MODAL ================= */
-function openCart() {
-  renderCart();
-  if (!cartModal) return;
-
-  cartModal.classList.remove("hidden");
-  cartModal.classList.add("flex");
-}
-
-function closeCartModal() {
-  if (!cartModal) return;
-
-  cartModal.classList.add("hidden");
-  cartModal.classList.remove("flex");
-}
-
-/* ================= RESTORE UI ================= */
-function restoreUIState() {
-  if (cart.package) {
-    document.querySelectorAll(".select-btn").forEach(btn => {
-      if (btn.dataset.name === cart.package.name) {
-        btn.classList.add("active-package");
-      }
-    });
-  }
-
-  if (Array.isArray(cart.extras)) {
-    cart.extras.forEach(ex => {
-      const btn = document.querySelector(`.extra-btn[data-name="${ex.name}"]`);
-      if (btn) {
-        btn.classList.add("active");
-        btn.textContent = "Added";
-      }
-    });
-  }
-
-  updateCartCount();
-}
-
-/* ================= RENDER CART ================= */
 function renderCart() {
   const el = document.getElementById("cartContent");
   if (!el) return;
 
+  let total = 0;
   let html = "";
 
   if (cart.package) {
-    html += `<div><strong>Package:</strong><br>${cart.package.name} - R${cart.package.price}</div>`;
+    total += cart.package.price;
+    html += `
+      <div><strong>Package:</strong><br>
+      ${cart.package.name} - R${cart.package.price}</div>
+    `;
   } else {
     html += `<div>No package selected</div>`;
   }
 
-  if (Array.isArray(cart.extras) && cart.extras.length) {
-    html += `<div class="mt-2"><strong>Extras:</strong><br>`;
+  if (cart.extras.length) {
+    html += `<div class="mt-3"><strong>Extras:</strong><br>`;
     cart.extras.forEach(ex => {
+      total += ex.price;
       html += `• ${ex.name} - R${ex.price}<br>`;
     });
     html += `</div>`;
   }
 
+  html += `
+    <div class="mt-4 pt-3 border-t border-white/20">
+      <strong>Total: R${total}</strong>
+    </div>
+  `;
+
   el.innerHTML = html;
+}
+
+function openCart() {
+  renderCart();
+  cartModal?.classList.remove("hidden");
+  cartModal?.classList.add("flex");
+}
+
+function closeCartModal() {
+  cartModal?.classList.add("hidden");
+  cartModal?.classList.remove("flex");
+}
+
+/* ================= UI RESTORE ================= */
+function restoreUIState() {
+
+  document.querySelectorAll(".select-btn").forEach(btn => {
+    if (cart.package && btn.dataset.name === cart.package.name) {
+      btn.classList.add("active-package");
+    } else {
+      btn.classList.remove("active-package");
+    }
+  });
+
+  document.querySelectorAll(".extra-btn").forEach(btn => {
+    const exists = cart.extras.find(e => e.name === btn.dataset.name);
+
+    if (exists) {
+      btn.classList.add("active");
+      btn.textContent = "Added";
+    } else {
+      btn.classList.remove("active");
+      btn.textContent = "Add Option";
+    }
+  });
+
+  updateCartCount();
 }
 
 /* ================= CHECKOUT ================= */
 function checkoutCart() {
+
   if (!cart.package) {
     alert("Please select a package first.");
     return;
@@ -990,12 +993,10 @@ function checkoutCart() {
 
   let body = `New Order Request:%0D%0A%0D%0A`;
 
-  body += `PACKAGE:%0D%0A`;
-  body += `${cart.package.name} - R${cart.package.price}%0D%0A%0D%0A`;
-
+  body += `PACKAGE:%0D%0A${cart.package.name} - R${cart.package.price}%0D%0A%0D%0A`;
   body += `EXTRAS:%0D%0A`;
 
-  if (!Array.isArray(cart.extras) || cart.extras.length === 0) {
+  if (!cart.extras.length) {
     body += `None%0D%0A`;
   } else {
     cart.extras.forEach(ex => {
@@ -1004,61 +1005,19 @@ function checkoutCart() {
   }
 
   window.location.href =
-    `mailto:sales@novyra.co.za?subject=New%20Content%20Package%20Order&body=${body}`;
+    `mailto:sales@novyra.co.za?subject=New%20Order&body=${body}`;
 }
 
 /* ================= EVENTS ================= */
-document.addEventListener("click", (e) => {
-  if (e.target.closest(".select-btn")) {
-    const btn = e.target.closest(".select-btn");
+cartBtn?.addEventListener("click", openCart);
+closeCart?.addEventListener("click", closeCartModal);
+checkoutBtn?.addEventListener("click", checkoutCart);
 
-    document.querySelectorAll(".select-btn").forEach(b => {
-      b.classList.remove("active-package");
-    });
-
-    btn.classList.add("active-package");
-
-    cart.package = {
-      name: btn.dataset.name,
-      price: Number(btn.dataset.price)
-    };
-
-    saveCart();
-  }
-
-  if (e.target.closest(".extra-btn")) {
-    const btn = e.target.closest(".extra-btn");
-
-    const name = btn.dataset.name;
-    const price = Number(btn.dataset.price);
-
-    const exists = cart.extras.find(ex => ex.name === name);
-
-    if (exists) {
-      cart.extras = cart.extras.filter(ex => ex.name !== name);
-      btn.classList.remove("active");
-      btn.textContent = "Add Option";
-    } else {
-      cart.extras.push({ name, price });
-      btn.classList.add("active");
-      btn.textContent = "Added";
-    }
-
-    saveCart();
-  }
+cartModal?.addEventListener("click", (e) => {
+  if (e.target === cartModal) closeCartModal();
 });
 
-if (cartBtn) cartBtn.addEventListener("click", openCart);
-if (closeCart) closeCart.addEventListener("click", closeCartModal);
-if (checkoutBtn) checkoutBtn.addEventListener("click", checkoutCart);
-
-if (cartModal) {
-  cartModal.addEventListener("click", (e) => {
-    if (e.target === cartModal) closeCartModal();
-  });
-}
-
-/* ================= CRITICAL FIX ================= */
+/* ================= INIT ================= */
 function initCart() {
   loadCart();
   updateCartCount();
@@ -1066,7 +1025,6 @@ function initCart() {
 }
 
 window.addEventListener("pageshow", initCart);
-
 initCart();
 
 });
