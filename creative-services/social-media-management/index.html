@@ -991,21 +991,23 @@ function checkoutCart() {
     return;
   }
 
-  let body = `New Order Request:%0D%0A%0D%0A`;
+  let body = `Hey Novyra, Please see below Request:\n\n`;
 
-  body += `PACKAGE:%0D%0A${cart.package.name} - R${cart.package.price}%0D%0A%0D%0A`;
-  body += `EXTRAS:%0D%0A`;
+  body += `PACKAGE:\n${cart.package.name} - R${cart.package.price}\n\n`;
+  body += `EXTRAS:\n`;
 
   if (!cart.extras.length) {
-    body += `None%0D%0A`;
+    body += `None\n`;
   } else {
     cart.extras.forEach(ex => {
-      body += `- ${ex.name} - R${ex.price}%0D%0A`;
+      body += `- ${ex.name} - R${ex.price}\n`;
     });
   }
 
+  body = encodeURIComponent(body);
+
   window.location.href =
-    `mailto:sales@novyra.co.za?subject=New%20Order&body=${body}`;
+    `mailto:sales@novyra.co.za?subject=New%20Quote%20Request%20From%20Website&body=${body}`;
 }
 
 /* ================= EVENTS ================= */
