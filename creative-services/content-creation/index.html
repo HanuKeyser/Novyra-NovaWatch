@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <title>Novyra - Social Meida Management</title>
+  <title>Novyra - Content Creation</title>
 
   <link rel="icon" type="image/png" href="Novyra Tab Icon (Light Theme).png">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -606,7 +606,7 @@ html.dark-mode .extra-item{
           <li>✖ No posting / scheduling</li>
           <li>✖ No platform management</li>
         </ul>
-        <button class="select-btn" data-name="Content Starter" data-price="1250">
+        <button class="select-btn" data-name="Content Starter" data-price="850">
           Select Content Starter
         </button>
       </div>
@@ -642,7 +642,7 @@ html.dark-mode .extra-item{
           <li>✖ No posting / scheduling</li>
           <li>✖ No platform management</li>
         </ul>
-        <button class="select-btn" data-name="Content Growth" data-price="2650">
+        <button class="select-btn" data-name="Content Growth" data-price="2850">
           Select Content Studio
         </button>
       </div>
@@ -722,7 +722,7 @@ let cart = {
 /* ================= LOAD ================= */
 function loadCart() {
   try {
-    const saved = localStorage.getItem("novyra-cart");
+    const saved = localStorage.getItem(CART_KEY)
     if (!saved) return;
 
     const parsed = JSON.parse(saved);
@@ -976,7 +976,13 @@ function initCart() {
   restoreUIState();
 }
 
+/* Run on page load (including back/forward navigation) */
 window.addEventListener("pageshow", initCart);
+
+/* Run when user returns to tab / page refocus */
+window.addEventListener("focus", initCart);
+
+/* Initial run */
 initCart();
 
 /* ================= SYNC BETWEEN PAGES ================= */
