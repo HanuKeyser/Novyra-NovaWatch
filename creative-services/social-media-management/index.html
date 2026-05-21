@@ -773,10 +773,25 @@ const closeCart = document.getElementById("closeCart");
 const checkoutBtn = document.getElementById("checkoutBtn");
 
 /* ================= CART (SESSION STORAGE) ================= */
-let cart = JSON.parse(sessionStorage.getItem("novyra-cart")) || {
+let cart = {
   package: null,
   extras: []
 };
+
+/* ================= LOAD CART ================= */
+function loadCart() {
+  try {
+    const saved = sessionStorage.getItem("novyra-cart");
+    if (!saved) return;
+
+    const parsed = JSON.parse(saved);
+
+    cart.package = parsed.package || null;
+    cart.extras = Array.isArray(parsed.extras) ? parsed.extras : [];
+  } catch (e) {
+    cart = { package: null, extras: [] };
+  }
+}
 
 /* ================= SAVE CART ================= */
 function saveCart() {
@@ -1043,9 +1058,16 @@ if (cartModal) {
   });
 }
 
-/* ================= INIT ================= */
-updateCartCount();
-restoreUIState();
+/* ================= CRITICAL FIX ================= */
+function initCart() {
+  loadCart();
+  updateCartCount();
+  restoreUIState();
+}
+
+window.addEventListener("pageshow", initCart);
+
+initCart();
 
 });
 </script>
