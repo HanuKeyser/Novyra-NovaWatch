@@ -772,11 +772,17 @@ const cartModal = document.getElementById("cartModal");
 const closeCart = document.getElementById("closeCart");
 const checkoutBtn = document.getElementById("checkoutBtn");
 
-/* ================= CART (SESSION ONLY - NO LOCALSTORAGE) ================= */
-let cart = {
+/* ================= CART (SESSION STORAGE) ================= */
+let cart = JSON.parse(sessionStorage.getItem("novyra-cart")) || {
   package: null,
   extras: []
 };
+
+/* ================= SAVE CART ================= */
+function saveCart() {
+  sessionStorage.setItem("novyra-cart", JSON.stringify(cart));
+  updateCartCount();
+}
 
 /* ================= CART COUNT ================= */
 function updateCartCount() {
@@ -788,11 +794,6 @@ function updateCartCount() {
     (Array.isArray(cart.extras) ? cart.extras.length : 0);
 
   el.textContent = total;
-}
-
-/* ================= SAVE CART (SESSION ONLY) ================= */
-function saveCart() {
-  updateCartCount();
 }
 
 /* ================= MOBILE MENU ================= */
@@ -857,31 +858,6 @@ if (servicesBtn && servicesDropdown) {
     servicesDropdown.classList.remove("open");
   });
 }
-
-/* ================= VIEW TRANSITIONS ================= */
-document.querySelectorAll("a").forEach(link => {
-  const href = link.getAttribute("href");
-
-  if (!href || !href.startsWith("https://www.novyra.co.za/")) return;
-
-  link.addEventListener("click", (e) => {
-    e.preventDefault();
-
-    if (document.startViewTransition) {
-      document.startViewTransition(() => {
-        window.location.href = href;
-      });
-    } else {
-      document.body.classList.add("fade-out");
-      setTimeout(() => window.location.href = href, 250);
-    }
-  });
-});
-
-window.addEventListener("load", () => {
-  document.body.classList.remove("fade-out");
-  restoreUIState();
-});
 
 /* ================= PACKAGE SELECT ================= */
 document.addEventListener("click", (e) => {
@@ -955,9 +931,7 @@ function restoreUIState() {
 
   if (Array.isArray(cart.extras)) {
     cart.extras.forEach(ex => {
-      const btn = document.querySelector(
-        `.extra-btn[data-name="${ex.name}"]`
-      );
+      const btn = document.querySelector(`.extra-btn[data-name="${ex.name}"]`);
       if (btn) {
         btn.classList.add("active");
         btn.textContent = "Added";
@@ -1019,6 +993,46 @@ function checkoutCart() {
 }
 
 /* ================= EVENTS ================= */
+document.addEventListener("click", (e) => {
+  if (e.target.closest(".select-btn")) {
+    const btn = e.target.closest(".select-btn");
+
+    document.querySelectorAll(".select-btn").forEach(b => {
+      b.classList.remove("active-package");
+    });
+
+    btn.classList.add("active-package");
+
+    cart.package = {
+      name: btn.dataset.name,
+      price: Number(btn.dataset.price)
+    };
+
+    saveCart();
+  }
+
+  if (e.target.closest(".extra-btn")) {
+    const btn = e.target.closest(".extra-btn");
+
+    const name = btn.dataset.name;
+    const price = Number(btn.dataset.price);
+
+    const exists = cart.extras.find(ex => ex.name === name);
+
+    if (exists) {
+      cart.extras = cart.extras.filter(ex => ex.name !== name);
+      btn.classList.remove("active");
+      btn.textContent = "Add Option";
+    } else {
+      cart.extras.push({ name, price });
+      btn.classList.add("active");
+      btn.textContent = "Added";
+    }
+
+    saveCart();
+  }
+});
+
 if (cartBtn) cartBtn.addEventListener("click", openCart);
 if (closeCart) closeCart.addEventListener("click", closeCartModal);
 if (checkoutBtn) checkoutBtn.addEventListener("click", checkoutCart);
@@ -1031,6 +1045,7 @@ if (cartModal) {
 
 /* ================= INIT ================= */
 updateCartCount();
+restoreUIState();
 
 });
 </script>
