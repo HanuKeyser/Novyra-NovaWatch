@@ -750,16 +750,6 @@ html.dark-mode .extra-item{
 </footer>
 
 <script>
-const CART_KEY = "novyra-cart";
-const SESSION_KEY = "novyra-session-init";
-
-/* ===== SESSION START DETECTION ===== */
-if (!sessionStorage.getItem(SESSION_KEY)) {
-  // new tab/session → clear cart once
-  localStorage.removeItem(CART_KEY);
-  sessionStorage.setItem(SESSION_KEY, "true");
-}
-  
 document.addEventListener("DOMContentLoaded", () => {
 
 const root = document.documentElement;
@@ -788,13 +778,14 @@ let cart = {
   extras: []
 };
 
-/* ================= LOAD / SAVE ================= */
+/* ================= LOAD CART ================= */
 function loadCart() {
   try {
-    const saved = localStorage.getItem("novyra-cart");
+    const saved = sessionStorage.getItem("novyra-cart");
     if (!saved) return;
 
     const parsed = JSON.parse(saved);
+
     cart.package = parsed.package || null;
     cart.extras = Array.isArray(parsed.extras) ? parsed.extras : [];
   } catch {
@@ -802,8 +793,9 @@ function loadCart() {
   }
 }
 
+/* ================= SAVE CART ================= */
 function saveCart() {
-  localStorage.setItem("novyra-cart", JSON.stringify(cart));
+  sessionStorage.setItem("novyra-cart", JSON.stringify(cart));
   updateCartCount();
 }
 
@@ -812,8 +804,11 @@ function updateCartCount() {
   const el = document.getElementById("cartCount");
   if (!el) return;
 
-  el.textContent =
-    (cart.package ? 1 : 0) + cart.extras.length;
+  const total =
+    (cart.package ? 1 : 0) +
+    (Array.isArray(cart.extras) ? cart.extras.length : 0);
+
+  el.textContent = total;
 }
 
 /* ================= MOBILE MENU ================= */
@@ -833,12 +828,16 @@ if (menuBtn && mobileMenu && backdrop) {
 function updateTheme() {
   const isDark = root.classList.contains("dark-mode");
 
-  navLogo.src = isDark
-    ? "Novyra Navigation Bar (Dark Theme).png"
-    : "Novyra Navigation Bar (Light Theme).png";
+  if (navLogo) {
+    navLogo.src = isDark
+      ? "Novyra Navigation Bar (Dark Theme).png"
+      : "Novyra Navigation Bar (Light Theme).png";
+  }
 
-  sunIcon.style.opacity = isDark ? "0" : "1";
-  moonIcon.style.opacity = isDark ? "1" : "0";
+  if (sunIcon && moonIcon) {
+    sunIcon.style.opacity = isDark ? "0" : "1";
+    moonIcon.style.opacity = isDark ? "1" : "0";
+  }
 }
 
 if (localStorage.getItem("novyra-theme") === "dark") {
@@ -871,17 +870,16 @@ document.addEventListener("click", () => {
   servicesDropdown?.classList.remove("open");
 });
 
-/* ================= CART LOGIC (FIXED CLEAN VERSION) ================= */
+/* ================= CART LOGIC ================= */
 document.addEventListener("click", (e) => {
 
-  /* ===== PACKAGE SELECT (TOGGLE FIXED) ===== */
+  /* ===== PACKAGE SELECT ===== */
   const pkgBtn = e.target.closest(".select-btn");
   if (pkgBtn) {
 
     const name = pkgBtn.dataset.name;
     const price = Number(pkgBtn.dataset.price);
 
-    // TOGGLE OFF if same package clicked
     if (cart.package && cart.package.name === name) {
       cart.package = null;
       pkgBtn.classList.remove("active-package");
@@ -967,7 +965,7 @@ function closeCartModal() {
   cartModal?.classList.remove("flex");
 }
 
-/* ================= UI RESTORE ================= */
+/* ================= RESTORE UI ================= */
 function restoreUIState() {
 
   document.querySelectorAll(".select-btn").forEach(btn => {
