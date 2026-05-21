@@ -760,10 +760,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const THEME_KEY = "novyra-theme";
 
   /* ================= STATE ================= */
-  let cart = {
-    package: null,
-    extras: []
-  };
+let cart = {
+  socialMedia: null,
+  contentCreation: null,
+  branding: null,
+  marketingMaterials: null,
+  extras: []
+}
 
   /* ================= ELEMENTS ================= */
   const menuBtn = document.getElementById("menuBtn");
@@ -802,7 +805,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const parsed = JSON.parse(saved);
 
-      cart.package = parsed.package || null;
+      cart.socialMedia = parsed.package || null;
       cart.extras = Array.isArray(parsed.extras)
         ? parsed.extras
         : [];
@@ -830,7 +833,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!cartCount) return;
 
     const total =
-      (cart.package ? 1 : 0) +
+      (cart.socialMedia ? 1 : 0) +
       cart.extras.length;
 
     cartCount.textContent = total;
@@ -843,8 +846,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".select-btn").forEach(btn => {
 
       const active =
-        cart.package &&
-        cart.package.name === btn.dataset.name;
+        cart.socialMedia &&
+        cart.socialMedia.name === btn.dataset.name;
 
       btn.classList.toggle("active-package", active);
     });
@@ -880,14 +883,14 @@ document.addEventListener("DOMContentLoaded", () => {
     let html = "";
 
     /* ===== PACKAGE ===== */
-    if (cart.package) {
+    if (cart.socialMedia) {
 
-      total += cart.package.price;
+      total += cart.socialMedia.price;
 
       html += `
         <div>
           <strong>Package:</strong><br>
-          ${cart.package.name} - R${cart.package.price}
+          ${cart.socialMedia.name} - R${cart.socialMedia.price}
         </div>
       `;
 
@@ -967,15 +970,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* ===== TOGGLE PACKAGE ===== */
     if (
-      cart.package &&
-      cart.package.name === name
+      cart.socialMedia &&
+      cart.socialMedia.name === name
     ) {
 
-      cart.package = null;
+      cart.socialMedia = null;
 
     } else {
 
-      cart.package = {
+      cart.socialMedia = {
         name,
         price
       };
@@ -1019,7 +1022,7 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ================= CHECKOUT ================= */
   function checkoutCart() {
 
-    if (!cart.package) {
+    if (!cart.socialMedia) {
 
       alert("Please select a package first.");
       return;
@@ -1030,7 +1033,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* ===== PACKAGE ===== */
     body += `PACKAGE:%0D%0A`;
-    body += `${cart.package.name} - R${cart.package.price}%0D%0A%0D%0A`;
+    body += `${cart.socialMedia.name} - R${cart.socialMedia.price}%0D%0A%0D%0A`;
 
     /* ===== EXTRAS ===== */
     body += `EXTRAS:%0D%0A`;
