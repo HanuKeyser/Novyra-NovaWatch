@@ -690,9 +690,6 @@ html.dark-mode .extra-item{
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-  const root = document.documentElement;
-
-  /* ================= CART KEY ================= */
   const CART_KEY = "novyra-cart";
 
   /* ================= ELEMENTS ================= */
@@ -703,23 +700,40 @@ document.addEventListener("DOMContentLoaded", () => {
   const cartContent = document.getElementById("cartContent");
   const cartCount = document.getElementById("cartCount");
 
-  /* ================= GLOBAL CART ================= */
-  let cart = { package: null, extras: [] };
+  /* ================= CART ================= */
+  let cart = {
+    socialMedia: null,
+    contentCreation: null,
+    extras: []
+  };
 
   /* ================= LOAD ================= */
   function loadCart() {
+
     try {
+
       const saved = localStorage.getItem(CART_KEY);
+
       if (!saved) return;
 
       const parsed = JSON.parse(saved);
 
-      cart.package = parsed.package || null;
-      cart.extras = Array.isArray(parsed.extras) ? parsed.extras : [];
+      cart.socialMedia = parsed.socialMedia || null;
+      cart.contentCreation = parsed.contentCreation || null;
+      cart.extras = Array.isArray(parsed.extras)
+        ? parsed.extras
+        : [];
 
-    } catch (e) {
-      cart = { package: null, extras: [] };
+    } catch(err) {
+
+      cart = {
+        socialMedia: null,
+        contentCreation: null,
+        extras: []
+      };
+
     }
+
   }
 
   /* ================= SAVE ================= */
@@ -730,68 +744,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ================= COUNT ================= */
   function updateCount() {
-    if (!cartCount) return;
 
-    const total = (cart.package ? 1 : 0) + cart.extras.length;
+    let total = 0;
+
+    if (cart.socialMedia) total++;
+    if (cart.contentCreation) total++;
+
+    total += cart.extras.length;
+
     cartCount.textContent = total;
   }
 
-  /* ================= RENDER CART ================= */
-  function renderCart() {
-    if (!cartContent) return;
-
-    let total = 0;
-    let html = "";
-
-    if (cart.package) {
-      total += cart.package.price;
-      html += `
-        <div><strong>Package:</strong><br>
-        ${cart.package.name} - R${cart.package.price}</div>
-      `;
-    } else {
-      html += `<div>No package selected</div>`;
-    }
-
-    if (cart.extras.length) {
-      html += `<div class="mt-3"><strong>Extras:</strong><br>`;
-      cart.extras.forEach(ex => {
-        total += ex.price;
-        html += `• ${ex.name} - R${ex.price}<br>`;
-      });
-      html += `</div>`;
-    }
-
-    html += `
-      <div class="mt-4 pt-3 border-t border-white/20">
-        <strong>Total: R${total}</strong>
-      </div>
-    `;
-
-    cartContent.innerHTML = html;
-  }
-
-  /* ================= OPEN / CLOSE ================= */
-  function openCart() {
-    renderCart();
-    cartModal?.classList.remove("hidden");
-    cartModal?.classList.add("flex");
-  }
-
-  function closeCartModal() {
-    cartModal?.classList.add("hidden");
-    cartModal?.classList.remove("flex");
-  }
-
-  cartBtn?.addEventListener("click", openCart);
-  closeCart?.addEventListener("click", closeCartModal);
-
-  cartModal?.addEventListener("click", (e) => {
-    if (e.target === cartModal) closeCartModal();
-  });
-
   /* ================= PACKAGE SELECT ================= */
   document.addEventListener("click", (e) => {
+
     const btn = e.target.closest(".select-btn");
 
     if (!btn) return;
@@ -799,109 +765,284 @@ document.addEventListener("DOMContentLoaded", () => {
     const name = btn.dataset.name;
     const price = Number(btn.dataset.price);
 
-    if (cart.package?.name === name) {
-      cart.package = null;
+    if (
+      cart.contentCreation &&
+      cart.contentCreation.name === name
+    ) {
+
+      cart.contentCreation = null;
+
     } else {
-      cart.package = { name, price };
+
+      cart.contentCreation = {
+        name,
+        price
+      };
+
     }
 
     saveCart();
     syncUI();
+
   });
 
   /* ================= EXTRAS ================= */
   document.addEventListener("click", (e) => {
+
     const btn = e.target.closest(".extra-btn");
+
     if (!btn) return;
 
     const name = btn.dataset.name;
     const price = Number(btn.dataset.price);
 
-    const index = cart.extras.findIndex(x => x.name === name);
+    const existing = cart.extras.findIndex(
+      item => item.name === name
+    );
 
-    if (index > -1) {
-      cart.extras.splice(index, 1);
+    if (existing > -1) {
+
+      cart.extras.splice(existing, 1);
+
     } else {
-      cart.extras.push({ name, price });
+
+      cart.extras.push({
+        name,
+        price
+      });
+
     }
 
     saveCart();
     syncUI();
+
   });
 
   /* ================= SYNC UI ================= */
   function syncUI() {
 
     document.querySelectorAll(".select-btn").forEach(btn => {
-      btn.classList.toggle(
-        "active-package",
-        cart.package?.name === btn.dataset.name
-      );
+
+      const active =
+        cart.contentCreation &&
+        cart.contentCreation.name === btn.dataset.name;
+
+      btn.classList.toggle("active-package", active);
+
     });
 
     document.querySelectorAll(".extra-btn").forEach(btn => {
-      const exists = cart.extras.find(x => x.name === btn.dataset.name);
+
+      const exists = cart.extras.find(
+        item => item.name === btn.dataset.name
+      );
 
       if (exists) {
+
         btn.classList.add("active");
         btn.textContent = "Added";
+
       } else {
+
         btn.classList.remove("active");
         btn.textContent = "Add Option";
+
       }
+
     });
 
     updateCount();
+
   }
+
+  /* ================= RENDER CART ================= */
+  function renderCart() {
+
+    let total = 0;
+    let html = "";
+
+    /* ===== SOCIAL MEDIA ===== */
+    if (cart.socialMedia) {
+
+      total += cart.socialMedia.price;
+
+      html += `
+        <div class="mb-4">
+          <strong>Social Media Package:</strong><br>
+          ${cart.socialMedia.name} - R${cart.socialMedia.price}
+        </div>
+      `;
+
+    }
+
+    /* ===== CONTENT CREATION ===== */
+    if (cart.contentCreation) {
+
+      total += cart.contentCreation.price;
+
+      html += `
+        <div class="mb-4">
+          <strong>Content Creation Package:</strong><br>
+          ${cart.contentCreation.name} - R${cart.contentCreation.price}
+        </div>
+      `;
+
+    }
+
+    /* ===== EXTRAS ===== */
+    if (cart.extras.length) {
+
+      html += `
+        <div class="mb-4">
+          <strong>Extras:</strong><br>
+      `;
+
+      cart.extras.forEach(extra => {
+
+        total += extra.price;
+
+        html += `
+          • ${extra.name} - R${extra.price}<br>
+        `;
+
+      });
+
+      html += `</div>`;
+
+    }
+
+    if (
+      !cart.socialMedia &&
+      !cart.contentCreation &&
+      !cart.extras.length
+    ) {
+
+      html = `<div>Your cart is empty</div>`;
+
+    }
+
+    html += `
+      <div class="mt-4 pt-4 border-t border-white/20">
+        <strong>Total: R${total}</strong>
+      </div>
+    `;
+
+    cartContent.innerHTML = html;
+
+  }
+
+  /* ================= OPEN / CLOSE ================= */
+  function openCart() {
+
+    renderCart();
+
+    cartModal.classList.remove("hidden");
+    cartModal.classList.add("flex");
+
+  }
+
+  function closeCartModal() {
+
+    cartModal.classList.add("hidden");
+    cartModal.classList.remove("flex");
+
+  }
+
+  cartBtn?.addEventListener("click", openCart);
+
+  closeCart?.addEventListener("click", closeCartModal);
+
+  cartModal?.addEventListener("click", (e) => {
+
+    if (e.target === cartModal) {
+      closeCartModal();
+    }
+
+  });
 
   /* ================= CHECKOUT ================= */
   function checkout() {
-    if (!cart.package) {
-      alert("Please select a package first.");
+
+    if (
+      !cart.socialMedia &&
+      !cart.contentCreation
+    ) {
+
+      alert("Please select at least one package.");
       return;
+
     }
 
-    let body = `Hey Novyra,%0D%0A%0D%0ARequest:%0D%0A%0D%0A`;
+    let body = `Hey Novyra,%0D%0A%0D%0A`;
 
-    body += `PACKAGE:%0D%0A${cart.package.name} - R${cart.package.price}%0D%0A%0D%0A`;
+    /* ===== SOCIAL MEDIA ===== */
+    if (cart.socialMedia) {
+
+      body += `SOCIAL MEDIA PACKAGE:%0D%0A`;
+      body += `${cart.socialMedia.name} - R${cart.socialMedia.price}%0D%0A%0D%0A`;
+
+    }
+
+    /* ===== CONTENT CREATION ===== */
+    if (cart.contentCreation) {
+
+      body += `CONTENT CREATION PACKAGE:%0D%0A`;
+      body += `${cart.contentCreation.name} - R${cart.contentCreation.price}%0D%0A%0D%0A`;
+
+    }
+
+    /* ===== EXTRAS ===== */
     body += `EXTRAS:%0D%0A`;
 
     if (!cart.extras.length) {
+
       body += `None%0D%0A`;
+
     } else {
-      cart.extras.forEach(e => {
-        body += `- ${e.name} - R${e.price}%0D%0A`;
+
+      cart.extras.forEach(extra => {
+
+        body += `- ${extra.name} - R${extra.price}%0D%0A`;
+
       });
+
     }
 
     window.location.href =
       `mailto:sales@novyra.co.za?subject=Quote Request&body=${body}`;
+
   }
 
   checkoutBtn?.addEventListener("click", checkout);
 
-  /* ================= INIT (IMPORTANT FIX) ================= */
+  /* ================= INIT ================= */
   function init() {
-    loadCart();
-    syncUI();   // <- THIS is what fixes cross-page mismatch
-  }
 
-  window.addEventListener("pageshow", init);
-  window.addEventListener("focus", init);
+    loadCart();
+    syncUI();
+
+  }
 
   init();
 
+  window.addEventListener("focus", init);
+
+  window.addEventListener("pageshow", init);
+
   /* ================= CROSS PAGE SYNC ================= */
   window.addEventListener("storage", (e) => {
+
     if (e.key === CART_KEY) {
+
       loadCart();
       syncUI();
+
     }
+
   });
 
 });
 </script>
-
 <!-- CART MODAL -->
 <div id="cartModal" class="fixed inset-0 hidden items-center justify-center z-[9999] bg-black/40">
   
