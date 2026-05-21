@@ -855,37 +855,41 @@ themeToggle?.addEventListener("click", () => {
   updateTheme();
 });
 
-/* ================= SERVICES DROPDOWN ================= */
-let servicesOpen = false;
-
+/* ================= SERVICES DROPDOWN (FIXED) ================= */
 servicesBtn?.addEventListener("click", (e) => {
   e.stopPropagation();
-  servicesOpen = !servicesOpen;
-  servicesDropdown.classList.toggle("open", servicesOpen);
+  servicesDropdown?.classList.toggle("open");
 });
 
-document.addEventListener("click", () => {
-  servicesOpen = false;
-  servicesDropdown?.classList.remove("open");
+document.addEventListener("click", (e) => {
+  if (
+    servicesDropdown &&
+    !servicesDropdown.contains(e.target) &&
+    e.target !== servicesBtn
+  ) {
+    servicesDropdown.classList.remove("open");
+  }
 });
 
 /* ================= CART LOGIC ================= */
 document.addEventListener("click", (e) => {
 
-  /* ===== PACKAGE SELECT ===== */
+  /* ===== PACKAGE SELECT (FIXED) ===== */
   const pkgBtn = e.target.closest(".select-btn");
   if (pkgBtn) {
 
     const name = pkgBtn.dataset.name;
     const price = Number(pkgBtn.dataset.price);
 
-    if (cart.package && cart.package.name === name) {
-      cart.package = null;
-      pkgBtn.classList.remove("active-package");
-    } else {
-      document.querySelectorAll(".select-btn")
-        .forEach(b => b.classList.remove("active-package"));
+    const isSame =
+      cart.package && cart.package.name === name;
 
+    document.querySelectorAll(".select-btn")
+      .forEach(b => b.classList.remove("active-package"));
+
+    if (isSame) {
+      cart.package = null;
+    } else {
       cart.package = { name, price };
       pkgBtn.classList.add("active-package");
     }
@@ -990,7 +994,7 @@ function restoreUIState() {
   updateCartCount();
 }
 
-/* ================= CHECKOUT ================= */
+/* ================= CHECKOUT (FIXED) ================= */
 function checkoutCart() {
 
   if (!cart.package) {
@@ -1013,8 +1017,9 @@ function checkoutCart() {
 
   body = encodeURIComponent(body);
 
-  window.location.href =
-    `mailto:sales@novyra.co.za?subject=New%20Quote%20Request%20From%20Website&body=${body}`;
+  window.open(
+    `mailto:sales@novyra.co.za?subject=New%20Quote%20Request%20From%20Website&body=${body}`
+  );
 }
 
 /* ================= EVENTS ================= */
@@ -1043,6 +1048,8 @@ window.addEventListener("storage", (e) => {
     updateCartCount();
     restoreUIState();
   }
+});
+
 });
 </script>
 
