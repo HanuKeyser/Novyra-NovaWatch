@@ -702,10 +702,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ================= CART ================= */
   let cart = {
-    socialMedia: null,
-    contentCreation: null,
-    extras: []
-  };
+  socialMedia: null,
+  contentCreation: null,
+  branding: null,
+  marketingMaterials: null,
+  extras: []
+}
 
   /* ================= LOAD ================= */
   function loadCart() {
@@ -1043,6 +1045,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 </script>
+
 <!-- CART MODAL -->
 <div id="cartModal" class="fixed inset-0 hidden items-center justify-center z-[9999] bg-black/40">
   
