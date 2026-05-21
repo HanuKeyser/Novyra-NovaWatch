@@ -27,9 +27,9 @@ html.dark-mode{
   --footer-text: #ffffff;
 
   --scroll-thumb: rgba(147,197,253,0.9);
-  --scroll-track: transparent;
 }
 
+/* ================= BASE ================= */
 html, body{
   margin:0;
   font-family:sans-serif;
@@ -57,17 +57,13 @@ html, body{
   background-clip:padding-box;
 }
 
-/* ================= GLASS BASE ================= */
+/* ================= GLASS ================= */
 .glass-card{
   background: rgba(255,255,255,0.4);
   backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-
   border-radius:20px;
   border:1px solid rgba(255,255,255,0.3);
-
   box-shadow:0 8px 32px rgba(0,0,0,0.1);
-
   transition:.3s ease;
 }
 
@@ -84,26 +80,21 @@ html.dark-mode .glass-card{
   transition:.2s ease;
 }
 
-.nav-link:hover{
-  color:#3b82f6;
-}
+.nav-link:hover{ color:#3b82f6; }
 
 .nav-link.active{
   color:#3b82f6;
   background:rgba(59,130,246,0.1);
 }
 
-/* ================= NAV BACKDROP ================= */
+/* ================= BACKDROP ================= */
 #backdrop{
   position:fixed;
   inset:0;
   background:rgba(0,0,0,0.25);
-
   opacity:0;
   pointer-events:none;
-
   transition:.3s ease;
-
   z-index:40;
 }
 
@@ -126,36 +117,17 @@ html.dark-mode .glass-card{
   top:52px;
   left:0;
   width:250px;
-
   background:rgba(15,23,42,0.92);
-
   backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
-
   border:1px solid rgba(59,130,246,0.25);
   border-radius:16px;
-
   padding:10px;
-
   opacity:0;
   transform:translateY(-8px);
   pointer-events:none;
-
   transition:all .25s ease;
-
   z-index:60;
-
   box-shadow:0 25px 60px rgba(0,0,0,0.5);
-}
-
-#servicesDropdown .nav-link{
-  color:rgba(255,255,255,0.85);
-  display:block;
-}
-
-#servicesDropdown .nav-link:hover{
-  color:#93c5fd;
-  background:rgba(59,130,246,0.18);
 }
 
 #servicesDropdown.open{
@@ -164,122 +136,228 @@ html.dark-mode .glass-card{
   pointer-events:auto;
 }
 
+/* light mode dropdown */
+html:not(.dark-mode) #servicesDropdown{
+  background:rgba(255,255,255,0.92);
+  border:1px solid rgba(59,130,246,0.2);
+}
+
 /* ================= MOBILE MENU ================= */
 #mobileMenu{
   max-height:0;
   opacity:0;
-
   overflow:hidden;
-
   transform:translateY(-10px);
-
   transition:all .3s ease;
-
   pointer-events:none;
 }
 
 #mobileMenu.open{
   max-height:500px;
   opacity:1;
-
   transform:translateY(0);
-
   pointer-events:auto;
-}
-
-/* ================= LIGHT MODE DROPDOWN ================= */
-html:not(.dark-mode) #servicesDropdown{
-  background:rgba(255,255,255,0.92);
-  border:1px solid rgba(59,130,246,0.2);
-}
-
-html:not(.dark-mode) #servicesDropdown .nav-link{
-  color:rgb(15 23 42);
-}
-
-html:not(.dark-mode) #servicesDropdown .nav-link:hover{
-  background:rgba(59,130,246,0.08);
-  color:#3b82f6;
-}
-
-/* ================= COMING SOON ================= */
-.coming-card{
-  position:relative;
-  overflow:hidden;
-}
-
-.coming-card::before{
-  content:"";
-
-  position:absolute;
-  inset:0;
-
-  padding:2px;
-
-  border-radius:20px;
-
-  background:linear-gradient(135deg,#3b82f6,#93c5fd);
-
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-
-  -webkit-mask-composite:xor;
-  mask-composite:exclude;
-
-  pointer-events:none;
 }
 
 /* ================= BACKGROUND GLOW ================= */
 .bg-glow{
   position:absolute;
-
   width:600px;
   height:600px;
-
-  background:
-    radial-gradient(circle,
-    rgba(59,130,246,0.18),
-    transparent 70%);
-
+  background:radial-gradient(circle, rgba(59,130,246,0.18), transparent 70%);
   filter:blur(50px);
-
   z-index:-1;
 }
 
-/* ================= FLOATING ================= */
+/* ================= FLOAT ================= */
 .float{
   animation:float 6s ease-in-out infinite;
 }
 
 @keyframes float{
-  0%{
-    transform:translateY(0px);
-  }
-
-  50%{
-    transform:translateY(-12px);
-  }
-
-  100%{
-    transform:translateY(0px);
-  }
+  0%,100%{ transform:translateY(0); }
+  50%{ transform:translateY(-12px); }
 }
 
-body {
-  opacity: 1;
-  transition: opacity 0.3s ease;
+/* ================= FADE ================= */
+body.fade-out{ opacity:0; transition:.3s ease; }
+
+/* ================= PRICING GRID ================= */
+.pricing-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:24px;
 }
 
-body.fade-out {
-  opacity: 0;
+@media (max-width:1024px){
+  .pricing-grid{ grid-template-columns:repeat(2,1fr); }
 }
 
-/* Optional smoother feel for View Transitions */
-@view-transition {
-  navigation: auto;
+@media (max-width:640px){
+  .pricing-grid{ grid-template-columns:1fr; }
 }
-  
+
+/* ================= PRICING CARD ================= */
+.pricing-card{
+  padding:28px;
+  border-radius:22px;
+  background:rgba(255,255,255,0.45);
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,0.25);
+  box-shadow:0 10px 30px rgba(0,0,0,0.08);
+  transition:.35s ease;
+}
+
+.pricing-card:hover{
+  transform:translateY(-8px);
+  box-shadow:0 25px 60px rgba(59,130,246,0.18);
+}
+
+html.dark-mode .pricing-card{
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.08);
+}
+
+.pricing-card h3{ font-size:20px; font-weight:600; }
+
+.pricing-card .price{
+  font-size:28px;
+  font-weight:800;
+  color:#3b82f6;
+  margin:10px 0;
+}
+
+.pricing-card ul{
+  margin:12px 0;
+  font-size:13px;
+  opacity:.8;
+  line-height:1.8;
+}
+
+/* featured */
+.pricing-card.featured{
+  border:1px solid rgba(59,130,246,0.4);
+  box-shadow:0 20px 60px rgba(59,130,246,0.15);
+  transform:scale(1.02);
+}
+
+/* ================= BUTTONS ================= */
+.select-btn{
+  width:100%;
+  margin-top:14px;
+  padding:10px 14px;
+  border-radius:14px;
+  background:rgba(59,130,246,0.12);
+  border:1px solid rgba(59,130,246,0.4);
+  color:#3b82f6;
+  font-weight:600;
+  cursor:pointer;
+  transition:.25s ease;
+}
+
+.select-btn:hover{
+  background:#3b82f6;
+  color:white;
+  transform:translateY(-2px);
+}
+
+.active-package{
+  background:#3b82f6 !important;
+  color:white !important;
+  transform:scale(1.02);
+}
+
+/* ================= CART ================= */
+#cartFloat{
+  position:fixed;
+  right:20px;
+  bottom:20px;
+  z-index:999;
+}
+
+#cartBtn{
+  width:60px;
+  height:60px;
+  border-radius:18px;
+}
+
+/* ================= EXTRAS ================= */
+.extras-card{
+  grid-column:1 / -1;
+  text-align:left;
+}
+
+.extras-header{
+  margin-bottom:18px;
+}
+
+.extras-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+}
+
+@media (max-width:1024px){
+  .extras-grid{ grid-template-columns:repeat(2,1fr); }
+}
+
+@media (max-width:640px){
+  .extras-grid{ grid-template-columns:1fr; }
+}
+
+.extra-item{
+  background:rgba(255,255,255,0.35);
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,0.25);
+  border-radius:18px;
+  padding:18px;
+  transition:.3s ease;
+  box-shadow:0 8px 25px rgba(0,0,0,0.06);
+}
+
+html.dark-mode .extra-item{
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.08);
+}
+
+.extra-item:hover{
+  transform:translateY(-6px);
+  box-shadow:0 20px 50px rgba(59,130,246,0.15);
+}
+
+.extra-item h4{
+  font-size:16px;
+  font-weight:600;
+  margin-bottom:6px;
+}
+
+.extra-item p{
+  font-size:13px;
+  opacity:.75;
+  margin-bottom:12px;
+}
+
+.extra-btn{
+  background:rgba(59,130,246,0.08);
+  border:1px solid rgba(59,130,246,0.25);
+  font-size:13px;
+  padding:12px 14px;
+  border-radius:12px;
+  cursor:pointer;
+  transition:.25s ease;
+}
+
+.extra-btn:hover{
+  background:rgba(59,130,246,0.15);
+  transform:translateY(-2px);
+}
+
+.extra-btn.active{
+  background:rgba(59,130,246,0.35);
+  border-color:rgba(59,130,246,0.6);
+  color:#3b82f6;
+}
+
 </style>
 </head>
 
@@ -301,30 +379,23 @@ body.fade-out {
       <div class="h-16 px-6 glass-card flex items-center justify-between">
 
         <!-- LOGO -->
-        <a href="https://www.novyra.co.za/">
-
+        <a href="https://www.novyra.co.za/" class="flex items-center">
           <img
             id="navLogo"
             src="Novyra Navigation Bar (Dark Theme).png"
             class="h-10 md:h-12 w-auto"
+            alt="Novyra Logo"
           >
-
         </a>
 
         <!-- DESKTOP NAV -->
         <div class="hidden md:flex items-center gap-2 text-sm">
 
-          <a href="https://www.novyra.co.za/#home" class="nav-link">
-            Home
-          </a>
+          <a href="https://www.novyra.co.za/#home" class="nav-link">Home</a>
 
-          <a href="https://www.novyra.co.za/#about" class="nav-link">
-            About
-          </a>
+          <a href="https://www.novyra.co.za/#about" class="nav-link">About</a>
 
-          <a href="https://www.novyra.co.za/coming-soon/" class="nav-link">
-            Coming Soon
-          </a>
+          <a href="https://www.novyra.co.za/coming-soon/" class="nav-link">Coming Soon</a>
 
           <!-- CREATIVE SERVICES -->
           <div class="relative flex items-center gap-0">
@@ -335,7 +406,8 @@ body.fade-out {
             </a>
 
             <button id="servicesBtn"
-              class="nav-link px-1 leading-none flex items-center justify-center">
+              class="nav-link px-1 leading-none flex items-center justify-center"
+              aria-label="Toggle services menu">
 
               <span class="text-[12px]">⮟</span>
 
@@ -346,22 +418,22 @@ body.fade-out {
 
               <a href="https://www.novyra.co.za/creative-services/social-media-management/"
                  class="block nav-link">
-                 Social Media Management
+                Social Media Management
               </a>
 
               <a href="https://www.novyra.co.za/creative-services/content-creation/"
                  class="block nav-link">
-                 Content Creation
+                Content Creation
               </a>
 
               <a href="https://www.novyra.co.za/creative-services/branding/"
                  class="block nav-link">
-                 Branding
+                Branding
               </a>
 
               <a href="https://www.novyra.co.za/creative-services/marketing-materials/"
                  class="block nav-link">
-                 Marketing Materials
+                Marketing Materials
               </a>
 
             </div>
@@ -377,7 +449,9 @@ body.fade-out {
         </div>
 
         <!-- MOBILE MENU BUTTON -->
-        <button id="menuBtn" class="md:hidden text-xl">
+        <button id="menuBtn"
+          class="md:hidden text-xl"
+          aria-label="Open menu">
           ☰
         </button>
 
@@ -387,7 +461,8 @@ body.fade-out {
 
     <!-- THEME TOGGLE -->
     <button id="themeToggle"
-      class="h-16 w-16 glass-card flex items-center justify-center relative overflow-hidden">
+      class="h-16 w-16 glass-card flex items-center justify-center relative overflow-hidden"
+      aria-label="Toggle theme">
 
       <!-- SUN -->
       <svg id="sunIcon"
@@ -396,11 +471,8 @@ body.fade-out {
            fill="none"
            stroke="currentColor"
            stroke-width="1.8">
-
         <circle cx="12" cy="12" r="4"></circle>
-
         <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
-
       </svg>
 
       <!-- MOON -->
@@ -410,9 +482,7 @@ body.fade-out {
            fill="none"
            stroke="currentColor"
            stroke-width="1.8">
-
         <path d="M21 12.6A8.5 8.5 0 1 1 11.4 3a6.8 6.8 0 0 0 9.6 9.6Z"/>
-
       </svg>
 
     </button>
@@ -420,47 +490,40 @@ body.fade-out {
   </div>
 
   <!-- MOBILE MENU -->
-  <div id="mobileMenu" class="dropdown md:hidden mt-3">
+  <div id="mobileMenu" class="md:hidden mt-3">
 
     <div class="max-w-screen-xl mx-auto px-6">
 
       <div class="glass-card p-6 flex flex-col gap-3 text-sm">
 
-        <a href="https://www.novyra.co.za/#home" class="nav-link">
-          Home
-        </a>
+        <a href="https://www.novyra.co.za/#home" class="nav-link">Home</a>
 
-        <a href="https://www.novyra.co.za/#about" class="nav-link">
-          About
-        </a>
+        <a href="https://www.novyra.co.za/#about" class="nav-link">About</a>
 
-        <a href="https://www.novyra.co.za/coming-soon/" class="nav-link">
-          Coming Soon
-        </a>
+        <a href="https://www.novyra.co.za/coming-soon/" class="nav-link">Coming Soon</a>
 
-        <a href="https://www.novyra.co.za/#creative-services"
-           class="nav-link">
+        <a href="https://www.novyra.co.za/#creative-services" class="nav-link">
           Creative Services
         </a>
 
         <a href="https://www.novyra.co.za/creative-services/social-media-management/"
            class="nav-link pl-4">
-           - Social Media Management
+          - Social Media Management
         </a>
 
         <a href="https://www.novyra.co.za/creative-services/content-creation/"
            class="nav-link pl-4">
-           - Content Creation
+          - Content Creation
         </a>
 
         <a href="https://www.novyra.co.za/creative-services/branding/"
            class="nav-link pl-4">
-           - Branding
+          - Branding
         </a>
 
         <a href="https://www.novyra.co.za/creative-services/marketing-materials/"
            class="nav-link pl-4">
-           - Marketing Materials
+          - Marketing Materials
         </a>
 
         <a href="https://www.novyra.co.za/contact-us/"
@@ -476,56 +539,200 @@ body.fade-out {
 
 </header>
 
-<!-- ================= HERO ================= -->
-<section class="min-h-screen flex items-center justify-center px-6 md:px-10 pt-32 pb-16">
+<!-- ================= FLOATING CART (MOVED OUTSIDE HEADER) ================= -->
+<div id="cartFloat">
+  <button id="cartBtn"
+    class="glass-card flex items-center justify-center relative"
+    aria-label="Open cart">
 
-  <div class="max-w-5xl mx-auto text-center w-full">
+    <!-- Checkout Cart SVG Icon -->
+    <svg xmlns="http://www.w3.org/2000/svg"
+      class="w-6 h-6"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round">
 
-    <div class="coming-card glass-card p-8 md:p-16 float">
+      <!-- cart wheels -->
+      <circle cx="9" cy="21" r="1"></circle>
+      <circle cx="20" cy="21" r="1"></circle>
 
-      <!-- LABEL -->
-      <p class="uppercase tracking-[0.35em] text-xs md:text-sm text-blue-500 mb-6">
-        Social Meida Management In Progress
+      <!-- cart body -->
+      <path d="M1 1h4l2.7 13.39a2 2 0 0 0 2 1.61h9.8a2 2 0 0 0 2-1.61L23 6H6"></path>
+
+    </svg>
+
+    <!-- CART COUNT BADGE -->
+    <span id="cartCount"
+      class="absolute top-2 right-2 text-xs bg-blue-500 text-white rounded-full px-1.5">
+      0
+    </span>
+
+  </button>
+</div>
+
+  
+<!-- ================= CONTENT PACKAGES ================= -->
+<section id="content-packages" class="scroll-mt-28 px-6 md:px-10 py-16 pt-28">
+
+  <div class="max-w-7xl mx-auto">
+
+    <!-- HEADER -->
+    <div class="mb-14 text-center">
+      <h2 class="text-4xl md:text-6xl font-bold mb-4">
+        Content Packages
+      </h2>
+
+      <p class="text-base md:text-lg opacity-70 max-w-3xl mx-auto leading-relaxed">
+        Structured content systems designed to keep your brand consistent, visible, and growing.
       </p>
+    </div>
 
-      <!-- TITLE -->
-      <h1 class="text-5xl md:text-8xl font-black leading-none mb-8">
+    <!-- GRID -->
+    <div class="pricing-grid">
 
-        Coming
-
-        <span class="block text-blue-500 mt-2">
-          Soon
-        </span>
-
-      </h1>
-
-      <!-- DESCRIPTION -->
-      <p class="max-w-3xl mx-auto text-base md:text-xl opacity-70 leading-relaxed mb-10">
-
-        Novyra’s Social Media Management service is coming soon, delivering
-        strategic content, platform management, scheduling, and performance
-        tracking to grow your brand online.
-
-      </p>
-
-      <!-- BUTTONS -->
-      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-
-        <a href="https://www.novyra.co.za/"
-           class="px-7 py-3 rounded-2xl bg-blue-500 text-white hover:bg-blue-600 transition">
-          Back to Home
-        </a>
-
-        <a href="https://www.novyra.co.za/#creative-services"
-           class="px-7 py-3 rounded-2xl glass-card hover:opacity-80 transition">
-          Explore Services
-        </a>
-
+      <!-- CARD 1 -->
+      <div class="pricing-card">
+        <h3>Content Starter</h3>
+        <p class="price">R1,250 / month</p>
+        <ul>
+          <li>✔ 4 posts per month</li>
+          <li>✔ Content creation</li>
+          <li>✔ Scheduling</li>
+          <li>✔ 1 platform</li>
+          <li>✔ Analytics</li>
+        </ul>
+        <button class="select-btn" data-name="Content Starter" data-price="1250">
+          Select Package
+        </button>
       </div>
 
-      <!-- FOOT TEXT -->
-      <div class="mt-14 opacity-40 text-sm tracking-[0.25em] uppercase">
-        New Era of Creation
+      <!-- CARD 2 -->
+      <div class="pricing-card">
+        <h3>Content Flow</h3>
+        <p class="price">R1,850 / month</p>
+        <ul>
+          <li>✔ 6 posts per month</li>
+          <li>✔ Content creation</li>
+          <li>✔ Scheduling</li>
+          <li>✔ 2 platforms</li>
+          <li>✔ Analytics</li>
+        </ul>
+        <button class="select-btn" data-name="Content Flow" data-price="1850">
+          Select Package
+        </button>
+      </div>
+
+      <!-- CARD 3 -->
+      <div class="pricing-card featured">
+        <h3>Content Growth</h3>
+        <p class="price">R2,650 / month</p>
+        <ul>
+          <li>✔ 8 posts per month</li>
+          <li>✔ Content creation</li>
+          <li>✔ Scheduling</li>
+          <li>✔ 2 platforms</li>
+          <li>✔ Analytics</li>
+        </ul>
+        <button class="select-btn" data-name="Content Growth" data-price="2650">
+          Select Package
+        </button>
+      </div>
+
+      <!-- CARD 4 -->
+      <div class="pricing-card">
+        <h3>Content Plus</h3>
+        <p class="price">R3,650 / month</p>
+        <ul>
+          <li>✔ 10 posts per month</li>
+          <li>✔ Content creation</li>
+          <li>✔ Scheduling</li>
+          <li>✔ 3 platforms</li>
+          <li>✔ Analytics</li>
+        </ul>
+        <button class="select-btn" data-name="Content Plus" data-price="3650">
+          Select Package
+        </button>
+      </div>
+
+      <!-- CARD 5 -->
+      <div class="pricing-card">
+        <h3>Content Authority</h3>
+        <p class="price">R4,850 / month</p>
+        <ul>
+          <li>✔ 12 posts per month</li>
+          <li>✔ Content creation</li>
+          <li>✔ Scheduling</li>
+          <li>✔ 4 platforms</li>
+          <li>✔ Analytics</li>
+        </ul>
+        <button class="select-btn" data-name="Content Authority" data-price="4850">
+          Select Package
+        </button>
+      </div>
+
+      <!-- CARD 6 -->
+      <div class="pricing-card">
+        <h3>Content Elite</h3>
+        <p class="price">R6,250 / month</p>
+        <ul>
+          <li>✔ 15 posts per month</li>
+          <li>✔ Full content system</li>
+          <li>✔ Scheduling</li>
+          <li>✔ 5 platforms</li>
+          <li>✔ Analytics</li>
+        </ul>
+        <button class="select-btn" data-name="Content Elite" data-price="6250">
+          Select Package
+        </button>
+      </div>
+
+      <!-- ================= EXTRAS SECTION ================= -->
+      <div class="pricing-card extras-card">
+
+        <div class="extras-header">
+          <h3>Extra Options</h3>
+          <p class="tag">
+            Optional add-ons to enhance your package and extend your content system.
+          </p>
+        </div>
+
+        <div class="extras-grid">
+
+          <div class="extra-item">
+            <h4>Extra Post</h4>
+            <p>R250 per additional post</p>
+            <button class="extra-btn"
+              data-name="Extra Post"
+              data-price="250">
+              Add Option
+            </button>
+          </div>
+
+          <div class="extra-item">
+            <h4>Social Ads Setup</h4>
+            <p>Facebook & Instagram advertising setup</p>
+            <button class="extra-btn"
+              data-name="Social Ads Setup"
+              data-price="0">
+              Add Option
+            </button>
+          </div>
+
+          <div class="extra-item">
+            <h4>Shorts Repurposing</h4>
+            <p>TikTok & YouTube Shorts adaptation</p>
+            <button class="extra-btn"
+              data-name="Shorts Repurposing"
+              data-price="0">
+              Add Option
+            </button>
+          </div>
+
+        </div>
+
       </div>
 
     </div>
@@ -535,7 +742,7 @@ body.fade-out {
 </section>
 
 <!-- ================= FOOTER ================= -->
-<footer class="text-center py-6 text-sm"
+<footer class="text-center py-8 text-sm opacity-80"
         style="color: var(--footer-text);">
 
   © 2026 Novyra. All rights reserved.
@@ -543,6 +750,8 @@ body.fade-out {
 </footer>
 
 <script>
+document.addEventListener("DOMContentLoaded", () => {
+
 const root = document.documentElement;
 
 /* ================= ELEMENTS ================= */
@@ -558,6 +767,47 @@ const moonIcon = document.getElementById("moonIcon");
 const servicesBtn = document.getElementById("servicesBtn");
 const servicesDropdown = document.getElementById("servicesDropdown");
 
+const cartBtn = document.getElementById("cartBtn");
+const cartModal = document.getElementById("cartModal");
+const closeCart = document.getElementById("closeCart");
+const checkoutBtn = document.getElementById("checkoutBtn");
+
+/* ================= SAFE CART INIT ================= */
+let cart = {
+  package: null,
+  extras: []
+};
+
+try {
+  const saved = JSON.parse(localStorage.getItem("novyra-cart"));
+  if (saved && typeof saved === "object") {
+    cart = {
+      package: saved.package || null,
+      extras: Array.isArray(saved.extras) ? saved.extras : []
+    };
+  }
+} catch (e) {
+  console.warn("Cart reset due to corrupted storage");
+}
+
+/* ================= SAVE CART ================= */
+function saveCart() {
+  localStorage.setItem("novyra-cart", JSON.stringify(cart));
+  updateCartCount();
+}
+
+/* ================= CART COUNT ================= */
+function updateCartCount() {
+  const el = document.getElementById("cartCount");
+  if (!el) return;
+
+  const total =
+    (cart.package ? 1 : 0) +
+    (Array.isArray(cart.extras) ? cart.extras.length : 0);
+
+  el.textContent = total;
+}
+
 /* ================= MOBILE MENU ================= */
 if (menuBtn && mobileMenu && backdrop) {
   menuBtn.addEventListener("click", () => {
@@ -569,16 +819,9 @@ if (menuBtn && mobileMenu && backdrop) {
     mobileMenu.classList.remove("open");
     backdrop.classList.remove("show");
   });
-
-  document.querySelectorAll("#mobileMenu a").forEach(link => {
-    link.addEventListener("click", () => {
-      mobileMenu.classList.remove("open");
-      backdrop.classList.remove("show");
-    });
-  });
 }
 
-/* ================= THEME SYSTEM ================= */
+/* ================= THEME ================= */
 function updateTheme() {
   const isDark = root.classList.contains("dark-mode");
 
@@ -594,13 +837,11 @@ function updateTheme() {
   }
 }
 
-/* Load saved theme */
 if (localStorage.getItem("novyra-theme") === "dark") {
   root.classList.add("dark-mode");
 }
 updateTheme();
 
-/* Toggle theme */
 if (themeToggle) {
   themeToggle.addEventListener("click", () => {
     root.classList.toggle("dark-mode");
@@ -628,26 +869,13 @@ if (servicesBtn && servicesDropdown) {
     servicesOpen = false;
     servicesDropdown.classList.remove("open");
   });
-
-  document.querySelectorAll("#servicesDropdown a").forEach(link => {
-    link.addEventListener("click", () => {
-      servicesOpen = false;
-      servicesDropdown.classList.remove("open");
-    });
-  });
 }
 
-/* ================= VIEW TRANSITION NAV ================= */
-const links = document.querySelectorAll("a");
-
-function isInternalLink(href) {
-  return href && href.startsWith("https://www.novyra.co.za/");
-}
-
-links.forEach(link => {
+/* ================= VIEW TRANSITIONS ================= */
+document.querySelectorAll("a").forEach(link => {
   const href = link.getAttribute("href");
 
-  if (!isInternalLink(href)) return;
+  if (!href || !href.startsWith("https://www.novyra.co.za/")) return;
 
   link.addEventListener("click", (e) => {
     e.preventDefault();
@@ -658,19 +886,189 @@ links.forEach(link => {
       });
     } else {
       document.body.classList.add("fade-out");
-      setTimeout(() => {
-        window.location.href = href;
-      }, 250);
+      setTimeout(() => window.location.href = href, 250);
     }
   });
 });
 
 window.addEventListener("load", () => {
   document.body.classList.remove("fade-out");
+  restoreUIState();
+});
+
+/* ================= PACKAGE SELECT ================= */
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".select-btn");
+  if (!btn) return;
+
+  document.querySelectorAll(".select-btn").forEach(b => {
+    b.classList.remove("active-package");
+  });
+
+  btn.classList.add("active-package");
+
+  cart.package = {
+    name: btn.dataset.name,
+    price: Number(btn.dataset.price)
+  };
+
+  saveCart();
+});
+
+/* ================= EXTRAS ================= */
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".extra-btn");
+  if (!btn) return;
+
+  const name = btn.dataset.name;
+  const price = Number(btn.dataset.price);
+
+  if (!Array.isArray(cart.extras)) cart.extras = [];
+
+  const exists = cart.extras.find(ex => ex.name === name);
+
+  if (exists) {
+    cart.extras = cart.extras.filter(ex => ex.name !== name);
+    btn.classList.remove("active");
+    btn.textContent = "Add Option";
+  } else {
+    cart.extras.push({ name, price });
+    btn.classList.add("active");
+    btn.textContent = "Added";
+  }
+
+  saveCart();
+});
+
+/* ================= CART MODAL ================= */
+function openCart() {
+  renderCart();
+  if (!cartModal) return;
+
+  cartModal.classList.remove("hidden");
+  cartModal.classList.add("flex");
+}
+
+function closeCartModal() {
+  if (!cartModal) return;
+
+  cartModal.classList.add("hidden");
+  cartModal.classList.remove("flex");
+}
+
+/* ================= RESTORE UI ================= */
+function restoreUIState() {
+  if (cart.package) {
+    document.querySelectorAll(".select-btn").forEach(btn => {
+      if (btn.dataset.name === cart.package.name) {
+        btn.classList.add("active-package");
+      }
+    });
+  }
+
+  if (Array.isArray(cart.extras)) {
+    cart.extras.forEach(ex => {
+      const btn = document.querySelector(
+        `.extra-btn[data-name="${ex.name}"]`
+      );
+      if (btn) {
+        btn.classList.add("active");
+        btn.textContent = "Added";
+      }
+    });
+  }
+
+  updateCartCount();
+}
+
+/* ================= RENDER CART ================= */
+function renderCart() {
+  const el = document.getElementById("cartContent");
+  if (!el) return;
+
+  let html = "";
+
+  if (cart.package) {
+    html += `<div><strong>Package:</strong><br>${cart.package.name} - R${cart.package.price}</div>`;
+  } else {
+    html += `<div>No package selected</div>`;
+  }
+
+  if (Array.isArray(cart.extras) && cart.extras.length) {
+    html += `<div class="mt-2"><strong>Extras:</strong><br>`;
+    cart.extras.forEach(ex => {
+      html += `• ${ex.name} - R${ex.price}<br>`;
+    });
+    html += `</div>`;
+  }
+
+  el.innerHTML = html;
+}
+
+/* ================= CHECKOUT ================= */
+function checkoutCart() {
+  if (!cart.package) {
+    alert("Please select a package first.");
+    return;
+  }
+
+  let body = `New Order Request:%0D%0A%0D%0A`;
+
+  body += `PACKAGE:%0D%0A`;
+  body += `${cart.package.name} - R${cart.package.price}%0D%0A%0D%0A`;
+
+  body += `EXTRAS:%0D%0A`;
+
+  if (!Array.isArray(cart.extras) || cart.extras.length === 0) {
+    body += `None%0D%0A`;
+  } else {
+    cart.extras.forEach(ex => {
+      body += `- ${ex.name} - R${ex.price}%0D%0A`;
+    });
+  }
+
+  window.location.href =
+    `mailto:sales@novyra.co.za?subject=New%20Content%20Package%20Order&body=${body}`;
+}
+
+/* ================= EVENTS ================= */
+if (cartBtn) cartBtn.addEventListener("click", openCart);
+if (closeCart) closeCart.addEventListener("click", closeCartModal);
+if (checkoutBtn) checkoutBtn.addEventListener("click", checkoutCart);
+
+if (cartModal) {
+  cartModal.addEventListener("click", (e) => {
+    if (e.target === cartModal) closeCartModal();
+  });
+}
+
+/* ================= INIT ================= */
+updateCartCount();
+
 });
 </script>
 
-<script src="/js/cart.js" defer></script>
+<!-- CART MODAL -->
+<div id="cartModal" class="fixed inset-0 hidden items-center justify-center z-[9999] bg-black/40">
+  
+  <div class="glass-card w-[90%] max-w-md p-6 relative">
+
+    <button id="closeCart" class="absolute top-3 right-3 text-xl">✕</button>
+
+    <h2 class="text-2xl font-bold mb-4">Your Cart</h2>
+
+    <div id="cartContent" class="text-sm space-y-3 opacity-80">
+      <!-- Filled by JS -->
+    </div>
+
+    <button id="checkoutBtn"
+      class="mt-6 w-full bg-blue-500 text-white py-2 rounded-xl">
+      Checkout via Email
+    </button>
+
+  </div>
+
+</div>
   
 </body>
 </html>
