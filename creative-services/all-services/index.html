@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>Novyra - New Era of Creation</title>
+
+  <link rel="icon" type="image/png" href="Novyra Tab Icon (Light Theme).png">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+
+/* ================= ROOT THEME ================= */
+:root{
+  --bg: #f3f4f6;
+  --text: rgb(15 23 42);
+  --footer-text: #000000;
+
+  --scroll-thumb: rgba(59,130,246,0.85);
+  --scroll-track: transparent;
+}
+
+html.dark-mode{
+  --bg: rgb(38 38 40);
+  --text: white;
+  --footer-text: #ffffff;
+
+  --scroll-thumb: rgba(147,197,253,0.9);
+  --scroll-track: transparent;
+}
+
+html, body{
+  margin:0;
+  font-family:sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  transition:.3s ease;
+  overflow-x:hidden;
+  scroll-behavior:smooth;
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+}
+
+/* ================= SCROLLBAR ================= */
+::-webkit-scrollbar{ width:8px; }
+::-webkit-scrollbar-track{ background: var(--scroll-track); }
+::-webkit-scrollbar-thumb{
+  background: var(--scroll-thumb);
+  border-radius:10px;
+  border:2px solid transparent;
+  background-clip:padding-box;
+}
+
+/* ================= GLASS ================= */
+.glass-card{
+  background: rgba(255,255,255,0.4);
+  backdrop-filter: blur(5px);
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,0.3);
+  box-shadow:0 8px 32px rgba(0,0,0,0.1);
+}
+
+html.dark-mode .glass-card{
+  background: rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  box-shadow:0 12px 40px rgba(0,0,0,0.45);
+}
+
+/* ================= NAV ================= */
+.nav-link{
+  padding:6px 10px;
+  border-radius:10px;
+  transition:.2s ease;
+}
+
+.nav-link:hover{
+  color:#3b82f6;
+}
+
+.nav-link.active{
+  color:#3b82f6;
+  background:rgba(59,130,246,0.1);
+}
+
+/* ================= BACKDROP ================= */
+#backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.25);
+  opacity:0;
+  pointer-events:none;
+  transition:.3s ease;
+  z-index:40;
+}
+
+#backdrop.show{
+  opacity:1;
+  pointer-events:auto;
+}
+
+/* ================= ICON SYSTEM (IMPORTANT - ORIGINAL STYLE) ================= */
+.icon{
+  position:absolute;
+  width:20px;
+  height:20px;
+  transition:.3s ease;
+}
+
+/* ================= DROPDOWN (FIXED LIGHT + DARK MODE) ================= */
+#servicesDropdown {
+  position: absolute;
+  top: 52px;
+  left: 0;
+  width: 250px;
+
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  border-radius: 16px;
+
+  padding: 10px;
+
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+
+  transition: all 0.25s ease;
+  z-index: 60;
+
+  box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+}
+
+#servicesDropdown.open {
+  opacity: 1;
+  transform: translateY(6px);
+  pointer-events: auto;
+}
+
+/* DARK MODE LINKS */
+#servicesDropdown .nav-link {
+  color: rgba(255, 255, 255, 0.85);
+  display: block;
+  border-radius: 10px;
+}
+
+#servicesDropdown .nav-link:hover {
+  color: #93c5fd;
+  background: rgba(59, 130, 246, 0.18);
+}
+
+/* ================= LIGHT MODE FIX (THIS WAS MISSING) ================= */
+html:not(.dark-mode) #servicesDropdown {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+}
+
+html:not(.dark-mode) #servicesDropdown .nav-link {
+  color: rgb(15 23 42);
+}
+
+html:not(.dark-mode) #servicesDropdown .nav-link:hover {
+  background: rgba(59, 130, 246, 0.08);
+  color: #3b82f6;
+}
+
+/* ================= MOBILE MENU ================= */
+#mobileMenu {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+#mobileMenu.open {
+  max-height: 500px;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* fade */
+body{
+  transition: opacity 0.3s ease;
+}
+body.fade-out{
+  opacity: 0;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="backdrop"></div>
+
+<!-- ================= NAVBAR (UNCHANGED EXACTLY) ================= -->
+<header class="fixed top-4 w-full z-50">
+
+  <div class="max-w-screen-xl mx-auto px-6 flex items-stretch gap-4">
+
+    <nav class="flex-1">
+
+      <div class="h-16 px-6 glass-card flex items-center justify-between">
+
+        <img
+          id="navLogo"
+          src="Novyra Navigation Bar (Dark Theme).png"
+          class="h-10 md:h-12 w-auto"
+        >
+
+        <div class="hidden md:flex items-center gap-2 text-sm">
+
+          <a href="#home" class="nav-link">Home</a>
+          <a href="#about" class="nav-link">About</a>
+          <a href="#coming-soon" class="nav-link">Coming Soon</a>
+
+          <div class="relative flex items-center gap-0">
+
+            <a href="#creative-services" class="nav-link pr-1">
+              Creative Services
+            </a>
+
+            <button id="servicesBtn"
+              class="nav-link px-1 leading-none flex items-center justify-center">
+              <span class="text-[12px]">⮟</span>
+            </button>
+
+            <div id="servicesDropdown" class="space-y-2 text-sm">
+              <a href="#" class="block nav-link">Social Media Management</a>
+              <a href="#" class="block nav-link">Content Creation</a>
+              <a href="#" class="block nav-link">Branding</a>
+              <a href="#" class="block nav-link">Marketing Materials</a>
+            </div>
+
+          </div>
+
+          <a href="#" class="px-5 py-2 rounded-2xl bg-blue-500 text-white ml-2">
+            Contact Us
+          </a>
+
+        </div>
+
+        <button id="menuBtn" class="md:hidden text-xl">☰</button>
+
+      </div>
+
+    </nav>
+
+    <!-- THEME TOGGLE (UNCHANGED FUNCTIONALITY) -->
+    <button id="themeToggle"
+      class="h-16 w-16 glass-card flex items-center justify-center relative overflow-hidden">
+
+      <svg id="sunIcon" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <circle cx="12" cy="12" r="4"></circle>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+      </svg>
+
+      <svg id="moonIcon" class="icon opacity-0 scale-75" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M21 12.6A8.5 8.5 0 1 1 11.4 3a6.8 6.8 0 0 0 9.6 9.6Z"/>
+      </svg>
+
+    </button>
+
+  </div>
+
+  <!-- MOBILE MENU -->
+  <div id="mobileMenu" class="md:hidden mt-3">
+
+    <div class="max-w-screen-xl mx-auto px-6">
+
+      <div class="glass-card p-6 flex flex-col gap-3 text-sm">
+
+        <a href="#home" class="nav-link">Home</a>
+        <a href="#about" class="nav-link">About</a>
+        <a href="#coming-soon" class="nav-link">Coming Soon</a>
+
+        <a href="#creative-services" class="nav-link">Creative Services</a>
+
+        <a href="#" class="nav-link pl-4">- Social Media Management</a>
+        <a href="#" class="nav-link pl-4">- Content Creation</a>
+        <a href="#" class="nav-link pl-4">- Branding</a>
+        <a href="#" class="nav-link pl-4">- Marketing Materials</a>
+
+        <a href="#" class="px-4 py-2 rounded-xl bg-blue-500 text-white text-center">
+          Contact Us
+        </a>
+
+      </div>
+    </div>
+  </div>
+
+</header>
+
+<!-- ================= EMPTY SECTIONS ================= -->
+<section id="home" class="min-h-screen"></section>
+<section id="about" class="min-h-screen"></section>
+<section id="creative-services" class="min-h-screen"></section>
+<section id="coming-soon" class="min-h-screen"></section>
+
+<footer class="text-center py-6 text-sm" style="color: var(--footer-text);">
+  © 2026 Novyra. All rights reserved.
+</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  const root = document.documentElement;
+
+  const menuBtn = document.getElementById("menuBtn");
+  const mobileMenu = document.getElementById("mobileMenu");
+  const backdrop = document.getElementById("backdrop");
+
+  const themeToggle = document.getElementById("themeToggle");
+  const sunIcon = document.getElementById("sunIcon");
+  const moonIcon = document.getElementById("moonIcon");
+
+  const servicesBtn = document.getElementById("servicesBtn");
+  const servicesDropdown = document.getElementById("servicesDropdown");
+
+  let open = false;
+
+  menuBtn?.addEventListener("click", () => {
+    mobileMenu.classList.toggle("open");
+    backdrop.classList.toggle("show");
+  });
+
+  backdrop?.addEventListener("click", () => {
+    mobileMenu.classList.remove("open");
+    backdrop.classList.remove("show");
+  });
+
+  servicesBtn?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    open = !open;
+    servicesDropdown.classList.toggle("open", open);
+  });
+
+  document.addEventListener("click", () => {
+    open = false;
+    servicesDropdown.classList.remove("open");
+  });
+
+  themeToggle?.addEventListener("click", () => {
+    root.classList.toggle("dark-mode");
+
+    const isDark = root.classList.contains("dark-mode");
+
+    sunIcon.style.opacity = isDark ? "0" : "1";
+    moonIcon.style.opacity = isDark ? "1" : "0";
+  });
+
+});
+</script>
+
+</body>
+</html>
