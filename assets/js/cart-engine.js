@@ -11,15 +11,10 @@ document.addEventListener("DOMContentLoaded", () => {
     "marketing-materials": "marketingMaterials"
   };
 
-  /* ================= DETECT PAGE ================= */
-  const path = window.location.pathname.replace(/\/$/, "");
-  const pageSlug = path.split("/").pop();
+  /* ================= SAFE PAGE DETECTION ================= */
+  const cleanPath = window.location.pathname.split("?")[0];
+  const pageSlug = cleanPath.split("/").filter(Boolean).pop();
   const PAGE_KEY = PAGE_MAP[pageSlug];
-
-  if (!PAGE_KEY) {
-    console.warn("Cart engine: unknown page slug:", pageSlug);
-    return;
-  }
 
   /* ================= CART STATE ================= */
   let cart = {
@@ -37,8 +32,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const cartContent = document.getElementById("cartContent");
   const cartCount = document.getElementById("cartCount");
 
-  const themeToggle = document.getElementById("themeToggle");
   const root = document.documentElement;
+  const themeToggle = document.getElementById("themeToggle");
 
   /* ================= LOAD ================= */
   function loadCart() {
@@ -49,8 +44,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const parsed = JSON.parse(saved);
 
       for (const key in cart) {
-        cart[key] = parsed[key] ?? { item: null, extras: [] };
-        cart[key].extras ??= [];
+        const old = parsed[key];
+
+        cart[key] = {
+          item: old?.item ?? old?.package ?? null,
+          extras: Array.isArray(old?.extras) ? old.extras : []
+        };
       }
 
     } catch (e) {
@@ -76,8 +75,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (cartCount) cartCount.textContent = total;
   }
 
-  /* ================= UI SYNC ================= */
+  /* ================= UI SYNC (PAGE SAFE) ================= */
   function syncUI() {
+
+    if (!PAGE_KEY) return;
 
     const data = cart[PAGE_KEY];
 
@@ -89,13 +90,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".extra-btn").forEach(btn => {
       const exists = data.extras.find(e => e.name === btn.dataset.name);
 
-      if (exists) {
-        btn.classList.add("active");
-        btn.textContent = "Added";
-      } else {
-        btn.classList.remove("active");
-        btn.textContent = "Add Option";
-      }
+      btn.classList.toggle("active", !!exists);
+      btn.textContent = exists ? "Added" : "Add Option";
     });
 
     updateCartCount();
@@ -119,12 +115,14 @@ document.addEventListener("DOMContentLoaded", () => {
     for (const key in cart) {
 
       const section = cart[key];
+      const hasItem = section.item;
+      const hasExtras = section.extras.length > 0;
 
-      if (!section.item && section.extras.length === 0) continue;
+      if (!hasItem && !hasExtras) continue;
 
       html += `<div class="mb-3"><strong>${labels[key]}</strong><br>`;
 
-      if (section.item) {
+      if (hasItem) {
         html += `${section.item.name} - R${section.item.price}<br>`;
         total += section.item.price;
       }
@@ -137,6 +135,8 @@ document.addEventListener("DOMContentLoaded", () => {
       html += `</div>`;
     }
 
+    if (!html) html = `<div>Your cart is empty</div>`;
+
     html += `
       <div class="mt-4 pt-3 border-t border-white/20">
         <strong>Total: R${total}</strong>
@@ -146,16 +146,16 @@ document.addEventListener("DOMContentLoaded", () => {
     cartContent.innerHTML = html;
   }
 
-  /* ================= OPEN/CLOSE ================= */
+  /* ================= CART OPEN/CLOSE ================= */
   function openCart() {
     renderCart();
-    cartModal.classList.remove("hidden");
-    cartModal.classList.add("flex");
+    cartModal?.classList.remove("hidden");
+    cartModal?.classList.add("flex");
   }
 
   function closeCartModal() {
-    cartModal.classList.add("hidden");
-    cartModal.classList.remove("flex");
+    cartModal?.classList.add("hidden");
+    cartModal?.classList.remove("flex");
   }
 
   cartBtn?.addEventListener("click", openCart);
@@ -165,11 +165,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target === cartModal) closeCartModal();
   });
 
-  /* ================= SELECT PACKAGE ================= */
+  /* ================= PACKAGE SELECT ================= */
   document.addEventListener("click", (e) => {
 
     const btn = e.target.closest(".select-btn");
-    if (!btn) return;
+    if (!btn || !PAGE_KEY) return;
 
     const name = btn.dataset.name;
     const price = Number(btn.dataset.price);
@@ -187,7 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("click", (e) => {
 
     const btn = e.target.closest(".extra-btn");
-    if (!btn) return;
+    if (!btn || !PAGE_KEY) return;
 
     const name = btn.dataset.name;
     const price = Number(btn.dataset.price);
@@ -205,21 +205,17 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ================= CHECKOUT ================= */
   function checkoutCart() {
 
-    const labels = {
-      socialMedia: "Social Media Management",
-      contentCreation: "Content Creation",
-      branding: "Branding",
-      marketingMaterials: "Marketing Materials"
-    };
-
     let body = `Hey Novyra,%0D%0A%0D%0AI would like a quote:%0D%0A%0D%0A`;
+    let hasItems = false;
 
     for (const key in cart) {
-      const section = cart[key];
 
+      const section = cart[key];
       if (!section.item) continue;
 
-      body += `${labels[key]}:%0D%0A`;
+      hasItems = true;
+
+      body += `${key}:%0D%0A`;
       body += `${section.item.name} - R${section.item.price}%0D%0A`;
 
       section.extras.forEach(extra => {
@@ -229,6 +225,11 @@ document.addEventListener("DOMContentLoaded", () => {
       body += `%0D%0A`;
     }
 
+    if (!hasItems) {
+      alert("Please select a package first.");
+      return;
+    }
+
     window.location.href =
       `mailto:sales@novyra.co.za?subject=Quote Request&body=${body}`;
   }
@@ -236,14 +237,6 @@ document.addEventListener("DOMContentLoaded", () => {
   checkoutBtn?.addEventListener("click", checkoutCart);
 
   /* ================= THEME ================= */
-  function updateTheme() {
-    const isDark = root.classList.contains("dark-mode");
-
-    if (themeToggle) {
-      themeToggle.dataset.mode = isDark ? "dark" : "light";
-    }
-  }
-
   if (localStorage.getItem(THEME_KEY) === "dark") {
     root.classList.add("dark-mode");
   }
@@ -255,13 +248,12 @@ document.addEventListener("DOMContentLoaded", () => {
       THEME_KEY,
       root.classList.contains("dark-mode") ? "dark" : "light"
     );
-
-    updateTheme();
   });
 
   /* ================= INIT ================= */
   loadCart();
   syncUI();
+  updateCartCount();
 
   window.addEventListener("storage", (e) => {
     if (e.key === CART_KEY) {
