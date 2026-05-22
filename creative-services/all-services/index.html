@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <title>Novyra - New Era of Creation</title>
+  <title>Novyra - Our Services</title>
 
   <link rel="icon" type="image/png" href="Novyra Tab Icon (Light Theme).png">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -135,7 +135,6 @@ html.dark-mode .glass-card{
   pointer-events: auto;
 }
 
-/* DARK MODE */
 #servicesDropdown .nav-link {
   color: rgba(255, 255, 255, 0.85);
   display: block;
@@ -146,7 +145,6 @@ html.dark-mode .glass-card{
   background: rgba(59, 130, 246, 0.18);
 }
 
-/* LIGHT MODE FIX */
 html:not(.dark-mode) #servicesDropdown {
   background: rgba(255, 255, 255, 0.92);
   border: 1px solid rgba(59, 130, 246, 0.2);
@@ -205,7 +203,7 @@ body.fade-out{
         <!-- LOGO -->
         <img
           id="navLogo"
-          src="Novyra Navigation Bar (Dark Theme).png"
+          src="Novyra Navigation Bar (Light Theme).png"
           class="h-10 md:h-12 w-auto"
         >
 
@@ -318,6 +316,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let open = false;
 
+  function updateTheme() {
+    const isDark = root.classList.contains("dark-mode");
+
+    sunIcon.style.opacity = isDark ? "0" : "1";
+    moonIcon.style.opacity = isDark ? "1" : "0";
+
+    if (navLogo) {
+      navLogo.src = isDark
+        ? "Novyra Navigation Bar (Dark Theme).png"
+        : "Novyra Navigation Bar (Light Theme).png";
+    }
+  }
+
+  // Ensure correct theme on load
+  updateTheme();
+
   menuBtn?.addEventListener("click", () => {
     mobileMenu.classList.toggle("open");
     backdrop.classList.toggle("show");
@@ -341,17 +355,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   themeToggle?.addEventListener("click", () => {
     root.classList.toggle("dark-mode");
-
-    const isDark = root.classList.contains("dark-mode");
-
-    sunIcon.style.opacity = isDark ? "0" : "1";
-    moonIcon.style.opacity = isDark ? "1" : "0";
-
-    if (navLogo) {
-      navLogo.src = isDark
-        ? "Novyra Navigation Bar (Dark Theme).png"
-        : "Novyra Navigation Bar (Light Theme).png";
-    }
+    updateTheme();
   });
 
 });
