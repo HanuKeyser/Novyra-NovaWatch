@@ -690,359 +690,59 @@ html.dark-mode .extra-item{
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-  const CART_KEY = "novyra-cart";
+  /* ================= PAGE IDENTIFIER ================= */
+  const PAGE_KEY = "contentCreation";
 
-  /* ================= ELEMENTS ================= */
-  const cartBtn = document.getElementById("cartBtn");
-  const cartModal = document.getElementById("cartModal");
-  const closeCart = document.getElementById("closeCart");
-  const checkoutBtn = document.getElementById("checkoutBtn");
-  const cartContent = document.getElementById("cartContent");
-  const cartCount = document.getElementById("cartCount");
+  /* ================= OPTIONAL: PAGE LABEL (used by global cart engine) ================= */
+  window.NOVYRA_PAGE = PAGE_KEY;
 
-  /* ================= CART ================= */
-  let cart = {
-  socialMedia: null,
-  contentCreation: null,
-  branding: null,
-  marketingMaterials: null,
-  extras: []
-}
+  /* ================= REGISTER PAGE WITH GLOBAL CART ENGINE ================= */
+  if (window.NovyraCart) {
+    window.NovyraCart.setActivePage(PAGE_KEY);
+    window.NovyraCart.initPage();
+  }
 
-  /* ================= LOAD ================= */
-  function loadCart() {
+  /* ================= THEME TOGGLE HOOK (ONLY UI SIDE) ================= */
+  const themeToggle = document.getElementById("themeToggle");
+  const root = document.documentElement;
 
-    try {
+  const navLogo = document.getElementById("navLogo");
+  const sunIcon = document.getElementById("sunIcon");
+  const moonIcon = document.getElementById("moonIcon");
 
-      const saved = localStorage.getItem(CART_KEY);
+  function updateThemeUI() {
+    const isDark = root.classList.contains("dark-mode");
 
-      if (!saved) return;
-
-      const parsed = JSON.parse(saved);
-
-      cart.socialMedia = parsed.socialMedia || null;
-      cart.contentCreation = parsed.contentCreation || null;
-      cart.extras = Array.isArray(parsed.extras)
-        ? parsed.extras
-        : [];
-
-    } catch(err) {
-
-      cart = {
-        socialMedia: null,
-        contentCreation: null,
-        extras: []
-      };
-
+    if (navLogo) {
+      navLogo.src = isDark
+        ? "Novyra Navigation Bar (Dark Theme).png"
+        : "Novyra Navigation Bar (Light Theme).png";
     }
 
-  }
-
-  /* ================= SAVE ================= */
-  function saveCart() {
-    localStorage.setItem(CART_KEY, JSON.stringify(cart));
-    updateCount();
-  }
-
-  /* ================= COUNT ================= */
-  function updateCount() {
-
-    let total = 0;
-
-    if (cart.socialMedia) total++;
-    if (cart.contentCreation) total++;
-
-    total += cart.extras.length;
-
-    cartCount.textContent = total;
-  }
-
-  /* ================= PACKAGE SELECT ================= */
-  document.addEventListener("click", (e) => {
-
-    const btn = e.target.closest(".select-btn");
-
-    if (!btn) return;
-
-    const name = btn.dataset.name;
-    const price = Number(btn.dataset.price);
-
-    if (
-      cart.contentCreation &&
-      cart.contentCreation.name === name
-    ) {
-
-      cart.contentCreation = null;
-
-    } else {
-
-      cart.contentCreation = {
-        name,
-        price
-      };
-
+    if (sunIcon && moonIcon) {
+      sunIcon.style.opacity = isDark ? "0" : "1";
+      moonIcon.style.opacity = isDark ? "1" : "0";
     }
+  }
 
-    saveCart();
-    syncUI();
+  themeToggle?.addEventListener("click", () => {
 
-  });
+    root.classList.toggle("dark-mode");
 
-  /* ================= EXTRAS ================= */
-  document.addEventListener("click", (e) => {
-
-    const btn = e.target.closest(".extra-btn");
-
-    if (!btn) return;
-
-    const name = btn.dataset.name;
-    const price = Number(btn.dataset.price);
-
-    const existing = cart.extras.findIndex(
-      item => item.name === name
+    localStorage.setItem(
+      "novyra-theme",
+      root.classList.contains("dark-mode") ? "dark" : "light"
     );
 
-    if (existing > -1) {
-
-      cart.extras.splice(existing, 1);
-
-    } else {
-
-      cart.extras.push({
-        name,
-        price
-      });
-
-    }
-
-    saveCart();
-    syncUI();
-
+    updateThemeUI();
   });
 
-  /* ================= SYNC UI ================= */
-  function syncUI() {
-
-    document.querySelectorAll(".select-btn").forEach(btn => {
-
-      const active =
-        cart.contentCreation &&
-        cart.contentCreation.name === btn.dataset.name;
-
-      btn.classList.toggle("active-package", active);
-
-    });
-
-    document.querySelectorAll(".extra-btn").forEach(btn => {
-
-      const exists = cart.extras.find(
-        item => item.name === btn.dataset.name
-      );
-
-      if (exists) {
-
-        btn.classList.add("active");
-        btn.textContent = "Added";
-
-      } else {
-
-        btn.classList.remove("active");
-        btn.textContent = "Add Option";
-
-      }
-
-    });
-
-    updateCount();
-
+  /* ================= INIT THEME ================= */
+  if (localStorage.getItem("novyra-theme") === "dark") {
+    root.classList.add("dark-mode");
   }
 
-  /* ================= RENDER CART ================= */
-  function renderCart() {
-
-    let total = 0;
-    let html = "";
-
-    /* ===== SOCIAL MEDIA ===== */
-    if (cart.socialMedia) {
-
-      total += cart.socialMedia.price;
-
-      html += `
-        <div class="mb-4">
-          <strong>Social Media Package:</strong><br>
-          ${cart.socialMedia.name} - R${cart.socialMedia.price}
-        </div>
-      `;
-
-    }
-
-    /* ===== CONTENT CREATION ===== */
-    if (cart.contentCreation) {
-
-      total += cart.contentCreation.price;
-
-      html += `
-        <div class="mb-4">
-          <strong>Content Creation Package:</strong><br>
-          ${cart.contentCreation.name} - R${cart.contentCreation.price}
-        </div>
-      `;
-
-    }
-
-    /* ===== EXTRAS ===== */
-    if (cart.extras.length) {
-
-      html += `
-        <div class="mb-4">
-          <strong>Extras:</strong><br>
-      `;
-
-      cart.extras.forEach(extra => {
-
-        total += extra.price;
-
-        html += `
-          • ${extra.name} - R${extra.price}<br>
-        `;
-
-      });
-
-      html += `</div>`;
-
-    }
-
-    if (
-      !cart.socialMedia &&
-      !cart.contentCreation &&
-      !cart.extras.length
-    ) {
-
-      html = `<div>Your cart is empty</div>`;
-
-    }
-
-    html += `
-      <div class="mt-4 pt-4 border-t border-white/20">
-        <strong>Total: R${total}</strong>
-      </div>
-    `;
-
-    cartContent.innerHTML = html;
-
-  }
-
-  /* ================= OPEN / CLOSE ================= */
-  function openCart() {
-
-    renderCart();
-
-    cartModal.classList.remove("hidden");
-    cartModal.classList.add("flex");
-
-  }
-
-  function closeCartModal() {
-
-    cartModal.classList.add("hidden");
-    cartModal.classList.remove("flex");
-
-  }
-
-  cartBtn?.addEventListener("click", openCart);
-
-  closeCart?.addEventListener("click", closeCartModal);
-
-  cartModal?.addEventListener("click", (e) => {
-
-    if (e.target === cartModal) {
-      closeCartModal();
-    }
-
-  });
-
-  /* ================= CHECKOUT ================= */
-  function checkout() {
-
-    if (
-      !cart.socialMedia &&
-      !cart.contentCreation
-    ) {
-
-      alert("Please select at least one package.");
-      return;
-
-    }
-
-    let body = `Hey Novyra,%0D%0A%0D%0A`;
-    body += `I would like a quote for:%0D%0A%0D%0A`;
-
-    /* ===== SOCIAL MEDIA ===== */
-    if (cart.socialMedia) {
-
-      body += `Social Media Package:%0D%0A`;
-      body += `${cart.socialMedia.name} - R${cart.socialMedia.price}%0D%0A%0D%0A`;
-
-    }
-
-    /* ===== CONTENT CREATION ===== */
-    if (cart.contentCreation) {
-
-      body += `Content Creation Package:%0D%0A`;
-      body += `${cart.contentCreation.name} - R${cart.contentCreation.price}%0D%0A%0D%0A`;
-
-    }
-
-    /* ===== EXTRAS ===== */
-    body += `Extras:%0D%0A`;
-
-    if (!cart.extras.length) {
-
-      body += `None%0D%0A`;
-
-    } else {
-
-      cart.extras.forEach(extra => {
-
-        body += `- ${extra.name} - R${extra.price}%0D%0A`;
-
-      });
-
-    }
-
-    window.location.href =
-      `mailto:sales@novyra.co.za?subject=Quote Request from Website&body=${body}`;
-
-  }
-
-  checkoutBtn?.addEventListener("click", checkout);
-
-  /* ================= INIT ================= */
-  function init() {
-
-    loadCart();
-    syncUI();
-
-  }
-
-  init();
-
-  window.addEventListener("focus", init);
-
-  window.addEventListener("pageshow", init);
-
-  /* ================= CROSS PAGE SYNC ================= */
-  window.addEventListener("storage", (e) => {
-
-    if (e.key === CART_KEY) {
-
-      loadCart();
-      syncUI();
-
-    }
-
-  });
+  updateThemeUI();
 
 });
 </script>
