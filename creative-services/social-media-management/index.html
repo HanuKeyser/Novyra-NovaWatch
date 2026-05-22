@@ -25,7 +25,6 @@ html.dark-mode{
   --bg: rgb(38 38 40);
   --text: white;
   --footer-text: #ffffff;
-
   --scroll-thumb: rgba(147,197,253,0.9);
 }
 
@@ -136,7 +135,6 @@ html.dark-mode .glass-card{
   pointer-events:auto;
 }
 
-/* light mode dropdown */
 html:not(.dark-mode) #servicesDropdown{
   background:rgba(255,255,255,0.92);
   border:1px solid rgba(59,130,246,0.2);
@@ -234,51 +232,11 @@ html.dark-mode .pricing-card{
   line-height:1.8;
 }
 
-/* featured */
+/* ================= FEATURED CARD ================= */
 .pricing-card.featured{
   border:1px solid rgba(59,130,246,0.4);
   box-shadow:0 20px 60px rgba(59,130,246,0.15);
   transform:scale(1.02);
-}
-
-/* ================= BUTTONS ================= */
-.select-btn{
-  width:100%;
-  margin-top:14px;
-  padding:10px 14px;
-  border-radius:14px;
-  background:rgba(59,130,246,0.12);
-  border:1px solid rgba(59,130,246,0.4);
-  color:#3b82f6;
-  font-weight:600;
-  cursor:pointer;
-  transition:.25s ease;
-}
-
-.select-btn:hover{
-  background:#3b82f6;
-  color:white;
-  transform:translateY(-2px);
-}
-
-.active-package{
-  background:#3b82f6 !important;
-  color:white !important;
-  transform:scale(1.02);
-}
-
-/* ================= CART ================= */
-#cartFloat{
-  position:fixed;
-  right:20px;
-  bottom:20px;
-  z-index:999;
-}
-
-#cartBtn{
-  width:60px;
-  height:60px;
-  border-radius:18px;
 }
 
 /* ================= EXTRAS ================= */
@@ -334,28 +292,7 @@ html.dark-mode .extra-item{
 .extra-item p{
   font-size:13px;
   opacity:.75;
-  margin-bottom:12px;
-}
-
-.extra-btn{
-  background:rgba(59,130,246,0.08);
-  border:1px solid rgba(59,130,246,0.25);
-  font-size:13px;
-  padding:12px 14px;
-  border-radius:12px;
-  cursor:pointer;
-  transition:.25s ease;
-}
-
-.extra-btn:hover{
-  background:rgba(59,130,246,0.15);
-  transform:translateY(-2px);
-}
-
-.extra-btn.active{
-  background:rgba(59,130,246,0.35);
-  border-color:rgba(59,130,246,0.6);
-  color:#3b82f6;
+  margin-bottom:0;
 }
 
 </style>
@@ -539,41 +476,6 @@ html.dark-mode .extra-item{
 
 </header>
 
-<!-- ================= FLOATING CART (MOVED OUTSIDE HEADER) ================= -->
-<div id="cartFloat">
-  <button id="cartBtn"
-    class="glass-card flex items-center justify-center relative"
-    aria-label="Open cart">
-
-    <!-- Checkout Cart SVG Icon -->
-    <svg xmlns="http://www.w3.org/2000/svg"
-      class="w-6 h-6"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round">
-
-      <!-- cart wheels -->
-      <circle cx="9" cy="21" r="1"></circle>
-      <circle cx="20" cy="21" r="1"></circle>
-
-      <!-- cart body -->
-      <path d="M1 1h4l2.7 13.39a2 2 0 0 0 2 1.61h9.8a2 2 0 0 0 2-1.61L23 6H6"></path>
-
-    </svg>
-
-    <!-- CART COUNT BADGE -->
-    <span id="cartCount"
-      class="absolute top-2 right-2 text-xs bg-blue-500 text-white rounded-full px-1.5">
-      0
-    </span>
-
-  </button>
-</div>
-
-  
 <!-- ================= CONTENT PACKAGES ================= -->
 <section id="content-packages" class="scroll-mt-28 px-6 md:px-10 py-16 pt-28">
 
@@ -585,8 +487,8 @@ html.dark-mode .extra-item{
         Social Media Management Packages
       </h2>
 
-      <p class="text-base md:text-lg opacity-70 max-w-3xl mx-auto leading-relaxed">
-        Structured content systems designed to keep your brand consistent, visible, and growing.
+      <p class="text-base md:text-lg opacity-70 max-w-7xl mx-auto leading-relaxed">
+        Structured content systems designed to keep your brand consistent, visible, and continuously growing across all platforms. We create and organise content in a way that strengthens your brand identity, improves engagement, and ensures your message stays clear and aligned wherever your audience finds you.
       </p>
     </div>
 
@@ -604,9 +506,6 @@ html.dark-mode .extra-item{
           <li>✔ 1 platform</li>
           <li>✔ Analytics</li>
         </ul>
-        <button class="select-btn" data-name="Content Starter" data-price="1250">
-          Select Content Starter
-        </button>
       </div>
 
       <!-- CARD 2 -->
@@ -620,9 +519,6 @@ html.dark-mode .extra-item{
           <li>✔ 2 platforms</li>
           <li>✔ Analytics</li>
         </ul>
-        <button class="select-btn" data-name="Content Flow" data-price="1850">
-          Select Content Flow
-        </button>
       </div>
 
       <!-- CARD 3 -->
@@ -636,9 +532,6 @@ html.dark-mode .extra-item{
           <li>✔ 2 platforms</li>
           <li>✔ Analytics</li>
         </ul>
-        <button class="select-btn" data-name="Content Growth" data-price="2650">
-          Select Content Growth
-        </button>
       </div>
 
       <!-- CARD 4 -->
@@ -652,9 +545,6 @@ html.dark-mode .extra-item{
           <li>✔ 3 platforms</li>
           <li>✔ Analytics</li>
         </ul>
-        <button class="select-btn" data-name="Content Plus" data-price="3650">
-          Select Content Plus
-        </button>
       </div>
 
       <!-- CARD 5 -->
@@ -668,9 +558,6 @@ html.dark-mode .extra-item{
           <li>✔ 4 platforms</li>
           <li>✔ Analytics</li>
         </ul>
-        <button class="select-btn" data-name="Content Authority" data-price="4850">
-          Select Content Authority
-        </button>
       </div>
 
       <!-- CARD 6 -->
@@ -684,18 +571,15 @@ html.dark-mode .extra-item{
           <li>✔ 5 platforms</li>
           <li>✔ Analytics</li>
         </ul>
-        <button class="select-btn" data-name="Content Elite" data-price="6250">
-          Select Content Elite
-        </button>
       </div>
 
-      <!-- ================= EXTRAS SECTION ================= -->
+      <!-- ================= EXTRAS ================= -->
       <div class="pricing-card extras-card">
 
         <div class="extras-header">
           <h3>Extra Options</h3>
-          <p class="tag">
-            Optional add-ons to enhance your package and extend your content system.
+          <p class="tag opacity-70">
+            Optional add-ons to enhance your content system.
           </p>
         </div>
 
@@ -704,31 +588,16 @@ html.dark-mode .extra-item{
           <div class="extra-item">
             <h4>Extra Post</h4>
             <p>R250 per additional post</p>
-            <button class="extra-btn"
-              data-name="Extra Post"
-              data-price="250">
-              Add Option
-            </button>
           </div>
 
           <div class="extra-item">
             <h4>Social Ads Setup</h4>
             <p>Facebook & Instagram advertising setup</p>
-            <button class="extra-btn"
-              data-name="Social Ads Setup"
-              data-price="0">
-              Add Option
-            </button>
           </div>
 
           <div class="extra-item">
             <h4>Shorts Repurposing</h4>
             <p>TikTok & YouTube Shorts adaptation</p>
-            <button class="extra-btn"
-              data-name="Shorts Repurposing"
-              data-price="0">
-              Add Option
-            </button>
           </div>
 
         </div>
@@ -752,180 +621,78 @@ html.dark-mode .extra-item{
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-  const CART_KEY = "novyra-cart";
-  const THEME_KEY = "novyra-theme";
+  /* ================= SERVICES DROPDOWN ================= */
+  const servicesBtn = document.getElementById("servicesBtn");
+  const servicesDropdown = document.getElementById("servicesDropdown");
 
-  const PAGE_MAP = {
-    "social-media-management": "socialMedia",
-    "content-creation": "contentCreation",
-    "branding": "branding",
-    "marketing-materials": "marketingMaterials"
-  };
+  if (servicesBtn && servicesDropdown) {
 
-  const path = window.location.pathname.replace(/\/$/, "");
-  const pageSlug = path.split("/").pop();
-  const PAGE_KEY = PAGE_MAP[pageSlug];
+    servicesBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      servicesDropdown.classList.toggle("open");
+    });
 
-  let cart = {
-    socialMedia: { item: null, extras: [] },
-    contentCreation: { item: null, extras: [] },
-    branding: { item: null, extras: [] },
-    marketingMaterials: { item: null, extras: [] }
-  };
-
-  const cartBtn = document.getElementById("cartBtn");
-  const cartModal = document.getElementById("cartModal");
-  const closeCart = document.getElementById("closeCart");
-  const checkoutBtn = document.getElementById("checkoutBtn");
-  const cartContent = document.getElementById("cartContent");
-  const cartCount = document.getElementById("cartCount");
-
-  function loadCart() {
-    const saved = localStorage.getItem(CART_KEY);
-    if (!saved) return;
-    const parsed = JSON.parse(saved);
-
-    for (const key in cart) {
-      cart[key] = parsed[key] ?? { item: null, extras: [] };
-    }
-  }
-
-  function saveCart() {
-    localStorage.setItem(CART_KEY, JSON.stringify(cart));
-    updateCartCount();
-  }
-
-  function updateCartCount() {
-    let total = 0;
-    for (const key in cart) {
-      if (cart[key].item) total++;
-      total += cart[key].extras.length;
-    }
-    if (cartCount) cartCount.textContent = total;
-  }
-
-  function renderCart() {
-    let html = "";
-    let total = 0;
-
-    for (const key in cart) {
-      const section = cart[key];
-      if (!section.item && section.extras.length === 0) continue;
-
-      html += `<div><strong>${key}</strong><br>`;
-
-      if (section.item) {
-        html += `${section.item.name} - R${section.item.price}<br>`;
-        total += section.item.price;
+    document.addEventListener("click", (e) => {
+      if (!servicesDropdown.contains(e.target) && e.target !== servicesBtn) {
+        servicesDropdown.classList.remove("open");
       }
+    });
 
-      section.extras.forEach(e => {
-        html += `• ${e.name} - R${e.price}<br>`;
-        total += e.price;
-      });
-
-      html += `</div>`;
-    }
-
-    html += `<div class="mt-3"><strong>Total: R${total}</strong></div>`;
-    cartContent.innerHTML = html;
   }
 
-  function openCart() {
-    renderCart();
-    cartModal.classList.remove("hidden");
-    cartModal.classList.add("flex");
+  /* ================= MOBILE MENU ================= */
+  const menuBtn = document.getElementById("menuBtn");
+  const mobileMenu = document.getElementById("mobileMenu");
+
+  if (menuBtn && mobileMenu) {
+    menuBtn.addEventListener("click", () => {
+      mobileMenu.classList.toggle("open");
+    });
   }
 
-  function closeCartModal() {
-    cartModal.classList.add("hidden");
-    cartModal.classList.remove("flex");
+  /* ================= THEME TOGGLE ================= */
+  const themeToggle = document.getElementById("themeToggle");
+
+  if (themeToggle) {
+    themeToggle.addEventListener("click", () => {
+      document.documentElement.classList.toggle("dark-mode");
+
+      // optional persistence
+      if (document.documentElement.classList.contains("dark-mode")) {
+        localStorage.setItem("theme", "dark");
+      } else {
+        localStorage.setItem("theme", "light");
+      }
+    });
   }
 
-  cartBtn?.addEventListener("click", openCart);
-  closeCart?.addEventListener("click", closeCartModal);
+  /* ================= LOAD THEME ================= */
+  const savedTheme = localStorage.getItem("theme");
+  if (savedTheme === "dark") {
+    document.documentElement.classList.add("dark-mode");
+  }
 
-  document.addEventListener("click", (e) => {
+  /* ================= PACKAGE BUTTONS ================= */
+  document.querySelectorAll(".select-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
 
-    const pkg = e.target.closest(".select-btn");
-    if (pkg && PAGE_KEY) {
-      const name = pkg.dataset.name;
-      const price = Number(pkg.dataset.price);
+      // simple visual toggle only (no cart system)
+      btn.classList.toggle("active-package");
 
-      const current = cart[PAGE_KEY].item;
-
-      cart[PAGE_KEY].item =
-        current?.name === name ? null : { name, price };
-
-      saveCart();
-      updateCartCount();
-    }
-
-    const extra = e.target.closest(".extra-btn");
-    if (extra && PAGE_KEY) {
-      const name = extra.dataset.name;
-      const price = Number(extra.dataset.price);
-
-      const extras = cart[PAGE_KEY].extras;
-      const i = extras.findIndex(e => e.name === name);
-
-      if (i > -1) extras.splice(i, 1);
-      else extras.push({ name, price });
-
-      saveCart();
-      updateCartCount();
-    }
-
+    });
   });
 
-  function checkoutCart() {
-    let body = "Quote request:%0D%0A";
+  /* ================= EXTRA BUTTONS ================= */
+  document.querySelectorAll(".extra-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
 
-    for (const key in cart) {
-      const s = cart[key];
-      if (!s.item) continue;
+      btn.classList.toggle("active");
 
-      body += `%0D%0A${key}%0D%0A`;
-      body += `${s.item.name} - R${s.item.price}%0D%0A`;
-
-      s.extras.forEach(e => {
-        body += `- ${e.name} - R${e.price}%0D%0A`;
-      });
-    }
-
-    window.location.href =
-      `mailto:sales@novyra.co.za?subject=Quote&body=${body}`;
-  }
-
-  checkoutBtn?.addEventListener("click", checkoutCart);
-
-  loadCart();
-  updateCartCount();
+    });
+  });
 
 });
 </script>
-
-<!-- CART MODAL -->
-<div id="cartModal" class="fixed inset-0 hidden items-center justify-center z-[9999] bg-black/40">
-  
-  <div class="glass-card w-[90%] max-w-md p-6 relative">
-
-    <button id="closeCart" class="absolute top-3 right-3 text-xl">✕</button>
-
-    <h2 class="text-2xl font-bold mb-4">Your Cart</h2>
-
-    <div id="cartContent" class="text-sm space-y-3 opacity-80">
-      <!-- Filled by JS -->
-    </div>
-
-    <button id="checkoutBtn"
-      class="mt-6 w-full bg-blue-500 text-white py-2 rounded-xl">
-      Checkout via Email
-    </button>
-
-  </div>
-
-</div>
   
 </body>
 </html>
