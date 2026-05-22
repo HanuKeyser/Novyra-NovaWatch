@@ -752,129 +752,155 @@ html.dark-mode .extra-item{
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-  /* ================= ROOT ================= */
-  const root = document.documentElement;
-
-  /* ================= STORAGE KEYS ================= */
+  const CART_KEY = "novyra-cart";
   const THEME_KEY = "novyra-theme";
 
-  /* ================= ELEMENTS ================= */
-  const menuBtn = document.getElementById("menuBtn");
-  const mobileMenu = document.getElementById("mobileMenu");
-  const backdrop = document.getElementById("backdrop");
+  const PAGE_MAP = {
+    "social-media-management": "socialMedia",
+    "content-creation": "contentCreation",
+    "branding": "branding",
+    "marketing-materials": "marketingMaterials"
+  };
 
-  const themeToggle = document.getElementById("themeToggle");
-  const navLogo = document.getElementById("navLogo");
-  const sunIcon = document.getElementById("sunIcon");
-  const moonIcon = document.getElementById("moonIcon");
+  const path = window.location.pathname.replace(/\/$/, "");
+  const pageSlug = path.split("/").pop();
+  const PAGE_KEY = PAGE_MAP[pageSlug];
 
-  const servicesBtn = document.getElementById("servicesBtn");
-  const servicesDropdown = document.getElementById("servicesDropdown");
+  let cart = {
+    socialMedia: { item: null, extras: [] },
+    contentCreation: { item: null, extras: [] },
+    branding: { item: null, extras: [] },
+    marketingMaterials: { item: null, extras: [] }
+  };
 
-  /* ================= PACKAGE + EXTRA CLICK HANDLING ================= */
+  const cartBtn = document.getElementById("cartBtn");
+  const cartModal = document.getElementById("cartModal");
+  const closeCart = document.getElementById("closeCart");
+  const checkoutBtn = document.getElementById("checkoutBtn");
+  const cartContent = document.getElementById("cartContent");
+  const cartCount = document.getElementById("cartCount");
+
+  function loadCart() {
+    const saved = localStorage.getItem(CART_KEY);
+    if (!saved) return;
+    const parsed = JSON.parse(saved);
+
+    for (const key in cart) {
+      cart[key] = parsed[key] ?? { item: null, extras: [] };
+    }
+  }
+
+  function saveCart() {
+    localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    updateCartCount();
+  }
+
+  function updateCartCount() {
+    let total = 0;
+    for (const key in cart) {
+      if (cart[key].item) total++;
+      total += cart[key].extras.length;
+    }
+    if (cartCount) cartCount.textContent = total;
+  }
+
+  function renderCart() {
+    let html = "";
+    let total = 0;
+
+    for (const key in cart) {
+      const section = cart[key];
+      if (!section.item && section.extras.length === 0) continue;
+
+      html += `<div><strong>${key}</strong><br>`;
+
+      if (section.item) {
+        html += `${section.item.name} - R${section.item.price}<br>`;
+        total += section.item.price;
+      }
+
+      section.extras.forEach(e => {
+        html += `• ${e.name} - R${e.price}<br>`;
+        total += e.price;
+      });
+
+      html += `</div>`;
+    }
+
+    html += `<div class="mt-3"><strong>Total: R${total}</strong></div>`;
+    cartContent.innerHTML = html;
+  }
+
+  function openCart() {
+    renderCart();
+    cartModal.classList.remove("hidden");
+    cartModal.classList.add("flex");
+  }
+
+  function closeCartModal() {
+    cartModal.classList.add("hidden");
+    cartModal.classList.remove("flex");
+  }
+
+  cartBtn?.addEventListener("click", openCart);
+  closeCart?.addEventListener("click", closeCartModal);
+
   document.addEventListener("click", (e) => {
 
-    /* ===== PACKAGE SELECT ===== */
-    const pkgBtn = e.target.closest(".select-btn");
+    const pkg = e.target.closest(".select-btn");
+    if (pkg && PAGE_KEY) {
+      const name = pkg.dataset.name;
+      const price = Number(pkg.dataset.price);
 
-    if (pkgBtn) {
+      const current = cart[PAGE_KEY].item;
 
-      const name = pkgBtn.dataset.name;
-      const price = Number(pkgBtn.dataset.price);
+      cart[PAGE_KEY].item =
+        current?.name === name ? null : { name, price };
 
-      if (window.NovyraCart?.toggle) {
-        window.NovyraCart.toggle("socialMedia", { name, price });
-      }
-
-      return;
+      saveCart();
+      updateCartCount();
     }
 
-    /* ===== EXTRAS ===== */
-    const extraBtn = e.target.closest(".extra-btn");
+    const extra = e.target.closest(".extra-btn");
+    if (extra && PAGE_KEY) {
+      const name = extra.dataset.name;
+      const price = Number(extra.dataset.price);
 
-    if (extraBtn) {
+      const extras = cart[PAGE_KEY].extras;
+      const i = extras.findIndex(e => e.name === name);
 
-      const name = extraBtn.dataset.name;
-      const price = Number(extraBtn.dataset.price);
+      if (i > -1) extras.splice(i, 1);
+      else extras.push({ name, price });
 
-      if (window.NovyraCart?.toggleExtra) {
-        window.NovyraCart.toggleExtra({ name, price });
-      }
-
-      return;
+      saveCart();
+      updateCartCount();
     }
 
   });
 
-  /* ================= THEME ================= */
-  function updateTheme() {
+  function checkoutCart() {
+    let body = "Quote request:%0D%0A";
 
-    const isDark = root.classList.contains("dark-mode");
+    for (const key in cart) {
+      const s = cart[key];
+      if (!s.item) continue;
 
-    if (navLogo) {
-      navLogo.src = isDark
-        ? "Novyra Navigation Bar (Dark Theme).png"
-        : "Novyra Navigation Bar (Light Theme).png";
+      body += `%0D%0A${key}%0D%0A`;
+      body += `${s.item.name} - R${s.item.price}%0D%0A`;
+
+      s.extras.forEach(e => {
+        body += `- ${e.name} - R${e.price}%0D%0A`;
+      });
     }
 
-    if (sunIcon && moonIcon) {
-
-      sunIcon.style.opacity = isDark ? "0" : "1";
-      moonIcon.style.opacity = isDark ? "1" : "0";
-
-      sunIcon.style.transform = isDark
-        ? "rotate(90deg) scale(.6)"
-        : "rotate(0deg) scale(1)";
-
-      moonIcon.style.transform = isDark
-        ? "rotate(0deg) scale(1)"
-        : "rotate(-90deg) scale(.6)";
-    }
+    window.location.href =
+      `mailto:sales@novyra.co.za?subject=Quote&body=${body}`;
   }
 
-  /* ===== LOAD THEME ===== */
-  if (localStorage.getItem(THEME_KEY) === "dark") {
-    root.classList.add("dark-mode");
-  }
+  checkoutBtn?.addEventListener("click", checkoutCart);
 
-  updateTheme();
-
-  themeToggle?.addEventListener("click", () => {
-
-    root.classList.toggle("dark-mode");
-
-    localStorage.setItem(
-      THEME_KEY,
-      root.classList.contains("dark-mode") ? "dark" : "light"
-    );
-
-    updateTheme();
-  });
-
-  /* ================= MOBILE MENU ================= */
-  menuBtn?.addEventListener("click", () => {
-    mobileMenu?.classList.toggle("open");
-    backdrop?.classList.toggle("show");
-  });
-
-  backdrop?.addEventListener("click", () => {
-    mobileMenu?.classList.remove("open");
-    backdrop?.classList.remove("show");
-  });
-
-  /* ================= SERVICES DROPDOWN ================= */
-  let dropdownOpen = false;
-
-  servicesBtn?.addEventListener("click", (e) => {
-    e.stopPropagation();
-    dropdownOpen = !dropdownOpen;
-    servicesDropdown?.classList.toggle("open", dropdownOpen);
-  });
-
-  document.addEventListener("click", () => {
-    dropdownOpen = false;
-    servicesDropdown?.classList.remove("open");
-  });
+  loadCart();
+  updateCartCount();
 
 });
 </script>
