@@ -136,7 +136,6 @@ html.dark-mode .glass-card{
   pointer-events:auto;
 }
 
-/* light mode dropdown */
 html:not(.dark-mode) #servicesDropdown{
   background:rgba(255,255,255,0.92);
   border:1px solid rgba(59,130,246,0.2);
@@ -218,7 +217,10 @@ html.dark-mode .pricing-card{
   border:1px solid rgba(255,255,255,0.08);
 }
 
-.pricing-card h3{ font-size:20px; font-weight:600; }
+.pricing-card h3{
+  font-size:20px;
+  font-weight:600;
+}
 
 .pricing-card .price{
   font-size:28px;
@@ -241,54 +243,15 @@ html.dark-mode .pricing-card{
   transform:scale(1.02);
 }
 
-/* ================= BUTTONS ================= */
-.select-btn{
-  width:100%;
-  margin-top:14px;
-  padding:10px 14px;
-  border-radius:14px;
-  background:rgba(59,130,246,0.12);
-  border:1px solid rgba(59,130,246,0.4);
-  color:#3b82f6;
-  font-weight:600;
-  cursor:pointer;
-  transition:.25s ease;
-}
-
-.select-btn:hover{
-  background:#3b82f6;
-  color:white;
-  transform:translateY(-2px);
-}
-
-.active-package{
-  background:#3b82f6 !important;
-  color:white !important;
-  transform:scale(1.02);
-}
-
-/* ================= CART ================= */
-#cartFloat{
-  position:fixed;
-  right:20px;
-  bottom:20px;
-  z-index:999;
-}
-
-#cartBtn{
-  width:60px;
-  height:60px;
-  border-radius:18px;
-}
-
-/* ================= EXTRAS ================= */
+/* ================= EXTRAS (REWORKED CLEAN LOOK) ================= */
 .extras-card{
   grid-column:1 / -1;
   text-align:left;
+  padding:32px;
 }
 
 .extras-header{
-  margin-bottom:18px;
+  margin-bottom:22px;
 }
 
 .extras-grid{
@@ -334,28 +297,13 @@ html.dark-mode .extra-item{
 .extra-item p{
   font-size:13px;
   opacity:.75;
-  margin-bottom:12px;
+  margin:0;
 }
 
-.extra-btn{
-  background:rgba(59,130,246,0.08);
-  border:1px solid rgba(59,130,246,0.25);
-  font-size:13px;
-  padding:12px 14px;
-  border-radius:12px;
-  cursor:pointer;
-  transition:.25s ease;
-}
-
-.extra-btn:hover{
-  background:rgba(59,130,246,0.15);
-  transform:translateY(-2px);
-}
-
-.extra-btn.active{
-  background:rgba(59,130,246,0.35);
-  border-color:rgba(59,130,246,0.6);
-  color:#3b82f6;
+.extra-note{
+  margin-top:10px;
+  font-size:12px;
+  opacity:0.6;
 }
 
 </style>
@@ -539,41 +487,6 @@ html.dark-mode .extra-item{
 
 </header>
 
-<!-- ================= FLOATING CART (MOVED OUTSIDE HEADER) ================= -->
-<div id="cartFloat">
-  <button id="cartBtn"
-    class="glass-card flex items-center justify-center relative"
-    aria-label="Open cart">
-
-    <!-- Checkout Cart SVG Icon -->
-    <svg xmlns="http://www.w3.org/2000/svg"
-      class="w-6 h-6"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round">
-
-      <!-- cart wheels -->
-      <circle cx="9" cy="21" r="1"></circle>
-      <circle cx="20" cy="21" r="1"></circle>
-
-      <!-- cart body -->
-      <path d="M1 1h4l2.7 13.39a2 2 0 0 0 2 1.61h9.8a2 2 0 0 0 2-1.61L23 6H6"></path>
-
-    </svg>
-
-    <!-- CART COUNT BADGE -->
-    <span id="cartCount"
-      class="absolute top-2 right-2 text-xs bg-blue-500 text-white rounded-full px-1.5">
-      0
-    </span>
-
-  </button>
-</div>
-
-  
 <!-- ================= CONTENT PACKAGES ================= -->
 <section id="content-packages" class="scroll-mt-28 px-6 md:px-10 py-16 pt-28">
 
@@ -606,9 +519,6 @@ html.dark-mode .extra-item{
           <li>✖ No posting / scheduling</li>
           <li>✖ No platform management</li>
         </ul>
-        <button class="select-btn" data-name="Content Starter" data-price="850">
-          Select Content Starter
-        </button>
       </div>
 
       <!-- CARD 2 -->
@@ -624,9 +534,6 @@ html.dark-mode .extra-item{
           <li>✖ No posting / scheduling</li>
           <li>✖ No platform management</li>
         </ul>
-        <button class="select-btn" data-name="Content Flow" data-price="1850">
-          Select Content Growth
-        </button>
       </div>
 
       <!-- CARD 3 -->
@@ -642,18 +549,15 @@ html.dark-mode .extra-item{
           <li>✖ No posting / scheduling</li>
           <li>✖ No platform management</li>
         </ul>
-        <button class="select-btn" data-name="Content Growth" data-price="2850">
-          Select Content Studio
-        </button>
       </div>
 
-      <!-- ================= EXTRAS SECTION ================= -->
+      <!-- ================= EXTRAS SECTION (REWORKED) ================= -->
       <div class="pricing-card extras-card">
 
         <div class="extras-header">
           <h3>Extra Options</h3>
-          <p class="tag">
-            Optional add-ons to enhance your package and extend your content system.
+          <p class="opacity-70 text-sm">
+            Optional add-ons available for enhanced content production.
           </p>
         </div>
 
@@ -661,12 +565,7 @@ html.dark-mode .extra-item{
 
           <div class="extra-item">
             <h4>Extra Post</h4>
-            <p>R250 per additional post</p>
-            <button class="extra-btn"
-              data-name="Extra Post"
-              data-price="250">
-              Add Option
-            </button>
+            <p>R250 per additional post added to your monthly content plan.</p>
           </div>
 
         </div>
@@ -690,19 +589,7 @@ html.dark-mode .extra-item{
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-  /* ================= PAGE IDENTIFIER ================= */
-  const PAGE_KEY = "contentCreation";
-
-  /* ================= OPTIONAL: PAGE LABEL (used by global cart engine) ================= */
-  window.NOVYRA_PAGE = PAGE_KEY;
-
-  /* ================= REGISTER PAGE WITH GLOBAL CART ENGINE ================= */
-  if (window.NovyraCart) {
-    window.NovyraCart.setActivePage(PAGE_KEY);
-    window.NovyraCart.initPage();
-  }
-
-  /* ================= THEME TOGGLE HOOK (ONLY UI SIDE) ================= */
+  /* ================= THEME ================= */
   const themeToggle = document.getElementById("themeToggle");
   const root = document.documentElement;
 
@@ -725,17 +612,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  themeToggle?.addEventListener("click", () => {
+  if (themeToggle) {
+    themeToggle.addEventListener("click", () => {
+      root.classList.toggle("dark-mode");
 
-    root.classList.toggle("dark-mode");
+      localStorage.setItem(
+        "novyra-theme",
+        root.classList.contains("dark-mode") ? "dark" : "light"
+      );
 
-    localStorage.setItem(
-      "novyra-theme",
-      root.classList.contains("dark-mode") ? "dark" : "light"
-    );
-
-    updateThemeUI();
-  });
+      updateThemeUI();
+    });
+  }
 
   /* ================= INIT THEME ================= */
   if (localStorage.getItem("novyra-theme") === "dark") {
@@ -744,30 +632,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
   updateThemeUI();
 
+
+  /* ================= SERVICES DROPDOWN ================= */
+  const servicesBtn = document.getElementById("servicesBtn");
+  const servicesDropdown = document.getElementById("servicesDropdown");
+
+  if (servicesBtn && servicesDropdown) {
+
+    // toggle dropdown
+    servicesBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      servicesDropdown.classList.toggle("open");
+    });
+
+    // close when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!servicesDropdown.contains(e.target) && !servicesBtn.contains(e.target)) {
+        servicesDropdown.classList.remove("open");
+      }
+    });
+
+    // close on ESC
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        servicesDropdown.classList.remove("open");
+      }
+    });
+  }
+
 });
 </script>
 
-<!-- CART MODAL -->
-<div id="cartModal" class="fixed inset-0 hidden items-center justify-center z-[9999] bg-black/40">
-  
-  <div class="glass-card w-[90%] max-w-md p-6 relative">
-
-    <button id="closeCart" class="absolute top-3 right-3 text-xl">✕</button>
-
-    <h2 class="text-2xl font-bold mb-4">Your Cart</h2>
-
-    <div id="cartContent" class="text-sm space-y-3 opacity-80">
-      <!-- Filled by JS -->
-    </div>
-
-    <button id="checkoutBtn"
-      class="mt-6 w-full bg-blue-500 text-white py-2 rounded-xl">
-      Checkout via Email
-    </button>
-
-  </div>
-
-</div>
-  
 </body>
 </html>
