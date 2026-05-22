@@ -11,10 +11,17 @@ document.addEventListener("DOMContentLoaded", () => {
     "marketing-materials": "marketingMaterials"
   };
 
-  /* ================= SAFE PAGE DETECTION ================= */
+  const LABELS = {
+    socialMedia: "Social Media Management",
+    contentCreation: "Content Creation",
+    branding: "Branding",
+    marketingMaterials: "Marketing Materials"
+  };
+
+  /* ================= PAGE DETECTION ================= */
   const cleanPath = window.location.pathname.split("?")[0];
-  const pageSlug = cleanPath.split("/").filter(Boolean).pop();
-  const PAGE_KEY = PAGE_MAP[pageSlug];
+  const pageSlug = cleanPath.split("/").filter(Boolean).pop()?.replace(".html", "");
+  const PAGE_KEY = PAGE_MAP[pageSlug] || null;
 
   /* ================= CART STATE ================= */
   let cart = {
@@ -44,11 +51,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const parsed = JSON.parse(saved);
 
       for (const key in cart) {
-        const old = parsed[key];
-
         cart[key] = {
-          item: old?.item ?? old?.package ?? null,
-          extras: Array.isArray(old?.extras) ? old.extras : []
+          item: parsed[key]?.item ?? null,
+          extras: Array.isArray(parsed[key]?.extras) ? parsed[key].extras : []
         };
       }
 
@@ -75,12 +80,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (cartCount) cartCount.textContent = total;
   }
 
-  /* ================= UI SYNC (PAGE SAFE) ================= */
+  /* ================= UI SYNC ================= */
   function syncUI() {
 
-    if (!PAGE_KEY) return;
-
-    const data = cart[PAGE_KEY];
+    const data = PAGE_KEY ? cart[PAGE_KEY] : null;
+    if (!data) return;
 
     document.querySelectorAll(".select-btn").forEach(btn => {
       const active = data.item?.name === btn.dataset.name;
@@ -102,27 +106,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!cartContent) return;
 
-    const labels = {
-      socialMedia: "Social Media Management",
-      contentCreation: "Content Creation",
-      branding: "Branding",
-      marketingMaterials: "Marketing Materials"
-    };
-
     let html = "";
     let total = 0;
 
     for (const key in cart) {
 
       const section = cart[key];
-      const hasItem = section.item;
-      const hasExtras = section.extras.length > 0;
+      if (!section.item && section.extras.length === 0) continue;
 
-      if (!hasItem && !hasExtras) continue;
+      html += `<div class="mb-3"><strong>${LABELS[key]}</strong><br>`;
 
-      html += `<div class="mb-3"><strong>${labels[key]}</strong><br>`;
-
-      if (hasItem) {
+      if (section.item) {
         html += `${section.item.name} - R${section.item.price}<br>`;
         total += section.item.price;
       }
@@ -215,7 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       hasItems = true;
 
-      body += `${key}:%0D%0A`;
+      body += `${LABELS[key]}:%0D%0A`;
       body += `${section.item.name} - R${section.item.price}%0D%0A`;
 
       section.extras.forEach(extra => {
