@@ -156,7 +156,7 @@ html:not(.dark-mode) #servicesDropdown .nav-link {
 }
 
 html:not(.dark-mode) #servicesDropdown .nav-link:hover {
-  background: rgba(59, 130, 246, 0.08);
+  background: rgba(59,130,246,0.08);
   color: #3b82f6;
 }
 
@@ -177,12 +177,242 @@ html:not(.dark-mode) #servicesDropdown .nav-link:hover {
   pointer-events: auto;
 }
 
+/* ================= PAGE FADE ================= */
 body{
   transition: opacity 0.3s ease;
 }
 
 body.fade-out{
   opacity: 0;
+}
+
+/* ======================================================
+   SOCIAL MEDIA SECTION (RESTORED + FIXED SPACING)
+====================================================== */
+
+#social-media-pricing {
+  padding-top: 7rem;   /* FIX: restores correct header spacing */
+  padding-bottom: 3rem;
+}
+
+#social-media-pricing .container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+#social-media-pricing h2 {
+  font-size: 3.2rem;
+  font-weight: 800;
+  color: #111827;
+  text-align: center;
+  line-height: 1.2;
+}
+
+#social-media-pricing .description {
+  margin: 1.5rem auto 2.5rem auto;
+  font-size: 1.25rem;
+  color: #6b7280;
+  text-align: center;
+  max-width: 1200px;
+  line-height: 1.7;
+}
+
+#social-media-pricing .grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.5rem;
+  margin-top: 0;
+}
+
+#social-media-pricing .card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  transition: 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+#social-media-pricing .card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 50px rgba(0,0,0,0.12);
+}
+
+#social-media-pricing .card h3 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+#social-media-pricing .price {
+  margin-top: 0.8rem;
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+
+#social-media-pricing .price span {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #6b7280;
+}
+
+#social-media-pricing ul {
+  margin-top: 2rem;
+  list-style: none;
+  padding: 0;
+}
+
+#social-media-pricing ul li {
+  margin-bottom: 0.6rem;
+  color: #4b5563;
+  font-size: 1rem;
+}
+
+#social-media-pricing button {
+  margin-top: auto;
+  padding: 0.9rem 1.2rem;
+  border-radius: 12px;
+  background: #111827;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+#social-media-pricing button:hover {
+  background: #1f2937;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 1024px) {
+  #social-media-pricing .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  #social-media-pricing .grid {
+    grid-template-columns: 1fr;
+  }
+
+  #social-media-pricing h2 {
+    font-size: 2.4rem;
+  }
+}
+
+/* ================= CONTENT CREATION ================= */
+
+#content-creation .container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+#content-creation h2 {
+  font-size: 3.2rem;
+  font-weight: 800;
+  color: #111827;
+  text-align: center;
+  line-height: 1.2;
+}
+
+#content-creation .description {
+  margin: 1.5rem auto 2.5rem auto;
+  font-size: 1.25rem;
+  color: #6b7280;
+  text-align: center;
+  max-width: 1200px;
+  line-height: 1.7;
+}
+
+#content-creation .grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.5rem;
+}
+
+#content-creation .card {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+#content-creation .card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 50px rgba(0,0,0,0.12);
+}
+
+#content-creation .card h3 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+#content-creation .price {
+  margin-top: 0.8rem;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+#content-creation .price span {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #6b7280;
+}
+
+#content-creation ul {
+  margin-top: 2rem;
+  list-style: none;
+  padding: 0;
+}
+
+#content-creation ul li {
+  margin-bottom: 0.6rem;
+  color: #4b5563;
+  font-size: 1rem;
+}
+
+#content-creation button {
+  margin-top: auto;
+  padding: 0.9rem 1.2rem;
+  border-radius: 12px;
+  background: #111827;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+#content-creation button:hover {
+  background: #1f2937;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 1024px) {
+  #content-creation .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  #content-creation .grid {
+    grid-template-columns: 1fr;
+  }
+
+  #content-creation h2 {
+    font-size: 2.4rem;
+  }
 }
 
 </style>
@@ -287,12 +517,169 @@ body.fade-out{
 
 </header>
 
-    <!-- Social Media Management -->
-<section id="social-media-management" class="min-h-screen">
+<!-- Social Media Management Pricing -->
+<section id="social-media-pricing">
+
+  <div class="container">
+
+    <!-- Heading -->
+    <h2>Social Media Management Packages</h2>
+
+    <!-- Description (closer to cards now) -->
+    <p class="description">
+      Our social media management packages are designed to help your brand stay consistent, grow engagement, and build a strong online presence through strategic content and performance tracking.
+    </p>
+
+    <!-- Grid (now closer to description) -->
+    <div class="grid">
+
+      <div class="card">
+        <h3>Content Starter</h3>
+        <div class="price">R1,250 <span>/ month</span></div>
+        <ul>
+          <li>✔ 4 posts per month</li>
+          <li>✔ Content creation</li>
+          <li>✔ Scheduling</li>
+          <li>✔ 1 platform</li>
+          <li>✔ Analytics</li>
+        </ul>
+        <button>Select Package</button>
+      </div>
+
+      <div class="card">
+        <h3>Content Flow</h3>
+        <div class="price">R1,850 <span>/ month</span></div>
+        <ul>
+          <li>✔ 6 posts per month</li>
+          <li>✔ Content creation</li>
+          <li>✔ Scheduling</li>
+          <li>✔ 2 platforms</li>
+          <li>✔ Analytics</li>
+        </ul>
+        <button>Select Package</button>
+      </div>
+
+      <div class="card">
+        <h3>Content Growth</h3>
+        <div class="price">R2,650 <span>/ month</span></div>
+        <ul>
+          <li>✔ 8 posts per month</li>
+          <li>✔ Content creation</li>
+          <li>✔ Scheduling</li>
+          <li>✔ 2 platforms</li>
+          <li>✔ Analytics</li>
+        </ul>
+        <button>Select Package</button>
+      </div>
+
+      <div class="card">
+        <h3>Content Plus</h3>
+        <div class="price">R3,650 <span>/ month</span></div>
+        <ul>
+          <li>✔ 10 posts per month</li>
+          <li>✔ Content creation</li>
+          <li>✔ Scheduling</li>
+          <li>✔ 3 platforms</li>
+          <li>✔ Analytics</li>
+        </ul>
+        <button>Select Package</button>
+      </div>
+
+      <div class="card">
+        <h3>Content Authority</h3>
+        <div class="price">R4,850 <span>/ month</span></div>
+        <ul>
+          <li>✔ 12 posts per month</li>
+          <li>✔ Content creation</li>
+          <li>✔ Scheduling</li>
+          <li>✔ 4 platforms</li>
+          <li>✔ Analytics</li>
+        </ul>
+        <button>Select Package</button>
+      </div>
+
+      <div class="card">
+        <h3>Content Elite</h3>
+        <div class="price">R6,250 <span>/ month</span></div>
+        <ul>
+          <li>✔ 15 posts per month</li>
+          <li>✔ Full content system</li>
+          <li>✔ Scheduling</li>
+          <li>✔ 5 platforms</li>
+          <li>✔ Analytics</li>
+        </ul>
+        <button>Select Package</button>
+      </div>
+
+    </div>
+  </div>
+
 </section>
 
-    <!-- Content Creation -->
-<section id="content-creation" class="min-h-screen">
+<section id="content-creation">
+
+  <div class="container">
+
+    <h2>Content Creation Packages</h2>
+
+    <p class="description">
+      Professional content creation packages designed to give your brand consistent, high-quality visuals and messaging.
+    </p>
+
+    <div class="grid">
+
+      <div class="card">
+        <h3>Content Starter</h3>
+        <div class="price">R850 <span>/ month</span></div>
+
+        <ul>
+          <li>✔ 4 pieces of content</li>
+          <li>✔ Brand-aligned captions</li>
+          <li>✔ Creative direction</li>
+          <li>✔ Static posts / simple reels</li>
+          <li>✔ 1 revision per piece</li>
+          <li>✖ No posting</li>
+        </ul>
+
+        <button>Choose Package</button>
+      </div>
+
+      <div class="card">
+        <h3>Content Growth</h3>
+        <div class="price">R1,850 <span>/ month</span></div>
+
+        <ul>
+          <li>✔ 8 pieces of content</li>
+          <li>✔ Brand-aligned captions</li>
+          <li>✔ Creative direction</li>
+          <li>✔ Static posts / simple reels</li>
+          <li>✔ 1 revision per piece</li>
+          <li>✖ No posting</li>
+        </ul>
+
+        <button>Choose Package</button>
+      </div>
+
+      <div class="card">
+        <h3>Content Studio</h3>
+        <div class="price">R2,850 <span>/ month</span></div>
+
+        <ul>
+          <li>✔ 12 pieces of content</li>
+          <li>✔ Brand-aligned captions</li>
+          <li>✔ Creative direction</li>
+          <li>✔ Static posts / simple reels</li>
+          <li>✔ 1 revision per piece</li>
+          <li>✖ No posting</li>
+        </ul>
+
+        <button>Choose Package</button>
+      </div>
+
+    </div>
+
+  </div>
+
 </section>
 
     <!-- Branding -->
