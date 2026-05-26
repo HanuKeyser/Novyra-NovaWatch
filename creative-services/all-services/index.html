@@ -397,6 +397,244 @@ body.fade-out{
   background: #1f2937;
 }
 
+
+/* ================= BRANDING SECTION ================= */
+
+#branding {
+  padding-top: 7rem;
+  padding-bottom: 3rem;
+}
+
+#branding .container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+#branding h2 {
+  font-size: 3.2rem;
+  font-weight: 800;
+  color: #111827;
+  text-align: center;
+  line-height: 1.2;
+}
+
+#branding .description {
+  margin: 1.5rem auto 2.5rem auto;
+  font-size: 1.25rem;
+  color: #6b7280;
+  text-align: center;
+  max-width: 1200px;
+  line-height: 1.7;
+}
+
+/* GRID */
+#branding .grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2.5rem;
+}
+
+/* CARD */
+#branding .card {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+#branding .card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 50px rgba(0,0,0,0.12);
+}
+
+/* TEXT */
+#branding .card h3 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+#branding .price {
+  margin-top: 0.8rem;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* LIST */
+#branding ul {
+  margin-top: 2rem;
+  list-style: none;
+  padding: 0;
+}
+
+#branding ul li {
+  margin-bottom: 0.6rem;
+  color: #4b5563;
+  font-size: 1rem;
+}
+
+/* BUTTON */
+#branding button {
+  margin-top: auto;
+  padding: 0.9rem 1.2rem;
+  border-radius: 12px;
+  background: #111827;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+#branding button:hover {
+  background: #1f2937;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 1280px) {
+  #branding .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  #branding .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  #branding .grid {
+    grid-template-columns: 1fr;
+  }
+
+  #branding h2 {
+    font-size: 2.4rem;
+  }
+}
+  
+/* ================= MARKETING MATERIAL ================= */
+
+#marketing-material {
+  padding-top: 7rem;
+  padding-bottom: 3rem;
+}
+
+#marketing-material .container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+#marketing-material h2 {
+  font-size: 3.2rem;
+  font-weight: 800;
+  color: #111827;
+  text-align: center;
+  line-height: 1.2;
+}
+
+#marketing-material .description {
+  margin: 1.5rem auto 2.5rem auto;
+  font-size: 1.25rem;
+  color: #6b7280;
+  text-align: center;
+  max-width: 1200px;
+  line-height: 1.7;
+}
+
+#marketing-material .grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2.5rem;
+}
+
+#marketing-material .card {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+#marketing-material .card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 50px rgba(0,0,0,0.12);
+}
+
+#marketing-material .card h3 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+#marketing-material .price {
+  margin-top: 0.8rem;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+#marketing-material ul {
+  margin-top: 2rem;
+  list-style: none;
+  padding: 0;
+}
+
+#marketing-material ul li {
+  margin-bottom: 0.6rem;
+  color: #4b5563;
+  font-size: 1rem;
+}
+
+#marketing-material button {
+  margin-top: auto;
+  padding: 0.9rem 1.2rem;
+  border-radius: 12px;
+  background: #111827;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+#marketing-material button:hover {
+  background: #1f2937;
+}
+
+/* Responsive */
+
+@media (max-width: 1280px) {
+  #marketing-material .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  #marketing-material .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  #marketing-material .grid {
+    grid-template-columns: 1fr;
+  }
+
+  #marketing-material h2 {
+    font-size: 2.4rem;
+  }
+}
+  
 /* ================= RESPONSIVE ================= */
 
 @media (max-width: 1024px) {
@@ -525,12 +763,12 @@ body.fade-out{
     <!-- Heading -->
     <h2>Social Media Management Packages</h2>
 
-    <!-- Description (closer to cards now) -->
+    <!-- Description -->
     <p class="description">
       Our social media management packages are designed to help your brand stay consistent, grow engagement, and build a strong online presence through strategic content and performance tracking.
     </p>
 
-    <!-- Grid (now closer to description) -->
+    <!-- Grid -->
     <div class="grid">
 
       <div class="card">
@@ -543,7 +781,7 @@ body.fade-out{
           <li>✔ 1 platform</li>
           <li>✔ Analytics</li>
         </ul>
-        <button>Select Package</button>
+        <button onclick="addToCart('Content Starter', 1250)">Add to Quote</button>
       </div>
 
       <div class="card">
@@ -556,7 +794,7 @@ body.fade-out{
           <li>✔ 2 platforms</li>
           <li>✔ Analytics</li>
         </ul>
-        <button>Select Package</button>
+        <button onclick="addToCart('Content Flow', 1850)">Add to Quote</button>
       </div>
 
       <div class="card">
@@ -569,7 +807,7 @@ body.fade-out{
           <li>✔ 2 platforms</li>
           <li>✔ Analytics</li>
         </ul>
-        <button>Select Package</button>
+        <button onclick="addToCart('Content Growth', 2650)">Add to Quote</button>
       </div>
 
       <div class="card">
@@ -582,7 +820,7 @@ body.fade-out{
           <li>✔ 3 platforms</li>
           <li>✔ Analytics</li>
         </ul>
-        <button>Select Package</button>
+        <button onclick="addToCart('Content Plus', 3650)">Add to Quote</button>
       </div>
 
       <div class="card">
@@ -595,7 +833,7 @@ body.fade-out{
           <li>✔ 4 platforms</li>
           <li>✔ Analytics</li>
         </ul>
-        <button>Select Package</button>
+        <button onclick="addToCart('Content Authority', 4850)">Add to Quote</button>
       </div>
 
       <div class="card">
@@ -608,7 +846,7 @@ body.fade-out{
           <li>✔ 5 platforms</li>
           <li>✔ Analytics</li>
         </ul>
-        <button>Select Package</button>
+        <button onclick="addToCart('Content Elite', 6250)">Add to Quote</button>
       </div>
 
     </div>
@@ -616,6 +854,7 @@ body.fade-out{
 
 </section>
 
+<!-- Content Creation Packages -->
 <section id="content-creation">
 
   <div class="container">
@@ -641,7 +880,7 @@ body.fade-out{
           <li>✖ No posting</li>
         </ul>
 
-        <button>Choose Package</button>
+        <button onclick="addToCart('Content Starter', 850)">Add to Quote</button>
       </div>
 
       <div class="card">
@@ -657,7 +896,7 @@ body.fade-out{
           <li>✖ No posting</li>
         </ul>
 
-        <button>Choose Package</button>
+        <button onclick="addToCart('Content Growth', 1850)">Add to Quote</button>
       </div>
 
       <div class="card">
@@ -673,7 +912,7 @@ body.fade-out{
           <li>✖ No posting</li>
         </ul>
 
-        <button>Choose Package</button>
+        <button onclick="addToCart('Content Studio', 2850)">Add to Quote</button>
       </div>
 
     </div>
@@ -682,12 +921,320 @@ body.fade-out{
 
 </section>
 
-    <!-- Branding -->
-<section id="branding" class="min-h-screen">
+<!-- Branding -->
+<section id="branding">
+
+  <div class="container">
+
+    <h2>Branding Services</h2>
+
+    <p class="description">
+      Build a memorable brand with professional visual identity systems designed to help your business stand out, build trust, and create a lasting impression.
+    </p>
+
+    <div class="grid">
+
+      <!-- Logo Design -->
+      <div class="card">
+        <h3>Logo Design</h3>
+
+        <div class="price">From R2,500</div>
+
+        <ul>
+          <li>✔ Custom logo concepts</li>
+          <li>✔ Multiple file formats</li>
+          <li>✔ Brand-focused design</li>
+          <li>✔ 2 revisions included</li>
+        </ul>
+
+        <button onclick="addToCart('Logo Design', 2500)">Add to Quote</button>
+      </div>
+
+      <!-- Brand Identity -->
+      <div class="card">
+        <h3>Brand Identity Package</h3>
+
+        <div class="price">From R5,500</div>
+
+        <ul>
+          <li>✔ Logo design</li>
+          <li>✔ Colour palette</li>
+          <li>✔ Typography selection</li>
+          <li>✔ Brand assets</li>
+        </ul>
+
+        <button onclick="addToCart('Brand Identity Package', 5500)">Add to Quote</button>
+      </div>
+
+      <!-- Brand Guidelines -->
+      <div class="card">
+        <h3>Brand Guidelines</h3>
+
+        <div class="price">From R2,500</div>
+
+        <ul>
+          <li>✔ Logo usage rules</li>
+          <li>✔ Colour specifications</li>
+          <li>✔ Typography guidelines</li>
+          <li>✔ Brand consistency standards</li>
+        </ul>
+
+        <button onclick="addToCart('Brand Guidelines', 2500)">Add to Quote</button>
+      </div>
+
+      <!-- Social Media Kit -->
+      <div class="card">
+        <h3>Social Media Branding Kit</h3>
+
+        <div class="price">From R1,850</div>
+
+        <ul>
+          <li>✔ Profile images</li>
+          <li>✔ Cover banners</li>
+          <li>✔ Post templates</li>
+          <li>✔ Story templates</li>
+        </ul>
+
+        <button onclick="addToCart('Social Media Branding Kit', 1850)">Add to Quote</button>
+      </div>
+
+      <!-- Stationery -->
+      <div class="card">
+        <h3>Stationery Design</h3>
+
+        <div class="price">From R950</div>
+
+        <ul>
+          <li>✔ Business card design</li>
+          <li>✔ Letterhead design</li>
+          <li>✔ Email signature design</li>
+          <li>✔ Brand consistency</li>
+        </ul>
+
+        <button onclick="addToCart('Stationery Design', 950)">Add to Quote</button>
+      </div>
+
+      <!-- Presentation Templates -->
+      <div class="card">
+        <h3>Presentation Templates</h3>
+
+        <div class="price">From R1,250</div>
+
+        <ul>
+          <li>✔ PowerPoint templates</li>
+          <li>✔ Google Slides templates</li>
+          <li>✔ Custom layouts</li>
+          <li>✔ Brand consistency</li>
+        </ul>
+
+        <button onclick="addToCart('Presentation Templates', 1250)">Add to Quote</button>
+      </div>
+
+      <!-- Brand Refresh -->
+      <div class="card">
+        <h3>Brand Refresh</h3>
+
+        <div class="price">From R4,500</div>
+
+        <ul>
+          <li>✔ Modernize existing branding</li>
+          <li>✔ Updated colour palette</li>
+          <li>✔ Refined visual identity</li>
+          <li>✔ Brand consistency improvements</li>
+        </ul>
+
+        <button onclick="addToCart('Brand Refresh', 4500)">Add to Quote</button>
+      </div>
+
+      <!-- Brand Launch -->
+      <div class="card">
+        <h3>Complete Brand Launch</h3>
+
+        <div class="price">From R8,500</div>
+
+        <ul>
+          <li>✔ Logo design</li>
+          <li>✔ Full brand identity</li>
+          <li>✔ Social media kit</li>
+          <li>✔ Brand guidelines document</li>
+        </ul>
+
+        <button onclick="addToCart('Complete Brand Launch', 8500)">Add to Quote</button>
+      </div>
+
+    </div>
+
+  </div>
+
 </section>
 
-    <!-- Marketing Material -->
-<section id="marketing-material" class="min-h-screen">
+<!-- Marketing Material -->
+<section id="marketing-material">
+
+  <div class="container">
+
+    <h2>Marketing Material Design</h2>
+
+    <p class="description">
+      Professionally designed marketing materials that help your business communicate clearly, strengthen your brand, and leave a lasting impression through high-quality branded assets.
+    </p>
+
+    <div class="grid">
+
+      <!-- Banner Design -->
+      <div class="card">
+        <h3>Banner Design</h3>
+        <div class="price">R850</div>
+
+        <ul>
+          <li>✔ Custom banner design</li>
+          <li>✔ Brand-aligned artwork</li>
+          <li>✔ Print-ready files</li>
+          <li>✔ 1 revision included</li>
+        </ul>
+
+        <button onclick="addToCart('Banner Design', 850)">Add to Quote</button>
+      </div>
+
+      <!-- Signage Design -->
+      <div class="card">
+        <h3>Signage Design</h3>
+        <div class="price">R1,500</div>
+
+        <ul>
+          <li>✔ Indoor & outdoor signage</li>
+          <li>✔ Brand-aligned design</li>
+          <li>✔ Print-ready artwork</li>
+          <li>✔ 1 revision included</li>
+        </ul>
+
+        <button onclick="addToCart('Signage Design', 1500)">Add to Quote</button>
+      </div>
+
+      <!-- Brochures -->
+      <div class="card">
+        <h3>Brochures</h3>
+        <div class="price">From R1,250</div>
+
+        <ul>
+          <li>✔ Bi-Fold Brochure → R1,250</li>
+          <li>✔ Tri-Fold Brochure → R1,650</li>
+          <li>✔ Professional layout design</li>
+          <li>✔ Print-ready artwork</li>
+        </ul>
+
+        <button onclick="addToCart('Brochure Design', 1250)">Add to Quote</button>
+      </div>
+
+      <!-- Business Cards -->
+      <div class="card">
+        <h3>Business Cards</h3>
+        <div class="price">From R350</div>
+
+        <ul>
+          <li>✔ Single-Sided Design → R350</li>
+          <li>✔ Double-Sided Design → R550</li>
+          <li>✔ Print-ready files</li>
+          <li>✔ Brand-aligned design</li>
+        </ul>
+
+        <button onclick="addToCart('Business Cards', 350)">Add to Quote</button>
+      </div>
+
+      <!-- Catalogues -->
+      <div class="card">
+        <h3>Catalogues</h3>
+        <div class="price">From R3,250</div>
+
+        <ul>
+          <li>✔ Catalogue Design (8 Pages) → R3,250</li>
+          <li>✔ Additional Pages → R350 each</li>
+          <li>✔ Professional layout design</li>
+          <li>✔ Product-focused presentation</li>
+        </ul>
+
+        <button onclick="addToCart('Catalogue Design', 3250)">Add to Quote</button>
+      </div>
+
+      <!-- Certificates -->
+      <div class="card">
+        <h3>Certificates</h3>
+        <div class="price">From R450</div>
+
+        <ul>
+          <li>✔ Certificate Design → R450</li>
+          <li>✔ Modifications → R100 per change</li>
+          <li>✔ Custom branded layouts</li>
+          <li>✔ Digital delivery included</li>
+        </ul>
+
+        <button onclick="addToCart('Certificate Design', 450)">Add to Quote</button>
+      </div>
+
+      <!-- Corporate Gifts -->
+      <div class="card">
+        <h3>Corporate Gifts</h3>
+        <div class="price">Custom Quote</div>
+
+        <ul>
+          <li>✔ Branded promotional products</li>
+          <li>✔ Product sourcing assistance</li>
+          <li>✔ Custom branding options</li>
+          <li>✔ Corporate gifting solutions</li>
+        </ul>
+
+        <button onclick="addToCart('Corporate Gifts (Custom Quote)', 0)">Add to Quote</button>
+      </div>
+
+      <!-- Email Signatures -->
+      <div class="card">
+        <h3>Email Signatures</h3>
+        <div class="price">From R350</div>
+
+        <ul>
+          <li>✔ Signature Design → R350</li>
+          <li>✔ Additional Employee → R100 each</li>
+          <li>✔ Mobile-friendly layouts</li>
+          <li>✔ Brand consistency</li>
+        </ul>
+
+        <button onclick="addToCart('Email Signature Design', 350)">Add to Quote</button>
+      </div>
+
+      <!-- Flyer Design -->
+      <div class="card">
+        <h3>Flyer Design</h3>
+        <div class="price">R550</div>
+
+        <ul>
+          <li>✔ Promotional flyer design</li>
+          <li>✔ Brand-aligned design</li>
+          <li>✔ Print-ready artwork</li>
+          <li>✔ 1 revision included</li>
+        </ul>
+
+        <button onclick="addToCart('Flyer Design', 550)">Add to Quote</button>
+      </div>
+
+      <!-- Poster Design -->
+      <div class="card">
+        <h3>Poster Design</h3>
+        <div class="price">R850</div>
+
+        <ul>
+          <li>✔ Promotional poster design</li>
+          <li>✔ Large-format artwork</li>
+          <li>✔ Print-ready files</li>
+          <li>✔ 1 revision included</li>
+        </ul>
+
+        <button onclick="addToCart('Poster Design', 850)">Add to Quote</button>
+      </div>
+
+    </div>
+
+  </div>
+
 </section>
 
 <footer class="text-center py-6 text-sm" style="color: var(--footer-text);">
@@ -712,8 +1259,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const navLogo = document.getElementById("navLogo");
 
-  let open = false;
+  const cartBtn = document.getElementById("cartBtn");
+  const cartPanel = document.getElementById("cartPanel");
+  const closeCart = document.getElementById("closeCart");
+  const sendBtn = document.getElementById("sendQuote");
 
+  let cart = [];
+  let dropdownOpen = false;
+
+  /* ================= THEME ================= */
   function updateTheme() {
     const isDark = root.classList.contains("dark-mode");
 
@@ -727,9 +1281,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Ensure correct theme on load
   updateTheme();
 
+  themeToggle?.addEventListener("click", () => {
+    root.classList.toggle("dark-mode");
+    updateTheme();
+  });
+
+  /* ================= MOBILE MENU ================= */
   menuBtn?.addEventListener("click", () => {
     mobileMenu.classList.toggle("open");
     backdrop.classList.toggle("show");
@@ -740,24 +1299,119 @@ document.addEventListener("DOMContentLoaded", () => {
     backdrop.classList.remove("show");
   });
 
+  /* ================= DROPDOWN ================= */
   servicesBtn?.addEventListener("click", (e) => {
     e.stopPropagation();
-    open = !open;
-    servicesDropdown.classList.toggle("open", open);
+    dropdownOpen = !dropdownOpen;
+    servicesDropdown.classList.toggle("open", dropdownOpen);
   });
 
   document.addEventListener("click", () => {
-    open = false;
+    dropdownOpen = false;
     servicesDropdown.classList.remove("open");
   });
 
-  themeToggle?.addEventListener("click", () => {
-    root.classList.toggle("dark-mode");
-    updateTheme();
+  /* ================= CART SYSTEM ================= */
+
+  window.addToCart = function(name, price) {
+    cart.push({ name, price });
+    updateCart();
+  };
+
+  window.removeItem = function(index) {
+    cart.splice(index, 1);
+    updateCart();
+  };
+
+  function updateCart() {
+    const cartItems = document.getElementById("cartItems");
+    const cartCount = document.getElementById("cartCount");
+
+    if (!cartItems || !cartCount) return;
+
+    cartCount.innerText = cart.length;
+    cartItems.innerHTML = "";
+
+    cart.forEach((item, index) => {
+      cartItems.innerHTML += `
+        <div class="border p-3 rounded-xl flex justify-between items-center">
+          <div>
+            <p class="font-semibold">${item.name}</p>
+            <p class="text-sm text-gray-500">R${item.price}</p>
+          </div>
+          <button onclick="removeItem(${index})" class="text-red-500">
+            Remove
+          </button>
+        </div>
+      `;
+    });
+  }
+
+  /* ================= CART OPEN/CLOSE ================= */
+
+  cartBtn?.addEventListener("click", () => {
+    cartPanel.classList.remove("translate-x-full");
+  });
+
+  closeCart?.addEventListener("click", () => {
+    cartPanel.classList.add("translate-x-full");
+  });
+
+  /* ================= SEND QUOTE EMAIL ================= */
+
+  sendBtn?.addEventListener("click", () => {
+
+    if (cart.length === 0) {
+      alert("Your quote is empty.");
+      return;
+    }
+
+    let total = 0;
+
+    let body =
+      "Hello Novyra Team,%0D%0A%0D%0A" +
+      "I would like a quote for the following:%0D%0A%0D%0A";
+
+    cart.forEach(item => {
+      total += item.price;
+      body += `- ${item.name} (R${item.price})%0D%0A`;
+    });
+
+    body += `%0D%0ATotal Estimate: R${total}%0D%0A%0D%0ARegards,%0D%0A`;
+
+    window.location.href =
+      `mailto:sales@novyra.co.za?subject=Website Quote Request&body=${body}`;
   });
 
 });
 </script>
+
+<!-- CART BUTTON -->
+<button id="cartBtn"
+  class="fixed bottom-6 right-6 bg-blue-500 text-white px-5 py-3 rounded-full shadow-lg z-50">
+  🛒 Quote (<span id="cartCount">0</span>)
+</button>
+
+<!-- CART PANEL -->
+<div id="cartPanel"
+  class="fixed right-0 top-0 h-full w-full md:w-[400px] bg-white shadow-2xl z-50 transform translate-x-full transition-all duration-300 flex flex-col">
+
+  <div class="p-5 border-b flex justify-between items-center">
+    <h2 class="text-xl font-bold">Your Quote</h2>
+    <button id="closeCart">✕</button>
+  </div>
+
+  <div id="cartItems" class="p-5 flex-1 overflow-y-auto space-y-3">
+    <!-- items injected here -->
+  </div>
+
+  <div class="p-5 border-t">
+    <button id="sendQuote"
+      class="w-full bg-blue-500 text-white py-3 rounded-xl font-semibold">
+      Send Quote Email
+    </button>
+  </div>
+</div>
 
 </body>
 </html>
