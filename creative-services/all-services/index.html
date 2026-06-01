@@ -15,39 +15,31 @@
 ========================= */
 
 :root{
-  --bg:#f3f4f6;
-  --card:#ffffff;
-  --border:#dbeafe;
-
-  --text:#0f172a;
-  --muted:#64748b;
-
-  --accent:#3b82f6;
-  --accent-light:#93c5fd;
-  --accent-dark:#2563eb;
+  --bg: #f3f4f6;
+  --text: rgb(15 23 42);
+  --muted: #64748b;
+  --card: rgba(255,255,255,0.55);
+  --border: rgba(255,255,255,0.35);
+  --accent: #3b82f6;
 }
 
-html.dark{
-  --bg:#0f172a;
-  --card:#111827;
-  --border:#1f2937;
-
-  --text:#f9fafb;
-  --muted:#9ca3af;
-
-  --accent:#60a5fa;
-  --accent-light:#93c5fd;
-  --accent-dark:#3b82f6;
+html.dark-mode{
+  --bg: rgb(38 38 40);
+  --text: #ffffff;
+  --muted: #9ca3af;
+  --card: rgba(255,255,255,0.05);
+  --border: rgba(255,255,255,0.08);
+  --accent: #93c5fd;
 }
 
-html.dark body{
+html.dark-mode body{
   background:var(--bg);
   color:var(--text);
 }
 
-html.dark .card,
-html.dark .quote,
-html.dark .glass-card{
+html.dark-mode .card,
+html.dark-mode .quote,
+html.dark-mode .glass-card{
   background: rgba(17, 24, 39, 0.6);
   border: 1px solid rgba(255,255,255,0.08);
 }
@@ -81,23 +73,36 @@ header{
 
 /* glass card used in navbar */
 .glass-card{
-  background: rgba(255,255,255,0.55);
-  border: 1px solid rgba(255,255,255,0.35);
-  border-radius: 20px;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 10px 35px rgba(15, 23, 42, 0.08);
+  background: rgba(255,255,255,0.4);
+  backdrop-filter: blur(5px);
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,0.3);
+  box-shadow:0 8px 32px rgba(0,0,0,0.1);
+  transition:.3s ease;
+}
+
+html.dark-mode .glass-card{
+  background: rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  box-shadow:0 12px 40px rgba(0,0,0,0.45);
 }
 
 /* nav links */
 .nav-link{
-  text-decoration:none;
-  color:var(--text);
-  font-weight:600;
-  padding:8px 12px;
+  padding:6px 10px;
   border-radius:10px;
-  transition:0.2s;
-  display:inline-block;
+  transition:.2s ease;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.nav-link:hover{
+  color:#3b82f6;
+}
+
+.nav-link.active{
+  color:#3b82f6;
+  background:rgba(59,130,246,0.1);
 }
 
 /* ✅ FIX: no background block anymore */
@@ -205,26 +210,31 @@ header{
    GLASS CARD (MAIN CARDS)
 ========================= */
 
-.card{
-  background: rgba(255, 255, 255, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.35);
+.service-card{
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(255,255,255,0.35);
   border-radius: 22px;
-  padding: 26px;
-
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-
-  box-shadow: 0 10px 35px rgba(15, 23, 42, 0.08);
-  transition: all 0.25s ease;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  transition: all .3s ease;
+  min-height: 160px;
 }
 
-.card:hover{
+.service-card:hover{
   transform: translateY(-6px);
-  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.12);
+  box-shadow: 0 18px 45px rgba(59,130,246,0.25);
+  border: 1px solid rgba(59,130,246,0.4);
+}
+
+html.dark-mode .service-card{
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+
+html.dark-mode .service-card:hover{
+  box-shadow: 0 18px 55px rgba(147, 197, 253, 0.22);
+  border: 1px solid rgba(147, 197, 253, 0.45);
 }
 
 /* =========================
@@ -303,8 +313,8 @@ button{
 .quote{
   margin-top:25px;
   margin-bottom:25px;
-  background:#fff;
-  border:1px solid var(--border);
+background: var(--card);
+border: 1px solid var(--border);
   border-radius:24px;
   padding:28px;
 }
@@ -459,6 +469,12 @@ button{
   }
 }
 
+body{
+  background: var(--bg);
+  color: var(--text);
+  transition: .3s ease;
+}
+   
 </style>
 </head>
 
@@ -1103,7 +1119,7 @@ const sun = document.getElementById("sunIcon");
 const moon = document.getElementById("moonIcon");
 
 function setTheme(isDark){
-  document.documentElement.classList.toggle("dark", isDark);
+  document.documentElement.classList.toggle("dark-mode", isDark);
 
   if(isDark){
     sun.style.opacity = "0";
