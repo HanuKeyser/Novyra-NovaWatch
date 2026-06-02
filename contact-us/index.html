@@ -1,202 +1,892 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>Novyra - New Era of Creation</title>
+  <title>Novyra - New Era of Creation</title>
 
-<link rel="icon" type="image/png" href="contact-us/Novyra - Tab Icon.png" />
+  <link rel="icon" type="image/png" href="Novyra Tab Icon (Light Theme).png">
+  <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
 
-    body {
-        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-        background: #ffffff;
-        color: #111;
-        line-height: 1.6;
-    }
+/* ================= ROOT THEME ================= */
+:root{
+  --bg: #f3f4f6;
+  --text: rgb(15 23 42);
+  --footer-text: #000000;
 
-    /* CONTAINER */
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 40px;
-    }
+  --scroll-thumb: rgba(59,130,246,0.85);
+  --scroll-track: transparent;
+}
 
-    /* NAV */
-    nav {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 20px 0;
-    }
+html.dark-mode{
+  --bg: rgb(38 38 40);
+  --text: white;
+  --footer-text: #ffffff;
 
-    nav .logo img {
-        height: 65px;
-        width: auto;
-        display: block;
-    }
+  --scroll-thumb: rgba(147,197,253,0.9);
+  --scroll-track: transparent;
+}
 
-    .nav-links {
-        display: flex;
-        gap: 22px;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-    }
+html, body{
+  margin:0;
+  font-family:sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  transition:.3s ease;
+  overflow-x:hidden;
+  scroll-behavior:smooth;
 
-    .nav-links a {
-        text-decoration: none;
-        color: #111;
-        font-size: 0.9rem;
-        transition: opacity 0.2s ease;
-        white-space: nowrap;
-    }
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+}
 
-    .nav-links a:hover {
-        opacity: 0.5;
-    }
+/* ================= SCROLLBAR ================= */
+::-webkit-scrollbar{ width:8px; }
+::-webkit-scrollbar-track{ background: var(--scroll-track); }
+::-webkit-scrollbar-thumb{
+  background: var(--scroll-thumb);
+  border-radius:10px;
+  border:2px solid transparent;
+  background-clip:padding-box;
+}
 
-    /* HERO */
-    .hero {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        min-height: 80vh;
-        gap: 60px;
-        padding: 40px 0;
-    }
+/* ================= GLASS BASE ================= */
+.glass-card{
+  background: rgba(255,255,255,0.4);
+  backdrop-filter: blur(5px);
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,0.3);
+  box-shadow:0 8px 32px rgba(0,0,0,0.1);
+  transition:.3s ease;
+}
 
-    .hero-left {
-        flex: 1;
-        max-width: 600px;
-    }
+html.dark-mode .glass-card{
+  background: rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  box-shadow:0 12px 40px rgba(0,0,0,0.45);
+}
 
-    .hero-left h1 {
-        font-size: 2.8rem;
-        font-weight: 400;
-        margin-bottom: 20px;
-    }
+/* ================= ABOUT CARD ================= */
+.about-card{
+  position: relative;
+  background: rgba(255,255,255,0.45);
+  backdrop-filter: blur(6px);
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  transition: .3s ease;
+  cursor: default;
+}
 
-    .hero-left p {
-        font-size: 1rem;
-        color: #444;
-        margin-bottom: 16px;
-    }
+.about-card::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 3px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #3b82f6, #93c5fd);
 
-    .hero-right {
-        flex: 1;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+  -webkit-mask: 
+    linear-gradient(#000 0 0) content-box, 
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
 
-    .hero-right video {
-        width: 100%;
-        max-width: 520px;
-        border-radius: 10px;
-    }
+  pointer-events: none;
+}
 
-    /* FOOTER */
-    footer {
-        text-align: center;
-        padding: 30px 0;
-        font-size: 0.8rem;
-        color: #666;
-        border-top: 1px solid #eee;
-        margin-top: 40px;
-    }
+html.dark-mode .about-card{
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
 
-    /* RESPONSIVE */
-    @media (max-width: 900px) {
-        .hero {
-            flex-direction: column;
-            text-align: left;
-        }
+/* ================= SERVICE CARDS ================= */
+.service-card{
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(255,255,255,0.35);
+  border-radius: 22px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  transition: all .3s ease;
+  min-height: 160px;
+}
 
-        .hero-right {
-            width: 100%;
-        }
-    }
+.service-card:hover{
+  transform: translateY(-6px);
+  box-shadow: 0 18px 45px rgba(59,130,246,0.25);
+  border: 1px solid rgba(59,130,246,0.4);
+}
 
-    @media (max-width: 600px) {
-        nav {
-            flex-direction: column;
-            gap: 15px;
-        }
+html.dark-mode .service-card{
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
 
-        .hero-left h1 {
-            font-size: 2rem;
-        }
+html.dark-mode .service-card:hover{
+  transform: translateY(-6px);
+  box-shadow: 0 18px 55px rgba(147, 197, 253, 0.22);
+  border: 1px solid rgba(147, 197, 253, 0.45);
+}
 
-        .nav-links {
-            justify-content: center;
-        }
-    }
+/* ================= NAV ================= */
+.nav-link{
+  padding:6px 10px;
+  border-radius:10px;
+  transition:.2s ease;
+}
+
+.nav-link:hover{
+  color:#3b82f6;
+}
+
+.nav-link.active{
+  color:#3b82f6;
+  background:rgba(59,130,246,0.1);
+}
+
+/* ================= NAV BACKDROP ================= */
+#backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.25);
+  opacity:0;
+  pointer-events:none;
+  transition:.3s ease;
+  z-index:40;
+}
+
+#backdrop.show{
+  opacity:1;
+  pointer-events:auto;
+}
+
+/* ================= ICON ================= */
+.icon{
+  position:absolute;
+  width:20px;
+  height:20px;
+  transition:.3s ease;
+}
+
+/* ================= DROPDOWN (FINAL PREMIUM VERSION) ================= */
+#servicesDropdown {
+  position: absolute;
+  top: 52px;
+  left: 0;
+  width: 250px;
+
+  /* BASE (LIGHT MODE SAFE TOO) */
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  border-radius: 16px;
+
+  padding: 10px;
+
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+
+  transition: all 0.25s ease;
+  z-index: 60;
+
+  box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+}
+
+/* DROPDOWN LINKS */
+#servicesDropdown .nav-link {
+  color: rgba(255, 255, 255, 0.85);
+  display: block;
+}
+
+#servicesDropdown .nav-link:hover {
+  color: #93c5fd;
+  background: rgba(59, 130, 246, 0.18);
+}
+
+/* OPEN STATE */
+#servicesDropdown.open {
+  opacity: 1;
+  transform: translateY(6px);
+  pointer-events: auto;
+}
+
+/* ================= MOBILE MENU ================= */
+#mobileMenu {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+#mobileMenu.open {
+  max-height: 500px;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* ================= OPTIONAL LIGHT MODE OVERRIDE ================= */
+html:not(.dark-mode) #servicesDropdown {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+html:not(.dark-mode) #servicesDropdown .nav-link {
+  color: rgb(15 23 42);
+}
+
+html:not(.dark-mode) #servicesDropdown .nav-link:hover {
+  background: rgba(59, 130, 246, 0.08);
+  color: #3b82f6;
+}
+
+body {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+body.fade-out {
+  opacity: 0;
+}
+
+/* Optional smoother feel for View Transitions */
+@view-transition {
+  navigation: auto;
+}
+  
 </style>
-
 </head>
 
 <body>
 
-<div class="container">
+<div id="backdrop"></div>
 
-    <!-- NAV -->
-    <nav>
-        <div class="logo">
-            <img src="contact-us/Novyra - Navigation Bar.png" alt="Novyra Logo">
+<header class="fixed top-4 w-full z-50">
+
+  <div class="max-w-screen-xl mx-auto px-6 flex items-stretch gap-4">
+
+    <nav class="flex-1">
+
+      <div class="h-16 px-6 glass-card flex items-center justify-between">
+
+        <!-- LOGO -->
+        <img
+          id="navLogo"
+          src="Novyra Navigation Bar (Dark Theme).png"
+          class="h-10 md:h-12 w-auto"
+        >
+
+        <!-- DESKTOP NAV -->
+        <div class="hidden md:flex items-center gap-2 text-sm">
+
+          <a href="#home" class="nav-link">Home</a>
+          <a href="#about" class="nav-link">About</a>
+          <a href="#coming-soon" class="nav-link">Coming Soon</a>
+
+          <!-- CREATIVE SERVICES (FIXED + TIGHT SPACING) -->
+          <div class="relative flex items-center gap-0">
+
+            <!-- MAIN LINK -->
+            <a href="#creative-services" class="nav-link pr-1">
+              Creative Services
+            </a>
+
+            <!-- DROPDOWN TOGGLE (CLOSER NOW) -->
+            <button id="servicesBtn"
+              class="nav-link px-1 leading-none flex items-center justify-center">
+              <span class="text-[12px]">⮟</span>
+            </button>
+
+            <!-- DROPDOWN -->
+            <div id="servicesDropdown" class="space-y-2 text-sm">
+              <a href="https://www.novyra.co.za/creative-services/all-services/" class="block nav-link">All Services</a>
+            </div>
+
+          </div>
+
+          <!-- CONTACT -->
+          <a href="https://www.novyra.co.za/contact-us/"
+             class="px-5 py-2 rounded-2xl bg-blue-500 text-white ml-2">
+            Contact Us
+          </a>
+
         </div>
 
-        <div class="nav-links">
-            <a href="#">Home</a>
-            <a href="#">About</a>
-            <a href="#">Coming Soon</a>
-            <a href="#">Creative Services</a>
-            <a href="#">All Services</a>
-            <a href="#">Contact Us</a>
-        </div>
+        <!-- MOBILE MENU BUTTON -->
+        <button id="menuBtn" class="md:hidden text-xl">☰</button>
+
+      </div>
+
     </nav>
 
-    <!-- HERO -->
-    <section class="hero">
+    <!-- THEME TOGGLE -->
+    <button id="themeToggle"
+      class="h-16 w-16 glass-card flex items-center justify-center relative overflow-hidden">
 
-        <!-- LEFT SIDE -->
-        <div class="hero-left">
-            <h1>Welcome to Novyra</h1>
+      <svg id="sunIcon" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="12" cy="12" r="4"></circle>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+      </svg>
 
-            <p>
-                Novyra is a full-service marketing and digital agency building modern brands through strategy, design, and creative performance-driven execution.
-            </p>
+      <svg id="moonIcon" class="icon opacity-0 scale-75" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M21 12.6A8.5 8.5 0 1 1 11.4 3a6.8 6.8 0 0 0 9.6 9.6Z"/>
+      </svg>
 
-            <p>
-                We provide a complete range of marketing solutions including branding, web design, content creation, social media management, digital advertising campaigns, and scalable business growth systems tailored to each client.
-            </p>
+    </button>
 
-            <p>
-                Our approach is structured, intentional, and results-focused, helping businesses build a consistent, impactful, and professional presence across all digital platforms while driving measurable long-term growth.
-            </p>
-        </div>
+  </div>
 
-        <!-- RIGHT SIDE -->
-        <div class="hero-right">
-            <video autoplay muted loop playsinline>
-                <source src="contact-us/Novyra - Logo Reveal.mp4" type="video/mp4">
-            </video>
-        </div>
+  <!-- MOBILE MENU -->
+  <div id="mobileMenu" class="dropdown md:hidden mt-3">
 
-    </section>
+    <div class="max-w-screen-xl mx-auto px-6">
 
-    <!-- FOOTER -->
-    <footer>
-        © 2026 Novyra. All rights reserved.
-    </footer>
+      <div class="glass-card p-6 flex flex-col gap-3 text-sm">
+
+        <a href="#home" class="nav-link">Home</a>
+        <a href="#about" class="nav-link">About</a>
+        <a href="#coming-soon" class="nav-link">Coming Soon</a>
+
+        <!-- MOBILE -->
+        <a href="#creative-services" class="nav-link">
+          Creative Services
+        </a>
+
+        <a href="https://www.novyra.co.za/creative-services/all-services/" class="nav-link pl-4">
+           - All Services
+        </a>
+
+        <!-- CONTACT -->
+        <a href="https://www.novyra.co.za/contact-us/"
+           class="px-4 py-2 rounded-xl bg-blue-500 text-white text-center">
+          Contact Us
+        </a>
+
+      </div>
+    </div>
+  </div>
+
+</header>
+
+<!-- HOME -->
+    <section id="home" class="scroll-mt-28 flex items-start px-6 md:px-10 pt-28 pb-0">
+
+  <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 w-full items-start">
+
+    <div class="text-left">
+
+      <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight text-left">
+        <span>Welcome</span>
+        <span>to</span>
+        <span class="text-blue-500 font-semibold">Novyra</span>
+      </h1>
+
+      <p class="mb-8 text-base md:text-lg leading-relaxed opacity-70">
+        Novyra is a full-service marketing and digital agency building modern brands through strategy, design, and creative performance-driven execution.
+      </p>
+
+      <p class="mb-8 text-base md:text-lg leading-relaxed opacity-70">
+        We provide a complete range of marketing solutions including branding, web design, content creation, social media management, digital advertising campaigns, and scalable business growth systems tailored to each client.
+      </p>
+
+      <p class="mb-8 text-base md:text-lg leading-relaxed opacity-70">
+        Our approach is structured, intentional, and results-focused, helping businesses build a consistent, impactful, and professional presence across all digital platforms while driving measurable long-term growth.
+      </p>
+
+      <div class="flex gap-4">
+        <a href="https://www.novyra.co.za/contact-us/"
+           class="px-6 py-3 rounded-2xl bg-blue-500 text-white hover:bg-blue-600 transition">
+          Get Started
+        </a>
+
+        <a href="#creative-services"
+           class="px-6 py-3 rounded-2xl glass-card hover:opacity-80 transition">
+          View Work
+        </a>
+      </div>
+
+    </div>
+
+    <div class="flex justify-center items-start">
+
+      <div class="w-full h-[420px] rounded-2xl overflow-hidden glass-card shadow-xl">
+
+        <video id="heroVideo" autoplay muted playsinline class="w-full h-full object-cover">
+          <source id="videoSource" src="Novyra Logo Reveal Landscape (Light Theme).mp4" type="video/mp4">
+        </video>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+  <!-- Hidden Logo -->
+  <img src="Novyra Logo.png" alt="Novyra Logo" class="hidden-assets">
+  <img src="AeroStack Digital Signature.png" alt="AeroStack Digital Logo" class="hidden-assets">
+  <img src="AeroStack Digital Slogan Signature.png" alt="AeroStack Digital Logo Slogan" class="hidden-assets">
+
+  <!-- Hidden Signature GIF -->
+  <img src="Novyra Signature.gif" alt="Novyra Signature" class="hidden-assets">
+
+    <style>
+    .hidden-assets {
+      display: none;
+    }
+  </style>
+  
+<!-- MARQUEE -->
+<div class="w-full overflow-hidden glass-marquee py-1">
+
+  <div class="marquee-content">
+    <span>Novyra - New Era of Creation ✦</span>
+    <span>Novyra - New Era of Creation ✦</span>
+    <span>Novyra - New Era of Creation ✦</span>
+    <span>Novyra - New Era of Creation ✦</span>
+    <span>Novyra - New Era of Creation ✦</span>
+  </div>
 
 </div>
 
+<style>
+
+/* MARQUEE WRAPPER */
+.glass-marquee{
+  background: var(--bg);
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+}
+
+/* MARQUEE TEXT */
+.marquee-content{
+  display: flex;
+  gap: 4rem;
+  white-space: nowrap;
+  width: max-content;
+
+  animation: marquee 55s linear infinite;
+
+  font-size: clamp(70px, 11vw, 140px);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+
+  /* prevents “y / g / p” clipping */
+  line-height: 1.25;
+
+  color: #3b82f6;
+  opacity: 0.15;
+}
+
+/* DARK MODE */
+html.dark-mode .marquee-content{
+  color: #3b82f6;
+  opacity: 0.18;
+}
+
+/* ANIMATION */
+@keyframes marquee{
+  from{
+    transform: translateX(0%);
+  }
+  to{
+    transform: translateX(-50%);
+  }
+}
+
+</style>
+  
+<!-- ABOUT -->
+<section id="about" class="scroll-mt-28 px-6 md:px-10 py-10 md:py-10">
+
+  <div class="max-w-7xl mx-auto">
+
+    <!-- TOP SPLIT -->
+    <div class="grid md:grid-cols-5 gap-12 items-start">
+
+      <!-- LEFT SIDE (WIDER) -->
+      <div class="md:col-span-3 max-w-3xl">
+
+        <h2 class="text-4xl md:text-6xl font-bold tracking-tight leading-tight">
+          We don’t just build brands.
+          <span class="block opacity-50">We engineer market dominance.</span>
+        </h2>
+
+        <p class="mt-6 text-base md:text-lg opacity-70 leading-relaxed">
+          Novyra is a performance-driven digital agency that blends strategy, design, and scalable systems
+          to turn ambitious companies into category leaders.
+        </p>
+
+      </div>
+
+      <!-- RIGHT SIDE (SMALLER VIDEO) -->
+      <div class="md:col-span-2 w-full">
+
+        <div class="aspect-video rounded-2xl overflow-hidden glass-card">
+
+          <video autoplay muted loop playsinline preload="auto" class="w-full h-full object-cover">
+            <source src="Novyra About Section.mp4" type="video/mp4">
+          </video>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- DIVIDER -->
+    <div class="my-14 h-px opacity-20 bg-current"></div>
+
+    <!-- CONTENT GRID -->
+    <div class="grid md:grid-cols-12 gap-10 items-start">
+
+      <!-- LEFT STATEMENT -->
+      <div class="md:col-span-5">
+        <div class="sticky top-28">
+
+          <h3 class="text-2xl md:text-3xl font-semibold leading-snug">
+            For brands that refuse to blend into the noise.
+          </h3>
+
+          <p class="mt-5 opacity-70 leading-relaxed">
+            We work with growth-focused companies that are eager to expand their marketing footprint and move beyond surface-level design by building systems rooted in strategy, psychology, and performance marketing that scale over time.
+          </p>
+
+          <div class="mt-8 flex gap-8">
+
+            <div>
+              <p class="text-base font-bold">Novyra is not a word with history - it is a word with intention.</p>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- RIGHT CARDS -->
+<div class="md:col-span-7 grid sm:grid-cols-2 gap-6">
+
+  <div class="about-card p-6">
+    <h4 class="text-lg font-semibold mb-2">How We Work</h4>
+    <p class="text-sm opacity-70 leading-relaxed mb-3">
+      Our process is structured and focused on delivering consistent, high-quality results for your brand.
+    </p>
+    <ul class="text-sm opacity-80 space-y-1">
+      <li>✔ Understand your business</li>
+      <li>✔ Plan strategy & content</li>
+      <li>✔ Create and execute</li>
+      <li>✔ Track and improve</li>
+    </ul>
+  </div>
+
+  <div class="about-card p-6">
+    <h4 class="text-lg font-semibold mb-2">What You Get</h4>
+    <p class="text-sm opacity-70 leading-relaxed mb-3">
+      Everything we deliver is designed to keep your brand active, visible, and professional across all platforms.
+    </p>
+    <ul class="text-sm opacity-80 space-y-1">
+      <li>✔ Consistent brand presence</li>
+      <li>✔ Professional content</li>
+      <li>✔ Clear communication</li>
+    </ul>
+  </div>
+
+</div>
+
+    </div>
+
+  </div>
+
+</section>
+  
+<!-- CREATIVE SERVICES -->
+<section id="creative-services" class="scroll-mt-28 px-6 md:px-10 py-10 md:py-12">
+
+  <div class="max-w-7xl mx-auto">
+
+<!-- HEADER -->
+<div class="mb-12 text-center">
+
+  <h2 class="text-3xl md:text-5xl font-bold mb-4">
+    Our Services
+  </h2>
+
+<p class="text-base md:text-lg opacity-70 leading-relaxed w-full max-w-5xl mx-auto">
+  We offer a focused range of marketing and design services built to help your brand grow, stay consistent, and stand out across digital and physical platforms, delivering clear, impactful, and professional results.
+</p>
+
+</div>
+
+    </div>
+
+    <!-- TOP ROW (3 CARDS) -->
+    <div class="grid md:grid-cols-3 gap-6">
+
+      <div class="service-card p-6">
+        <h3 class="text-xl font-semibold mb-3">Social Media Management</h3>
+        <p class="opacity-70 text-sm mb-4 leading-relaxed">
+          Consistent, strategic management of your social platforms to keep your brand active, visible, growing.
+        </p>
+        <ul class="text-sm opacity-80 space-y-1">
+          <li>✔ Platform management</li>
+          <li>✔ Content creation</li>
+          <li>✔ Content planning</li>
+          <li>✔ Scheduling</li>
+          <li>✔ Performance tracking</li>
+        </ul>
+      </div>
+
+      <div class="service-card p-6">
+        <h3 class="text-xl font-semibold mb-3">Content Creation</h3>
+        <p class="opacity-70 text-sm mb-4 leading-relaxed">
+          High-quality visuals and messaging designed to capture attention and communicate your brand.
+        </p>
+        <ul class="text-sm opacity-80 space-y-1">
+          <li>✔ Graphics design</li>
+          <li>✔ Short-form videos</li>
+          <li>✔ Caption writing</li>
+          <li>✔ Visual consistency</li>
+          <li>✔ Creative direction</li>
+        </ul>
+      </div>
+
+      <div class="service-card p-6">
+        <h3 class="text-xl font-semibold mb-3">Branding</h3>
+        <p class="opacity-70 text-sm mb-4 leading-relaxed">
+          Build a strong, recognisable identity that reflects your business and resonates with your audience.
+        </p>
+        <ul class="text-sm opacity-80 space-y-1">
+          <li>✔ Logo design</li>
+          <li>✔ Brand identity</li>
+          <li>✔ Brand guidelines</li>
+          <li>✔ Rebranding</li>
+          <li>✔ Brand positioning</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- BOTTOM ROW (2 CARDS) -->
+    <div class="grid md:grid-cols-2 gap-6 mt-6">
+
+      <div class="service-card p-6">
+        <h3 class="text-xl font-semibold mb-3">Marketing Materials</h3>
+        <p class="opacity-70 text-sm mb-4 leading-relaxed">
+          Professionally designed materials that enhance your brand presence across print and digital touchpoints.
+        </p>
+        <ul class="text-sm opacity-80 space-y-1">
+          <li>✔ Business cards</li>
+          <li>✔ Email signatures</li>
+          <li>✔ Brochures</li>
+          <li>✔ Flyers & posters</li>
+          <li>✔ Banners & signage</li>
+        </ul>
+      </div>
+
+      <div class="service-card p-6">
+        <h3 class="text-xl font-semibold mb-3">Marketing Strategy</h3>
+        <p class="opacity-70 text-sm mb-4 leading-relaxed">
+          Data-driven planning to guide your marketing efforts and help your brand grow with purpose.
+        </p>
+        <ul class="text-sm opacity-80 space-y-1">
+          <li>✔ Campaign planning</li>
+          <li>✔ Content strategy</li>
+          <li>✔ Audience targeting</li>
+          <li>✔ Growth planning</li>
+        </ul>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<footer class="text-center py-6 text-sm" style="color: var(--footer-text);">
+  © 2026 Novyra. All rights reserved.
+</footer>
+  
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  const root = document.documentElement;
+
+  /* ================= NAV ================= */
+  const menuBtn = document.getElementById("menuBtn");
+  const mobileMenu = document.getElementById("mobileMenu");
+  const backdrop = document.getElementById("backdrop");
+
+  /* ================= THEME ================= */
+  const themeToggle = document.getElementById("themeToggle");
+  const navLogo = document.getElementById("navLogo");
+  const sunIcon = document.getElementById("sunIcon");
+  const moonIcon = document.getElementById("moonIcon");
+
+  /* ================= VIDEO ================= */
+  const video = document.getElementById("heroVideo");
+  const videoSource = document.getElementById("videoSource");
+  let playCount = 0;
+
+  /* ================= SERVICES DROPDOWN ================= */
+  const servicesBtn = document.getElementById("servicesBtn");
+  const servicesDropdown = document.getElementById("servicesDropdown");
+  let servicesOpen = false;
+
+  /* ================= MOBILE MENU ================= */
+  if (menuBtn && mobileMenu && backdrop) {
+
+    menuBtn.addEventListener("click", () => {
+      mobileMenu.classList.toggle("open");
+      backdrop.classList.toggle("show");
+    });
+
+    backdrop.addEventListener("click", () => {
+      mobileMenu.classList.remove("open");
+      backdrop.classList.remove("show");
+    });
+
+    document.querySelectorAll('#mobileMenu a').forEach(link => {
+      link.addEventListener("click", () => {
+        mobileMenu.classList.remove("open");
+        backdrop.classList.remove("show");
+      });
+    });
+  }
+
+  /* ================= VIDEO CONTROL ================= */
+  if (video) {
+    video.addEventListener("ended", () => {
+      playCount++;
+
+      if (playCount < 2) {
+        video.currentTime = 0;
+        video.play();
+      }
+    });
+  }
+
+  /* ================= THEME SYSTEM ================= */
+  function updateTheme() {
+    const isDark = root.classList.contains("dark-mode");
+
+    if (navLogo) {
+      navLogo.src = isDark
+        ? "Novyra Navigation Bar (Dark Theme).png"
+        : "Novyra Navigation Bar (Light Theme).png";
+    }
+
+    if (video && videoSource) {
+      videoSource.src = isDark
+        ? "Novyra Logo Reveal Landscape (Dark Theme).mp4"
+        : "Novyra Logo Reveal Landscape (Light Theme).mp4";
+
+      video.load();
+      video.play().catch(() => {});
+      playCount = 0;
+    }
+
+    if (sunIcon && moonIcon) {
+      sunIcon.style.opacity = isDark ? "0" : "1";
+      moonIcon.style.opacity = isDark ? "1" : "0";
+    }
+  }
+
+  if (themeToggle) {
+    themeToggle.addEventListener("click", () => {
+      root.classList.toggle("dark-mode");
+
+      localStorage.setItem(
+        "novyra-theme",
+        root.classList.contains("dark-mode") ? "dark" : "light"
+      );
+
+      updateTheme();
+    });
+  }
+
+  /* load saved theme */
+  if (localStorage.getItem("novyra-theme") === "dark") {
+    root.classList.add("dark-mode");
+  }
+
+  updateTheme();
+
+  /* ================= SERVICES DROPDOWN ================= */
+  if (servicesBtn && servicesDropdown) {
+
+    servicesBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      servicesOpen = !servicesOpen;
+      servicesDropdown.classList.toggle("open", servicesOpen);
+    });
+
+    document.addEventListener("click", () => {
+      servicesOpen = false;
+      servicesDropdown.classList.remove("open");
+    });
+
+    document.querySelectorAll('#servicesDropdown a').forEach(link => {
+      link.addEventListener("click", () => {
+        servicesOpen = false;
+        servicesDropdown.classList.remove("open");
+      });
+    });
+  }
+
+  /* ================= PAGE TRANSITIONS ================= */
+  const links = document.querySelectorAll("a");
+
+  function isInternalLink(href) {
+    if (!href) return false;
+
+    return (
+      href.startsWith("/") ||
+      href.includes("novyra.co.za")
+    );
+  }
+
+  links.forEach(link => {
+    const href = link.getAttribute("href");
+
+    if (!isInternalLink(href)) return;
+
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      if (document.startViewTransition) {
+        document.startViewTransition(() => {
+          window.location.href = href;
+        });
+      } else {
+        document.body.classList.add("fade-out");
+
+        setTimeout(() => {
+          window.location.href = href;
+        }, 250);
+      }
+    });
+  });
+
+  /* fade-in fallback */
+  window.addEventListener("load", () => {
+    document.body.classList.remove("fade-out");
+  });
+
+});
+</script>
+
+<script src="/js/cart.js" defer></script>
+  
 </body>
 </html>
