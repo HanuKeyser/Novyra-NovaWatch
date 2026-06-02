@@ -4,10 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<!-- TAB TITLE -->
 <title>Novyra - New Era of Creation</title>
 
-<!-- TAB ICON -->
 <link rel="icon" type="image/png" href="contact-us/Novyra - Tab Icon.png" />
 
 <style>
@@ -24,29 +22,44 @@
         line-height: 1.6;
     }
 
+    /* CONTAINER */
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 40px;
+    }
+
     /* NAV */
     nav {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 20px 40px;
+        padding: 20px 0;
     }
 
     nav .logo img {
-        height: 35px;
+        height: 65px;
         width: auto;
         display: block;
     }
 
-    nav a {
-        text-decoration: none;
-        color: #111;
-        margin-left: 20px;
-        font-size: 0.9rem;
+    .nav-links {
+        display: flex;
+        gap: 22px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
     }
 
-    nav a:hover {
-        opacity: 0.6;
+    .nav-links a {
+        text-decoration: none;
+        color: #111;
+        font-size: 0.9rem;
+        transition: opacity 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .nav-links a:hover {
+        opacity: 0.5;
     }
 
     /* HERO */
@@ -55,8 +68,8 @@
         align-items: center;
         justify-content: space-between;
         min-height: 80vh;
-        padding: 60px 40px;
         gap: 60px;
+        padding: 40px 0;
     }
 
     .hero-left {
@@ -92,10 +105,11 @@
     /* FOOTER */
     footer {
         text-align: center;
-        padding: 30px 20px;
+        padding: 30px 0;
         font-size: 0.8rem;
         color: #666;
         border-top: 1px solid #eee;
+        margin-top: 40px;
     }
 
     /* RESPONSIVE */
@@ -104,16 +118,24 @@
             flex-direction: column;
             text-align: left;
         }
+
+        .hero-right {
+            width: 100%;
+        }
     }
 
     @media (max-width: 600px) {
         nav {
             flex-direction: column;
-            gap: 10px;
+            gap: 15px;
         }
 
         .hero-left h1 {
             font-size: 2rem;
+        }
+
+        .nav-links {
+            justify-content: center;
         }
     }
 </style>
@@ -122,21 +144,28 @@
 
 <body>
 
+<div class="container">
+
+    <!-- NAV -->
     <nav>
         <div class="logo">
             <img src="contact-us/Novyra - Navigation Bar.png" alt="Novyra Logo">
         </div>
 
-        <div>
+        <div class="nav-links">
             <a href="#">Home</a>
             <a href="#">About</a>
-            <a href="#">Contact</a>
+            <a href="#">Coming Soon</a>
+            <a href="#">Creative Services</a>
+            <a href="#">All Services</a>
+            <a href="#">Contact Us</a>
         </div>
     </nav>
 
     <!-- HERO -->
     <section class="hero">
 
+        <!-- LEFT SIDE -->
         <div class="hero-left">
             <h1>Welcome to Novyra</h1>
 
@@ -153,6 +182,7 @@
             </p>
         </div>
 
+        <!-- RIGHT SIDE -->
         <div class="hero-right">
             <video autoplay muted loop playsinline>
                 <source src="contact-us/Novyra - Logo Reveal.mp4" type="video/mp4">
@@ -161,9 +191,12 @@
 
     </section>
 
+    <!-- FOOTER -->
     <footer>
         © 2026 Novyra. All rights reserved.
     </footer>
+
+</div>
 
 </body>
 </html>
