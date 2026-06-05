@@ -453,7 +453,7 @@ a, button{
 
 <style>
 /* =========================
-   HERO SPLIT LAYOUT (UPDATED)
+   HERO SECTION
 ========================= */
 
 .hero{
@@ -469,12 +469,14 @@ a, button{
     align-items:center;
 }
 
-/* LEFT TEXT ALIGN FIX */
+/* =========================
+   HERO TEXT
+========================= */
+
 .hero-text{
-    text-align:left; /* ✅ FORCE LEFT ALIGN */
+    text-align:left;
 }
 
-/* TITLE */
 .hero-text h1{
     font-size:clamp(2.2rem,4vw,3.5rem);
     font-weight:800;
@@ -482,12 +484,10 @@ a, button{
     line-height:1.1;
 }
 
-/* BLUE HEADING */
 .hero-highlight{
-    color:var(--primary); /* ✅ BLUE TEXT */
+    color:var(--primary);
 }
 
-/* PARAGRAPHS */
 .hero-text p{
     font-size:14px;
     line-height:1.7;
@@ -495,18 +495,25 @@ a, button{
     margin-bottom:12px;
 }
 
-/* BUTTON */
 .hero-actions{
     margin-top:22px;
 }
 
-/* VIDEO */
+/* =========================
+   HERO VIDEO CARD
+========================= */
+
 .hero-video{
     padding:0;
     overflow:hidden;
     border-radius:var(--radius);
-    height: 420px;
+
+    width:100%;
+    aspect-ratio:21 / 9;
+
     display:flex;
+    align-items:center;
+    justify-content:center;
 }
 
 .hero-video video{
@@ -522,13 +529,38 @@ a, button{
 
 @media(max-width:992px){
 
+    .hero{
+        min-height:auto;
+        padding-top:40px;
+    }
+
     .hero-grid{
         grid-template-columns:1fr;
         gap:24px;
     }
 
+    .hero-text{
+        order:1;
+    }
+
     .hero-video{
-        min-height:260px;
+        order:2;
+        width:100%;
+        aspect-ratio:16 / 9;
+    }
+}
+
+@media(max-width:576px){
+
+    .hero-text h1{
+        font-size:2rem;
+    }
+
+    .hero-text p{
+        font-size:13px;
+    }
+
+    .hero-video{
         aspect-ratio:16 / 9;
     }
 }
