@@ -205,7 +205,7 @@ body::after{
     justify-content:space-between;
     align-items:center;
 
-    padding:24px 40px;
+    padding: 14px 28px;
 
     background: rgba(255,255,255,0.6);
     backdrop-filter: blur(22px);
@@ -659,9 +659,10 @@ a, button{
     padding:0;
     overflow:hidden;
     border-radius:var(--radius);
-    min-height:320px;
+
+    aspect-ratio: 16 / 10;
+    min-height: unset;
     display:flex;
-    align-items:stretch;
 }
 
 .about-video video{
