@@ -966,6 +966,33 @@ img {
     color: var(--blue-light);
 }
 
+/* Season Batch Actions */
+.season-batch-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.season-batch-btn {
+    flex: 1;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 10px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.season-batch-btn:hover {
+    border-color: var(--blue-light);
+    color: var(--text);
+}
+
 /* Per-Episode Rewatch Controls */
 .episode-rewatch-controls {
     display: flex;
@@ -1889,7 +1916,7 @@ function createInitialData() {
             id: "tv-only-murders-in-the-building",
             title: "Only Murders in the Building",
             year: "2021",
-            poster: "https://image.tmdb.org/t/p/w500/A2P341l3P0uV9L3vW8D0q2T4U0n.jpg",
+            poster: "https://image.tmdb.org/t/p/w500/rm3854807298",
             backdrop: "https://image.tmdb.org/t/p/w1280/mAJ83Vo12C26R2d0i6a4i4bU56A.jpg",
             description: "Three strangers who share an obsession with true crime podcasts suddenly find themselves wrapped up in one when a gruesome death occurs inside their exclusive Upper West Side apartment building.",
             isFinished: false,
@@ -1923,7 +1950,7 @@ function createInitialData() {
             id: "tv-every-year-after",
             title: "Every Year After",
             year: "2026",
-            poster: "https://image.tmdb.org/t/p/w500/every_year_after_poster.jpg",
+            poster: "https://image.tmdb.org/t/p/w500/rm3932408066",
             backdrop: "https://image.tmdb.org/t/p/w1280/every_year_after_backdrop.jpg",
             description: "A drama series following evolving relationships over successive years.",
             isFinished: false,
@@ -1938,7 +1965,7 @@ function createInitialData() {
             id: "tv-elle",
             title: "Elle",
             year: "2026",
-            poster: "https://image.tmdb.org/t/p/w500/elle_poster.jpg",
+            poster: "https://image.tmdb.org/t/p/w500/rm2590821634",
             backdrop: "https://image.tmdb.org/t/p/w1280/elle_backdrop.jpg",
             description: "Prequel series following the early high school years of Elle Woods.",
             isFinished: false,
@@ -1953,7 +1980,7 @@ function createInitialData() {
             id: "tv-sweet-magnolias",
             title: "Sweet Magnolias",
             year: "2020",
-            poster: "https://image.tmdb.org/t/p/w500/2L2zT8y8j83m58V2k9k5k4.jpg",
+            poster: "https://image.tmdb.org/t/p/w500/rm1350748418",
             backdrop: "https://image.tmdb.org/t/p/w1280/2L2zT8y8j83m58V2k9k5k4_bg.jpg",
             description: "Lifelong friends Maddie, Helen, and Dana Sue navigate relationships, family, and careers in Serenity.",
             isFinished: false,
@@ -3074,6 +3101,17 @@ function renderEpisodes(
 
         </div>
 
+        <div class="season-batch-actions">
+            <button class="season-batch-btn" onclick="markSeasonWatched('${show.id}', ${selectedSeason})">
+                <svg class="icon icon-small" style="width:14px;height:14px;" viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg>
+                Mark Season Watched
+            </button>
+            <button class="season-batch-btn" onclick="markSeasonUnwatched('${show.id}', ${selectedSeason})">
+                <svg class="icon icon-small" style="width:14px;height:14px;" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+                Mark Season Unwatched
+            </button>
+        </div>
+
 
         <div id="episodeList"></div>
 
@@ -3400,6 +3438,63 @@ function removeEpisodeRewatch(showId, episodeId) {
     renderDashboard();
     renderLibrary();
     renderWatched();
+}
+
+
+function markSeasonWatched(showId, seasonNumber) {
+    const show = getItem(showId);
+    if (!show) return;
+
+    let updatedCount = 0;
+    show.episodes.forEach(episode => {
+        if (Number(episode.season) === Number(seasonNumber) && isReleased(episode.releaseDate)) {
+            episode.watched = true;
+            if (!episode.watchCount || episode.watchCount < 1) {
+                episode.watchCount = 1;
+            }
+            updatedCount++;
+        }
+    });
+
+    if (updatedCount === 0) {
+        showToast("No released episodes in this season");
+        return;
+    }
+
+    saveState();
+    renderEpisodes(show);
+    renderModalActions(show);
+    renderDashboard();
+    renderLibrary();
+    renderWatched();
+
+    showToast(`Season ${seasonNumber} marked watched`);
+}
+
+
+function markSeasonUnwatched(showId, seasonNumber) {
+    const show = getItem(showId);
+    if (!show) return;
+
+    let updatedCount = 0;
+    show.episodes.forEach(episode => {
+        if (Number(episode.season) === Number(seasonNumber)) {
+            episode.watched = false;
+            episode.watchCount = 0;
+            updatedCount++;
+        }
+    });
+
+    if (updatedCount === 0) return;
+
+    saveState();
+    renderEpisodes(show);
+    renderModalActions(show);
+    renderDashboard();
+    renderLibrary();
+    renderWatched();
+
+    showToast(`Season ${seasonNumber} marked unwatched`);
 }
 
 
