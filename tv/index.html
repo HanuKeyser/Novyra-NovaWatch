@@ -1,31 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
->
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#05070b">
 <title>ReelTrack</title>
 
 <style>
-
 /* =========================================================
-   RESET
+   RESET & VARIABLES
 ========================================================= */
 
 * {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
 }
 
 :root {
-
     --bg: #05070b;
     --surface: #0b0f16;
     --surface-2: #101620;
@@ -45,8 +38,6 @@
     --danger: #ff5268;
 
     --radius: 16px;
-    --radius-small: 11px;
-
 }
 
 html {
@@ -55,7 +46,6 @@ html {
 }
 
 body {
-
     font-family:
         Inter,
         -apple-system,
@@ -71,152 +61,108 @@ body {
         );
 
     color: var(--text);
-
     min-height: 100vh;
-
     overflow-x: hidden;
-
-    padding-bottom: 90px;
-
+    padding-bottom: 86px;
 }
 
 button,
 input {
-
     font: inherit;
-
 }
 
 button {
-
     border: 0;
-    cursor: pointer;
     color: inherit;
+    cursor: pointer;
+}
 
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
 }
 
 img {
-
     display: block;
     max-width: 100%;
-
 }
-
 
 /* =========================================================
    SVG ICONS
 ========================================================= */
 
 .icon {
-
     width: 22px;
     height: 22px;
-
     fill: none;
-
     stroke: currentColor;
-
     stroke-width: 1.8;
-
     stroke-linecap: round;
     stroke-linejoin: round;
-
 }
 
 .icon-small {
-
     width: 17px;
     height: 17px;
-
 }
 
 .icon-large {
-
-    width: 28px;
-    height: 28px;
-
+    width: 30px;
+    height: 30px;
 }
-
 
 /* =========================================================
    APP
 ========================================================= */
 
 .app {
-
     width: 100%;
-
     max-width: 600px;
-
-    margin: 0 auto;
-
     min-height: 100vh;
-
+    margin: 0 auto;
 }
-
 
 /* =========================================================
    HEADER
 ========================================================= */
 
 .header {
-
     position: sticky;
-
     top: 0;
-
     z-index: 50;
 
+    height: 68px;
+    padding: 0 17px;
+
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
 
-    height: 68px;
+    background: rgba(5,7,11,0.9);
+    backdrop-filter: blur(20px);
 
-    padding: 0 18px;
-
-    background:
-        rgba(5,7,11,0.88);
-
-    backdrop-filter:
-        blur(20px);
-
-    border-bottom:
-        1px solid var(--border);
-
+    border-bottom: 1px solid var(--border);
 }
 
 .logo {
-
     display: flex;
-
     align-items: center;
-
     gap: 9px;
 
     font-size: 20px;
-
     font-weight: 800;
-
     letter-spacing: -0.6px;
-
 }
 
 .logo-mark {
-
-    width: 32px;
-
-    height: 32px;
-
-    border-radius: 10px;
+    width: 33px;
+    height: 33px;
 
     display: flex;
-
     align-items: center;
-
     justify-content: center;
+
+    border-radius: 10px;
 
     background:
         linear-gradient(
@@ -228,43 +174,25 @@ img {
     box-shadow:
         0 6px 20px
         rgba(22,119,255,0.3);
-
 }
 
 .profile-button {
-
-    width: 38px;
-
-    height: 38px;
+    width: 39px;
+    height: 39px;
 
     border-radius: 50%;
-
-    background:
-        var(--surface-3);
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
     overflow: hidden;
 
-    border:
-        1px solid var(--border);
-
+    background: var(--surface-3);
+    border: 1px solid var(--border);
 }
 
 .profile-avatar {
-
     width: 100%;
-
     height: 100%;
 
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
     background:
@@ -275,89 +203,62 @@ img {
         );
 
     font-size: 14px;
-
-    font-weight: 700;
-
+    font-weight: 800;
 }
 
-
 /* =========================================================
-   PAGE
+   PAGES
 ========================================================= */
 
 .page {
-
     display: none;
-
-    padding:
-        20px 16px 30px;
-
+    padding: 20px 16px 30px;
 }
 
 .page.active {
-
     display: block;
-
 }
 
-
 /* =========================================================
-   SECTION
+   SECTIONS
 ========================================================= */
 
 .section-header {
-
     display: flex;
-
+    align-items: center;
     justify-content: space-between;
 
-    align-items: center;
-
-    margin:
-        26px 0 14px;
-
+    margin: 26px 0 14px;
 }
 
 .section-header:first-child {
-
     margin-top: 0;
-
 }
 
 .section-title {
-
     font-size: 18px;
-
     font-weight: 750;
-
     letter-spacing: -0.4px;
-
 }
 
 .section-link {
-
+    background: transparent;
     color: var(--blue-light);
 
     font-size: 13px;
-
-    font-weight: 600;
-
+    font-weight: 650;
 }
-
 
 /* =========================================================
    HERO
 ========================================================= */
 
 .hero {
-
     position: relative;
-
-    min-height: 330px;
-
-    border-radius: 22px;
+    min-height: 325px;
 
     overflow: hidden;
+    border-radius: 22px;
 
     background:
         linear-gradient(
@@ -366,37 +267,26 @@ img {
             #080b11
         );
 
-    border:
-        1px solid var(--border);
-
+    border: 1px solid var(--border);
 }
 
 .hero-image {
-
     position: absolute;
-
     inset: 0;
 
     width: 100%;
-
     height: 100%;
 
     object-fit: cover;
-
-    opacity: 0.55;
-
+    opacity: 0.5;
 }
 
 .hero-image.hidden {
-
     display: none;
-
 }
 
 .hero-overlay {
-
     position: absolute;
-
     inset: 0;
 
     background:
@@ -405,164 +295,116 @@ img {
             rgba(5,7,11,0.05),
             rgba(5,7,11,0.98)
         );
-
 }
 
 .hero-content {
-
     position: relative;
-
     z-index: 2;
 
-    min-height: 330px;
-
+    min-height: 325px;
     padding: 22px;
 
     display: flex;
-
     flex-direction: column;
-
     justify-content: flex-end;
-
 }
 
 .hero-label {
-
     color: var(--blue-light);
 
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.3px;
     text-transform: uppercase;
 
-    font-size: 10px;
-
-    font-weight: 800;
-
-    letter-spacing: 1.3px;
-
     margin-bottom: 8px;
-
 }
 
 .hero-title {
-
     font-size: 28px;
-
     line-height: 1.05;
-
     font-weight: 800;
-
     letter-spacing: -1px;
 
     margin-bottom: 9px;
-
 }
 
 .hero-description {
+    max-width: 410px;
 
     color: var(--text-secondary);
 
     font-size: 13px;
-
     line-height: 1.5;
 
-    max-width: 400px;
-
     margin-bottom: 16px;
-
 }
 
 .primary-button {
-
-    display: inline-flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    gap: 8px;
-
-    height: 45px;
+    width: fit-content;
+    min-height: 45px;
 
     padding: 0 18px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 
     border-radius: 12px;
 
     background: var(--blue);
 
     font-size: 13px;
-
     font-weight: 700;
-
-    width: fit-content;
 
     box-shadow:
         0 8px 25px
         rgba(22,119,255,0.25);
-
 }
 
 .primary-button:active {
-
     transform: scale(0.97);
-
 }
-
 
 /* =========================================================
    STATS
 ========================================================= */
 
 .stats {
-
     display: grid;
-
-    grid-template-columns:
-        repeat(2, 1fr);
-
+    grid-template-columns: repeat(2, 1fr);
     gap: 10px;
 
     margin-top: 14px;
-
 }
 
 .stat {
-
-    background: var(--surface);
-
-    border: 1px solid var(--border);
-
-    border-radius: var(--radius);
-
     padding: 16px;
 
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
 }
 
 .stat-value {
-
     font-size: 23px;
-
     font-weight: 800;
-
 }
 
 .stat-label {
-
     color: var(--text-secondary);
-
     font-size: 11px;
 
     margin-top: 4px;
-
 }
-
 
 /* =========================================================
    HORIZONTAL ROW
 ========================================================= */
 
 .horizontal-row {
-
     display: flex;
-
     gap: 12px;
 
     overflow-x: auto;
@@ -570,41 +412,32 @@ img {
     padding-bottom: 5px;
 
     scrollbar-width: none;
-
 }
 
 .horizontal-row::-webkit-scrollbar {
-
     display: none;
-
 }
 
-
 /* =========================================================
-   POSTER CARD
+   CARDS
 ========================================================= */
 
 .card {
-
     flex: 0 0 125px;
-
     width: 125px;
 
     cursor: pointer;
-
 }
 
 .poster {
-
     position: relative;
 
     width: 125px;
-
     height: 178px;
 
-    border-radius: 13px;
-
     overflow: hidden;
+
+    border-radius: 13px;
 
     background:
         linear-gradient(
@@ -614,322 +447,234 @@ img {
         );
 
     border: 1px solid var(--border);
-
 }
 
 .poster img {
-
     width: 100%;
-
     height: 100%;
-
     object-fit: cover;
-
 }
 
 .poster-placeholder {
-
     width: 100%;
-
     height: 100%;
 
+    padding: 12px;
+
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
     text-align: center;
 
-    padding: 12px;
-
     color: var(--text-secondary);
 
     font-size: 11px;
-
     font-weight: 700;
-
 }
 
 .card-title {
-
     margin-top: 9px;
 
     font-size: 12px;
-
     font-weight: 650;
 
     white-space: nowrap;
-
     overflow: hidden;
-
     text-overflow: ellipsis;
-
 }
 
 .card-meta {
-
     margin-top: 4px;
 
     color: var(--text-muted);
 
     font-size: 10px;
-
 }
 
 .progress-bar {
-
-    height: 3px;
-
     width: 100%;
-
-    background:
-        rgba(255,255,255,0.08);
+    height: 3px;
 
     margin-top: 7px;
 
-    border-radius: 5px;
-
     overflow: hidden;
 
+    border-radius: 5px;
+
+    background:
+        rgba(255,255,255,0.08);
 }
 
 .progress-fill {
-
     height: 100%;
-
     background: var(--blue);
-
 }
-
-
-/* =========================================================
-   LIBRARY TABS
-========================================================= */
-
-.library-tabs {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(2, 1fr);
-
-    gap: 5px;
-
-    background: var(--surface);
-
-    padding: 4px;
-
-    border-radius: 12px;
-
-    margin-bottom: 18px;
-
-}
-
-.library-tab {
-
-    height: 40px;
-
-    border-radius: 9px;
-
-    color: var(--text-secondary);
-
-    background: transparent;
-
-    font-size: 12px;
-
-    font-weight: 700;
-
-}
-
-.library-tab.active {
-
-    color: white;
-
-    background: var(--blue);
-
-}
-
 
 /* =========================================================
    3 COLUMN GRID
 ========================================================= */
 
 .library-grid {
-
     display: grid;
 
     grid-template-columns:
         repeat(3, minmax(0, 1fr));
 
-    gap:
-        18px 10px;
-
+    gap: 18px 10px;
 }
 
 .library-grid .card {
-
     width: 100%;
-
     min-width: 0;
-
 }
 
 .library-grid .poster {
-
     width: 100%;
-
     height: auto;
 
-    aspect-ratio:
-        0.70;
-
+    aspect-ratio: 0.70;
 }
 
-
 /* =========================================================
-   EMPTY
+   TABS
 ========================================================= */
 
-.empty-state {
+.library-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
 
-    text-align: center;
+    gap: 5px;
 
-    padding:
-        55px 20px;
+    padding: 4px;
+
+    margin-bottom: 18px;
+
+    background: var(--surface);
+
+    border-radius: 12px;
+}
+
+.library-tab {
+    height: 40px;
+
+    border-radius: 9px;
+
+    background: transparent;
 
     color: var(--text-secondary);
 
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.library-tab.active {
+    background: var(--blue);
+    color: white;
+}
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.empty-state {
+    padding: 55px 20px;
+
+    text-align: center;
+
+    color: var(--text-secondary);
 }
 
 .empty-state svg {
-
-    color: var(--text-muted);
-
     margin-bottom: 15px;
-
+    color: var(--text-muted);
 }
 
 .empty-state h3 {
-
     color: var(--text);
 
     font-size: 16px;
 
     margin-bottom: 7px;
-
 }
 
 .empty-state p {
-
     font-size: 12px;
-
     line-height: 1.5;
-
 }
-
 
 /* =========================================================
    SEARCH
 ========================================================= */
 
 .search-box {
-
     position: relative;
 
     margin-bottom: 18px;
-
 }
 
 .search-box input {
-
     width: 100%;
-
     height: 48px;
 
-    padding:
-        0 16px 0 45px;
-
-    border:
-        1px solid var(--border);
-
-    border-radius: 14px;
-
-    background: var(--surface);
-
-    color: white;
+    padding: 0 16px 0 45px;
 
     outline: none;
 
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+    border-radius: 14px;
+
+    color: white;
 }
 
 .search-box input:focus {
-
     border-color:
         rgba(22,119,255,0.6);
-
 }
 
 .search-icon {
-
     position: absolute;
 
     left: 16px;
-
     top: 50%;
 
     transform:
         translateY(-50%);
 
     color: var(--text-muted);
-
 }
-
 
 /* =========================================================
    UPCOMING
 ========================================================= */
 
-.upcoming-section {
-
-    margin-top: 26px;
-
-}
-
 .upcoming-card {
-
     display: flex;
-
     gap: 12px;
 
     padding: 12px;
 
     margin-bottom: 10px;
 
-    background:
-        var(--surface);
+    background: var(--surface);
 
-    border:
-        1px solid var(--border);
-
+    border: 1px solid var(--border);
     border-radius: 14px;
 
     cursor: pointer;
-
 }
 
 .upcoming-poster {
-
-    flex:
-        0 0 62px;
+    flex: 0 0 62px;
 
     width: 62px;
-
     height: 88px;
 
-    border-radius: 9px;
-
     overflow: hidden;
+
+    border-radius: 9px;
 
     background:
         linear-gradient(
@@ -937,120 +682,87 @@ img {
             #182131,
             #0b0e14
         );
-
 }
 
 .upcoming-poster img {
-
     width: 100%;
-
     height: 100%;
-
     object-fit: cover;
-
 }
 
 .upcoming-poster-placeholder {
-
     width: 100%;
-
     height: 100%;
 
+    padding: 6px;
+
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
     text-align: center;
 
-    padding: 6px;
+    color: var(--text-secondary);
 
     font-size: 8px;
-
-    color:
-        var(--text-secondary);
-
+    font-weight: 700;
 }
 
 .upcoming-info {
-
     flex: 1;
-
     min-width: 0;
 
     display: flex;
-
     flex-direction: column;
-
     justify-content: center;
-
 }
 
 .upcoming-type {
-
-    color:
-        var(--blue-light);
+    color: var(--blue-light);
 
     font-size: 9px;
-
     font-weight: 800;
 
     text-transform: uppercase;
-
     letter-spacing: 0.8px;
 
     margin-bottom: 5px;
-
 }
 
 .upcoming-title {
-
     font-size: 13px;
-
     font-weight: 700;
 
     white-space: nowrap;
-
     overflow: hidden;
-
     text-overflow: ellipsis;
-
 }
 
 .upcoming-date {
-
-    color:
-        var(--text-secondary);
+    color: var(--text-secondary);
 
     font-size: 10px;
+    line-height: 1.5;
 
     margin-top: 6px;
-
 }
 
 .upcoming-countdown {
-
-    color:
-        var(--text-muted);
+    color: var(--text-muted);
 
     font-size: 10px;
 
     margin-top: 3px;
-
 }
-
 
 /* =========================================================
    BOTTOM NAV
 ========================================================= */
 
 .bottom-nav {
-
     position: fixed;
 
     left: 50%;
-
     bottom: 0;
 
     transform:
@@ -1059,13 +771,11 @@ img {
     z-index: 100;
 
     width: 100%;
-
     max-width: 600px;
 
     height: 72px;
 
-    padding:
-        7px 12px;
+    padding: 7px 12px;
 
     display: grid;
 
@@ -1073,24 +783,19 @@ img {
         repeat(4, 1fr);
 
     background:
-        rgba(8,11,17,0.94);
+        rgba(8,11,17,0.95);
 
-    backdrop-filter:
-        blur(20px);
+    backdrop-filter: blur(20px);
 
     border-top:
         1px solid var(--border);
-
 }
 
 .nav-button {
-
     display: flex;
-
     flex-direction: column;
 
     align-items: center;
-
     justify-content: center;
 
     gap: 4px;
@@ -1100,55 +805,40 @@ img {
     color: var(--text-muted);
 
     font-size: 9px;
-
     font-weight: 650;
-
 }
 
 .nav-button.active {
-
     color: var(--blue-light);
-
 }
-
 
 /* =========================================================
    MODAL
 ========================================================= */
 
 .modal {
-
     position: fixed;
-
     inset: 0;
 
     z-index: 200;
 
     display: none;
-
     align-items: flex-end;
 
     background:
         rgba(0,0,0,0.7);
-
 }
 
 .modal.open {
-
     display: flex;
-
 }
 
 .modal-sheet {
-
     width: 100%;
-
     max-width: 600px;
-
     max-height: 92vh;
 
-    margin:
-        0 auto;
+    margin: 0 auto;
 
     overflow-y: auto;
 
@@ -1160,13 +850,10 @@ img {
 
     border:
         1px solid var(--border);
-
 }
 
 .modal-header {
-
     position: sticky;
-
     top: 0;
 
     z-index: 5;
@@ -1174,48 +861,35 @@ img {
     height: 55px;
 
     display: flex;
-
     align-items: center;
-
     justify-content: flex-end;
 
-    padding:
-        0 15px;
+    padding: 0 15px;
 
     background:
         rgba(9,13,20,0.9);
 
     backdrop-filter:
         blur(15px);
-
 }
 
 .close-button {
-
     width: 36px;
-
     height: 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     border-radius: 50%;
 
-    display: flex;
+    background: var(--surface-3);
 
-    align-items: center;
-
-    justify-content: center;
-
-    background:
-        var(--surface-3);
-
-    color:
-        var(--text-secondary);
-
+    color: var(--text-secondary);
 }
 
 .modal-backdrop {
-
     width: 100%;
-
     height: 220px;
 
     object-fit: cover;
@@ -1226,267 +900,190 @@ img {
             #152033,
             #080b10
         );
-
 }
 
 .modal-content {
-
-    padding:
-        20px;
-
+    padding: 20px;
 }
 
 .modal-title {
-
     font-size: 25px;
-
     font-weight: 800;
 
     letter-spacing: -0.7px;
-
 }
 
 .modal-meta {
-
     display: flex;
-
+    flex-wrap: wrap;
     gap: 8px;
 
-    color:
-        var(--text-secondary);
+    color: var(--text-secondary);
 
     font-size: 11px;
 
-    margin:
-        9px 0 16px;
-
+    margin: 9px 0 16px;
 }
 
 .modal-description {
-
-    color:
-        var(--text-secondary);
+    color: var(--text-secondary);
 
     font-size: 13px;
-
     line-height: 1.6;
-
 }
 
 .modal-actions {
-
     display: flex;
-
     gap: 8px;
 
-    margin:
-        20px 0;
-
+    margin: 20px 0;
 }
 
 .action-button {
-
     flex: 1;
 
     min-height: 43px;
 
-    border-radius:
-        11px;
+    border-radius: 11px;
 
-    background:
-        var(--surface-3);
+    background: var(--surface-3);
 
-    color:
-        white;
+    color: white;
 
     font-size: 12px;
-
     font-weight: 700;
-
 }
 
 .action-button.primary {
-
-    background:
-        var(--blue);
-
+    background: var(--blue);
 }
 
 .season-selector {
-
     display: flex;
-
     gap: 7px;
 
     overflow-x: auto;
 
-    margin:
-        20px 0 14px;
+    margin: 20px 0 14px;
 
     scrollbar-width: none;
-
 }
 
 .season-selector::-webkit-scrollbar {
-
     display: none;
-
 }
 
 .season-button {
-
-    flex:
-        0 0 auto;
+    flex: 0 0 auto;
 
     height: 36px;
 
-    padding:
-        0 14px;
+    padding: 0 14px;
 
-    border-radius:
-        9px;
+    border-radius: 9px;
 
-    background:
-        var(--surface-3);
+    background: var(--surface-3);
 
-    color:
-        var(--text-secondary);
+    color: var(--text-secondary);
 
     font-size: 11px;
-
     font-weight: 700;
-
 }
 
 .season-button.active {
+    background: var(--blue);
+    color: white;
+}
 
-    background:
-        var(--blue);
-
-    color:
-        white;
-
+.season-button.upcoming {
+    color: var(--blue-light);
 }
 
 .episode {
-
     display: flex;
-
     align-items: center;
-
     gap: 12px;
 
-    padding:
-        13px 0;
+    padding: 13px 0;
 
     border-bottom:
         1px solid var(--border);
-
 }
 
 .episode-check {
-
-    flex:
-        0 0 29px;
+    flex: 0 0 29px;
 
     width: 29px;
-
     height: 29px;
 
-    border-radius:
-        50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
 
     border:
         1px solid var(--text-muted);
 
-    background:
-        transparent;
+    background: transparent;
 
-    color:
-        white;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
+    color: white;
 }
 
 .episode-check.watched {
-
-    background:
-        var(--blue);
-
-    border-color:
-        var(--blue);
-
+    background: var(--blue);
+    border-color: var(--blue);
 }
 
 .episode-info {
-
     min-width: 0;
-
 }
 
 .episode-title {
-
     font-size: 12px;
-
     font-weight: 650;
-
 }
 
 .episode-meta {
-
-    color:
-        var(--text-muted);
+    color: var(--text-muted);
 
     font-size: 10px;
 
+    line-height: 1.5;
+
     margin-top: 4px;
-
 }
-
 
 /* =========================================================
    PROFILE
 ========================================================= */
 
 .profile-card {
+    padding: 20px;
 
-    background:
-        var(--surface);
+    background: var(--surface);
 
     border:
         1px solid var(--border);
 
-    border-radius:
-        var(--radius);
-
-    padding:
-        20px;
-
+    border-radius: var(--radius);
 }
 
 .profile-row {
-
     display: flex;
-
     align-items: center;
-
     gap: 14px;
-
 }
 
 .large-avatar {
-
     width: 58px;
-
     height: 58px;
 
-    border-radius:
-        50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
 
     background:
         linear-gradient(
@@ -1495,141 +1092,116 @@ img {
             #0045a9
         );
 
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
     font-size: 20px;
-
     font-weight: 800;
-
 }
 
 .profile-name {
-
     font-size: 17px;
-
     font-weight: 750;
-
 }
 
 .profile-subtitle {
-
-    color:
-        var(--text-secondary);
+    color: var(--text-secondary);
 
     font-size: 11px;
 
     margin-top: 4px;
-
 }
-
 
 /* =========================================================
    TOAST
 ========================================================= */
 
 .toast {
-
     position: fixed;
 
     left: 50%;
-
     bottom: 88px;
+
+    z-index: 500;
 
     transform:
         translateX(-50%)
         translateY(20px);
 
-    z-index: 500;
-
     opacity: 0;
 
     pointer-events: none;
 
-    padding:
-        11px 16px;
+    padding: 11px 16px;
 
-    border-radius:
-        10px;
+    border-radius: 10px;
 
-    background:
-        #161d29;
+    background: #161d29;
 
     border:
         1px solid var(--border);
 
-    color:
-        white;
+    color: white;
 
     font-size: 12px;
-
     font-weight: 600;
 
     transition:
         0.25s ease;
 
     white-space: nowrap;
-
 }
 
 .toast.show {
-
     opacity: 1;
 
     transform:
         translateX(-50%)
         translateY(0);
-
 }
-
 
 /* =========================================================
    RESPONSIVE
 ========================================================= */
 
-@media (
-    max-width: 360px
-) {
+@media (max-width: 360px) {
 
     .page {
-
-        padding-left:
-            12px;
-
-        padding-right:
-            12px;
-
+        padding-left: 12px;
+        padding-right: 12px;
     }
 
     .library-grid {
-
-        gap:
-            14px 7px;
-
+        gap: 14px 7px;
     }
 
     .hero-title {
+        font-size: 24px;
+    }
 
-        font-size:
-            24px;
+}
 
+@media (min-width: 601px) {
+
+    body {
+        background:
+            #020408;
+    }
+
+    .app {
+        background:
+            var(--bg);
+
+        box-shadow:
+            0 0 50px
+            rgba(0,0,0,0.5);
     }
 
 }
 
 </style>
-
 </head>
-
 
 <body>
 
-
 <div class="app">
-
 
 <!-- =====================================================
      HEADER
@@ -1641,27 +1213,10 @@ img {
 
         <div class="logo-mark">
 
-            <svg
-                class="icon"
-                viewBox="0 0 24 24"
-            >
-
-                <rect
-                    x="3"
-                    y="4"
-                    width="18"
-                    height="16"
-                    rx="3"
-                />
-
-                <path
-                    d="M8 4v16"
-                />
-
-                <path
-                    d="M16 4v16"
-                />
-
+            <svg class="icon" viewBox="0 0 24 24">
+                <rect x="3" y="4" width="18" height="16" rx="3"/>
+                <path d="M8 4v16"/>
+                <path d="M16 4v16"/>
             </svg>
 
         </div>
@@ -1670,10 +1225,10 @@ img {
 
     </div>
 
-
     <button
         class="profile-button"
         onclick="showPage('profile')"
+        aria-label="Open profile"
     >
 
         <div
@@ -1692,127 +1247,107 @@ img {
      HOME
 ===================================================== -->
 
-<main
-    id="homePage"
-    class="page active"
->
+<main id="homePage" class="page active">
 
+    <section class="hero">
 
-<section class="hero">
-
-    <img
-        id="heroImage"
-        class="hero-image hidden"
-        alt=""
-    >
-
-    <div class="hero-overlay"></div>
-
-    <div class="hero-content">
-
-        <div class="hero-label">
-            Continue Watching
-        </div>
-
-        <h1
-            id="heroTitle"
-            class="hero-title"
-        >
-            Welcome to ReelTrack
-        </h1>
-
-        <p
-            id="heroDescription"
-            class="hero-description"
-        >
-            Track every movie and TV show your household watches.
-        </p>
-
-        <button
-            class="primary-button"
-            onclick="continueWatching()"
+        <img
+            id="heroImage"
+            class="hero-image hidden"
+            alt=""
         >
 
-            <svg
-                class="icon icon-small"
-                viewBox="0 0 24 24"
+        <div class="hero-overlay"></div>
+
+        <div class="hero-content">
+
+            <div class="hero-label">
+                Continue Watching
+            </div>
+
+            <h1
+                id="heroTitle"
+                class="hero-title"
+            >
+                Welcome to ReelTrack
+            </h1>
+
+            <p
+                id="heroDescription"
+                class="hero-description"
+            >
+                Track every movie and TV show your household watches.
+            </p>
+
+            <button
+                class="primary-button"
+                onclick="continueWatching()"
             >
 
-                <path
-                    d="M8 5l11 7-11 7V5z"
-                />
+                <svg class="icon icon-small" viewBox="0 0 24 24">
+                    <path d="M8 5l11 7-11 7V5z"/>
+                </svg>
 
-            </svg>
+                Continue Watching
 
-            Continue Watching
+            </button>
 
-        </button>
-
-    </div>
-
-</section>
-
-
-<div
-    id="dashboardStats"
-    class="stats"
-></div>
-
-
-<!-- ONLY CONTINUE TV SHOWS -->
-
-<div>
-
-    <div class="section-header">
-
-        <div class="section-title">
-            Continue TV Shows
         </div>
 
-        <button
-            class="section-link"
-            onclick="openLibrary('tv')"
-        >
-            See All
-        </button>
-
-    </div>
+    </section>
 
 
     <div
-        id="continueTVGrid"
-        class="horizontal-row"
+        id="dashboardStats"
+        class="stats"
     ></div>
 
-</div>
 
+    <div>
 
-<!-- UPCOMING -->
+        <div class="section-header">
 
-<div class="upcoming-section">
+            <div class="section-title">
+                Continue TV Shows
+            </div>
 
-    <div class="section-header">
+            <button
+                class="section-link"
+                onclick="openLibrary('tv')"
+            >
+                See All
+            </button>
 
-        <div class="section-title">
-            Upcoming
         </div>
 
-        <button
-            class="section-link"
-            onclick="showPage('upcoming')"
-        >
-            See All
-        </button>
+        <div
+            id="continueTVGrid"
+            class="horizontal-row"
+        ></div>
 
     </div>
 
 
-    <div
-        id="homeUpcoming"
-    ></div>
+    <div>
 
-</div>
+        <div class="section-header">
 
+            <div class="section-title">
+                Upcoming
+            </div>
+
+            <button
+                class="section-link"
+                onclick="showPage('upcoming')"
+            >
+                See All
+            </button>
+
+        </div>
+
+        <div id="homeUpcoming"></div>
+
+    </div>
 
 </main>
 
@@ -1821,105 +1356,59 @@ img {
      LIBRARY
 ===================================================== -->
 
-<main
-    id="libraryPage"
-    class="page"
->
+<main id="libraryPage" class="page">
 
+    <div class="section-header">
 
-<div class="section-header">
+        <div class="section-title">
+            Library
+        </div>
 
-    <div class="section-title">
-        Library
     </div>
 
-</div>
 
+    <div class="search-box">
 
-<div class="library-tabs">
+        <svg class="icon search-icon" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="7"/>
+            <path d="M20 20l-4-4"/>
+        </svg>
 
-    <button
-        id="moviesTab"
-        class="library-tab active"
-        onclick="setLibraryType('movie')"
-    >
-        Movies
-    </button>
+        <input
+            id="librarySearchInput"
+            type="search"
+            placeholder="Search your library..."
+            autocomplete="off"
+        >
 
-
-    <button
-        id="tvTab"
-        class="library-tab"
-        onclick="setLibraryType('tv')"
-    >
-        TV Shows
-    </button>
-
-</div>
-
-
-<div
-    id="libraryGrid"
-    class="library-grid"
-></div>
-
-
-</main>
-
-
-<!-- =====================================================
-     SEARCH
-===================================================== -->
-
-<main
-    id="searchPage"
-    class="page"
->
-
-
-<div class="section-header">
-
-    <div class="section-title">
-        Search
     </div>
 
-</div>
+
+    <div class="library-tabs">
+
+        <button
+            id="moviesTab"
+            class="library-tab active"
+            onclick="setLibraryType('movie')"
+        >
+            Movies
+        </button>
+
+        <button
+            id="tvTab"
+            class="library-tab"
+            onclick="setLibraryType('tv')"
+        >
+            TV Shows
+        </button>
+
+    </div>
 
 
-<div class="search-box">
-
-    <svg
-        class="icon search-icon"
-        viewBox="0 0 24 24"
-    >
-
-        <circle
-            cx="11"
-            cy="11"
-            r="7"
-        />
-
-        <path
-            d="M20 20l-4-4"
-        />
-
-    </svg>
-
-
-    <input
-        id="searchInput"
-        type="search"
-        placeholder="Search movies and TV shows..."
-        autocomplete="off"
-    >
-
-</div>
-
-
-<div
-    id="searchResults"
-></div>
-
+    <div
+        id="libraryGrid"
+        class="library-grid"
+    ></div>
 
 </main>
 
@@ -1928,48 +1417,42 @@ img {
      WATCHED
 ===================================================== -->
 
-<main
-    id="watchlistPage"
-    class="page"
->
+<main id="watchedPage" class="page">
 
+    <div class="section-header">
 
-<div class="section-header">
+        <div class="section-title">
+            Watched
+        </div>
 
-    <div class="section-title">
-        Watched
     </div>
 
-</div>
+
+    <div class="library-tabs">
+
+        <button
+            id="watchMovieTab"
+            class="library-tab active"
+            onclick="setWatchedType('movie')"
+        >
+            Movies
+        </button>
+
+        <button
+            id="watchTVTab"
+            class="library-tab"
+            onclick="setWatchedType('tv')"
+        >
+            TV Shows
+        </button>
+
+    </div>
 
 
-<div class="library-tabs">
-
-    <button
-        id="watchMovieTab"
-        class="library-tab active"
-        onclick="setWatchlistType('movie')"
-    >
-        Movies
-    </button>
-
-
-    <button
-        id="watchTVTab"
-        class="library-tab"
-        onclick="setWatchlistType('tv')"
-    >
-        TV Shows
-    </button>
-
-</div>
-
-
-<div
-    id="watchlistGrid"
-    class="library-grid"
-></div>
-
+    <div
+        id="watchedGrid"
+        class="library-grid"
+    ></div>
 
 </main>
 
@@ -1978,47 +1461,39 @@ img {
      UPCOMING
 ===================================================== -->
 
-<main
-    id="upcomingPage"
-    class="page"
->
+<main id="upcomingPage" class="page">
 
+    <div class="section-header">
 
-<div class="section-header">
+        <div class="section-title">
+            Upcoming
+        </div>
 
-    <div class="section-title">
-        Upcoming
     </div>
 
-</div>
+
+    <div class="library-tabs">
+
+        <button
+            id="upcomingTVTab"
+            class="library-tab active"
+            onclick="setUpcomingType('tv')"
+        >
+            TV Shows
+        </button>
+
+        <button
+            id="upcomingMovieTab"
+            class="library-tab"
+            onclick="setUpcomingType('movie')"
+        >
+            Movies
+        </button>
+
+    </div>
 
 
-<div class="library-tabs">
-
-    <button
-        id="upcomingTVTab"
-        class="library-tab active"
-        onclick="setUpcomingType('tv')"
-    >
-        TV Shows
-    </button>
-
-
-    <button
-        id="upcomingMovieTab"
-        class="library-tab"
-        onclick="setUpcomingType('movie')"
-    >
-        Movies
-    </button>
-
-</div>
-
-
-<div
-    id="upcomingGrid"
-></div>
-
+    <div id="upcomingGrid"></div>
 
 </main>
 
@@ -2027,187 +1502,122 @@ img {
      PROFILE
 ===================================================== -->
 
-<main
-    id="profilePage"
-    class="page"
->
+<main id="profilePage" class="page">
 
+    <div class="section-header">
 
-<div class="section-header">
-
-    <div class="section-title">
-        Profile
-    </div>
-
-</div>
-
-
-<div class="profile-card">
-
-    <div class="profile-row">
-
-        <div
-            class="large-avatar"
-            id="largeAvatar"
-        >
-            H
+        <div class="section-title">
+            Profile
         </div>
 
+    </div>
 
-        <div>
+
+    <div class="profile-card">
+
+        <div class="profile-row">
 
             <div
-                class="profile-name"
-                id="profileName"
+                class="large-avatar"
+                id="largeAvatar"
             >
-                Hanu
+                H
             </div>
 
-            <div class="profile-subtitle">
-                ReelTrack household member
+            <div>
+
+                <div
+                    class="profile-name"
+                    id="profileName"
+                >
+                    Hanu
+                </div>
+
+                <div class="profile-subtitle">
+                    ReelTrack household member
+                </div>
+
             </div>
 
         </div>
 
     </div>
-
-</div>
-
 
 </main>
 
 
 <!-- =====================================================
-     BOTTOM NAV
+     BOTTOM NAVIGATION
 ===================================================== -->
 
 <nav class="bottom-nav">
 
-
-<button
-    id="navHome"
-    class="nav-button active"
-    onclick="showPage('home')"
->
-
-    <svg
-        class="icon"
-        viewBox="0 0 24 24"
+    <button
+        id="navHome"
+        class="nav-button active"
+        onclick="showPage('home')"
     >
 
-        <path
-            d="M3 10.5L12 3l9 7.5"
-        />
+        <svg class="icon" viewBox="0 0 24 24">
+            <path d="M3 10.5L12 3l9 7.5"/>
+            <path d="M5 9v11h14V9"/>
+        </svg>
 
-        <path
-            d="M5 9v11h14V9"
-        />
+        Home
 
-    </svg>
-
-    Home
-
-</button>
+    </button>
 
 
-<button
-    id="navLibrary"
-    class="nav-button"
-    onclick="showPage('library')"
->
-
-    <svg
-        class="icon"
-        viewBox="0 0 24 24"
+    <button
+        id="navLibrary"
+        class="nav-button"
+        onclick="showPage('library')"
     >
 
-        <rect
-            x="4"
-            y="3"
-            width="16"
-            height="18"
-            rx="2"
-        />
+        <svg class="icon" viewBox="0 0 24 24">
+            <rect x="4" y="3" width="16" height="18" rx="2"/>
+            <path d="M8 3v18"/>
+        </svg>
 
-        <path
-            d="M8 3v18"
-        />
+        Library
 
-    </svg>
-
-    Library
-
-</button>
+    </button>
 
 
-<button
-    id="navSearch"
-    class="nav-button"
-    onclick="showPage('search')"
->
-
-    <svg
-        class="icon"
-        viewBox="0 0 24 24"
+    <button
+        id="navWatched"
+        class="nav-button"
+        onclick="showPage('watched')"
     >
 
-        <circle
-            cx="11"
-            cy="11"
-            r="7"
-        />
+        <svg class="icon" viewBox="0 0 24 24">
+            <path d="M5 4h14v16H5z"/>
+            <path d="M8 12l2.5 2.5L16 9"/>
+        </svg>
 
-        <path
-            d="M20 20l-4-4"
-        />
+        Watched
 
-    </svg>
-
-    Search
-
-</button>
+    </button>
 
 
-<button
-    id="navUpcoming"
-    class="nav-button"
-    onclick="showPage('upcoming')"
->
-
-    <svg
-        class="icon"
-        viewBox="0 0 24 24"
+    <button
+        id="navUpcoming"
+        class="nav-button"
+        onclick="showPage('upcoming')"
     >
 
-        <rect
-            x="3"
-            y="4"
-            width="18"
-            height="17"
-            rx="2"
-        />
+        <svg class="icon" viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="17" rx="2"/>
+            <path d="M16 2v4"/>
+            <path d="M8 2v4"/>
+            <path d="M3 10h18"/>
+        </svg>
 
-        <path
-            d="M16 2v4"
-        />
+        Upcoming
 
-        <path
-            d="M8 2v4"
-        />
-
-        <path
-            d="M3 10h18"
-        />
-
-    </svg>
-
-    Upcoming
-
-</button>
-
+    </button>
 
 </nav>
-
 
 </div>
 
@@ -2222,87 +1632,69 @@ img {
     onclick="closeModalOutside(event)"
 >
 
+    <div class="modal-sheet">
 
-<div class="modal-sheet">
+        <div class="modal-header">
+
+            <button
+                class="close-button"
+                onclick="closeModal()"
+                aria-label="Close"
+            >
+
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M6 6l12 12"/>
+                    <path d="M18 6L6 18"/>
+                </svg>
+
+            </button>
+
+        </div>
 
 
-<div class="modal-header">
-
-    <button
-        class="close-button"
-        onclick="closeModal()"
-    >
-
-        <svg
-            class="icon"
-            viewBox="0 0 24 24"
+        <img
+            id="modalBackdrop"
+            class="modal-backdrop"
+            alt=""
         >
 
-            <path
-                d="M6 6l12 12"
-            />
 
-            <path
-                d="M18 6L6 18"
-            />
+        <div class="modal-content">
 
-        </svg>
-
-    </button>
-
-</div>
+            <h2
+                id="modalTitle"
+                class="modal-title"
+            ></h2>
 
 
-<img
-    id="modalBackdrop"
-    class="modal-backdrop"
-    alt=""
->
+            <div
+                id="modalMeta"
+                class="modal-meta"
+            ></div>
 
 
-<div class="modal-content">
+            <p
+                id="modalDescription"
+                class="modal-description"
+            ></p>
 
 
-<h2
-    id="modalTitle"
-    class="modal-title"
-></h2>
+            <div
+                id="modalActions"
+                class="modal-actions"
+            ></div>
 
 
-<div
-    id="modalMeta"
-    class="modal-meta"
-></div>
+            <div
+                id="modalEpisodes"
+            ></div>
 
+        </div>
 
-<p
-    id="modalDescription"
-    class="modal-description"
-></p>
-
-
-<div
-    id="modalActions"
-    class="modal-actions"
-></div>
-
-
-<div
-    id="modalEpisodes"
-></div>
-
+    </div>
 
 </div>
 
-
-</div>
-
-</div>
-
-
-<!-- =====================================================
-     TOAST
-===================================================== -->
 
 <div
     id="toast"
@@ -2313,88 +1705,145 @@ img {
 <script>
 
 /* =========================================================
-   STATE
+   APP STATE
 ========================================================= */
 
 const STORAGE_KEY =
-    "reeltrack_data_v2";
-
+    "reeltrack_data_v3";
 
 let state = {
-
     movies: [],
-
     tvShows: [],
-
     profiles: [
-
         {
-            id:
-                "profile-hanu",
-
-            name:
-                "Hanu",
-
-            initials:
-                "H"
-
+            id: "profile-hanu",
+            name: "Hanu",
+            initials: "H"
         }
-
     ],
-
-    activeProfileId:
-        "profile-hanu"
-
+    activeProfileId: "profile-hanu"
 };
 
+let currentLibraryType = "movie";
+let currentWatchedType = "movie";
+let currentUpcomingType = "tv";
 
 let currentItem = null;
-
-let currentLibraryType =
-    "movie";
-
-let currentWatchlistType =
-    "movie";
-
-let currentUpcomingType =
-    "tv";
+let selectedSeason = 1;
+let toastTimer = null;
 
 
 /* =========================================================
-   LOAD
+   DATE HELPERS
 ========================================================= */
 
-function loadState() {
+function now() {
+    return new Date();
+}
 
-    const saved =
-        localStorage.getItem(
-            STORAGE_KEY
-        );
+function isReleased(date) {
+    if (!date) return true;
+    return new Date(date).getTime() <= now().getTime();
+}
 
+function formatDate(date) {
 
-    if (!saved) {
+    return new Intl.DateTimeFormat(
+        "en-ZA",
+        {
+            weekday: "short",
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    ).format(new Date(date));
 
-        return;
+}
 
+function formatReleaseDate(date) {
+
+    return new Intl.DateTimeFormat(
+        "en-ZA",
+        {
+            day: "numeric",
+            month: "short",
+            year: "numeric"
+        }
+    ).format(new Date(date));
+
+}
+
+function getCountdown(date) {
+
+    const difference =
+        new Date(date).getTime() -
+        now().getTime();
+
+    if (difference <= 0) {
+        return "Available now";
     }
 
+    const days =
+        Math.floor(
+            difference /
+            (1000 * 60 * 60 * 24)
+        );
+
+    const hours =
+        Math.floor(
+            (
+                difference %
+                (1000 * 60 * 60 * 24)
+            ) /
+            (1000 * 60 * 60)
+        );
+
+    const minutes =
+        Math.floor(
+            (
+                difference %
+                (1000 * 60 * 60)
+            ) /
+            (1000 * 60)
+        );
+
+    if (days > 0) {
+        return `${days}d ${hours}h until release`;
+    }
+
+    if (hours > 0) {
+        return `${hours}h ${minutes}m until release`;
+    }
+
+    return `${minutes}m until release`;
+
+}
+
+
+/* =========================================================
+   STORAGE
+========================================================= */
+
+function saveState() {
 
     try {
 
-        state = {
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(state)
+        );
 
-            ...state,
-
-            ...JSON.parse(saved)
-
-        };
-
-    }
-
-    catch (error) {
+    } catch (error) {
 
         console.error(
+            "Could not save data:",
             error
+        );
+
+        showToast(
+            "Could not save changes"
         );
 
     }
@@ -2402,21 +1851,46 @@ function loadState() {
 }
 
 
-/* =========================================================
-   SAVE
-========================================================= */
+function loadState() {
 
-function saveState() {
+    try {
 
-    localStorage.setItem(
+        const saved =
+            localStorage.getItem(
+                STORAGE_KEY
+            );
 
-        STORAGE_KEY,
+        if (!saved) {
+            return;
+        }
 
-        JSON.stringify(
-            state
-        )
+        const parsed =
+            JSON.parse(saved);
 
-    );
+        if (
+            parsed &&
+            typeof parsed === "object"
+        ) {
+
+            state = {
+                ...state,
+                ...parsed
+            };
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Could not load saved data:",
+            error
+        );
+
+        localStorage.removeItem(
+            STORAGE_KEY
+        );
+
+    }
 
 }
 
@@ -2429,11 +1903,9 @@ function createDemoData() {
 
     const hasTV =
         state.tvShows.some(
-
             show =>
                 show.id ===
                 "placeholder-tv-show"
-
         );
 
 
@@ -2465,19 +1937,11 @@ function createDemoData() {
             description:
                 "A placeholder TV show used to test the ReelTrack tracking system.",
 
-            watchlist:
-                false,
-
-            completed:
-                false,
-
             episodes:
                 []
 
         };
 
-
-        /* Seasons 1 and 2 */
 
         for (
             let season = 1;
@@ -2496,7 +1960,8 @@ function createDemoData() {
                     id:
                         `s${season}e${episode}`,
 
-                    season,
+                    season:
+                        season,
 
                     number:
                         episode,
@@ -2510,8 +1975,8 @@ function createDemoData() {
                     watched:
                         false,
 
-                    available:
-                        true
+                    releaseDate:
+                        null
 
                 });
 
@@ -2519,14 +1984,6 @@ function createDemoData() {
 
         }
 
-
-        /*
-            Season 3
-            3 August 2026
-            20:00
-            Every Monday
-            10 episodes
-        */
 
         const startDate =
             new Date(
@@ -2545,16 +2002,11 @@ function createDemoData() {
                     startDate
                 );
 
-
             releaseDate.setDate(
-
-                startDate.getDate()
-                +
+                startDate.getDate() +
                 (
-                    (episode - 1)
-                    * 7
+                    (episode - 1) * 7
                 )
-
             );
 
 
@@ -2578,12 +2030,8 @@ function createDemoData() {
                 watched:
                     false,
 
-                available:
-                    false,
-
                 releaseDate:
-                    releaseDate
-                        .toISOString()
+                    releaseDate.toISOString()
 
             });
 
@@ -2597,19 +2045,15 @@ function createDemoData() {
     }
 
 
-    /* Placeholder movie */
-
-    const hasMovie =
+    const hasPlaceholderMovie =
         state.movies.some(
-
             movie =>
                 movie.id ===
                 "placeholder-movie"
-
         );
 
 
-    if (!hasMovie) {
+    if (!hasPlaceholderMovie) {
 
         state.movies.push({
 
@@ -2635,12 +2079,9 @@ function createDemoData() {
                 "",
 
             description:
-                "A placeholder movie for testing the ReelTrack movie tracking system.",
+                "A placeholder movie for testing ReelTrack.",
 
             watched:
-                false,
-
-            watchlist:
                 false,
 
             releaseDate:
@@ -2651,15 +2092,11 @@ function createDemoData() {
     }
 
 
-    /* Upcoming movie */
-
     const hasUpcomingMovie =
         state.movies.some(
-
             movie =>
                 movie.id ===
                 "upcoming-movie-2026"
-
         );
 
 
@@ -2694,9 +2131,6 @@ function createDemoData() {
             watched:
                 false,
 
-            watchlist:
-                false,
-
             releaseDate:
                 "2026-10-05T00:00:00"
 
@@ -2711,41 +2145,133 @@ function createDemoData() {
 
 
 /* =========================================================
-   TV PROGRESS
+   DATA HELPERS
 ========================================================= */
 
-function getTVProgress(
-    show
+function getItem(
+    type,
+    id
 ) {
 
-    const available =
-        show.episodes.filter(
+    const collection =
+        type === "movie"
+            ? state.movies
+            : state.tvShows;
 
-            episode =>
-                episode.available ===
-                true
+    return collection.find(
+        item =>
+            item.id === id
+    );
 
+}
+
+
+function getAvailableEpisodes(show) {
+
+    return show.episodes.filter(
+        episode =>
+            isReleased(
+                episode.releaseDate
+            )
+    );
+
+}
+
+
+function getUpcomingEpisodes(show = null) {
+
+    const results = [];
+
+    const shows =
+        show
+            ? [show]
+            : state.tvShows;
+
+    shows.forEach(
+        currentShow => {
+
+            currentShow.episodes
+                .filter(
+                    episode =>
+                        episode.releaseDate &&
+                        !isReleased(
+                            episode.releaseDate
+                        )
+                )
+                .forEach(
+                    episode => {
+
+                        results.push({
+
+                            show:
+                                currentShow,
+
+                            episode:
+                                episode,
+
+                            date:
+                                new Date(
+                                    episode.releaseDate
+                                )
+
+                        });
+
+                    }
+                );
+
+        }
+    );
+
+
+    return results.sort(
+        (a, b) =>
+            a.date - b.date
+    );
+
+}
+
+
+function getUpcomingMovies() {
+
+    return state.movies
+        .filter(
+            movie =>
+                movie.releaseDate &&
+                !isReleased(
+                    movie.releaseDate
+                )
+        )
+        .sort(
+            (a, b) =>
+                new Date(
+                    a.releaseDate
+                ) -
+                new Date(
+                    b.releaseDate
+                )
         );
 
+}
+
+
+function getTVProgress(show) {
+
+    const available =
+        getAvailableEpisodes(
+            show
+        );
 
     const watched =
         available.filter(
-
             episode =>
-                episode.watched ===
-                true
-
+                episode.watched
         );
 
-
-    const next =
+    const nextEpisode =
         available.find(
-
             episode =>
                 !episode.watched
-
         );
-
 
     return {
 
@@ -2757,259 +2283,34 @@ function getTVProgress(
 
         percentage:
             available.length
-
-            ?
-
-            Math.round(
-
-                watched.length /
-                available.length *
-                100
-
-            )
-
-            :
-
-            0,
+                ? Math.round(
+                    (
+                        watched.length /
+                        available.length
+                    ) * 100
+                )
+                : 0,
 
         nextEpisode:
-            next
+            nextEpisode
 
     };
 
 }
 
 
-/* =========================================================
-   UPCOMING TV EPISODES
-========================================================= */
+function isTVFinished(show) {
 
-function getUpcomingEpisodes() {
-
-    const upcoming = [];
-
-
-    state.tvShows.forEach(
-
-        show => {
-
-            show.episodes.forEach(
-
-                episode => {
-
-                    if (
-                        episode.releaseDate
-                    ) {
-
-                        const date =
-                            new Date(
-                                episode.releaseDate
-                            );
-
-
-                        if (
-                            date >
-                            new Date()
-                        ) {
-
-                            upcoming.push({
-
-                                show,
-
-                                episode,
-
-                                date
-
-                            });
-
-                        }
-
-                    }
-
-                }
-
-            );
-
-        }
-
-    );
-
-
-    return upcoming.sort(
-
-        (
-            a,
-            b
-        ) =>
-
-            a.date -
-            b.date
-
-    );
-
-}
-
-
-/* =========================================================
-   UPCOMING MOVIES
-========================================================= */
-
-function getUpcomingMovies() {
-
-    return state.movies
-
-        .filter(
-
-            movie =>
-
-                movie.releaseDate
-
-                &&
-
-                new Date(
-                    movie.releaseDate
-                ) >
-                new Date()
-
-        )
-
-        .sort(
-
-            (
-                a,
-                b
-            ) =>
-
-                new Date(
-                    a.releaseDate
-                )
-
-                -
-
-                new Date(
-                    b.releaseDate
-                )
-
+    const progress =
+        getTVProgress(
+            show
         );
 
-}
-
-
-/* =========================================================
-   DATE FORMAT
-========================================================= */
-
-function formatDate(
-    date
-) {
-
-    return new Intl.DateTimeFormat(
-
-        "en-ZA",
-
-        {
-
-            weekday:
-                "short",
-
-            day:
-                "numeric",
-
-            month:
-                "short",
-
-            year:
-                "numeric",
-
-            hour:
-                "2-digit",
-
-            minute:
-                "2-digit"
-
-        }
-
-    ).format(
-        new Date(date)
+    return (
+        progress.total > 0 &&
+        progress.watched ===
+        progress.total
     );
-
-}
-
-
-/* =========================================================
-   COUNTDOWN
-========================================================= */
-
-function getCountdown(
-    date
-) {
-
-    const difference =
-
-        new Date(date)
-        -
-        new Date();
-
-
-    if (
-        difference <= 0
-    ) {
-
-        return "Available now";
-
-    }
-
-
-    const days =
-        Math.floor(
-
-            difference /
-            (
-                1000 *
-                60 *
-                60 *
-                24
-
-            )
-
-        );
-
-
-    const hours =
-        Math.floor(
-
-            (
-                difference %
-                (
-                    1000 *
-                    60 *
-                    60 *
-                    24
-                )
-
-            )
-
-            /
-
-            (
-                1000 *
-                60 *
-                60
-            )
-
-        );
-
-
-    if (
-        days > 0
-    ) {
-
-        return `${days}d ${hours}h until release`;
-
-    }
-
-
-    return `${hours}h until release`;
 
 }
 
@@ -3018,37 +2319,25 @@ function getCountdown(
    NAVIGATION
 ========================================================= */
 
-function showPage(
-    page
-) {
+function showPage(page) {
 
     document
-        .querySelectorAll(
-            ".page"
-        )
+        .querySelectorAll(".page")
         .forEach(
-
             element =>
-
                 element.classList.remove(
                     "active"
                 )
-
         );
 
 
     const target =
         document.getElementById(
-
-            page +
-            "Page"
-
+            `${page}Page`
         );
 
 
-    if (
-        target
-    ) {
+    if (target) {
 
         target.classList.add(
             "active"
@@ -3058,38 +2347,24 @@ function showPage(
 
 
     document
-        .querySelectorAll(
-            ".nav-button"
-        )
+        .querySelectorAll(".nav-button")
         .forEach(
-
             button =>
-
                 button.classList.remove(
                     "active"
                 )
-
         );
 
 
     const nav =
         document.getElementById(
-
-            "nav" +
-
-            page.charAt(0)
-                .toUpperCase()
-
-            +
-
-            page.slice(1)
-
+            `nav${page
+                .charAt(0)
+                .toUpperCase()}${page.slice(1)}`
         );
 
 
-    if (
-        nav
-    ) {
+    if (nav) {
 
         nav.classList.add(
             "active"
@@ -3098,43 +2373,24 @@ function showPage(
     }
 
 
-    if (
-        page ===
-        "home"
-    ) {
-
+    if (page === "home") {
         renderDashboard();
-
     }
 
-
-    if (
-        page ===
-        "library"
-    ) {
-
+    if (page === "library") {
         renderLibrary();
-
     }
 
-
-    if (
-        page ===
-        "watchlist"
-    ) {
-
+    if (page === "watched") {
         renderWatched();
-
     }
 
-
-    if (
-        page ===
-        "upcoming"
-    ) {
-
+    if (page === "upcoming") {
         renderUpcoming();
+    }
 
+    if (page === "profile") {
+        renderProfile();
     }
 
 }
@@ -3144,13 +2400,10 @@ function showPage(
    LIBRARY
 ========================================================= */
 
-function openLibrary(
-    type
-) {
+function openLibrary(type) {
 
     currentLibraryType =
         type;
-
 
     showPage(
         "library"
@@ -3159,9 +2412,7 @@ function openLibrary(
 }
 
 
-function setLibraryType(
-    type
-) {
+function setLibraryType(type) {
 
     currentLibraryType =
         type;
@@ -3172,12 +2423,8 @@ function setLibraryType(
             "moviesTab"
         )
         .classList.toggle(
-
             "active",
-
-            type ===
-            "movie"
-
+            type === "movie"
         );
 
 
@@ -3186,12 +2433,8 @@ function setLibraryType(
             "tvTab"
         )
         .classList.toggle(
-
             "active",
-
-            type ===
-            "tv"
-
+            type === "tv"
         );
 
 
@@ -3207,41 +2450,68 @@ function renderLibrary() {
             "libraryGrid"
         );
 
+    const searchInput =
+        document.getElementById(
+            "librarySearchInput"
+        );
 
-    const items =
+    const query =
+        searchInput.value
+            .trim()
+            .toLowerCase();
 
-        currentLibraryType ===
-        "movie"
 
-        ?
+    let items =
+        currentLibraryType === "movie"
+            ? state.movies
+            : state.tvShows;
 
-        state.movies
 
-        :
-
-        state.tvShows;
-
+    /*
+       Released movies only appear
+       in the main Movies library.
+    */
 
     if (
-        !items.length
+        currentLibraryType ===
+        "movie"
     ) {
+
+        items =
+            items.filter(
+                movie =>
+                    isReleased(
+                        movie.releaseDate
+                    )
+            );
+
+    }
+
+
+    if (query) {
+
+        items =
+            items.filter(
+                item =>
+                    item.title
+                        .toLowerCase()
+                        .includes(
+                            query
+                        )
+            );
+
+    }
+
+
+    if (!items.length) {
 
         grid.innerHTML =
             emptyState(
-
                 currentLibraryType ===
                 "movie"
-
-                ?
-
-                "No Movies Yet"
-
-                :
-
-                "No TV Shows Yet"
-
+                    ? "No Movies Found"
+                    : "No TV Shows Found"
             );
-
 
         return;
 
@@ -3249,16 +2519,13 @@ function renderLibrary() {
 
 
     grid.innerHTML =
-
         items
             .map(
-
                 item =>
                     createCard(
                         item,
                         currentLibraryType
                     )
-
             )
             .join("");
 
@@ -3269,11 +2536,9 @@ function renderLibrary() {
    WATCHED
 ========================================================= */
 
-function setWatchlistType(
-    type
-) {
+function setWatchedType(type) {
 
-    currentWatchlistType =
+    currentWatchedType =
         type;
 
 
@@ -3282,12 +2547,8 @@ function setWatchlistType(
             "watchMovieTab"
         )
         .classList.toggle(
-
             "active",
-
-            type ===
-            "movie"
-
+            type === "movie"
         );
 
 
@@ -3296,12 +2557,8 @@ function setWatchlistType(
             "watchTVTab"
         )
         .classList.toggle(
-
             "active",
-
-            type ===
-            "tv"
-
+            type === "tv"
         );
 
 
@@ -3314,65 +2571,46 @@ function renderWatched() {
 
     const grid =
         document.getElementById(
-            "watchlistGrid"
+            "watchedGrid"
         );
 
 
-    let items = [];
+    let items;
 
 
     if (
-        currentWatchlistType ===
+        currentWatchedType ===
         "movie"
     ) {
 
         items =
             state.movies.filter(
-
                 movie =>
                     movie.watched
-
             );
 
-    }
-
-    else {
+    } else {
 
         items =
             state.tvShows.filter(
-
                 show =>
-
-                    getTVProgress(
+                    isTVFinished(
                         show
-                    ).percentage ===
-                    100
-
+                    )
             );
 
     }
 
 
-    if (
-        !items.length
-    ) {
+    if (!items.length) {
 
         grid.innerHTML =
             emptyState(
-
-                currentWatchlistType ===
+                currentWatchedType ===
                 "movie"
-
-                ?
-
-                "No Movies Watched"
-
-                :
-
-                "No TV Shows Finished"
-
+                    ? "No Movies Watched"
+                    : "No TV Shows Finished"
             );
-
 
         return;
 
@@ -3380,16 +2618,13 @@ function renderWatched() {
 
 
     grid.innerHTML =
-
         items
             .map(
-
                 item =>
                     createCard(
                         item,
-                        currentWatchlistType
+                        currentWatchedType
                     )
-
             )
             .join("");
 
@@ -3397,12 +2632,10 @@ function renderWatched() {
 
 
 /* =========================================================
-   UPCOMING NAV
+   UPCOMING
 ========================================================= */
 
-function setUpcomingType(
-    type
-) {
+function setUpcomingType(type) {
 
     currentUpcomingType =
         type;
@@ -3413,12 +2646,8 @@ function setUpcomingType(
             "upcomingTVTab"
         )
         .classList.toggle(
-
             "active",
-
-            type ===
-            "tv"
-
+            type === "tv"
         );
 
 
@@ -3427,12 +2656,8 @@ function setUpcomingType(
             "upcomingMovieTab"
         )
         .classList.toggle(
-
             "active",
-
-            type ===
-            "movie"
-
+            type === "movie"
         );
 
 
@@ -3443,7 +2668,7 @@ function setUpcomingType(
 
 function renderUpcoming() {
 
-    const grid =
+    const container =
         document.getElementById(
             "upcomingGrid"
         );
@@ -3458,69 +2683,53 @@ function renderUpcoming() {
             getUpcomingEpisodes();
 
 
-        if (
-            !episodes.length
-        ) {
+        if (!episodes.length) {
 
-            grid.innerHTML =
+            container.innerHTML =
                 emptyState(
                     "No Upcoming TV Episodes"
                 );
-
 
             return;
 
         }
 
 
-        grid.innerHTML =
-
+        container.innerHTML =
             episodes
                 .map(
-
-                    item =>
-
+                    data =>
                         createUpcomingTVCard(
-                            item
+                            data
                         )
-
                 )
                 .join("");
 
-    }
-
-    else {
+    } else {
 
         const movies =
             getUpcomingMovies();
 
 
-        if (
-            !movies.length
-        ) {
+        if (!movies.length) {
 
-            grid.innerHTML =
+            container.innerHTML =
                 emptyState(
                     "No Upcoming Movies"
                 );
-
 
             return;
 
         }
 
 
-        grid.innerHTML =
-
+        container.innerHTML =
             movies
                 .map(
-
                     movie =>
-
                         createUpcomingMovieCard(
                             movie
                         )
-
                 )
                 .join("");
 
@@ -3533,13 +2742,10 @@ function renderUpcoming() {
    UPCOMING CARDS
 ========================================================= */
 
-function createUpcomingTVCard(
-    data
-) {
+function createUpcomingTVCard(data) {
 
     const show =
         data.show;
-
 
     const episode =
         data.episode;
@@ -3557,52 +2763,49 @@ function createUpcomingTVCard(
             "
         >
 
-            <div
-                class="upcoming-poster"
-            >
+            <div class="upcoming-poster">
 
-                <div
-                    class="
-                        upcoming-poster-placeholder
-                    "
-                >
+                ${
+                    show.poster
 
-                    ${escapeHTML(
-                        show.title
-                    )}
+                        ? `
+                            <img
+                                src="${show.poster}"
+                                alt="${escapeHTML(
+                                    show.title
+                                )}"
+                            >
+                        `
 
-                </div>
+                        : `
+                            <div
+                                class="
+                                    upcoming-poster-placeholder
+                                "
+                            >
+                                ${escapeHTML(
+                                    show.title
+                                )}
+                            </div>
+                        `
+                }
 
             </div>
 
 
-            <div
-                class="upcoming-info"
-            >
+            <div class="upcoming-info">
 
-                <div
-                    class="upcoming-type"
-                >
-
+                <div class="upcoming-type">
                     TV Show
-
                 </div>
 
-
-                <div
-                    class="upcoming-title"
-                >
-
+                <div class="upcoming-title">
                     ${escapeHTML(
                         show.title
                     )}
-
                 </div>
 
-
-                <div
-                    class="upcoming-date"
-                >
+                <div class="upcoming-date">
 
                     Season
                     ${episode.season}
@@ -3613,18 +2816,15 @@ function createUpcomingTVCard(
                     <br>
 
                     ${formatDate(
-                        data.date
+                        episode.releaseDate
                     )}
 
                 </div>
 
-
-                <div
-                    class="upcoming-countdown"
-                >
+                <div class="upcoming-countdown">
 
                     ${getCountdown(
-                        data.date
+                        episode.releaseDate
                     )}
 
                 </div>
@@ -3638,9 +2838,7 @@ function createUpcomingTVCard(
 }
 
 
-function createUpcomingMovieCard(
-    movie
-) {
+function createUpcomingMovieCard(movie) {
 
     return `
 
@@ -3654,67 +2852,61 @@ function createUpcomingMovieCard(
             "
         >
 
-            <div
-                class="upcoming-poster"
-            >
+            <div class="upcoming-poster">
 
-                <div
-                    class="
-                        upcoming-poster-placeholder
-                    "
-                >
+                ${
+                    movie.poster
 
-                    ${escapeHTML(
-                        movie.title
-                    )}
+                        ? `
+                            <img
+                                src="${movie.poster}"
+                                alt="${escapeHTML(
+                                    movie.title
+                                )}"
+                            >
+                        `
 
-                </div>
+                        : `
+                            <div
+                                class="
+                                    upcoming-poster-placeholder
+                                "
+                            >
+                                ${escapeHTML(
+                                    movie.title
+                                )}
+                            </div>
+                        `
+                }
 
             </div>
 
 
-            <div
-                class="upcoming-info"
-            >
+            <div class="upcoming-info">
 
-                <div
-                    class="upcoming-type"
-                >
-
+                <div class="upcoming-type">
                     Movie
-
                 </div>
 
-
-                <div
-                    class="upcoming-title"
-                >
-
+                <div class="upcoming-title">
                     ${escapeHTML(
                         movie.title
                     )}
-
                 </div>
 
-
-                <div
-                    class="upcoming-date"
-                >
+                <div class="upcoming-date">
 
                     Release Date
 
                     <br>
 
-                    ${formatDate(
+                    ${formatReleaseDate(
                         movie.releaseDate
                     )}
 
                 </div>
 
-
-                <div
-                    class="upcoming-countdown"
-                >
+                <div class="upcoming-countdown">
 
                     ${getCountdown(
                         movie.releaseDate
@@ -3732,8 +2924,203 @@ function createUpcomingMovieCard(
 
 
 /* =========================================================
-   HOME UPCOMING
+   HOME
 ========================================================= */
+
+function renderDashboard() {
+
+    const watchedMovies =
+        state.movies.filter(
+            movie =>
+                movie.watched
+        );
+
+
+    const watchedEpisodes =
+        state.tvShows.reduce(
+            (
+                total,
+                show
+            ) =>
+                total +
+                getTVProgress(
+                    show
+                ).watched,
+            0
+        );
+
+
+    document
+        .getElementById(
+            "dashboardStats"
+        )
+        .innerHTML = `
+
+            <div class="stat">
+
+                <div class="stat-value">
+                    ${watchedMovies.length}
+                </div>
+
+                <div class="stat-label">
+                    Movies Watched
+                </div>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div class="stat-value">
+                    ${watchedEpisodes}
+                </div>
+
+                <div class="stat-label">
+                    Episodes Watched
+                </div>
+
+            </div>
+
+        `;
+
+
+    const continueShows =
+        state.tvShows.filter(
+            show => {
+
+                const progress =
+                    getTVProgress(
+                        show
+                    );
+
+                return (
+                    progress.watched >
+                    0 &&
+                    !isTVFinished(
+                        show
+                    )
+                );
+
+            }
+        );
+
+
+    const displayShows =
+        continueShows.length
+            ? continueShows
+            : state.tvShows.filter(
+                show =>
+                    !isTVFinished(
+                        show
+                    )
+            );
+
+
+    renderRow(
+        "continueTVGrid",
+        displayShows
+    );
+
+
+    const firstShow =
+        continueShows[0];
+
+
+    if (firstShow) {
+
+        const progress =
+            getTVProgress(
+                firstShow
+            );
+
+
+        document
+            .getElementById(
+                "heroTitle"
+            )
+            .textContent =
+            firstShow.title;
+
+
+        document
+            .getElementById(
+                "heroDescription"
+            )
+            .textContent =
+            progress.nextEpisode
+                ? `Continue with Season ${progress.nextEpisode.season}, Episode ${progress.nextEpisode.number}.`
+                : "Continue watching this TV show.";
+
+    } else {
+
+        document
+            .getElementById(
+                "heroTitle"
+            )
+            .textContent =
+            "Welcome to ReelTrack";
+
+
+        document
+            .getElementById(
+                "heroDescription"
+            )
+            .textContent =
+            "Track every movie and TV show your household watches.";
+
+    }
+
+
+    renderHomeUpcoming();
+
+}
+
+
+function renderRow(
+    elementId,
+    items
+) {
+
+    const container =
+        document.getElementById(
+            elementId
+        );
+
+
+    if (!items.length) {
+
+        container.innerHTML = `
+
+            <div
+                style="
+                    color: var(--text-muted);
+                    font-size: 12px;
+                    padding: 15px 0;
+                "
+            >
+                No TV shows to continue yet.
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+        items
+            .map(
+                item =>
+                    createCard(
+                        item,
+                        "tv"
+                    )
+            )
+            .join("");
+
+}
+
 
 function renderHomeUpcoming() {
 
@@ -3743,7 +3130,7 @@ function renderHomeUpcoming() {
         );
 
 
-    const tv =
+    const tvEpisodes =
         getUpcomingEpisodes();
 
 
@@ -3754,45 +3141,34 @@ function renderHomeUpcoming() {
     const items = [];
 
 
-    if (
-        tv.length
-    ) {
+    if (tvEpisodes.length) {
 
         items.push(
-
             createUpcomingTVCard(
-                tv[0]
+                tvEpisodes[0]
             )
-
         );
 
     }
 
 
-    if (
-        movies.length
-    ) {
+    if (movies.length) {
 
         items.push(
-
             createUpcomingMovieCard(
                 movies[0]
             )
-
         );
 
     }
 
 
-    if (
-        !items.length
-    ) {
+    if (!items.length) {
 
         container.innerHTML =
             emptyState(
                 "Nothing Upcoming"
             );
-
 
         return;
 
@@ -3824,14 +3200,10 @@ function createCard(
 
         meta =
             item.watched
-            ?
-            "Watched"
-            :
-            "Not watched";
+                ? "Watched"
+                : "Not watched";
 
-    }
-
-    else {
+    } else {
 
         const progress =
             getTVProgress(
@@ -3840,7 +3212,6 @@ function createCard(
 
 
         meta =
-
             `${progress.watched}/${progress.total} episodes`;
 
     }
@@ -3863,9 +3234,7 @@ function createCard(
 
         progressHTML = `
 
-            <div
-                class="progress-bar"
-            >
+            <div class="progress-bar">
 
                 <div
                     class="progress-fill"
@@ -3894,60 +3263,45 @@ function createCard(
             "
         >
 
-            <div
-                class="poster"
-            >
+            <div class="poster">
 
                 ${
                     item.poster
 
-                    ?
+                        ? `
+                            <img
+                                src="${item.poster}"
+                                alt="${escapeHTML(
+                                    item.title
+                                )}"
+                            >
+                        `
 
-                    `
-                    <img
-                        src="${item.poster}"
-                        alt="${escapeHTML(
-                            item.title
-                        )}"
-                    >
-                    `
-
-                    :
-
-                    `
-                    <div
-                        class="poster-placeholder"
-                    >
-
-                        ${escapeHTML(
-                            item.title
-                        )}
-
-                    </div>
-                    `
-
+                        : `
+                            <div
+                                class="
+                                    poster-placeholder
+                                "
+                            >
+                                ${escapeHTML(
+                                    item.title
+                                )}
+                            </div>
+                        `
                 }
 
             </div>
 
 
-            <div
-                class="card-title"
-            >
-
+            <div class="card-title">
                 ${escapeHTML(
                     item.title
                 )}
-
             </div>
 
 
-            <div
-                class="card-meta"
-            >
-
+            <div class="card-meta">
                 ${meta}
-
             </div>
 
 
@@ -3961,281 +3315,6 @@ function createCard(
 
 
 /* =========================================================
-   DASHBOARD
-========================================================= */
-
-function renderDashboard() {
-
-    const movies =
-        state.movies;
-
-
-    const shows =
-        state.tvShows;
-
-
-    const watchedMovies =
-        movies.filter(
-
-            movie =>
-                movie.watched
-
-        );
-
-
-    const watchedShows =
-        shows.filter(
-
-            show =>
-
-                getTVProgress(
-                    show
-                ).percentage ===
-                100
-
-        );
-
-
-    const watchedEpisodes =
-        shows.reduce(
-
-            (
-                total,
-                show
-            ) =>
-
-                total +
-
-                getTVProgress(
-                    show
-                ).watched,
-
-            0
-
-        );
-
-
-    document
-        .getElementById(
-            "dashboardStats"
-        )
-        .innerHTML = `
-
-            <div class="stat">
-
-                <div
-                    class="stat-value"
-                >
-
-                    ${watchedMovies.length}
-
-                </div>
-
-                <div
-                    class="stat-label"
-                >
-
-                    Movies Watched
-
-                </div>
-
-            </div>
-
-
-            <div class="stat">
-
-                <div
-                    class="stat-value"
-                >
-
-                    ${watchedEpisodes}
-
-                </div>
-
-                <div
-                    class="stat-label"
-                >
-
-                    Episodes Watched
-
-                </div>
-
-            </div>
-
-        `;
-
-
-    const continueTV =
-        shows.filter(
-
-            show => {
-
-                const progress =
-                    getTVProgress(
-                        show
-                    );
-
-
-                return (
-
-                    progress.watched >
-                    0
-
-                    &&
-
-                    progress.watched <
-                    progress.total
-
-                );
-
-            }
-
-        );
-
-
-    renderRow(
-
-        "continueTVGrid",
-
-        continueTV.length
-        ?
-
-        continueTV
-
-        :
-
-        shows
-
-    );
-
-
-    renderHomeUpcoming();
-
-
-    const heroTitle =
-        document.getElementById(
-            "heroTitle"
-        );
-
-
-    const heroDescription =
-        document.getElementById(
-            "heroDescription"
-        );
-
-
-    if (
-        continueTV.length
-    ) {
-
-        const show =
-            continueTV[0];
-
-
-        const progress =
-            getTVProgress(
-                show
-            );
-
-
-        heroTitle.textContent =
-            show.title;
-
-
-        heroDescription.textContent =
-
-            progress.nextEpisode
-
-            ?
-
-            `Continue with Season ${progress.nextEpisode.season}, Episode ${progress.nextEpisode.number}.`
-
-            :
-
-            "Continue watching this TV show.";
-
-    }
-
-    else {
-
-        heroTitle.textContent =
-            "Welcome to ReelTrack";
-
-
-        heroDescription.textContent =
-            "Track every movie and TV show your household watches.";
-
-    }
-
-}
-
-
-/* =========================================================
-   ROW
-========================================================= */
-
-function renderRow(
-    elementId,
-    items
-) {
-
-    const element =
-        document.getElementById(
-            elementId
-        );
-
-
-    if (
-        !items.length
-    ) {
-
-        element.innerHTML = `
-
-            <div
-                style="
-                    color:
-                        var(--text-muted);
-                    font-size:
-                        12px;
-                    padding:
-                        15px 0;
-                "
-            >
-
-                Nothing here yet.
-
-            </div>
-
-        `;
-
-
-        return;
-
-    }
-
-
-    element.innerHTML =
-
-        items
-            .map(
-
-                item =>
-
-                    createCard(
-
-                        item,
-
-                        item.type
-
-                    )
-
-            )
-            .join("");
-
-}
-
-
-/* =========================================================
    CONTINUE WATCHING
 ========================================================= */
 
@@ -4243,42 +3322,28 @@ function continueWatching() {
 
     const show =
         state.tvShows.find(
-
-            show => {
+            currentShow => {
 
                 const progress =
                     getTVProgress(
-                        show
+                        currentShow
                     );
 
-
                 return (
-
                     progress.watched >
-                    0
-
-                    &&
-
-                    progress.watched <
-                    progress.total
-
+                    0 &&
+                    progress.nextEpisode
                 );
 
             }
-
         );
 
 
-    if (
-        show
-    ) {
+    if (show) {
 
         openDetails(
-
             "tv",
-
             show.id
-
         );
 
         return;
@@ -4294,39 +3359,6 @@ function continueWatching() {
 
 
 /* =========================================================
-   FIND ITEM
-========================================================= */
-
-function findItem(
-    type,
-    id
-) {
-
-    return (
-
-        type ===
-        "movie"
-
-        ?
-
-        state.movies
-
-        :
-
-        state.tvShows
-
-    ).find(
-
-        item =>
-            item.id ===
-            id
-
-    );
-
-}
-
-
-/* =========================================================
    DETAILS
 ========================================================= */
 
@@ -4336,27 +3368,20 @@ function openDetails(
 ) {
 
     const item =
-        findItem(
+        getItem(
             type,
             id
         );
 
 
-    if (
-        !item
-    ) {
-
+    if (!item) {
         return;
-
     }
 
 
     currentItem = {
-
         type,
-
         id
-
     };
 
 
@@ -4385,22 +3410,45 @@ function openDetails(
 
             <span>
                 ${
-                    type ===
-                    "tv"
-                    ?
-                    "TV Show"
-                    :
-                    "Movie"
+                    type === "tv"
+                        ? "TV Show"
+                        : "Movie"
                 }
             </span>
 
-            <span>|</span>
+            <span>•</span>
 
             <span>
                 ${item.year}
             </span>
 
         `;
+
+
+    const backdrop =
+        document.getElementById(
+            "modalBackdrop"
+        );
+
+
+    if (item.backdrop) {
+
+        backdrop.src =
+            item.backdrop;
+
+        backdrop.style.display =
+            "block";
+
+    } else {
+
+        backdrop.removeAttribute(
+            "src"
+        );
+
+        backdrop.style.display =
+            "block";
+
+    }
 
 
     renderModalActions(
@@ -4410,17 +3458,14 @@ function openDetails(
 
 
     if (
-        type ===
-        "tv"
+        type === "tv"
     ) {
 
         renderEpisodes(
             item
         );
 
-    }
-
-    else {
+    } else {
 
         document
             .getElementById(
@@ -4447,10 +3492,6 @@ function openDetails(
 }
 
 
-/* =========================================================
-   MODAL ACTIONS
-========================================================= */
-
 function renderModalActions(
     item,
     type
@@ -4463,17 +3504,14 @@ function renderModalActions(
 
 
     if (
-        type ===
-        "movie"
+        type === "movie"
     ) {
 
         if (
-            item.releaseDate
-            &&
-            new Date(
+            item.releaseDate &&
+            !isReleased(
                 item.releaseDate
-            ) >
-            new Date()
+            )
         ) {
 
             actions.innerHTML = `
@@ -4488,7 +3526,10 @@ function renderModalActions(
                     "
                 >
 
-                    Upcoming Release
+                    Releases
+                    ${formatReleaseDate(
+                        item.releaseDate
+                    )}
 
                 </button>
 
@@ -4513,56 +3554,51 @@ function renderModalActions(
 
                 ${
                     item.watched
-                    ?
-                    "Mark Unwatched"
-                    :
-                    "Mark Watched"
+                        ? "Mark Unwatched"
+                        : "Mark Watched"
                 }
 
             </button>
 
         `;
 
-    }
-
-    else {
-
-        const progress =
-            getTVProgress(
-                item
-            );
-
-
-        actions.innerHTML = `
-
-            <button
-                class="
-                    action-button
-                    primary
-                "
-                onclick="
-                    markNextEpisode()
-                "
-            >
-
-                ${
-                    progress.nextEpisode
-
-                    ?
-
-                    `Mark S${progress.nextEpisode.season} E${progress.nextEpisode.number} Watched`
-
-                    :
-
-                    "Show Completed"
-
-                }
-
-            </button>
-
-        `;
+        return;
 
     }
+
+
+    const progress =
+        getTVProgress(
+            item
+        );
+
+
+    actions.innerHTML = `
+
+        <button
+            class="
+                action-button
+                primary
+            "
+            ${
+                progress.nextEpisode
+                    ? ""
+                    : "disabled"
+            }
+            onclick="
+                markNextEpisode()
+            "
+        >
+
+            ${
+                progress.nextEpisode
+                    ? `Mark S${progress.nextEpisode.season} E${progress.nextEpisode.number} Watched`
+                    : "All Available Episodes Watched"
+            }
+
+        </button>
+
+    `;
 
 }
 
@@ -4585,7 +3621,6 @@ function renderEpisodes(
 
 
     show.episodes.forEach(
-
         episode => {
 
             if (
@@ -4608,14 +3643,46 @@ function renderEpisodes(
             );
 
         }
-
     );
 
 
     const seasonKeys =
         Object.keys(
             seasons
+        )
+        .map(
+            Number
+        )
+        .sort(
+            (a,b) =>
+                a - b
         );
+
+
+    const latestReleasedSeason =
+        seasonKeys.find(
+            season =>
+                seasons[season].some(
+                    episode =>
+                        isReleased(
+                            episode.releaseDate
+                        )
+                )
+        );
+
+
+    if (
+        !selectedSeason ||
+        !seasonKeys.includes(
+            selectedSeason
+        )
+    ) {
+
+        selectedSeason =
+            latestReleasedSeason ||
+            seasonKeys[0];
+
+    }
 
 
     container.innerHTML = `
@@ -4626,71 +3693,73 @@ function renderEpisodes(
                 font-weight:750;
             "
         >
-
             Episodes
-
         </div>
 
 
-        <div
-            class="season-selector"
-        >
+        <div class="season-selector">
 
             ${
                 seasonKeys.map(
+                    season => {
 
-                    (
-                        season,
-                        index
-                    ) => `
+                        const isUpcoming =
+                            seasons[
+                                season
+                            ].every(
+                                episode =>
+                                    !isReleased(
+                                        episode.releaseDate
+                                    )
+                            );
 
-                        <button
-                            class="
-                                season-button
-                                ${
-                                    index ===
-                                    0
-                                    ?
-                                    "active"
-                                    :
-                                    ""
-                                }
-                            "
-                            onclick="
-                                selectSeason(
-                                    '${show.id}',
-                                    ${season}
-                                )
-                            "
-                        >
 
-                            Season ${season}
+                        return `
 
-                        </button>
+                            <button
+                                class="
+                                    season-button
+                                    ${
+                                        season ===
+                                        selectedSeason
+                                            ? "active"
+                                            : ""
+                                    }
+                                    ${
+                                        isUpcoming
+                                            ? "upcoming"
+                                            : ""
+                                    }
+                                "
+                                onclick="
+                                    selectSeason(
+                                        '${show.id}',
+                                        ${season}
+                                    )
+                                "
+                            >
 
-                    `
+                                Season ${season}
 
+                            </button>
+
+                        `;
+
+                    }
                 ).join("")
             }
 
         </div>
 
 
-        <div
-            id="episodeList"
-        ></div>
+        <div id="episodeList"></div>
 
     `;
 
 
     renderSeasonEpisodes(
-
         show,
-
-        Number(
-            seasonKeys[0]
-        )
-
+        selectedSeason
     );
 
 }
@@ -4701,43 +3770,21 @@ function selectSeason(
     season
 ) {
 
+    selectedSeason =
+        Number(
+            season
+        );
+
+
     const show =
-        findItem(
+        getItem(
             "tv",
             showId
         );
 
 
-    document
-        .querySelectorAll(
-            ".season-button"
-        )
-        .forEach(
-
-            button => {
-
-                button.classList.toggle(
-
-                    "active",
-
-                    button.textContent
-                        .trim()
-                        ===
-                    `Season ${season}`
-
-                );
-
-            }
-
-        );
-
-
-    renderSeasonEpisodes(
-
-        show,
-
-        season
-
+    renderEpisodes(
+        show
     );
 
 }
@@ -4754,64 +3801,51 @@ function renderSeasonEpisodes(
         );
 
 
+    if (!list) {
+        return;
+    }
+
+
     const episodes =
         show.episodes.filter(
-
             episode =>
-
                 Number(
                     episode.season
-                )
-
-                ===
-
+                ) ===
                 Number(
                     season
                 )
-
         );
 
 
     list.innerHTML =
-
         episodes
             .map(
-
                 episode => {
 
                     const upcoming =
-                        episode.releaseDate
-                        &&
-                        new Date(
+                        !isReleased(
                             episode.releaseDate
-                        )
-                        >
-                        new Date();
+                        );
 
 
                     return `
 
-                        <div
-                            class="episode"
-                        >
+                        <div class="episode">
 
                             <button
                                 class="
                                     episode-check
                                     ${
                                         episode.watched
-                                        ?
-                                        "watched"
-                                        :
-                                        ""
+                                            ? "watched"
+                                            : ""
                                     }
                                 "
                                 ${
                                     upcoming
-                                    ?
-                                    "disabled"
-                                    :
-                                    ""
+                                        ? "disabled"
+                                        : ""
                                 }
                                 onclick="
                                     toggleEpisode(
@@ -4823,45 +3857,32 @@ function renderSeasonEpisodes(
 
                                 ${
                                     episode.watched
-
-                                    ?
-
-                                    `
-                                    <svg
-                                        class="
-                                            icon
-                                            icon-small
-                                        "
-                                        viewBox="0 0 24 24"
-                                    >
-
-                                        <path
-                                            d="
-                                                M5 12
-                                                l4 4
-                                                10-10
-                                            "
-                                        />
-
-                                    </svg>
-                                    `
-
-                                    :
-
-                                    ""
-
+                                        ? `
+                                            <svg
+                                                class="
+                                                    icon
+                                                    icon-small
+                                                "
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    d="
+                                                        M5 12
+                                                        l4 4
+                                                        10-10
+                                                    "
+                                                />
+                                            </svg>
+                                        `
+                                        : ""
                                 }
 
                             </button>
 
 
-                            <div
-                                class="episode-info"
-                            >
+                            <div class="episode-info">
 
-                                <div
-                                    class="episode-title"
-                                >
+                                <div class="episode-title">
 
                                     ${episode.number}.
                                     ${escapeHTML(
@@ -4871,23 +3892,24 @@ function renderSeasonEpisodes(
                                 </div>
 
 
-                                <div
-                                    class="episode-meta"
-                                >
+                                <div class="episode-meta">
 
                                     ${
                                         upcoming
 
-                                        ?
+                                            ? `
+                                                Releases
+                                                ${formatDate(
+                                                    episode.releaseDate
+                                                )}
+                                            `
 
-                                        `Releases ${formatDate(
-                                            episode.releaseDate
-                                        )}`
-
-                                        :
-
-                                        `Season ${episode.season} · ${episode.runtime}`
-
+                                            : `
+                                                Season
+                                                ${episode.season}
+                                                ·
+                                                ${episode.runtime}
+                                            `
                                     }
 
                                 </div>
@@ -4899,7 +3921,6 @@ function renderSeasonEpisodes(
                     `;
 
                 }
-
             )
             .join("");
 
@@ -4907,7 +3928,7 @@ function renderSeasonEpisodes(
 
 
 /* =========================================================
-   EPISODE TOGGLE
+   EPISODE ACTIONS
 ========================================================= */
 
 function toggleEpisode(
@@ -4916,7 +3937,7 @@ function toggleEpisode(
 ) {
 
     const show =
-        findItem(
+        getItem(
             "tv",
             showId
         );
@@ -4924,27 +3945,21 @@ function toggleEpisode(
 
     const episode =
         show.episodes.find(
-
             item =>
                 item.id ===
                 episodeId
-
         );
 
 
     if (
-        episode.releaseDate
-        &&
-        new Date(
+        !isReleased(
             episode.releaseDate
-        ) >
-        new Date()
+        )
     ) {
 
         showToast(
-            "This episode has not been released yet"
+            "This episode is not available yet"
         );
-
 
         return;
 
@@ -4967,44 +3982,25 @@ function toggleEpisode(
 
 
     showToast(
-
         episode.watched
-
-        ?
-
-        "Episode marked watched"
-
-        :
-
-        "Episode marked unwatched"
-
+            ? "Episode marked watched"
+            : "Episode marked unwatched"
     );
 
 }
 
 
-/* =========================================================
-   MARK NEXT EPISODE
-========================================================= */
-
 function markNextEpisode() {
 
-    if (
-        !currentItem
-    ) {
-
+    if (!currentItem) {
         return;
-
     }
 
 
     const show =
-        findItem(
-
+        getItem(
             "tv",
-
             currentItem.id
-
         );
 
 
@@ -5021,7 +4017,6 @@ function markNextEpisode() {
         showToast(
             "All available episodes watched"
         );
-
 
         return;
 
@@ -5057,19 +4052,36 @@ function markNextEpisode() {
 
 
 /* =========================================================
-   MOVIE WATCHED
+   MOVIE ACTION
 ========================================================= */
 
 function toggleMovieWatched() {
 
+    if (!currentItem) {
+        return;
+    }
+
+
     const movie =
-        findItem(
-
+        getItem(
             "movie",
-
             currentItem.id
-
         );
+
+
+    if (
+        !isReleased(
+            movie.releaseDate
+        )
+    ) {
+
+        showToast(
+            "This movie has not been released yet"
+        );
+
+        return;
+
+    }
 
 
     movie.watched =
@@ -5088,21 +4100,16 @@ function toggleMovieWatched() {
     renderDashboard();
 
 
+    renderLibrary();
+
+
     renderWatched();
 
 
     showToast(
-
         movie.watched
-
-        ?
-
-        "Movie marked watched"
-
-        :
-
-        "Movie marked unwatched"
-
+            ? "Movie marked watched"
+            : "Movie marked unwatched"
     );
 
 }
@@ -5114,218 +4121,16 @@ function toggleMovieWatched() {
 
 document
     .getElementById(
-        "searchInput"
+        "librarySearchInput"
     )
     .addEventListener(
-
         "input",
+        function() {
 
-        function () {
-
-            const query =
-                this.value
-                    .trim()
-                    .toLowerCase();
-
-
-            const container =
-                document.getElementById(
-                    "searchResults"
-                );
-
-
-            if (
-                !query
-            ) {
-
-                container.innerHTML =
-                    emptyState(
-                        "Search Your Library"
-                    );
-
-
-                return;
-
-            }
-
-
-            const movies =
-                state.movies.filter(
-
-                    movie =>
-
-                        movie.title
-                            .toLowerCase()
-                            .includes(
-                                query
-                            )
-
-                );
-
-
-            const shows =
-                state.tvShows.filter(
-
-                    show =>
-
-                        show.title
-                            .toLowerCase()
-                            .includes(
-                                query
-                            )
-
-                );
-
-
-            let html = "";
-
-
-            if (
-                movies.length
-            ) {
-
-                html += `
-
-                    <div
-                        class="section-header"
-                    >
-
-                        <div
-                            class="section-title"
-                        >
-
-                            Movies
-
-                        </div>
-
-                    </div>
-
-
-                    <div
-                        class="library-grid"
-                    >
-
-                        ${
-                            movies.map(
-
-                                movie =>
-
-                                    createCard(
-                                        movie,
-                                        "movie"
-                                    )
-
-                            ).join("")
-                        }
-
-                    </div>
-
-                `;
-
-            }
-
-
-            if (
-                shows.length
-            ) {
-
-                html += `
-
-                    <div
-                        class="section-header"
-                    >
-
-                        <div
-                            class="section-title"
-                        >
-
-                            TV Shows
-
-                        </div>
-
-                    </div>
-
-
-                    <div
-                        class="library-grid"
-                    >
-
-                        ${
-                            shows.map(
-
-                                show =>
-
-                                    createCard(
-                                        show,
-                                        "tv"
-                                    )
-
-                            ).join("")
-                        }
-
-                    </div>
-
-                `;
-
-            }
-
-
-            if (
-                !movies.length &&
-                !shows.length
-            ) {
-
-                html =
-                    emptyState(
-                        "Nothing Found"
-                    );
-
-            }
-
-
-            container.innerHTML =
-                html;
+            renderLibrary();
 
         }
-
     );
-
-
-/* =========================================================
-   MODAL
-========================================================= */
-
-function closeModal() {
-
-    document
-        .getElementById(
-            "detailsModal"
-        )
-        .classList.remove(
-            "open"
-        );
-
-
-    document.body.style.overflow =
-        "";
-
-}
-
-
-function closeModalOutside(
-    event
-) {
-
-    if (
-        event.target.id ===
-        "detailsModal"
-    ) {
-
-        closeModal();
-
-    }
-
-}
 
 
 /* =========================================================
@@ -5336,20 +4141,14 @@ function renderProfile() {
 
     const profile =
         state.profiles.find(
-
             item =>
                 item.id ===
                 state.activeProfileId
-
         );
 
 
-    if (
-        !profile
-    ) {
-
+    if (!profile) {
         return;
-
     }
 
 
@@ -5413,13 +4212,8 @@ function emptyState(
                     rx="3"
                 />
 
-                <path
-                    d="M8 4v16"
-                />
-
-                <path
-                    d="M16 4v16"
-                />
+                <path d="M8 4v16"/>
+                <path d="M16 4v16"/>
 
             </svg>
 
@@ -5443,9 +4237,6 @@ function emptyState(
 /* =========================================================
    TOAST
 ========================================================= */
-
-let toastTimer;
-
 
 function showToast(
     message
@@ -5473,7 +4264,6 @@ function showToast(
 
     toastTimer =
         setTimeout(
-
             () => {
 
                 toast.classList.remove(
@@ -5481,10 +4271,45 @@ function showToast(
                 );
 
             },
-
             2200
-
         );
+
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+function closeModal() {
+
+    document
+        .getElementById(
+            "detailsModal"
+        )
+        .classList.remove(
+            "open"
+        );
+
+
+    document.body.style.overflow =
+        "";
+
+}
+
+
+function closeModalOutside(
+    event
+) {
+
+    if (
+        event.target.id ===
+        "detailsModal"
+    ) {
+
+        closeModal();
+
+    }
 
 }
 
@@ -5514,6 +4339,83 @@ function escapeHTML(
 
 
 /* =========================================================
+   AUTO REFRESH
+========================================================= */
+
+function refreshApp() {
+
+    renderDashboard();
+
+    renderLibrary();
+
+    renderWatched();
+
+    renderUpcoming();
+
+    renderProfile();
+
+
+    if (
+        currentItem
+    ) {
+
+        const item =
+            getItem(
+                currentItem.type,
+                currentItem.id
+            );
+
+
+        if (item) {
+
+            renderModalActions(
+                item,
+                currentItem.type
+            );
+
+        }
+
+    }
+
+}
+
+
+/*
+    This checks every 30 seconds.
+
+    This means if the website is left open
+    when an episode/movie reaches its release
+    time, the UI updates automatically.
+*/
+
+setInterval(
+    refreshApp,
+    30000
+);
+
+
+/* =========================================================
+   KEYBOARD
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key ===
+            "Escape"
+        ) {
+
+            closeModal();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
    INITIALISE
 ========================================================= */
 
@@ -5529,40 +4431,13 @@ setLibraryType(
     "movie"
 );
 
-setWatchlistType(
+setWatchedType(
     "movie"
 );
 
 setUpcomingType(
     "tv"
 );
-
-
-/* =========================================================
-   ESC KEY
-========================================================= */
-
-document
-    .addEventListener(
-
-        "keydown",
-
-        function (
-            event
-        ) {
-
-            if (
-                event.key ===
-                "Escape"
-            ) {
-
-                closeModal();
-
-            }
-
-        }
-
-    );
 
 </script>
 
