@@ -1,294 +1,3888 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ReelTrack</title>
-    <style>
-        :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-color: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent: #38bdf8;
-            --accent-hover: #0ea5e9;
-            --danger: #f43f5e;
-            --border-radius: 12px;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#05070b">
+<title>ReelTrack</title>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        }
+<style>
+/* =========================================================
+   RESET & VARIABLES
+========================================================= */
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
 
-        header {
-            background-color: rgba(30, 41, 59, 0.8);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+:root {
+    --bg: #05070b;
+    --surface: #0b0f16;
+    --surface-2: #101620;
+    --surface-3: #151c28;
 
-        h1 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            letter-spacing: -0.025em;
-            color: var(--accent);
-        }
+    --blue: #1677ff;
+    --blue-light: #4b9aff;
+    --blue-dark: #0d4fb5;
 
-        nav {
-            display: flex;
-            gap: 0.5rem;
-        }
+    --text: #ffffff;
+    --text-secondary: #8d96a5;
+    --text-muted: #5f6876;
 
-        .tab-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
+    --border: rgba(255,255,255,0.07);
 
-        .tab-btn:hover {
-            color: var(--text-color);
-            background: rgba(255, 255, 255, 0.05);
-        }
+    --success: #24d17e;
+    --danger: #ff5268;
 
-        .tab-btn.active {
-            color: var(--text-color);
-            background: var(--accent);
-            color: #0f172a;
-            font-weight: 600;
-        }
+    --radius: 16px;
+}
 
-        main {
-            flex: 1;
-            max-width: 1400px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 2rem;
-        }
+html {
+    background: var(--bg);
+    color-scheme: dark;
+}
 
-        .tab-content {
-            display: none;
-        }
+body {
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
 
-        .tab-content.active {
-            display: block;
-        }
+    background:
+        linear-gradient(
+            180deg,
+            #070a10 0%,
+            #05070b 100%
+        );
 
-        .section-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            color: var(--text-color);
-        }
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    padding-bottom: 86px;
+}
 
-        .poster-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 3rem;
-        }
+button,
+input {
+    font: inherit;
+}
 
-        .poster-card {
-            background-color: var(--card-bg);
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-        }
+button {
+    border: 0;
+    color: inherit;
+    cursor: pointer;
+}
 
-        .poster-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
-        }
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
 
-        .poster-image-container {
-            width: 100%;
-            aspect-ratio: 2/3;
-            background-color: #334155;
-            position: relative;
-            overflow: hidden;
-        }
+img {
+    display: block;
+    max-width: 100%;
+}
 
-        .poster-image-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+/* =========================================================
+   SVG ICONS
+========================================================= */
 
-        .poster-title-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 1rem;
-            background: linear-gradient(to top, rgba(15, 23, 42, 0.9), transparent);
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #fff;
-            text-align: center;
-        }
+.icon {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
 
-        .card-actions {
-            padding: 0.75rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: var(--card-bg);
-        }
+.icon-small {
+    width: 17px;
+    height: 17px;
+}
 
-        .btn {
-            background-color: var(--accent);
-            color: #0f172a;
-            border: none;
-            padding: 0.4rem 0.8rem;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
+.icon-large {
+    width: 30px;
+    height: 30px;
+}
 
-        .btn:hover {
-            background-color: var(--accent-hover);
-        }
+/* =========================================================
+   APP
+========================================================= */
 
-        @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                gap: 1rem;
-                padding: 1rem;
-            }
-            main {
-                padding: 1rem;
-            }
-            .poster-grid {
-                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-                gap: 1rem;
-            }
-        }
-    </style>
+.app {
+    width: 100%;
+    max-width: 600px;
+    min-height: 100vh;
+    margin: 0 auto;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+
+    height: 68px;
+    padding: 0 17px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    background: rgba(5,7,11,0.9);
+    backdrop-filter: blur(20px);
+
+    border-bottom: 1px solid var(--border);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.6px;
+}
+
+.logo-mark {
+    width: 33px;
+    height: 33px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--blue),
+            #0052d4
+        );
+
+    box-shadow:
+        0 6px 20px
+        rgba(22,119,255,0.3);
+}
+
+.profile-button {
+    width: 39px;
+    height: 39px;
+
+    border-radius: 50%;
+    overflow: hidden;
+
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+}
+
+.profile-avatar {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--blue),
+            #003f9e
+        );
+
+    font-size: 14px;
+    font-weight: 800;
+}
+
+/* =========================================================
+   PAGES
+========================================================= */
+
+.page {
+    display: none;
+    padding: 20px 16px 30px;
+}
+
+.page.active {
+    display: block;
+}
+
+#homePage {
+    display: none;
+    flex-direction: column;
+    gap: 28px;
+}
+
+#homePage.active {
+    display: flex;
+}
+
+#watchedPage {
+    display: none;
+    flex-direction: column;
+    gap: 28px;
+}
+
+#watchedPage.active {
+    display: flex;
+}
+
+/* =========================================================
+   SECTIONS
+========================================================= */
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin: 0 0 14px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 750;
+    letter-spacing: -0.4px;
+}
+
+.section-link {
+    background: transparent;
+    color: var(--blue-light);
+
+    font-size: 13px;
+    font-weight: 650;
+}
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero {
+    position: relative;
+    min-height: 325px;
+
+    overflow: hidden;
+    border-radius: 22px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #101827,
+            #080b11
+        );
+
+    border: 1px solid var(--border);
+}
+
+.hero-image {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+    opacity: 0.5;
+}
+
+.hero-image.hidden {
+    display: none;
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(5,7,11,0.05),
+            rgba(5,7,11,0.98)
+        );
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+
+    min-height: 325px;
+    padding: 22px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.hero-label {
+    color: var(--blue-light);
+
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.3px;
+    text-transform: uppercase;
+
+    margin-bottom: 8px;
+}
+
+.hero-title {
+    font-size: 28px;
+    line-height: 1.05;
+    font-weight: 800;
+    letter-spacing: -1px;
+
+    margin-bottom: 9px;
+}
+
+.hero-description {
+    max-width: 410px;
+
+    color: var(--text-secondary);
+
+    font-size: 13px;
+    line-height: 1.5;
+
+    margin-bottom: 16px;
+}
+
+.primary-button {
+    width: fit-content;
+    min-height: 45px;
+
+    padding: 0 18px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    border-radius: 12px;
+
+    background: var(--blue);
+
+    font-size: 13px;
+    font-weight: 700;
+
+    box-shadow:
+        0 8px 25px
+        rgba(22,119,255,0.25);
+}
+
+.primary-button:active {
+    transform: scale(0.97);
+}
+
+/* =========================================================
+   STATS
+========================================================= */
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.stat {
+    padding: 16px;
+
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.stat-value {
+    font-size: 23px;
+    font-weight: 800;
+}
+
+.stat-label {
+    color: var(--text-secondary);
+    font-size: 11px;
+
+    margin-top: 4px;
+}
+
+/* =========================================================
+   HORIZONTAL ROW
+========================================================= */
+
+.horizontal-row {
+    display: flex;
+    gap: 12px;
+
+    overflow-x: auto;
+
+    padding-bottom: 5px;
+
+    scrollbar-width: none;
+}
+
+.horizontal-row::-webkit-scrollbar {
+    display: none;
+}
+
+/* =========================================================
+   CARDS
+========================================================= */
+
+.card {
+    flex: 0 0 125px;
+    width: 125px;
+
+    cursor: pointer;
+}
+
+.poster {
+    position: relative;
+
+    width: 125px;
+    height: 178px;
+
+    overflow: hidden;
+
+    border-radius: 13px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #182131,
+            #0b0e14
+        );
+
+    border: 1px solid var(--border);
+}
+
+.poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.poster-placeholder {
+    width: 100%;
+    height: 100%;
+
+    padding: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    color: var(--text);
+
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+/* Watch Count Badge on Poster */
+.watch-count-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(5, 7, 11, 0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border);
+    color: var(--blue-light);
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 7px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+/* =========================================================
+   3 COLUMN GRID
+========================================================= */
+
+.library-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 14px 10px;
+}
+
+.library-grid .card {
+    width: 100%;
+    min-width: 0;
+}
+
+.library-grid .poster {
+    width: 100%;
+    height: auto;
+
+    aspect-ratio: 0.70;
+}
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.empty-state {
+    padding: 35px 20px;
+
+    text-align: center;
+
+    color: var(--text-secondary);
+}
+
+.empty-state svg {
+    margin-bottom: 12px;
+    color: var(--text-muted);
+}
+
+.empty-state h3 {
+    color: var(--text);
+
+    font-size: 15px;
+
+    margin-bottom: 5px;
+}
+
+.empty-state p {
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.search-box {
+    position: relative;
+
+    margin-bottom: 18px;
+}
+
+.search-box input {
+    width: 100%;
+    height: 48px;
+
+    padding: 0 16px 0 45px;
+
+    outline: none;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+    border-radius: 14px;
+
+    color: white;
+}
+
+.search-box input:focus {
+    border-color:
+        rgba(22,119,255,0.6);
+}
+
+.search-icon {
+    position: absolute;
+
+    left: 16px;
+    top: 50%;
+
+    transform:
+        translateY(-50%);
+
+    color: var(--text-muted);
+}
+
+/* =========================================================
+   UPCOMING
+========================================================= */
+
+.upcoming-card {
+    display: flex;
+    gap: 12px;
+
+    padding: 12px;
+
+    margin-bottom: 10px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+    border-radius: 14px;
+
+    cursor: pointer;
+}
+
+.upcoming-poster {
+    flex: 0 0 62px;
+
+    width: 62px;
+    height: 88px;
+
+    overflow: hidden;
+
+    border-radius: 9px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #182131,
+            #0b0e14
+        );
+}
+
+.upcoming-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.upcoming-poster-placeholder {
+    width: 100%;
+    height: 100%;
+
+    padding: 6px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    color: var(--text);
+
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.upcoming-info {
+    flex: 1;
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.upcoming-title {
+    font-size: 13px;
+    font-weight: 700;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.upcoming-date {
+    color: var(--text-secondary);
+
+    font-size: 10px;
+    line-height: 1.5;
+
+    margin-top: 2px;
+}
+
+.upcoming-countdown {
+    color: var(--text-muted);
+
+    font-size: 10px;
+
+    margin-top: 3px;
+}
+
+/* =========================================================
+   BOTTOM NAV
+========================================================= */
+
+.bottom-nav {
+    position: fixed;
+
+    left: 50%;
+    bottom: 0;
+
+    transform:
+        translateX(-50%);
+
+    z-index: 100;
+
+    width: 100%;
+    max-width: 600px;
+
+    height: 72px;
+
+    padding: 7px 12px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    background:
+        rgba(8,11,17,0.95);
+
+    backdrop-filter: blur(20px);
+
+    border-top:
+        1px solid var(--border);
+}
+
+.nav-button {
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 4px;
+
+    background: transparent;
+
+    color: var(--text-muted);
+
+    font-size: 9px;
+    font-weight: 650;
+}
+
+.nav-button.active {
+    color: var(--blue-light);
+}
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.modal {
+    position: fixed;
+    inset: 0;
+
+    z-index: 200;
+
+    display: none;
+    align-items: flex-end;
+
+    background:
+        rgba(0,0,0,0.7);
+}
+
+.modal.open {
+    display: flex;
+}
+
+.modal-sheet {
+    width: 100%;
+    max-width: 600px;
+    max-height: 92vh;
+
+    margin: 0 auto;
+
+    overflow-y: auto;
+
+    background:
+        #090d14;
+
+    border-radius:
+        24px 24px 0 0;
+
+    border:
+        1px solid var(--border);
+}
+
+.modal-header {
+    position: sticky;
+    top: 0;
+
+    z-index: 5;
+
+    height: 55px;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    padding: 0 15px;
+
+    background:
+        rgba(9,13,20,0.9);
+
+    backdrop-filter:
+        blur(15px);
+}
+
+.close-button {
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: var(--surface-3);
+
+    color: var(--text-secondary);
+}
+
+.modal-backdrop-wrapper {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    background:
+        linear-gradient(
+            145deg,
+            #152033,
+            #080b10
+        );
+}
+
+.modal-backdrop {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+.modal-backdrop-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text);
+}
+
+.modal-content {
+    padding: 20px;
+}
+
+.modal-title {
+    font-size: 25px;
+    font-weight: 800;
+
+    letter-spacing: -0.7px;
+}
+
+.modal-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    color: var(--text-secondary);
+
+    font-size: 11px;
+
+    margin: 9px 0 16px;
+}
+
+.modal-description {
+    color: var(--text-secondary);
+
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 8px;
+
+    margin: 20px 0;
+}
+
+.action-button {
+    flex: 1;
+
+    min-height: 43px;
+
+    border-radius: 11px;
+
+    background: var(--surface-3);
+
+    color: white;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.action-button.primary {
+    background: var(--blue);
+}
+
+/* Season selector row with Rewatch button integrated */
+.season-selector-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 20px 0 14px;
+}
+
+.season-selector {
+    display: flex;
+    gap: 7px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    flex: 1;
+    min-width: 0;
+}
+
+.season-selector::-webkit-scrollbar {
+    display: none;
+}
+
+.season-button {
+    flex: 0 0 auto;
+    height: 36px;
+    padding: 0 14px;
+    border-radius: 9px;
+    background: var(--surface-3);
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.season-button.active {
+    background: var(--blue);
+    color: white;
+}
+
+.season-button.upcoming {
+    color: var(--blue-light);
+}
+
+/* Season Batch Actions */
+.season-batch-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.season-batch-btn {
+    flex: 1;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 10px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.season-batch-btn:hover {
+    border-color: var(--blue-light);
+    color: var(--text);
+}
+
+/* Per-Episode Rewatch Controls */
+.episode-rewatch-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.episode-rewatch-btn {
+    height: 29px;
+    padding: 0 8px;
+    border-radius: 8px;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 10px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.episode-rewatch-btn:hover {
+    border-color: var(--blue-light);
+    color: var(--text);
+}
+
+.episode-unwatch-btn {
+    height: 29px;
+    padding: 0 8px;
+    border-radius: 8px;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    color: var(--danger);
+    font-size: 10px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.episode-unwatch-btn:hover {
+    border-color: var(--danger);
+    background: rgba(255, 82, 104, 0.1);
+}
+
+.episode-rewatch-badge {
+    height: 24px;
+    padding: 0 6px;
+    border-radius: 6px;
+    background: rgba(22, 119, 255, 0.15);
+    border: 1px solid rgba(22, 119, 255, 0.3);
+    color: var(--blue-light);
+    font-size: 9px;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.episode {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    padding: 13px 0;
+
+    border-bottom:
+        1px solid var(--border);
+}
+
+.episode-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    flex: 1;
+}
+
+.episode-check {
+    flex: 0 0 29px;
+
+    width: 29px;
+    height: 29px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    border:
+        1px solid var(--text-muted);
+
+    background: transparent;
+
+    color: white;
+}
+
+.episode-check.watched {
+    background: var(--blue);
+    border-color: var(--blue);
+}
+
+.episode-info {
+    min-width: 0;
+    flex: 1;
+}
+
+.episode-title {
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.episode-meta {
+    color: var(--text-muted);
+
+    font-size: 10px;
+
+    line-height: 1.5;
+
+    margin-top: 4px;
+}
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+.profile-card {
+    padding: 20px;
+
+    background: var(--surface);
+
+    border:
+        1px solid var(--border);
+
+    border-radius: var(--radius);
+}
+
+.profile-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.large-avatar {
+    width: 58px;
+    height: 58px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--blue),
+            #0045a9
+        );
+
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.profile-name {
+    font-size: 17px;
+    font-weight: 750;
+}
+
+.profile-subtitle {
+    color: var(--text-secondary);
+
+    font-size: 11px;
+
+    margin-top: 4px;
+}
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+.toast {
+    position: fixed;
+
+    left: 50%;
+    bottom: 88px;
+
+    z-index: 500;
+
+    transform:
+        translateX(-50%)
+        translateY(20px);
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    padding: 11px 16px;
+
+    border-radius: 10px;
+
+    background: #161d29;
+
+    border:
+        1px solid var(--border);
+
+    color: white;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    transition:
+        0.25s ease;
+
+    white-space: nowrap;
+}
+
+.toast.show {
+    opacity: 1;
+
+    transform:
+        translateX(-50%)
+        translateY(0);
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 360px) {
+
+    .page {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .library-grid {
+        gap: 14px 7px;
+    }
+
+    .hero-title {
+        font-size: 24px;
+    }
+
+}
+
+@media (min-width: 601px) {
+
+    body {
+        background:
+            #020408;
+    }
+
+    .app {
+        background:
+            var(--bg);
+
+        box-shadow:
+            0 0 50px
+            rgba(0,0,0,0.5);
+    }
+
+}
+
+</style>
 </head>
+
 <body>
 
-    <header>
-        <h1>ReelTrack</h1>
-        <nav>
-            <button class="tab-btn active" onclick="switchTab('home')">Home</button>
-            <button class="tab-btn" onclick="switchTab('library')">Library</button>
-            <button class="tab-btn" onclick="switchTab('upcoming')">Upcoming</button>
-            <button class="tab-btn" onclick="switchTab('watched')">Watched</button>
-        </nav>
-    </header>
+<div class="app">
 
-    <main>
-        <!-- Home Tab -->
-        <section id="home" class="tab-content active">
-            <h2 class="section-title">Continue Watching</h2>
-            <div class="poster-grid" id="home-grid">
-                <!-- Dynamically populated -->
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
+<header class="header">
+
+    <div class="logo">
+
+        <div class="logo-mark">
+
+            <svg class="icon" viewBox="0 0 24 24">
+                <rect x="3" y="4" width="18" height="16" rx="3"/>
+                <path d="M8 4v16"/>
+                <path d="M16 4v16"/>
+            </svg>
+
+        </div>
+
+        ReelTrack
+
+    </div>
+
+    <button
+        class="profile-button"
+        onclick="showPage('profile')"
+        aria-label="Open profile"
+    >
+
+        <div
+            class="profile-avatar"
+            id="headerAvatar"
+        >
+            H
+        </div>
+
+    </button>
+
+</header>
+
+
+<!-- =====================================================
+     HOME
+===================================================== -->
+
+<main id="homePage" class="page active">
+
+    <section class="hero">
+
+        <img
+            id="heroImage"
+            class="hero-image hidden"
+            alt=""
+            onerror="this.style.display='none';"
+        >
+
+        <div class="hero-overlay"></div>
+
+        <div class="hero-content">
+
+            <div class="hero-label">
+                Continue Watching
             </div>
-        </section>
 
-        <!-- Library Tab -->
-        <section id="library" class="tab-content">
-            <h2 class="section-title">TV Show Library</h2>
-            <div class="poster-grid" id="library-grid">
-                <!-- Dynamically populated -->
+            <h1
+                id="heroTitle"
+                class="hero-title"
+            >
+                Welcome to ReelTrack
+            </h1>
+
+            <p
+                id="heroDescription"
+                class="hero-description"
+            >
+                Track every TV show your household watches.
+            </p>
+
+            <button
+                class="primary-button"
+                onclick="continueWatching()"
+            >
+
+                <svg class="icon icon-small" viewBox="0 0 24 24">
+                    <path d="M8 5l11 7-11 7V5z"/>
+                </svg>
+
+                Continue Watching
+
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <div
+        id="dashboardStats"
+        class="stats"
+    ></div>
+
+
+    <div>
+
+        <div class="section-header">
+
+            <div class="section-title">
+                Continue Watching
             </div>
-        </section>
 
-        <!-- Upcoming Tab -->
-        <section id="upcoming" class="tab-content">
-            <h2 class="section-title">Upcoming Releases</h2>
-            <div class="poster-grid" id="upcoming-grid">
-                <!-- Dynamically populated -->
+            <button
+                class="section-link"
+                onclick="showPage('watched')"
+            >
+                See All
+            </button>
+
+        </div>
+
+        <div
+            id="continueTVGrid"
+            class="horizontal-row"
+        ></div>
+
+    </div>
+
+
+    <div>
+
+        <div class="section-header">
+
+            <div class="section-title">
+                Upcoming
             </div>
-        </section>
 
-        <!-- Watched Tab -->
-        <section id="watched" class="tab-content">
-            <h2 class="section-title">Completed & Watched</h2>
-            <div class="poster-grid" id="watched-grid">
-                <!-- Dynamically populated -->
+            <button
+                class="section-link"
+                onclick="showPage('upcoming')"
+            >
+                See All
+            </button>
+
+        </div>
+
+        <div id="homeUpcoming"></div>
+
+    </div>
+
+</main>
+
+
+<!-- =====================================================
+     LIBRARY
+===================================================== -->
+
+<main id="libraryPage" class="page">
+
+    <div class="section-header">
+
+        <div class="section-title">
+            Library
+        </div>
+
+    </div>
+
+
+    <div class="search-box">
+
+        <svg class="icon search-icon" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="7"/>
+            <path d="M20 20l-4-4"/>
+        </svg>
+
+        <input
+            id="librarySearchInput"
+            type="search"
+            placeholder="Search your TV shows..."
+            autocomplete="off"
+        >
+
+    </div>
+
+
+    <div
+        id="libraryGrid"
+        class="library-grid"
+    ></div>
+
+</main>
+
+
+<!-- =====================================================
+     UPCOMING
+===================================================== -->
+
+<main id="upcomingPage" class="page">
+
+    <div class="section-header">
+
+        <div class="section-title">
+            Upcoming
+        </div>
+
+    </div>
+
+
+    <div id="upcomingGrid"></div>
+
+</main>
+
+
+<!-- =====================================================
+     WATCHED
+===================================================== -->
+
+<main id="watchedPage" class="page">
+
+    <div class="section-header">
+
+        <div class="section-title">
+            Watched
+        </div>
+
+    </div>
+
+    <!-- Continue Watching Section -->
+    <div>
+        <div class="section-header">
+            <div class="section-title">Continue Watching</div>
+        </div>
+        <div id="watchedContinueGrid" class="horizontal-row"></div>
+    </div>
+
+    <!-- Up to Date Section -->
+    <div>
+        <div class="section-header">
+            <div class="section-title">Up to Date</div>
+        </div>
+        <div id="watchedUpToDateGrid" class="horizontal-row"></div>
+    </div>
+
+    <!-- Finished Section -->
+    <div>
+        <div class="section-header">
+            <div class="section-title">Finished</div>
+        </div>
+        <div id="watchedFinishedGrid" class="horizontal-row"></div>
+    </div>
+
+</main>
+
+
+<!-- =====================================================
+     PROFILE
+===================================================== -->
+
+<main id="profilePage" class="page">
+
+    <div class="section-header">
+
+        <div class="section-title">
+            Profile
+        </div>
+
+    </div>
+
+
+    <div class="profile-card" style="display: flex; flex-direction: column; gap: 16px;">
+
+        <div class="profile-row">
+
+            <div
+                class="large-avatar"
+                id="largeAvatar"
+            >
+                H
             </div>
-        </section>
-    </main>
 
-    <script>
-        const shows = [
-            { id: 1, title: "Only Murders in the Building", status: "home", img: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500&auto=format&fit=crop&q=60" },
-            { id: 2, title: "Every Year After", status: "home", img: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&auto=format&fit=crop&q=60" },
-            { id: 3, title: "Elle", status: "library", img: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=500&auto=format&fit=crop&q=60" },
-            { id: 4, title: "Sweet Magnolias", status: "upcoming", img: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=500&auto=format&fit=crop&q=60" }
-        ];
+            <div>
 
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                <div
+                    class="profile-name"
+                    id="profileName"
+                >
+                    Hanu
+                </div>
 
-            document.getElementById(tabId).classList.add('active');
-            event.target.classList.add('active');
+                <div class="profile-subtitle">
+                    ReelTrack household member
+                </div>
 
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            </div>
+
+        </div>
+
+        <div style="border-top: 1px solid var(--border); padding-top: 14px;">
+            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">Total Time Watched</div>
+            <div id="totalWatchTime" style="font-size: 18px; font-weight: 800; color: var(--blue-light);">0 days, 0 hours, 0 minutes</div>
+        </div>
+
+    </div>
+
+</main>
+
+
+<!-- =====================================================
+     BOTTOM NAVIGATION
+===================================================== -->
+
+<nav class="bottom-nav">
+
+    <button
+        id="navHome"
+        class="nav-button active"
+        onclick="showPage('home')"
+    >
+
+        <svg class="icon" viewBox="0 0 24 24">
+            <path d="M3 10.5L12 3l9 7.5"/>
+            <path d="M5 9v11h14V9"/>
+        </svg>
+
+        Home
+
+    </button>
+
+
+    <button
+        id="navLibrary"
+        class="nav-button"
+        onclick="showPage('library')"
+    >
+
+        <svg class="icon" viewBox="0 0 24 24">
+            <rect x="4" y="3" width="16" height="18" rx="2"/>
+            <path d="M8 3v18"/>
+        </svg>
+
+        Library
+
+    </button>
+
+
+    <button
+        id="navUpcoming"
+        class="nav-button"
+        onclick="showPage('upcoming')"
+    >
+
+        <svg class="icon" viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="17" rx="2"/>
+            <path d="M16 2v4"/>
+            <path d="M8 2v4"/>
+            <path d="M3 10h18"/>
+        </svg>
+
+        Upcoming
+
+    </button>
+
+
+    <button
+        id="navWatched"
+        class="nav-button"
+        onclick="showPage('watched')"
+    >
+
+        <svg class="icon" viewBox="0 0 24 24">
+            <path d="M5 4h14v16H5z"/>
+            <path d="M8 12l2.5 2.5L16 9"/>
+        </svg>
+
+        Watched
+
+    </button>
+
+</nav>
+
+</div>
+
+
+<!-- =====================================================
+     DETAILS MODAL
+===================================================== -->
+
+<div
+    id="detailsModal"
+    class="modal"
+    onclick="closeModalOutside(event)"
+>
+
+    <div class="modal-sheet">
+
+        <div class="modal-header">
+
+            <button
+                class="close-button"
+                onclick="closeModal()"
+                aria-label="Close"
+            >
+
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M6 6l12 12"/>
+                    <path d="M18 6L6 18"/>
+                </svg>
+
+            </button>
+
+        </div>
+
+
+        <div class="modal-backdrop-wrapper">
+            <img
+                id="modalBackdrop"
+                class="modal-backdrop"
+                alt=""
+                onerror="this.style.display='none'; document.getElementById('modalBackdropPlaceholder').style.display='flex';"
+            >
+            <div id="modalBackdropPlaceholder" class="modal-backdrop-placeholder" style="display: none;"></div>
+        </div>
+
+
+        <div class="modal-content">
+
+            <h2
+                id="modalTitle"
+                class="modal-title"
+            ></h2>
+
+
+            <div
+                id="modalMeta"
+                class="modal-meta"
+            ></div>
+
+
+            <p
+                id="modalDescription"
+                class="modal-description"
+            ></p>
+
+
+            <div
+                id="modalActions"
+                class="modal-actions"
+            ></div>
+
+
+            <div
+                id="modalEpisodes"
+            ></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div
+    id="toast"
+    class="toast"
+></div>
+
+
+<script>
+
+/* =========================================================
+   APP STATE
+========================================================= */
+
+const STORAGE_KEY =
+    "reeltrack_tv_data_v13";
+
+let state = {
+    tvShows: [],
+    profiles: [
+        {
+            id: "profile-hanu",
+            name: "Hanu",
+            initials: "H"
+        }
+    ],
+    activeProfileId: "profile-hanu"
+};
+
+let currentItem = null;
+let selectedSeason = 1;
+let toastTimer = null;
+
+
+/* =========================================================
+   DATE HELPERS
+========================================================= */
+
+function now() {
+    return new Date();
+}
+
+function isReleased(date) {
+    if (!date) return true;
+    return new Date(date).getTime() <= now().getTime();
+}
+
+function formatDate(date) {
+
+    return new Intl.DateTimeFormat(
+        "en-ZA",
+        {
+            weekday: "short",
+            day: "numeric",
+            month: "short",
+            year: "numeric"
+        }
+    ).format(new Date(date));
+
+}
+
+function getCountdown(date) {
+
+    const difference =
+        new Date(date).getTime() -
+        now().getTime();
+
+    if (difference <= 0) {
+        return "Available now";
+    }
+
+    const days =
+        Math.floor(
+            difference /
+            (1000 * 60 * 60 * 24)
+        );
+
+    const hours =
+        Math.floor(
+            (
+                difference %
+                (1000 * 60 * 60 * 24)
+            ) /
+            (1000 * 60 * 60)
+        );
+
+    const minutes =
+        Math.floor(
+            (
+                difference %
+                (1000 * 60 * 60)
+            ) /
+            (1000 * 60)
+        );
+
+    if (days > 0) {
+        return `${days}d ${hours}h until release`;
+    }
+
+    if (hours > 0) {
+        return `${hours}h ${minutes}m until release`;
+    }
+
+    return `${minutes}m until release`;
+
+}
+
+
+/* =========================================================
+   STORAGE
+========================================================= */
+
+function saveState() {
+
+    try {
+
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(state)
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Could not save data:",
+            error
+        );
+
+        showToast(
+            "Could not save changes"
+        );
+
+    }
+
+}
+
+
+function loadState() {
+
+    try {
+
+        const saved =
+            localStorage.getItem(
+                STORAGE_KEY
+            );
+
+        if (!saved) {
+            return;
         }
 
-        function renderShows() {
-            const homeGrid = document.getElementById('home-grid');
-            const libraryGrid = document.getElementById('library-grid');
-            const upcomingGrid = document.getElementById('upcoming-grid');
-            const watchedGrid = document.getElementById('watched-grid');
+        const parsed =
+            JSON.parse(saved);
 
-            homeGrid.innerHTML = '';
-            libraryGrid.innerHTML = '';
-            upcomingGrid.innerHTML = '';
-            watchedGrid.innerHTML = '';
+        if (
+            parsed &&
+            typeof parsed === "object"
+        ) {
 
-            shows.forEach(show => {
-                const card = document.createElement('div');
-                card.className = 'poster-card';
-                card.innerHTML = `
-                    <div class="poster-image-container">
-                        <img src="${show.img}" alt="${show.title}" onerror="this.src='https://via.placeholder.com/500x750?text=No+Image'">
-                        <div class="poster-title-overlay">${show.title}</div>
-                    </div>
-                    <div class="card-actions">
-                        <span style="font-size:0.75rem; color:var(--text-muted);">${show.status.toUpperCase()}</span>
-                        <button class="btn" onclick="alert('${show.title}')">View</button>
-                    </div>
-                `;
+            state = {
+                ...state,
+                ...parsed
+            };
 
-                if (show.status === 'home') homeGrid.appendChild(card);
-                if (show.status === 'library' || show.status === 'home') libraryGrid.appendChild(card);
-                if (show.status === 'upcoming') upcomingGrid.appendChild(card);
-                if (show.status === 'watched') watchedGrid.appendChild(card);
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Could not load saved data:",
+            error
+        );
+
+        localStorage.removeItem(
+            STORAGE_KEY
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   INITIAL DATA POPULATION
+========================================================= */
+
+function createInitialData() {
+
+    const showsToBuild = [
+        {
+            id: "tv-only-murders-in-the-building",
+            title: "Only Murders in the Building",
+            year: "2021",
+            poster: "https://image.tmdb.org/t/p/w500/rm3854807298",
+            backdrop: "https://image.tmdb.org/t/p/w1280/mAJ83Vo12C26R2d0i6a4i4bU56A.jpg",
+            description: "Three strangers who share an obsession with true crime podcasts suddenly find themselves wrapped up in one when a gruesome death occurs inside their exclusive Upper West Side apartment building.",
+            isFinished: false,
+            seasonDates: {
+                1: "2021-08-31T00:00:00",
+                2: "2022-06-28T00:00:00",
+                3: "2023-08-08T00:00:00",
+                4: "2024-08-27T00:00:00",
+                5: {
+                    1: "2026-09-09T00:00:00",
+                    2: "2026-09-09T00:00:00",
+                    3: "2026-09-09T00:00:00",
+                    4: "2026-09-16T00:00:00",
+                    5: "2026-09-23T00:00:00",
+                    6: "2026-09-30T00:00:00",
+                    7: "2026-10-07T00:00:00",
+                    8: "2026-10-14T00:00:00",
+                    9: "2026-10-21T00:00:00",
+                    10: "2026-10-28T00:00:00"
+                }
+            },
+            seasonEpisodesCount: {
+                1: 10,
+                2: 10,
+                3: 10,
+                4: 10,
+                5: 10
+            }
+        },
+        {
+            id: "tv-every-year-after",
+            title: "Every Year After",
+            year: "2026",
+            poster: "https://image.tmdb.org/t/p/w500/rm3932408066",
+            backdrop: "https://image.tmdb.org/t/p/w1280/every_year_after_backdrop.jpg",
+            description: "A drama series following evolving relationships over successive years.",
+            isFinished: false,
+            seasonDates: {
+                1: "2026-06-10T00:00:00"
+            },
+            seasonEpisodesCount: {
+                1: 8
+            }
+        },
+        {
+            id: "tv-elle",
+            title: "Elle",
+            year: "2026",
+            poster: "https://image.tmdb.org/t/p/w500/rm2590821634",
+            backdrop: "https://image.tmdb.org/t/p/w1280/elle_backdrop.jpg",
+            description: "Prequel series following the early high school years of Elle Woods.",
+            isFinished: false,
+            seasonDates: {
+                1: "2026-07-01T00:00:00"
+            },
+            seasonEpisodesCount: {
+                1: 8
+            }
+        },
+        {
+            id: "tv-sweet-magnolias",
+            title: "Sweet Magnolias",
+            year: "2020",
+            poster: "https://image.tmdb.org/t/p/w500/rm1350748418",
+            backdrop: "https://image.tmdb.org/t/p/w1280/2L2zT8y8j83m58V2k9k5k4_bg.jpg",
+            description: "Lifelong friends Maddie, Helen, and Dana Sue navigate relationships, family, and careers in Serenity.",
+            isFinished: false,
+            seasonDates: {
+                1: "2020-05-19T00:00:00",
+                2: "2022-02-04T00:00:00",
+                3: "2023-07-20T00:00:00",
+                4: "2025-02-06T00:00:00",
+                5: "2026-06-11T00:00:00"
+            },
+            seasonEpisodesCount: {
+                1: 10,
+                2: 10,
+                3: 10,
+                4: 10,
+                5: 10
+            }
+        }
+    ];
+
+    showsToBuild.forEach(showData => {
+        const existingIndex = state.tvShows.findIndex(show => show.id === showData.id);
+        
+        const show = {
+            id: showData.id,
+            ownerId: state.activeProfileId,
+            title: showData.title,
+            year: showData.year,
+            poster: showData.poster || "",
+            backdrop: showData.backdrop || "",
+            description: showData.description,
+            isFinished: showData.isFinished,
+            episodes: []
+        };
+
+        const seasonNumbers = Object.keys(showData.seasonDates).map(Number);
+
+        seasonNumbers.forEach(season => {
+            const seasonDateConfig = showData.seasonDates[season];
+            const totalEpisodes = showData.seasonEpisodesCount[season];
+
+            for (let episode = 1; episode <= totalEpisodes; episode++) {
+                let releaseDate;
+                if (typeof seasonDateConfig === "object" && seasonDateConfig !== null) {
+                    releaseDate = seasonDateConfig[episode];
+                } else {
+                    releaseDate = seasonDateConfig;
+                }
+
+                show.episodes.push({
+                    id: `s${season}e${episode}`,
+                    season: season,
+                    number: episode,
+                    title: `Episode ${episode}`,
+                    runtime: "45 min",
+                    watched: false,
+                    watchCount: 0,
+                    releaseDate: releaseDate
+                });
+            }
+        });
+
+        if (existingIndex > -1) {
+            const oldEpisodes = state.tvShows[existingIndex].episodes || [];
+            show.episodes.forEach(ep => {
+                const match = oldEpisodes.find(o => o.id === ep.id);
+                if (match) {
+                    ep.watched = match.watched;
+                    ep.watchCount = match.watchCount || (match.watched ? 1 : 0);
+                }
             });
+            state.tvShows[existingIndex] = show;
+        } else {
+            state.tvShows.push(show);
+        }
+    });
+
+    saveState();
+
+}
+
+
+/* =========================================================
+   DATA HELPERS
+========================================================= */
+
+function getItem(id) {
+    return state.tvShows.find(item => item.id === id);
+}
+
+
+function getAvailableEpisodes(show) {
+
+    return show.episodes.filter(
+        episode =>
+            isReleased(
+                episode.releaseDate
+            )
+    );
+
+}
+
+
+function getUpcomingEpisodes(show = null) {
+
+    const results = [];
+
+    const shows =
+        show
+            ? [show]
+            : state.tvShows;
+
+    shows.forEach(
+        currentShow => {
+
+            currentShow.episodes
+                .filter(
+                    episode =>
+                        episode.releaseDate &&
+                        !isReleased(
+                            episode.releaseDate
+                        )
+                )
+                .forEach(
+                    episode => {
+
+                        results.push({
+
+                            show:
+                                currentShow,
+
+                            episode:
+                                episode,
+
+                            date:
+                                new Date(
+                                    episode.releaseDate
+                                )
+
+                        });
+
+                    }
+                );
+
+        }
+    );
+
+
+    return results.sort(
+        (a, b) =>
+            a.date - b.date
+    );
+
+}
+
+
+function getTVProgress(show) {
+
+    const available =
+        getAvailableEpisodes(
+            show
+        );
+
+    const watched =
+        available.filter(
+            episode =>
+                episode.watched
+        );
+
+    const nextEpisode =
+        available.find(
+            episode =>
+                !episode.watched
+        );
+
+    return {
+
+        total:
+            available.length,
+
+        watched:
+            watched.length,
+
+        percentage:
+            available.length
+                ? Math.round(
+                    (
+                        watched.length /
+                        available.length
+                    ) * 100
+                )
+                : 0,
+
+        nextEpisode:
+            nextEpisode
+
+    };
+
+}
+
+
+function isTVUpToDate(show) {
+
+    const progress =
+        getTVProgress(
+            show
+        );
+
+    return (
+        progress.total > 0 &&
+        progress.watched === progress.total
+    );
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function showPage(page) {
+
+    window.scrollTo(0, 0);
+
+    document
+        .querySelectorAll(".page")
+        .forEach(
+            element =>
+                element.classList.remove(
+                    "active"
+                )
+        );
+
+
+    const target =
+        document.getElementById(
+            `${page}Page`
+        );
+
+
+    if (target) {
+
+        target.classList.add(
+            "active"
+        );
+
+    }
+
+
+    document
+        .querySelectorAll(".nav-button")
+        .forEach(
+            button =>
+                button.classList.remove(
+                    "active"
+                )
+        );
+
+
+    const nav =
+        document.getElementById(
+            `nav${page
+                .charAt(0)
+                .toUpperCase()}${page.slice(1)}`
+        );
+
+
+    if (nav) {
+
+        nav.classList.add(
+            "active"
+        );
+
+    }
+
+
+    if (page === "home") {
+        renderDashboard();
+    }
+
+    if (page === "library") {
+        renderLibrary();
+    }
+
+    if (page === "upcoming") {
+        renderUpcoming();
+    }
+
+    if (page === "watched") {
+        renderWatched();
+    }
+
+    if (page === "profile") {
+        renderProfile();
+    }
+
+}
+
+
+/* =========================================================
+   LIBRARY
+========================================================= */
+
+function renderLibrary() {
+
+    const grid =
+        document.getElementById(
+            "libraryGrid"
+        );
+
+    const searchInput =
+        document.getElementById(
+            "librarySearchInput"
+        );
+
+    const query =
+        searchInput.value
+            .trim()
+            .toLowerCase();
+
+
+    let items = [...state.tvShows].sort((a, b) => a.title.localeCompare(b.title));
+
+
+    if (query) {
+
+        items =
+            items.filter(
+                item =>
+                    item.title
+                        .toLowerCase()
+                        .includes(
+                            query
+                        )
+            );
+
+    }
+
+
+    if (!items.length) {
+
+        grid.innerHTML =
+            emptyState("No TV Shows Found");
+
+        return;
+
+    }
+
+
+    grid.innerHTML =
+        items
+            .map(
+                item =>
+                    createCard(item)
+            )
+            .join("");
+
+}
+
+
+/* =========================================================
+   WATCHED
+========================================================= */
+
+function renderWatched() {
+
+    const continueShows = state.tvShows.filter(show => {
+        const progress = getTVProgress(show);
+        return progress.watched > 0 && progress.watched < progress.total;
+    }).sort((a, b) => a.title.localeCompare(b.title));
+
+    const upToDateShows = state.tvShows.filter(show => {
+        return isTVUpToDate(show) && !show.isFinished;
+    }).sort((a, b) => a.title.localeCompare(b.title));
+
+    const finishedShows = state.tvShows.filter(show => {
+        return isTVUpToDate(show) && show.isFinished;
+    }).sort((a, b) => a.title.localeCompare(b.title));
+
+    renderRow("watchedContinueGrid", continueShows, "No TV shows currently in progress.");
+    renderRow("watchedUpToDateGrid", upToDateShows, "No TV shows currently up to date.");
+    renderRow("watchedFinishedGrid", finishedShows, "No finished TV shows.");
+
+}
+
+
+/* =========================================================
+   UPCOMING
+========================================================= */
+
+function renderUpcoming() {
+
+    const container =
+        document.getElementById(
+            "upcomingGrid"
+        );
+
+    const episodes =
+        getUpcomingEpisodes();
+
+
+    if (!episodes.length) {
+
+        container.innerHTML =
+            emptyState(
+                "No Upcoming TV Episodes"
+            );
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+        episodes
+            .map(
+                data =>
+                    createUpcomingTVCard(
+                        data
+                    )
+            )
+            .join("");
+
+}
+
+
+/* =========================================================
+   UPCOMING CARDS
+========================================================= */
+
+function createUpcomingTVCard(data) {
+
+    const show =
+        data.show;
+
+    const episode =
+        data.episode;
+
+
+    return `
+
+        <div
+            class="upcoming-card"
+            onclick="
+                openDetails(
+                    '${show.id}'
+                )
+            "
+        >
+
+            <div class="upcoming-poster">
+                <img
+                    src="${show.poster}"
+                    alt="${escapeHTML(show.title)}"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                >
+                <div
+                    class="upcoming-poster-placeholder"
+                    style="display: none;"
+                >
+                    ${escapeHTML(show.title)}
+                </div>
+            </div>
+
+
+            <div class="upcoming-info">
+
+                <div class="upcoming-title">
+                    ${escapeHTML(
+                        show.title
+                    )}
+                </div>
+
+                <div class="upcoming-date">
+
+                    Season
+                    ${episode.season}
+                    ·
+                    Episode
+                    ${episode.number}
+
+                    <br>
+
+                    ${formatDate(
+                        episode.releaseDate
+                    )}
+
+                </div>
+
+                <div class="upcoming-countdown">
+
+                    ${getCountdown(
+                        episode.releaseDate
+                    )}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   HOME
+========================================================= */
+
+function renderDashboard() {
+
+    const finishedShows =
+        state.tvShows.filter(
+            show =>
+                isTVUpToDate(show)
+        );
+
+
+    const watchedEpisodes =
+        state.tvShows.reduce(
+            (
+                total,
+                show
+            ) =>
+                total +
+                getTVProgress(
+                    show
+                ).watched,
+            0
+        );
+
+
+    document
+        .getElementById(
+            "dashboardStats"
+        )
+        .innerHTML = `
+
+            <div class="stat">
+
+                <div class="stat-value">
+                    ${finishedShows.length}
+                </div>
+
+                <div class="stat-label">
+                    Shows Completed
+                </div>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div class="stat-value">
+                    ${watchedEpisodes}
+                </div>
+
+                <div class="stat-label">
+                    Episodes Watched
+                </div>
+
+            </div>
+
+        `;
+
+
+    const continueShows =
+        state.tvShows.filter(
+            show => {
+
+                const progress =
+                    getTVProgress(
+                        show
+                    );
+
+                return (
+                    progress.watched >
+                    0 &&
+                    !isTVUpToDate(
+                        show
+                    )
+                );
+
+            }
+        ).sort((a, b) => a.title.localeCompare(b.title));
+
+
+    const displayShows =
+        continueShows.length
+            ? continueShows
+            : [...state.tvShows].filter(
+                show =>
+                    !isTVUpToDate(
+                        show
+                    )
+            ).sort((a, b) => a.title.localeCompare(b.title));
+
+
+    renderRow(
+        "continueTVGrid",
+        displayShows,
+        "No TV shows to continue yet."
+    );
+
+
+    const firstShow =
+        continueShows[0];
+
+
+    if (firstShow) {
+
+        const progress =
+            getTVProgress(
+                firstShow
+            );
+
+
+        document
+            .getElementById(
+                "heroTitle"
+            )
+            .textContent =
+            firstShow.title;
+
+
+        document
+            .getElementById(
+                "heroDescription"
+            )
+            .textContent =
+            progress.nextEpisode
+                ? `Continue with Season ${progress.nextEpisode.season}, Episode ${progress.nextEpisode.number}.`
+                : "Continue watching this TV show.";
+
+    } else {
+
+        document
+            .getElementById(
+                "heroTitle"
+            )
+            .textContent =
+            "Welcome to ReelTrack";
+
+
+        document
+            .getElementById(
+                "heroDescription"
+            )
+            .textContent =
+            "Track every TV show your household watches.";
+
+    }
+
+
+    renderHomeUpcoming();
+
+}
+
+
+function renderRow(
+    elementId,
+    items,
+    emptyText = "No items to display."
+) {
+
+    const container =
+        document.getElementById(
+            elementId
+        );
+
+
+    if (!container) return;
+
+
+    if (!items.length) {
+
+        container.innerHTML = `
+
+            <div
+                style="
+                    color: var(--text-muted);
+                    font-size: 12px;
+                    padding: 15px 0;
+                "
+            >
+                ${emptyText}
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+        items
+            .map(
+                item =>
+                    createCard(item)
+            )
+            .join("");
+
+}
+
+
+function renderHomeUpcoming() {
+
+    const container =
+        document.getElementById(
+            "homeUpcoming"
+        );
+
+
+    const tvEpisodes =
+        getUpcomingEpisodes();
+
+
+    const items = [];
+
+
+    if (tvEpisodes.length) {
+
+        items.push(
+            createUpcomingTVCard(
+                tvEpisodes[0]
+            )
+        );
+
+    }
+
+
+    if (!items.length) {
+
+        container.innerHTML =
+            emptyState(
+                "Nothing Upcoming"
+            );
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+        items.join("");
+
+}
+
+
+/* =========================================================
+   CARD (WITH FALLBACK PLACEHOLDER)
+========================================================= */
+
+function createCard(item) {
+
+    // Calculate max rewatch count across episodes or check if any episode has been rewatched
+    const maxRewatch = item.episodes.reduce((max, ep) => Math.max(max, ep.watchCount || (ep.watched ? 1 : 0)), 0);
+    const badgeHTML = maxRewatch > 1 ? `
+        <div class="watch-count-badge">
+            <svg class="icon icon-small" style="width:12px;height:12px;" viewBox="0 0 24 24">
+                <path d="M1 4v6h6"/>
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+            </svg>
+            ${maxRewatch}x
+        </div>
+    ` : '';
+
+    return `
+
+        <div
+            class="card"
+            onclick="
+                openDetails(
+                    '${item.id}'
+                )
+            "
+        >
+
+            <div class="poster">
+                <img
+                    src="${item.poster}"
+                    alt="${escapeHTML(item.title)}"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                >
+                <div
+                    class="poster-placeholder"
+                    style="display: none;"
+                >
+                    ${escapeHTML(item.title)}
+                </div>
+                ${badgeHTML}
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   CONTINUE WATCHING
+========================================================= */
+
+function continueWatching() {
+
+    const show =
+        state.tvShows.find(
+            currentShow => {
+
+                const progress =
+                    getTVProgress(
+                        currentShow
+                    );
+
+                return (
+                    progress.watched >
+                    0 &&
+                    progress.nextEpisode
+                );
+
+            }
+        );
+
+
+    if (show) {
+
+        openDetails(show.id);
+
+        return;
+
+    }
+
+
+    showToast(
+        "Nothing to continue watching"
+    );
+
+}
+
+
+/* =========================================================
+   DETAILS
+========================================================= */
+
+function openDetails(id) {
+
+    const item = getItem(id);
+
+
+    if (!item) {
+        return;
+
+    }
+
+
+    currentItem = { id };
+
+
+    document
+        .getElementById(
+            "modalTitle"
+        )
+        .textContent =
+        item.title;
+
+
+    document
+        .getElementById(
+            "modalDescription"
+        )
+        .textContent =
+        item.description ||
+        "No description available.";
+
+
+    document
+        .getElementById(
+            "modalMeta"
+        )
+        .innerHTML = `
+
+            <span>
+                ${item.year}
+            </span>
+
+        `;
+
+
+    const backdrop =
+        document.getElementById(
+            "modalBackdrop"
+        );
+
+    const backdropPlaceholder =
+        document.getElementById(
+            "modalBackdropPlaceholder"
+        );
+
+    backdropPlaceholder.textContent = item.title;
+    backdropPlaceholder.style.display = "none";
+    backdrop.style.display = "block";
+
+    if (item.backdrop) {
+        backdrop.src = item.backdrop;
+    } else {
+        backdrop.style.display = "none";
+        backdropPlaceholder.style.display = "flex";
+    }
+
+
+    renderModalActions(item);
+    renderEpisodes(item);
+
+
+    document
+        .getElementById(
+            "detailsModal"
+        )
+        .classList.add(
+            "open"
+        );
+
+
+    document.body.style.overflow =
+        "hidden";
+
+}
+
+
+function renderModalActions(item) {
+
+    const actions =
+        document.getElementById(
+            "modalActions"
+        );
+
+    const progress =
+        getTVProgress(
+            item
+        );
+
+
+    actions.innerHTML = `
+
+        <button
+            class="
+                action-button
+                primary
+            "
+            ${
+                progress.nextEpisode
+                    ? ""
+                    : "disabled"
+            }
+            onclick="
+                markNextEpisode()
+            "
+        >
+
+            ${
+                progress.nextEpisode
+                    ? `Mark S${progress.nextEpisode.season} E${progress.nextEpisode.number} Watched`
+                    : "All Available Episodes Watched"
+            }
+
+        </button>
+
+    `;
+
+}
+
+
+/* =========================================================
+   EPISODES
+========================================================= */
+
+function renderEpisodes(
+    show
+) {
+
+    const container =
+        document.getElementById(
+            "modalEpisodes"
+        );
+
+
+    const seasons = {};
+
+
+    show.episodes.forEach(
+        episode => {
+
+            if (
+                !seasons[
+                    episode.season
+                ]
+            ) {
+
+                seasons[
+                    episode.season
+                ] = [];
+
+            }
+
+
+            seasons[
+                episode.season
+            ].push(
+                episode
+            );
+
+        }
+    );
+
+
+    const seasonKeys =
+        Object.keys(
+            seasons
+        )
+        .map(
+            Number
+        )
+        .sort(
+            (a,b) =>
+                a - b
+        );
+
+
+    const latestReleasedSeason =
+        seasonKeys.find(
+            season =>
+                seasons[season].some(
+                    episode =>
+                        isReleased(
+                            episode.releaseDate
+                        )
+                )
+        );
+
+
+    if (
+        !selectedSeason ||
+        !seasonKeys.includes(
+            selectedSeason
+        )
+    ) {
+
+        selectedSeason =
+            latestReleasedSeason ||
+            seasonKeys[0];
+
+    }
+
+
+    container.innerHTML = `
+
+        <div class="season-selector-wrapper">
+            <div style="font-size:16px; font-weight:750;">
+                Episodes
+            </div>
+        </div>
+
+
+        <div class="season-selector">
+
+            ${
+                seasonKeys.map(
+                    season => {
+
+                        const isUpcoming =
+                            seasons[
+                                season
+                            ].every(
+                                episode =>
+                                    !isReleased(
+                                        episode.releaseDate
+                                    )
+                            );
+
+
+                        return `
+
+                            <button
+                                class="
+                                    season-button
+                                    ${
+                                        season ===
+                                        selectedSeason
+                                            ? "active"
+                                            : ""
+                                    }
+                                    ${
+                                        isUpcoming
+                                            ? "upcoming"
+                                            : ""
+                                    }
+                                "
+                                onclick="
+                                    selectSeason(
+                                        '${show.id}',
+                                        ${season}
+                                    )
+                                "
+                            >
+
+                                Season ${season}
+
+                            </button>
+
+                        `;
+
+                    }
+                ).join("")
+            }
+
+        </div>
+
+        <div class="season-batch-actions">
+            <button class="season-batch-btn" onclick="markSeasonWatched('${show.id}', ${selectedSeason})">
+                <svg class="icon icon-small" style="width:14px;height:14px;" viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg>
+                Mark Season Watched
+            </button>
+            <button class="season-batch-btn" onclick="markSeasonUnwatched('${show.id}', ${selectedSeason})">
+                <svg class="icon icon-small" style="width:14px;height:14px;" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+                Mark Season Unwatched
+            </button>
+        </div>
+
+
+        <div id="episodeList"></div>
+
+    `;
+
+
+    renderSeasonEpisodes(
+        show,
+        selectedSeason
+    );
+
+}
+
+
+function selectSeason(
+    showId,
+    season
+) {
+
+    selectedSeason =
+        Number(
+            season
+        );
+
+
+    const show = getItem(showId);
+
+
+    renderEpisodes(
+        show
+    );
+
+}
+
+
+function renderSeasonEpisodes(
+    show,
+    season
+) {
+
+    const list =
+        document.getElementById(
+            "episodeList"
+        );
+
+
+    if (!list) {
+        return;
+
+    }
+
+
+    const episodes =
+        show.episodes.filter(
+            episode =>
+                Number(
+                    episode.season
+                ) ===
+                Number(
+                    season
+                )
+        );
+
+
+    list.innerHTML =
+        episodes
+            .map(
+                episode => {
+
+                    const upcoming =
+                        !isReleased(
+                            episode.releaseDate
+                        );
+
+                    const watchCount = episode.watchCount || (episode.watched ? 1 : 0);
+                    
+                    let rewatchControlHTML = '';
+                    if (!upcoming) {
+                        if (watchCount > 1) {
+                            rewatchControlHTML = `
+                                <div class="episode-rewatch-controls">
+                                    <div class="episode-rewatch-badge" title="Watched ${watchCount} times">
+                                        <svg class="icon icon-small" style="width:11px;height:11px;" viewBox="0 0 24 24">
+                                            <path d="M1 4v6h6"/>
+                                            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+                                        </svg>
+                                        ${watchCount}x
+                                    </div>
+                                    <button class="episode-rewatch-btn" onclick="addEpisodeRewatch('${show.id}', '${episode.id}')" title="Log another rewatch">
+                                        + Rewatch
+                                    </button>
+                                    <button class="episode-unwatch-btn" onclick="removeEpisodeRewatch('${show.id}', '${episode.id}')" title="Remove watch count">
+                                        - Unwatch
+                                    </button>
+                                </div>
+                            `;
+                        } else if (episode.watched) {
+                            rewatchControlHTML = `
+                                <div class="episode-rewatch-controls">
+                                    <button class="episode-rewatch-btn" onclick="addEpisodeRewatch('${show.id}', '${episode.id}')" title="Log rewatch">
+                                        <svg class="icon icon-small" style="width:13px;height:13px;" viewBox="0 0 24 24">
+                                            <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
+                                            <path d="M21 3v5h-5"/>
+                                        </svg>
+                                        Rewatch
+                                    </button>
+                                    <button class="episode-unwatch-btn" onclick="removeEpisodeRewatch('${show.id}', '${episode.id}')" title="Mark unwatched">
+                                        Unwatch
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    }
+
+
+                    return `
+
+                        <div class="episode">
+
+                            <div class="episode-left">
+                                <button
+                                    class="
+                                        episode-check
+                                        ${
+                                            episode.watched
+                                                ? "watched"
+                                                : ""
+                                        }
+                                    "
+                                    ${
+                                        upcoming
+                                            ? "disabled"
+                                            : ""
+                                    }
+                                    onclick="
+                                        toggleEpisode(
+                                            '${show.id}',
+                                            '${episode.id}'
+                                        )
+                                    "
+                                >
+
+                                    ${
+                                        episode.watched
+                                            ? `
+                                                <svg
+                                                    class="
+                                                        icon
+                                                        icon-small
+                                                    "
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path
+                                                        d="
+                                                            M5 12
+                                                            l4 4
+                                                            10-10
+                                                        "
+                                                    />
+                                                </svg>
+                                            `
+                                            : ""
+                                    }
+
+                                </button>
+
+
+                                <div class="episode-info">
+
+                                    <div class="episode-title">
+
+                                        ${episode.number}.
+                                        ${escapeHTML(
+                                            episode.title
+                                        )}
+
+                                    </div>
+
+
+                                    <div class="episode-meta">
+
+                                        ${
+                                            upcoming
+
+                                                ? `
+                                                    Releases
+                                                    ${formatDate(
+                                                        episode.releaseDate
+                                                    )}
+                                                `
+
+                                                : `
+                                                    Season
+                                                    ${episode.season}
+                                                    ·
+                                                    ${episode.runtime}
+                                                `
+                                        }
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            ${rewatchControlHTML}
+
+                        </div>
+
+                    `;
+
+                }
+            )
+            .join("");
+
+}
+
+
+/* =========================================================
+   EPISODE ACTIONS
+========================================================= */
+
+function toggleEpisode(
+    showId,
+    episodeId
+) {
+
+    const show = getItem(showId);
+
+
+    const episode =
+        show.episodes.find(
+            item =>
+                item.id ===
+                episodeId
+        );
+
+
+    if (
+        !isReleased(
+            episode.releaseDate
+        )
+    ) {
+
+        showToast(
+            "This episode is not available yet"
+        );
+
+        return;
+
+    }
+
+
+    episode.watched =
+        !episode.watched;
+
+    if (episode.watched) {
+        if (!episode.watchCount || episode.watchCount < 1) {
+            episode.watchCount = 1;
+        }
+    } else {
+        episode.watchCount = 0;
+    }
+
+
+    saveState();
+
+
+    renderEpisodes(
+        show
+    );
+
+
+    renderDashboard();
+    renderLibrary();
+    renderWatched();
+
+
+    showToast(
+        episode.watched
+            ? "Episode marked watched"
+            : "Episode marked unwatched"
+    );
+
+}
+
+
+function addEpisodeRewatch(showId, episodeId) {
+    const show = getItem(showId);
+    const episode = show.episodes.find(item => item.id === episodeId);
+
+    if (!episode) return;
+
+    episode.watched = true;
+    episode.watchCount = (episode.watchCount || 1) + 1;
+
+    saveState();
+
+    renderEpisodes(show);
+    renderDashboard();
+    renderLibrary();
+    renderWatched();
+
+    showToast(`Logged rewatch #${episode.watchCount} for S${episode.season}E${episode.number}`);
+}
+
+function removeEpisodeRewatch(showId, episodeId) {
+    const show = getItem(showId);
+    const episode = show.episodes.find(item => item.id === episodeId);
+
+    if (!episode) return;
+
+    if (episode.watchCount > 1) {
+        episode.watchCount -= 1;
+        showToast(`Reduced rewatch count to ${episode.watchCount} for S${episode.season}E${episode.number}`);
+    } else {
+        episode.watchCount = 0;
+        episode.watched = false;
+        showToast(`Episode marked unwatched`);
+    }
+
+    saveState();
+
+    renderEpisodes(show);
+    renderDashboard();
+    renderLibrary();
+    renderWatched();
+}
+
+
+function markSeasonWatched(showId, seasonNumber) {
+    const show = getItem(showId);
+    if (!show) return;
+
+    let updatedCount = 0;
+    show.episodes.forEach(episode => {
+        if (Number(episode.season) === Number(seasonNumber) && isReleased(episode.releaseDate)) {
+            episode.watched = true;
+            if (!episode.watchCount || episode.watchCount < 1) {
+                episode.watchCount = 1;
+            }
+            updatedCount++;
+        }
+    });
+
+    if (updatedCount === 0) {
+        showToast("No released episodes in this season");
+        return;
+    }
+
+    saveState();
+    renderEpisodes(show);
+    renderModalActions(show);
+    renderDashboard();
+    renderLibrary();
+    renderWatched();
+
+    showToast(`Season ${seasonNumber} marked watched`);
+}
+
+
+function markSeasonUnwatched(showId, seasonNumber) {
+    const show = getItem(showId);
+    if (!show) return;
+
+    let updatedCount = 0;
+    show.episodes.forEach(episode => {
+        if (Number(episode.season) === Number(seasonNumber)) {
+            episode.watched = false;
+            episode.watchCount = 0;
+            updatedCount++;
+        }
+    });
+
+    if (updatedCount === 0) return;
+
+    saveState();
+    renderEpisodes(show);
+    renderModalActions(show);
+    renderDashboard();
+    renderLibrary();
+    renderWatched();
+
+    showToast(`Season ${seasonNumber} marked unwatched`);
+}
+
+
+function markNextEpisode() {
+
+    if (!currentItem) {
+        return;
+
+    }
+
+
+    const show = getItem(currentItem.id);
+
+
+    const progress =
+        getTVProgress(
+            show
+        );
+
+
+    if (
+        !progress.nextEpisode
+    ) {
+
+        showToast(
+            "All available episodes watched"
+        );
+
+        return;
+
+    }
+
+
+    progress.nextEpisode.watched =
+        true;
+    if (!progress.nextEpisode.watchCount || progress.nextEpisode.watchCount < 1) {
+        progress.nextEpisode.watchCount = 1;
+    }
+
+
+    saveState();
+
+
+    renderEpisodes(
+        show
+    );
+
+
+    renderModalActions(
+        show
+    );
+
+
+    renderDashboard();
+    renderLibrary();
+    renderWatched();
+
+
+    showToast(
+        "Episode marked watched"
+    );
+
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+document
+    .getElementById(
+        "librarySearchInput"
+    )
+    .addEventListener(
+        "input",
+        function() {
+
+            renderLibrary();
+
+        }
+    );
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+function renderProfile() {
+
+    const profile =
+        state.profiles.find(
+            item =>
+                item.id ===
+                state.activeProfileId
+        );
+
+
+    if (!profile) {
+        return;
+
+    }
+
+
+    document
+        .getElementById(
+            "profileName"
+        )
+        .textContent =
+        profile.name;
+
+
+    document
+        .getElementById(
+            "headerAvatar"
+        )
+        .textContent =
+        profile.initials;
+
+
+    document
+        .getElementById(
+            "largeAvatar"
+        )
+        .textContent =
+        profile.initials;
+
+    // Calculate total watch time in days, hours, and minutes
+    let totalMinutes = 0;
+    state.tvShows.forEach(show => {
+        show.episodes.forEach(ep => {
+            if (ep.watched) {
+                const count = ep.watchCount || 1;
+                // Parse runtime string e.g., "45 min"
+                const match = (ep.runtime || "").match(/(\d+)/);
+                const runtimeMins = match ? parseInt(match[1], 10) : 45;
+                totalMinutes += runtimeMins * count;
+            }
+        });
+    });
+
+    const days = Math.floor(totalMinutes / (24 * 60));
+    const hours = Math.floor((totalMinutes % (24 * 60)) / 60);
+    const minutes = totalMinutes % 60;
+
+    const timeString = `${days} days, ${hours} hours, ${minutes} minutes`;
+    const timeEl = document.getElementById("totalWatchTime");
+    if (timeEl) {
+        timeEl.textContent = timeString;
+    }
+
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+function emptyState(
+    title
+) {
+
+    return `
+
+        <div
+            class="empty-state"
+            style="
+                grid-column:
+                    1 / -1;
+            "
+        >
+
+            <svg
+                class="
+                    icon
+                    icon-large
+                "
+                viewBox="0 0 24 24"
+            >
+
+                <rect
+                    x="3"
+                    y="4"
+                    width="18"
+                    height="16"
+                    rx="3"
+                />
+
+                <path d="M8 4v16"/>
+                <path d="M16 4v16"/>
+
+            </svg>
+
+
+            <h3>
+                ${title}
+            </h3>
+
+
+            <p>
+                Your library will appear here.
+            </p>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+function showToast(
+    message
+) {
+
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+
+    toast.textContent =
+        message;
+
+
+    toast.classList.add(
+        "show"
+    );
+
+
+    clearTimeout(
+        toastTimer
+    );
+
+
+    toastTimer =
+        setTimeout(
+            () => {
+
+                toast.classList.remove(
+                    "show"
+                );
+
+            },
+            2200
+        );
+
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+function closeModal() {
+
+    document
+        .getElementById(
+            "detailsModal"
+        )
+        .classList.remove(
+            "open"
+        );
+
+
+    document.body.style.overflow =
+        "";
+
+}
+
+
+function closeModalOutside(
+    event
+) {
+
+    if (
+        event.target.id ===
+        "detailsModal"
+    ) {
+
+        closeModal();
+
+    }
+
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHTML(
+    value
+) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+
+    div.textContent =
+        value ||
+        "";
+
+
+    return div.innerHTML;
+
+}
+
+
+/* =========================================================
+   AUTO REFRESH
+========================================================= */
+
+function refreshApp() {
+
+    renderDashboard();
+
+    renderLibrary();
+
+    renderUpcoming();
+
+    renderWatched();
+
+    renderProfile();
+
+
+    if (
+        currentItem
+    ) {
+
+        const item = getItem(currentItem.id);
+
+
+        if (item) {
+
+            renderModalActions(item);
+
         }
 
-        renderShows();
-    </script>
+    }
+
+}
+
+
+setInterval(
+    refreshApp,
+    30000
+);
+
+
+/* =========================================================
+   KEYBOARD
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key ===
+            "Escape"
+        ) {
+
+            closeModal();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   INITIALISE
+========================================================= */
+
+loadState();
+
+createInitialData();
+
+renderProfile();
+
+renderDashboard();
+
+</script>
+
 </body>
 </html>
