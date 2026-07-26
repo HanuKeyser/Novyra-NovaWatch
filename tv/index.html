@@ -1767,7 +1767,7 @@ img {
 ========================================================= */
 
 const STORAGE_KEY =
-    "reeltrack_tv_data_v21"; // Incremented version to ensure fresh initialization check safely
+    "reeltrack_tv_data_v20";
 
 let state = {
     tvShows: [],
@@ -1899,7 +1899,7 @@ function loadState() {
             );
 
         if (!saved) {
-            return false;
+            return;
         }
 
         const parsed =
@@ -1914,7 +1914,6 @@ function loadState() {
                 ...state,
                 ...parsed
             };
-            return true;
 
         }
 
@@ -1930,13 +1929,12 @@ function loadState() {
         );
 
     }
-    return false;
 
 }
 
 
 /* =========================================================
-   INITIAL DATA POPULATION (PRESERVING TRACKING DATA)
+   INITIAL DATA POPULATION
 ========================================================= */
 
 function createInitialData() {
@@ -1947,7 +1945,7 @@ function createInitialData() {
             title: "Only Murders in the Building",
             year: "2021",
             poster: "https://cdn.cinematerial.com/p/297x/ig9ycog4/only-murders-in-the-building-movie-poster-md.jpg?v=1755024213",
-            backdrop: "https://cdn.cinematerial.com/p/700x/pelgzxva/only-murders-in-the-building-movie-poster.jpg?v=1692028127",
+            backdrop: "https://cdn.cinematerial.com/p/136x/pelgzxva/only-murders-in-the-building-movie-poster-sm.jpg?v=1692028127",
             description: "Three strangers who share an obsession with true crime podcasts suddenly find themselves wrapped up in one when a gruesome death occurs inside their exclusive Upper West Side apartment building.",
             isFinished: false,
             seasonDates: {
@@ -2034,7 +2032,7 @@ function createInitialData() {
             title: "Every Year After",
             year: "2026",
             poster: "https://cdn.cinematerial.com/p/297x/nsqkkzmj/every-year-after-movie-poster-md.jpg?v=1778795136",
-            backdrop: "https://cdn.cinematerial.com/p/700x/90i6jnjb/every-year-after-movie-poster.jpg?v=1778624144",
+            backdrop: "https://cdn.cinematerial.com/p/136x/90i6jnjb/every-year-after-movie-poster-sm.jpg?v=1778624144",
             description: "A drama series following evolving relationships over successive years.",
             isFinished: false,
             seasonDates: {
@@ -2042,18 +2040,6 @@ function createInitialData() {
             },
             seasonEpisodesCount: {
                 1: 8
-            },
-            seasonEpisodeDetails: {
-                1: {
-                    1: { title: "First Glance", runtime: "45 min" },
-                    2: { title: "Unspoken", runtime: "46 min" },
-                    3: { title: "Shift in Time", runtime: "44 min" },
-                    4: { title: "Turning Points", runtime: "48 min" },
-                    5: { title: "Crossroads", runtime: "45 min" },
-                    6: { title: "Echoes", runtime: "47 min" },
-                    7: { title: "Promises", runtime: "49 min" },
-                    8: { title: "Full Circle", runtime: "52 min" }
-                }
             }
         },
         {
@@ -2061,7 +2047,7 @@ function createInitialData() {
             title: "Elle",
             year: "2026",
             poster: "https://cdn.cinematerial.com/p/297x/c8a5sw4j/elle-movie-poster-md.jpg?v=1781210369",
-            backdrop: "https://cdn.cinematerial.com/p/700x/vukpbpdc/elle-movie-poster.jpg?v=1781012153",
+            backdrop: "https://cdn.cinematerial.com/p/136x/vukpbpdc/elle-movie-poster-sm.jpg?v=1781012153",
             description: "Prequel series following the early high school years of Elle Woods.",
             isFinished: false,
             seasonDates: {
@@ -2076,7 +2062,7 @@ function createInitialData() {
                     2: { title: "No Silly, I Go Here", runtime: "43 min" },
                     3: { title: "You're Not The Girl I Thought You Were", runtime: "51 min" },
                     4: { title: "I'm Not Afraid Of A Challenge", runtime: "48 min" },
-                    5: { title: "Trust Me, I Can Handle Anything", runtime: "46 min" },
+                    5: { title: "Trust Me, I Cam Handle Anything", runtime: "46 min" },
                     6: { title: "Whoever Said Orange Is The New Pink Was Seriously Disturbed", runtime: "49 min" },
                     7: { title: "You Picked The Wrong Girl", runtime: "47 min" },
                     8: { title: "What, Like It's Hard", runtime: "56 min" }
@@ -2088,7 +2074,7 @@ function createInitialData() {
             title: "Sweet Magnolias",
             year: "2020",
             poster: "https://cdn.cinematerial.com/p/297x/fkwgg3fd/sweet-magnolias-movie-poster-md.jpg?v=1781279968",
-            backdrop: "https://cdn.cinematerial.com/p/700x/fs4yqq8n/sweet-magnolias-movie-poster.jpg?v=1589418409",
+            backdrop: "https://cdn.cinematerial.com/p/136x/fs4yqq8n/sweet-magnolias-movie-poster-sm.jpg?v=1589418409",
             description: "Lifelong friends Maddie, Helen, and Dana Sue navigate relationships, family, and careers in Serenity.",
             isFinished: false,
             seasonDates: {
@@ -2153,18 +2139,6 @@ function createInitialData() {
                     8: { title: "Walls and Doors", runtime: "50 min" },
                     9: { title: "Dance Your Sugarplum Off", runtime: "48 min" },
                     10: { title: "Do Not Be Afraid", runtime: "52 min" }
-                },
-                5: {
-                    1: { title: "New Beginnings", runtime: "50 min" },
-                    2: { title: "Stepping Forward", runtime: "49 min" },
-                    3: { title: "Anchor and Sail", runtime: "48 min" },
-                    4: { title: "Ties That Bind", runtime: "51 min" },
-                    5: { title: "Serenity Sunsets", runtime: "50 min" },
-                    6: { title: "Shared Moments", runtime: "47 min" },
-                    7: { title: "Uncharted Waters", runtime: "49 min" },
-                    8: { title: "Holding Fast", runtime: "50 min" },
-                    9: { title: "Gathering Storms", runtime: "48 min" },
-                    10: { title: "Sweet Harmony", runtime: "53 min" }
                 }
             }
         }
