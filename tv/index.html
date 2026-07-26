@@ -1628,7 +1628,7 @@ img {
 ========================================================= */
 
 const STORAGE_KEY =
-    "reeltrack_tv_data_v10";
+    "reeltrack_tv_data_v11";
 
 let state = {
     tvShows: [],
@@ -1814,7 +1814,18 @@ function createInitialData() {
                 2: "2022-06-28T00:00:00",
                 3: "2023-08-08T00:00:00",
                 4: "2024-08-27T00:00:00",
-                5: "2026-09-08T00:00:00" // Set to future date so S5 is unreleased
+                5: {
+                    1: "2026-09-09T00:00:00",
+                    2: "2026-09-09T00:00:00",
+                    3: "2026-09-09T00:00:00",
+                    4: "2026-09-16T00:00:00",
+                    5: "2026-09-23T00:00:00",
+                    6: "2026-09-30T00:00:00",
+                    7: "2026-10-07T00:00:00",
+                    8: "2026-10-14T00:00:00",
+                    9: "2026-10-21T00:00:00",
+                    10: "2026-10-28T00:00:00"
+                }
             },
             seasonEpisodesCount: {
                 1: 10,
@@ -1897,10 +1908,17 @@ function createInitialData() {
         const seasonNumbers = Object.keys(showData.seasonDates).map(Number);
 
         seasonNumbers.forEach(season => {
-            const releaseDate = showData.seasonDates[season];
+            const seasonDateConfig = showData.seasonDates[season];
             const totalEpisodes = showData.seasonEpisodesCount[season];
 
             for (let episode = 1; episode <= totalEpisodes; episode++) {
+                let releaseDate;
+                if (typeof seasonDateConfig === "object" && seasonDateConfig !== null) {
+                    releaseDate = seasonDateConfig[episode];
+                } else {
+                    releaseDate = seasonDateConfig;
+                }
+
                 show.episodes.push({
                     id: `s${season}e${episode}`,
                     season: season,
@@ -1914,7 +1932,6 @@ function createInitialData() {
         });
 
         if (existingIndex > -1) {
-            // Keep watch history while updating show details/dates
             const oldEpisodes = state.tvShows[existingIndex].episodes || [];
             show.episodes.forEach(ep => {
                 const match = oldEpisodes.find(o => o.id === ep.id);
