@@ -1767,7 +1767,7 @@ img {
 ========================================================= */
 
 const STORAGE_KEY =
-    "reeltrack_tv_data_v19";
+    "reeltrack_tv_data_v20";
 
 let state = {
     tvShows: [],
@@ -1953,25 +1953,78 @@ function createInitialData() {
                 2: "2022-06-28T00:00:00",
                 3: "2023-08-08T00:00:00",
                 4: "2024-08-27T00:00:00",
-                5: {
-                    1: "2026-09-09T00:00:00",
-                    2: "2026-09-09T00:00:00",
-                    3: "2026-09-09T00:00:00",
-                    4: "2026-09-16T00:00:00",
-                    5: "2026-09-23T00:00:00",
-                    6: "2026-09-30T00:00:00",
-                    7: "2026-10-07T00:00:00",
-                    8: "2026-10-14T00:00:00",
-                    9: "2026-10-21T00:00:00",
-                    10: "2026-10-28T00:00:00"
-                }
+                5: "2025-09-09T00:00:00",
+                6: "2026-07-24T00:00:00"
             },
             seasonEpisodesCount: {
                 1: 10,
                 2: 10,
                 3: 10,
                 4: 10,
-                5: 10
+                5: 10,
+                6: 10
+            },
+            seasonEpisodeDetails: {
+                1: {
+                    1: { title: "True Crime", runtime: "35 min" },
+                    2: { title: "Who Is Tim Kono?", runtime: "32 min" },
+                    3: { title: "How Well Do You Know Your Neighbors?", runtime: "31 min" },
+                    4: { title: "The Sting", runtime: "29 min" },
+                    5: { title: "Twist", runtime: "28 min" },
+                    6: { title: "To Protect and Serve", runtime: "34 min" },
+                    7: { title: "The Boy from 6B", runtime: "30 min" },
+                    8: { title: "Fan Fiction", runtime: "33 min" },
+                    9: { title: "Double Time", runtime: "34 min" },
+                    10: { title: "Open and Shut", runtime: "35 min" }
+                },
+                2: {
+                    1: { title: "Persons of Interest", runtime: "35 min" },
+                    2: { title: "Framed", runtime: "33 min" },
+                    3: { title: "The Last Day of Bunny Folger", runtime: "31 min" },
+                    4: { title: "Here's Looking at You", runtime: "27 min" },
+                    5: { title: "The Tell", runtime: "32 min" },
+                    6: { title: "Performance Review", runtime: "30 min" },
+                    7: { title: "Flipping the Pieces", runtime: "35 min" },
+                    8: { title: "Hello, Darkness", runtime: "30 min" },
+                    9: { title: "Sparring Partners", runtime: "32 min" },
+                    10: { title: "I Know Who Did It", runtime: "37 min" }
+                },
+                3: {
+                    1: { title: "The Show Must…", runtime: "39 min" },
+                    2: { title: "The Beat Goes On", runtime: "33 min" },
+                    3: { title: "Grab Your Hankies", runtime: "33 min" },
+                    4: { title: "The White Room", runtime: "32 min" },
+                    5: { title: "Ah, Love!", runtime: "34 min" },
+                    6: { title: "Ghost Light", runtime: "34 min" },
+                    7: { title: "CoBro", runtime: "31 min" },
+                    8: { title: "Sitzprobe", runtime: "39 min" },
+                    9: { title: "Thirty-Five Millimeter", runtime: "32 min" },
+                    10: { title: "Headship", runtime: "40 min" }
+                },
+                4: {
+                    1: { title: "Once Upon a Time in the West", runtime: "36 min" },
+                    2: { title: "Gates of Heaven", runtime: "34 min" },
+                    3: { title: "Two for the Road", runtime: "32 min" },
+                    4: { title: "The Stunt Man", runtime: "33 min" },
+                    5: { title: "Adaptation", runtime: "30 min" },
+                    6: { title: "Blow-Up", runtime: "35 min" },
+                    7: { title: "Valley of the Dolls", runtime: "31 min" },
+                    8: { title: "Lifeboat", runtime: "33 min" },
+                    9: { title: "Escape From Planet Klongo", runtime: "30 min" },
+                    10: { title: "My Best Friend's Wedding", runtime: "38 min" }
+                },
+                5: {
+                    1: { title: "Nail in the Coffin", runtime: "39 min" },
+                    2: { title: "After You", runtime: "32 min" },
+                    3: { title: "Rigor", runtime: "37 min" },
+                    4: { title: "Dirty Birds", runtime: "37 min" },
+                    5: { title: "Tongue Tied", runtime: "36 min" },
+                    6: { title: "Flatbush", runtime: "38 min" },
+                    7: { title: "Silver Alert", runtime: "37 min" },
+                    8: { title: "Cuckoo Chicks", runtime: "40 min" },
+                    9: { title: "LESTR", runtime: "35 min" },
+                    10: { title: "The House Always...", runtime: "40 min" }
+                }
             }
         },
         {
@@ -2037,6 +2090,56 @@ function createInitialData() {
                 3: 10,
                 4: 10,
                 5: 10
+            },
+            seasonEpisodeDetails: {
+                1: {
+                    1: { title: "Pour It Out", runtime: "50 min" },
+                    2: { title: "A United Front", runtime: "49 min" },
+                    3: { title: "Give Drink to the Thirsty", runtime: "50 min" },
+                    4: { title: "Lay It All Down", runtime: "48 min" },
+                    5: { title: "Dance First, Think Later", runtime: "49 min" },
+                    6: { title: "All Best Intentions", runtime: "51 min" },
+                    7: { title: "Hold My Hand", runtime: "48 min" },
+                    8: { title: "What Fools These Mortals Be", runtime: "50 min" },
+                    9: { title: "Where You Find Me", runtime: "49 min" },
+                    10: { title: "Storms and Rainbows", runtime: "52 min" }
+                },
+                2: {
+                    1: { title: "Casseroles and Casualties", runtime: "50 min" },
+                    2: { title: "So Much to Say", runtime: "49 min" },
+                    3: { title: "The More Things Change", runtime: "48 min" },
+                    4: { title: "Walk of Faith", runtime: "51 min" },
+                    5: { title: "Great Expectations", runtime: "50 min" },
+                    6: { title: "Find It in Your Heart", runtime: "47 min" },
+                    7: { title: "Fragile Things", runtime: "48 min" },
+                    8: { title: "The Rules of the Game", runtime: "49 min" },
+                    9: { title: "Dear Heart", runtime: "51 min" },
+                    10: { title: "If Thou Wilt, Remember", runtime: "53 min" }
+                },
+                3: {
+                    1: { title: "Meaning to Tell You", runtime: "48 min" },
+                    2: { title: "Meet Me Where I Am", runtime: "49 min" },
+                    3: { title: "The Searchers", runtime: "50 min" },
+                    4: { title: "Be Bold", runtime: "47 min" },
+                    5: { title: "On This Foundation", runtime: "48 min" },
+                    6: { title: "And a Star to Steer Her By", runtime: "51 min" },
+                    7: { title: "Goinga-Gogo", runtime: "49 min" },
+                    8: { title: "Crave", runtime: "50 min" },
+                    9: { title: "A Beautiful Mind", runtime: "47 min" },
+                    10: { title: "Romeo and Juliet Got Nothing on Us", runtime: "52 min" }
+                },
+                4: {
+                    1: { title: "The Other Side of the Veil", runtime: "50 min" },
+                    2: { title: "Practical Dreams", runtime: "49 min" },
+                    3: { title: "Abundant Grace", runtime: "48 min" },
+                    4: { title: "How Great Thou Art", runtime: "50 min" },
+                    5: { title: "True North", runtime: "51 min" },
+                    6: { title: "Ring That Bell", runtime: "47 min" },
+                    7: { title: "Hide and Seek", runtime: "49 min" },
+                    8: { title: "Walls and Doors", runtime: "50 min" },
+                    9: { title: "Dance Your Sugarplum Off", runtime: "48 min" },
+                    10: { title: "Do Not Be Afraid", runtime: "52 min" }
+                }
             }
         }
     ];
