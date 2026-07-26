@@ -1767,7 +1767,7 @@ img {
 ========================================================= */
 
 const STORAGE_KEY =
-    "reeltrack_tv_data_v15";
+    "reeltrack_tv_data_v16";
 
 let state = {
     tvShows: [],
@@ -2447,6 +2447,8 @@ function createUpcomingTVCard(data) {
     const episode =
         data.episode;
 
+    const hasPoster = show.poster && show.poster.trim() !== "";
+
 
     return `
 
@@ -2460,17 +2462,26 @@ function createUpcomingTVCard(data) {
         >
 
             <div class="upcoming-poster">
-                <img
-                    src="${show.poster}"
-                    alt="${escapeHTML(show.title)}"
-                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                >
-                <div
-                    class="upcoming-poster-placeholder"
-                    style="display: none;"
-                >
-                    ${escapeHTML(show.title)}
-                </div>
+                ${hasPoster ? `
+                    <img
+                        src="${show.poster}"
+                        alt="${escapeHTML(show.title)}"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                    >
+                    <div
+                        class="upcoming-poster-placeholder"
+                        style="display: none;"
+                    >
+                        ${escapeHTML(show.title)}
+                    </div>
+                ` : `
+                    <div
+                        class="upcoming-poster-placeholder"
+                        style="display: flex;"
+                    >
+                        ${escapeHTML(show.title)}
+                    </div>
+                `}
             </div>
 
 
@@ -2604,7 +2615,7 @@ function renderDashboard() {
     );
 
 
-    // Render untracked/start watching shows (shows with 0 watched episodes)
+    // Render untracked/start watching shows (shows with >0 tracked episodes or 0 watched episodes depending on logic, but ensuring proper filtering so shows with 0 tracked don't mistakenly block)
     const startWatchingShows = state.tvShows.filter(show => {
         const progress = getTVProgress(show);
         return progress.watched === 0;
@@ -2796,7 +2807,6 @@ function createCard(item) {
                     <img
                         src="${item.poster}"
                         alt="${escapeHTML(item.title)}"
-                        onload="this.style.display='block'; this.nextElementSibling.style.display='none';"
                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                     >
                     <div
@@ -2926,7 +2936,7 @@ function openDetails(id) {
     backdropPlaceholder.style.display = "none";
     backdrop.style.display = "block";
 
-    if (item.backdrop) {
+    if (item.backdrop && item.backdrop.trim() !== "") {
         backdrop.src = item.backdrop;
     } else {
         backdrop.style.display = "none";
