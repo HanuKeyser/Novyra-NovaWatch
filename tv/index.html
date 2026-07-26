@@ -856,7 +856,7 @@ img {
     background: var(--blue);
 }
 
-/* Season selector row with consistent spacing */
+/* Season selector row */
 .season-selector-wrapper {
     display: flex;
     align-items: center;
@@ -898,7 +898,7 @@ img {
     color: var(--blue-light);
 }
 
-/* Season Batch Actions - Clean and unified layout */
+/* Season Batch Actions */
 .season-batch-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1838,12 +1838,16 @@ function createInitialData() {
             poster: "https://cdn.cinematerial.com/p/297x/c8a5sw4j/elle-movie-poster-md.jpg?v=1781210369",
             description: "Prequel series following the early high school years of Elle Woods.",
             isFinished: false,
-            seasonDates: {
-                1: "2026-07-01T00:00:00"
-            },
-            seasonEpisodesCount: {
-                1: 8
-            }
+            episodesDetails: [
+                { season: 1, number: 1, title: "Pilot", releaseDate: "2026-07-01T00:00:00", runtime: "49 min" },
+                { season: 1, number: 2, title: "No Silly, I Go Here", releaseDate: "2026-07-01T00:00:00", runtime: "43 min" },
+                { season: 1, number: 3, title: "You're Not the Girl I Thought You Were", releaseDate: "2026-07-01T00:00:00", runtime: "51 min" },
+                { season: 1, number: 4, title: "I'm Not Afraid of a Challenge", releaseDate: "2026-07-01T00:00:00", runtime: "48 min" },
+                { season: 1, number: 5, title: "Trust Me, I Can Handle Anything", releaseDate: "2026-07-01T00:00:00", runtime: "46 min" },
+                { season: 1, number: 6, title: "Whoever Said Orange Is the New Pink Was Seriously Disturbed", releaseDate: "2026-07-01T00:00:00", runtime: "49 min" },
+                { season: 1, number: 7, title: "You Picked the Wrong Girl", releaseDate: "2026-07-01T00:00:00", runtime: "47 min" },
+                { season: 1, number: 8, title: "What, Like It's Hard", releaseDate: "2026-07-01T00:00:00", runtime: "56 min" }
+            ]
         },
         {
             id: "tv-sweet-magnolias",
@@ -1883,32 +1887,46 @@ function createInitialData() {
             episodes: []
         };
 
-        const seasonNumbers = Object.keys(showData.seasonDates).map(Number);
-
-        seasonNumbers.forEach(season => {
-            const seasonDateConfig = showData.seasonDates[season];
-            const totalEpisodes = showData.seasonEpisodesCount[season];
-
-            for (let episode = 1; episode <= totalEpisodes; episode++) {
-                let releaseDate;
-                if (typeof seasonDateConfig === "object" && seasonDateConfig !== null) {
-                    releaseDate = seasonDateConfig[episode];
-                } else {
-                    releaseDate = seasonDateConfig;
-                }
-
+        if (showData.episodesDetails) {
+            showData.episodesDetails.forEach(epData => {
                 show.episodes.push({
-                    id: `s${season}e${episode}`,
-                    season: season,
-                    number: episode,
-                    title: `Episode ${episode}`,
-                    runtime: "45 min",
+                    id: `s${epData.season}e${epData.number}`,
+                    season: epData.season,
+                    number: epData.number,
+                    title: epData.title,
+                    runtime: epData.runtime || "45 min",
                     watched: false,
                     watchCount: 0,
-                    releaseDate: releaseDate
+                    releaseDate: epData.releaseDate
                 });
-            }
-        });
+            });
+        } else if (showData.seasonDates) {
+            const seasonNumbers = Object.keys(showData.seasonDates).map(Number);
+            seasonNumbers.forEach(season => {
+                const seasonDateConfig = showData.seasonDates[season];
+                const totalEpisodes = showData.seasonEpisodesCount[season];
+
+                for (let episode = 1; episode <= totalEpisodes; episode++) {
+                    let releaseDate;
+                    if (typeof seasonDateConfig === "object" && seasonDateConfig !== null) {
+                        releaseDate = seasonDateConfig[episode];
+                    } else {
+                        releaseDate = seasonDateConfig;
+                    }
+
+                    show.episodes.push({
+                        id: `s${season}e${episode}`,
+                        season: season,
+                        number: episode,
+                        title: `Episode ${episode}`,
+                        runtime: "45 min",
+                        watched: false,
+                        watchCount: 0,
+                        releaseDate: releaseDate
+                    });
+                }
+            });
+        }
 
         if (existingIndex > -1) {
             const oldEpisodes = state.tvShows[existingIndex].episodes || [];
