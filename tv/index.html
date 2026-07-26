@@ -924,72 +924,22 @@ img {
     background: var(--blue);
 }
 
-/* Rewatch Banner / Box inside Modal */
-.rewatch-status-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 14px 16px;
-    margin: 16px 0;
+/* Season selector row with Rewatch button integrated */
+.season-selector-wrapper {
     display: flex;
     align-items: center;
     justify-content: space-between;
-}
-
-.rewatch-info-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.rewatch-icon-wrapper {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    background: var(--surface-3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--blue-light);
-}
-
-.rewatch-text-title {
-    font-size: 13px;
-    font-weight: 750;
-}
-
-.rewatch-text-sub {
-    font-size: 11px;
-    color: var(--text-secondary);
-    margin-top: 2px;
-}
-
-.rewatch-action-btn {
-    background: var(--surface-3);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 8px 14px;
-    border-radius: 10px;
-    font-size: 11px;
-    font-weight: 700;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.rewatch-action-btn:hover {
-    border-color: var(--blue-light);
+    gap: 10px;
+    margin: 20px 0 14px;
 }
 
 .season-selector {
     display: flex;
     gap: 7px;
-
     overflow-x: auto;
-
-    margin: 20px 0 14px;
-
     scrollbar-width: none;
+    flex: 1;
+    min-width: 0;
 }
 
 .season-selector::-webkit-scrollbar {
@@ -998,17 +948,11 @@ img {
 
 .season-button {
     flex: 0 0 auto;
-
     height: 36px;
-
     padding: 0 14px;
-
     border-radius: 9px;
-
     background: var(--surface-3);
-
     color: var(--text-secondary);
-
     font-size: 11px;
     font-weight: 700;
 }
@@ -1022,15 +966,65 @@ img {
     color: var(--blue-light);
 }
 
+/* Per-Episode Rewatch Controls */
+.episode-rewatch-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.episode-rewatch-btn {
+    height: 29px;
+    padding: 0 8px;
+    border-radius: 8px;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 10px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.episode-rewatch-btn:hover {
+    border-color: var(--blue-light);
+    color: var(--text);
+}
+
+.episode-rewatch-badge {
+    height: 24px;
+    padding: 0 6px;
+    border-radius: 6px;
+    background: rgba(22, 119, 255, 0.15);
+    border: 1px solid rgba(22, 119, 255, 0.3);
+    color: var(--blue-light);
+    font-size: 9px;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
 .episode {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 12px;
 
     padding: 13px 0;
 
     border-bottom:
         1px solid var(--border);
+}
+
+.episode-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    flex: 1;
 }
 
 .episode-check {
@@ -1060,6 +1054,7 @@ img {
 
 .episode-info {
     min-width: 0;
+    flex: 1;
 }
 
 .episode-title {
@@ -1661,8 +1656,6 @@ img {
                 class="modal-description"
             ></p>
 
-            <div id="modalRewatchSection"></div>
-
 
             <div
                 id="modalActions"
@@ -1694,7 +1687,7 @@ img {
 ========================================================= */
 
 const STORAGE_KEY =
-    "reeltrack_tv_data_v12";
+    "reeltrack_tv_data_v13";
 
 let state = {
     tvShows: [],
@@ -1968,7 +1961,6 @@ function createInitialData() {
             backdrop: showData.backdrop || "",
             description: showData.description,
             isFinished: showData.isFinished,
-            watchCount: existingIndex > -1 && state.tvShows[existingIndex].watchCount !== undefined ? state.tvShows[existingIndex].watchCount : 1,
             episodes: []
         };
 
@@ -1993,6 +1985,7 @@ function createInitialData() {
                     title: `Episode ${episode}`,
                     runtime: "45 min",
                     watched: false,
+                    watchCount: 0,
                     releaseDate: releaseDate
                 });
             }
@@ -2002,7 +1995,10 @@ function createInitialData() {
             const oldEpisodes = state.tvShows[existingIndex].episodes || [];
             show.episodes.forEach(ep => {
                 const match = oldEpisodes.find(o => o.id === ep.id);
-                if (match) ep.watched = match.watched;
+                if (match) {
+                    ep.watched = match.watched;
+                    ep.watchCount = match.watchCount || (match.watched ? 1 : 0);
+                }
             });
             state.tvShows[existingIndex] = show;
         } else {
@@ -2685,19 +2681,20 @@ function renderHomeUpcoming() {
 
 
 /* =========================================================
-   CARD (WITH FALLBACK PLACEHOLDER & REWATCH BADGE)
+   CARD (WITH FALLBACK PLACEHOLDER)
 ========================================================= */
 
 function createCard(item) {
 
-    const watchCount = item.watchCount || 1;
-    const badgeHTML = watchCount > 1 ? `
+    // Calculate max rewatch count across episodes or check if any episode has been rewatched
+    const maxRewatch = item.episodes.reduce((max, ep) => Math.max(max, ep.watchCount || (ep.watched ? 1 : 0)), 0);
+    const badgeHTML = maxRewatch > 1 ? `
         <div class="watch-count-badge">
             <svg class="icon icon-small" style="width:12px;height:12px;" viewBox="0 0 24 24">
                 <path d="M1 4v6h6"/>
                 <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
             </svg>
-            ${watchCount}x
+            ${maxRewatch}x
         </div>
     ` : '';
 
@@ -2845,7 +2842,6 @@ function openDetails(id) {
     }
 
 
-    renderRewatchSection(item);
     renderModalActions(item);
     renderEpisodes(item);
 
@@ -2862,58 +2858,6 @@ function openDetails(id) {
     document.body.style.overflow =
         "hidden";
 
-}
-
-
-function renderRewatchSection(item) {
-    const container = document.getElementById("modalRewatchSection");
-    const watchCount = item.watchCount || 1;
-
-    container.innerHTML = `
-        <div class="rewatch-status-card">
-            <div class="rewatch-info-left">
-                <div class="rewatch-icon-wrapper">
-                    <svg class="icon icon-small" viewBox="0 0 24 24">
-                        <path d="M1 4v6h6"/>
-                        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
-                    </svg>
-                </div>
-                <div>
-                    <div class="rewatch-text-title">Watch Cycles</div>
-                    <div class="rewatch-text-sub">Completed ${watchCount} ${watchCount === 1 ? 'time' : 'times'}</div>
-                </div>
-            </div>
-            <button class="rewatch-action-btn" onclick="startRewatch('${item.id}')">
-                <svg class="icon icon-small" style="width:14px;height:14px;" viewBox="0 0 24 24">
-                    <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
-                    <path d="M21 3v5h-5"/>
-                </svg>
-                Rewatch Show
-            </button>
-        </div>
-    `;
-}
-
-function startRewatch(id) {
-    const item = getItem(id);
-    if (!item) return;
-
-    // Reset all episodes to unwatched and increment watch count
-    item.episodes.forEach(ep => {
-        ep.watched = false;
-    });
-
-    item.watchCount = (item.watchCount || 1) + 1;
-    saveState();
-
-    renderRewatchSection(item);
-    renderModalActions(item);
-    renderEpisodes(item);
-    renderDashboard();
-    renderLibrary();
-    renderWatched();
-
-    showToast(`Started watch cycle #${item.watchCount}!`);
 }
 
 
@@ -3044,13 +2988,10 @@ function renderEpisodes(
 
     container.innerHTML = `
 
-        <div
-            style="
-                font-size:16px;
-                font-weight:750;
-            "
-        >
-            Episodes
+        <div class="season-selector-wrapper">
+            <div style="font-size:16px; font-weight:750;">
+                Episodes
+            </div>
         </div>
 
 
@@ -3182,93 +3123,131 @@ function renderSeasonEpisodes(
                             episode.releaseDate
                         );
 
+                    const watchCount = episode.watchCount || (episode.watched ? 1 : 0);
+                    
+                    let rewatchControlHTML = '';
+                    if (!upcoming) {
+                        if (watchCount > 1) {
+                            rewatchControlHTML = `
+                                <div class="episode-rewatch-controls">
+                                    <div class="episode-rewatch-badge" title="Watched ${watchCount} times">
+                                        <svg class="icon icon-small" style="width:11px;height:11px;" viewBox="0 0 24 24">
+                                            <path d="M1 4v6h6"/>
+                                            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+                                        </svg>
+                                        ${watchCount}x
+                                    </div>
+                                    <button class="episode-rewatch-btn" onclick="addEpisodeRewatch('${show.id}', '${episode.id}')" title="Log another rewatch">
+                                        + Rewatch
+                                    </button>
+                                </div>
+                            `;
+                        } else if (episode.watched) {
+                            rewatchControlHTML = `
+                                <div class="episode-rewatch-controls">
+                                    <button class="episode-rewatch-btn" onclick="addEpisodeRewatch('${show.id}', '${episode.id}')" title="Log rewatch">
+                                        <svg class="icon icon-small" style="width:13px;height:13px;" viewBox="0 0 24 24">
+                                            <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
+                                            <path d="M21 3v5h-5"/>
+                                        </svg>
+                                        Rewatch
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    }
+
 
                     return `
 
                         <div class="episode">
 
-                            <button
-                                class="
-                                    episode-check
-                                    ${
-                                        episode.watched
-                                            ? "watched"
-                                            : ""
-                                    }
-                                "
-                                ${
-                                    upcoming
-                                        ? "disabled"
-                                        : ""
-                                }
-                                onclick="
-                                    toggleEpisode(
-                                        '${show.id}',
-                                        '${episode.id}'
-                                    )
-                                "
-                            >
-
-                                ${
-                                    episode.watched
-                                        ? `
-                                            <svg
-                                                class="
-                                                    icon
-                                                    icon-small
-                                                "
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path
-                                                    d="
-                                                        M5 12
-                                                        l4 4
-                                                        10-10
-                                                    "
-                                                />
-                                            </svg>
-                                        `
-                                        : ""
-                                }
-
-                            </button>
-
-
-                            <div class="episode-info">
-
-                                <div class="episode-title">
-
-                                    ${episode.number}.
-                                    ${escapeHTML(
-                                        episode.title
-                                    )}
-
-                                </div>
-
-
-                                <div class="episode-meta">
-
+                            <div class="episode-left">
+                                <button
+                                    class="
+                                        episode-check
+                                        ${
+                                            episode.watched
+                                                ? "watched"
+                                                : ""
+                                        }
+                                    "
                                     ${
                                         upcoming
+                                            ? "disabled"
+                                            : ""
+                                    }
+                                    onclick="
+                                        toggleEpisode(
+                                            '${show.id}',
+                                            '${episode.id}'
+                                        )
+                                    "
+                                >
 
+                                    ${
+                                        episode.watched
                                             ? `
-                                                Releases
-                                                ${formatDate(
-                                                    episode.releaseDate
-                                                )}
+                                                <svg
+                                                    class="
+                                                        icon
+                                                        icon-small
+                                                    "
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path
+                                                        d="
+                                                            M5 12
+                                                            l4 4
+                                                            10-10
+                                                        "
+                                                    />
+                                                </svg>
                                             `
-
-                                            : `
-                                                Season
-                                                ${episode.season}
-                                                ·
-                                                ${episode.runtime}
-                                            `
+                                            : ""
                                     }
 
-                                </div>
+                                </button>
 
+
+                                <div class="episode-info">
+
+                                    <div class="episode-title">
+
+                                        ${episode.number}.
+                                        ${escapeHTML(
+                                            episode.title
+                                        )}
+
+                                    </div>
+
+
+                                    <div class="episode-meta">
+
+                                        ${
+                                            upcoming
+
+                                                ? `
+                                                    Releases
+                                                    ${formatDate(
+                                                        episode.releaseDate
+                                                    )}
+                                                `
+
+                                                : `
+                                                    Season
+                                                    ${episode.season}
+                                                    ·
+                                                    ${episode.runtime}
+                                                `
+                                        }
+
+                                    </div>
+
+                                </div>
                             </div>
+
+                            ${rewatchControlHTML}
 
                         </div>
 
@@ -3319,6 +3298,14 @@ function toggleEpisode(
     episode.watched =
         !episode.watched;
 
+    if (episode.watched) {
+        if (!episode.watchCount || episode.watchCount < 1) {
+            episode.watchCount = 1;
+        }
+    } else {
+        episode.watchCount = 0;
+    }
+
 
     saveState();
 
@@ -3329,6 +3316,8 @@ function toggleEpisode(
 
 
     renderDashboard();
+    renderLibrary();
+    renderWatched();
 
 
     showToast(
@@ -3337,6 +3326,26 @@ function toggleEpisode(
             : "Episode marked unwatched"
     );
 
+}
+
+
+function addEpisodeRewatch(showId, episodeId) {
+    const show = getItem(showId);
+    const episode = show.episodes.find(item => item.id === episodeId);
+
+    if (!episode) return;
+
+    episode.watched = true;
+    episode.watchCount = (episode.watchCount || 1) + 1;
+
+    saveState();
+
+    renderEpisodes(show);
+    renderDashboard();
+    renderLibrary();
+    renderWatched();
+
+    showToast(`Logged rewatch #${episode.watchCount} for S${episode.season}E${episode.number}`);
 }
 
 
@@ -3372,6 +3381,9 @@ function markNextEpisode() {
 
     progress.nextEpisode.watched =
         true;
+    if (!progress.nextEpisode.watchCount || progress.nextEpisode.watchCount < 1) {
+        progress.nextEpisode.watchCount = 1;
+    }
 
 
     saveState();
@@ -3388,6 +3400,8 @@ function markNextEpisode() {
 
 
     renderDashboard();
+    renderLibrary();
+    renderWatched();
 
 
     showToast(
