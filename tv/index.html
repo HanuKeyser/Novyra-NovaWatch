@@ -1675,89 +1675,10 @@ img {
 <script>
 
 /* =========================================================
-   ONLY MURDERS IN THE BUILDING DATA
-========================================================= */
-
-const onlyMurdersEpisodes = [
-  // --- SEASON 1 ---
-  { id: "omitb-s1e1", season: 1, number: 1, title: "True Crime", runtime: "34 min", releaseDate: "August 31, 2021", watched: false, watchCount: 0 },
-  { id: "omitb-s1e2", season: 1, number: 2, title: "Who Is Tim Kono?", runtime: "30 min", releaseDate: "August 31, 2021", watched: false, watchCount: 0 },
-  { id: "omitb-s1e3", season: 1, number: 3, title: "How Well Do You Know Your Neighbors?", runtime: "35 min", releaseDate: "August 31, 2021", watched: false, watchCount: 0 },
-  { id: "omitb-s1e4", season: 1, number: 4, title: "The Sting", runtime: "34 min", releaseDate: "September 7, 2021", watched: false, watchCount: 0 },
-  { id: "omitb-s1e5", season: 1, number: 5, title: "Twist", runtime: "26 min", releaseDate: "September 14, 2021", watched: false, watchCount: 0 },
-  { id: "omitb-s1e6", season: 1, number: 6, title: "To Protect and Serve", runtime: "33 min", releaseDate: "September 21, 2021", watched: false, watchCount: 0 },
-  { id: "omitb-s1e7", season: 1, number: 7, title: "The Boy from 6B", runtime: "32 min", releaseDate: "September 28, 2021", watched: false, watchCount: 0 },
-  { id: "omitb-s1e8", season: 1, number: 8, title: "Fan Fiction", runtime: "32 min", releaseDate: "October 5, 2021", watched: false, watchCount: 0 },
-  { id: "omitb-s1e9", season: 1, number: 9, title: "Double Time", runtime: "32 min", releaseDate: "October 12, 2021", watched: false, watchCount: 0 },
-  { id: "omitb-s1e10", season: 1, number: 10, title: "Open and Shut", runtime: "36 min", releaseDate: "October 19, 2021", watched: false, watchCount: 0 },
-
-  // --- SEASON 2 ---
-  { id: "omitb-s2e1", season: 2, number: 1, title: "Persons of Interest", runtime: "36 min", releaseDate: "June 28, 2022", watched: false, watchCount: 0 },
-  { id: "omitb-s2e2", season: 2, number: 2, title: "Framed", runtime: "35 min", releaseDate: "June 28, 2022", watched: false, watchCount: 0 },
-  { id: "omitb-s2e3", season: 2, number: 3, title: "The Last Day of Bunny Folger", runtime: "31 min", releaseDate: "July 5, 2022", watched: false, watchCount: 0 },
-  { id: "omitb-s2e4", season: 2, number: 4, title: "Here's Looking at You", runtime: "37 min", releaseDate: "July 12, 2022", watched: false, watchCount: 0 },
-  { id: "omitb-s2e5", season: 2, number: 5, title: "The Tell", runtime: "35 min", releaseDate: "July 19, 2022", watched: false, watchCount: 0 },
-  { id: "omitb-s2e6", season: 2, number: 6, title: "Performance Review", runtime: "33 min", releaseDate: "July 26, 2022", watched: false, watchCount: 0 },
-  { id: "omitb-s2e7", season: 2, number: 7, title: "Flipping the Pieces", runtime: "32 min", releaseDate: "August 2, 2022", watched: false, watchCount: 0 },
-  { id: "omitb-s2e8", season: 2, number: 8, title: "Hello, Darkness", runtime: "30 min", releaseDate: "August 9, 2022", watched: false, watchCount: 0 },
-  { id: "omitb-s2e9", season: 2, number: 9, title: "Sparring Partners", runtime: "29 min", releaseDate: "August 16, 2022", watched: false, watchCount: 0 },
-  { id: "omitb-s2e10", season: 2, number: 10, title: "I Know Who Did It", runtime: "37 min", releaseDate: "August 23, 2022", watched: false, watchCount: 0 },
-
-  // --- SEASON 3 ---
-  { id: "omitb-s3e1", season: 3, number: 1, title: "The Show Must...", runtime: "37 min", releaseDate: "August 8, 2023", watched: false, watchCount: 0 },
-  { id: "omitb-s3e2", season: 3, number: 2, title: "The Beat Goes On", runtime: "34 min", releaseDate: "August 8, 2023", watched: false, watchCount: 0 },
-  { id: "omitb-s3e3", season: 3, number: 3, title: "Grab Your Hankies", runtime: "39 min", releaseDate: "August 15, 2023", watched: false, watchCount: 0 },
-  { id: "omitb-s3e4", season: 3, number: 4, title: "The White Room", runtime: "35 min", releaseDate: "August 22, 2023", watched: false, watchCount: 0 },
-  { id: "omitb-s3e5", season: 3, number: 5, title: "Ah, Love!", runtime: "36 min", releaseDate: "August 29, 2023", watched: false, watchCount: 0 },
-  { id: "omitb-s3e6", season: 3, number: 6, title: "Ghost Light", runtime: "34 min", releaseDate: "September 5, 2023", watched: false, watchCount: 0 },
-  { id: "omitb-s3e7", season: 3, number: 7, title: "CoBro", runtime: "36 min", releaseDate: "September 12, 2023", watched: false, watchCount: 0 },
-  { id: "omitb-s3e8", season: 3, number: 8, title: "Sitzprobe", runtime: "39 min", releaseDate: "September 19, 2023", watched: false, watchCount: 0 },
-  { id: "omitb-s3e9", season: 3, number: 9, title: "Thirty", runtime: "38 min", releaseDate: "September 26, 2023", watched: false, watchCount: 0 },
-  { id: "omitb-s3e10", season: 3, number: 10, title: "Opening Night", runtime: "38 min", releaseDate: "October 3, 2023", watched: false, watchCount: 0 },
-
-  // --- SEASON 4 ---
-  { id: "omitb-s4e1", season: 4, number: 1, title: "Once Upon a Time in the West", runtime: "39 min", releaseDate: "August 27, 2024", watched: false, watchCount: 0 },
-  { id: "omitb-s4e2", season: 4, number: 2, title: "Gates of Heaven", runtime: "37 min", releaseDate: "September 3, 2024", watched: false, watchCount: 0 },
-  { id: "omitb-s4e3", season: 4, number: 3, title: "Two for the Road", runtime: "40 min", releaseDate: "September 10, 2024", watched: false, watchCount: 0 },
-  { id: "omitb-s4e4", season: 4, number: 4, title: "The Stunt Man", runtime: "35 min", releaseDate: "September 17, 2024", watched: false, watchCount: 0 },
-  { id: "omitb-s4e5", season: 4, number: 5, title: "Adaptation", runtime: "34 min", releaseDate: "September 24, 2024", watched: false, watchCount: 0 },
-  { id: "omitb-s4e6", season: 4, number: 6, title: "Blow-Up", runtime: "34 min", releaseDate: "October 1, 2024", watched: false, watchCount: 0 },
-  { id: "omitb-s4e7", season: 4, number: 7, title: "Valley of the Dolls", runtime: "40 min", releaseDate: "October 8, 2024", watched: false, watchCount: 0 },
-  { id: "omitb-s4e8", season: 4, number: 8, title: "Lifeboat", runtime: "37 min", releaseDate: "October 15, 2024", watched: false, watchCount: 0 },
-  { id: "omitb-s4e9", season: 4, number: 9, title: "Escape From Planet Klongo", runtime: "35 min", releaseDate: "October 22, 2024", watched: false, watchCount: 0 },
-  { id: "omitb-s4e10", season: 4, number: 10, title: "My Best Friend's Wedding", runtime: "36 min", releaseDate: "October 29, 2024", watched: false, watchCount: 0 },
-
-  // --- SEASON 5 ---
-  { id: "omitb-s5e1", season: 5, number: 1, title: "Nail in the Coffin", runtime: "39 min", releaseDate: "September 9, 2025", watched: false, watchCount: 0 },
-  { id: "omitb-s5e2", season: 5, number: 2, title: "After You", runtime: "32 min", releaseDate: "September 9, 2025", watched: false, watchCount: 0 },
-  { id: "omitb-s5e3", season: 5, number: 3, title: "Rigor", runtime: "37 min", releaseDate: "September 9, 2025", watched: false, watchCount: 0 },
-  { id: "omitb-s5e4", season: 5, number: 4, title: "Dirty Birds", runtime: "37 min", releaseDate: "September 16, 2025", watched: false, watchCount: 0 },
-  { id: "omitb-s5e5", season: 5, number: 5, title: "Tongue Tied", runtime: "36 min", releaseDate: "September 23, 2025", watched: false, watchCount: 0 },
-  { id: "omitb-s5e6", season: 5, number: 6, title: "Flatbush", runtime: "37 min", releaseDate: "September 30, 2025", watched: false, watchCount: 0 },
-  { id: "omitb-s5e7", season: 5, number: 7, title: "Cuckoo Chicks", runtime: "39 min", releaseDate: "October 7, 2025", watched: false, watchCount: 0 },
-  { id: "omitb-s5e8", season: 5, number: 8, title: "The Brothers Caccimelio", runtime: "37 min", releaseDate: "October 14, 2025", watched: false, watchCount: 0 },
-  { id: "omitb-s5e9", season: 5, number: 9, title: "The Invitation", runtime: "37 min", releaseDate: "October 21, 2025", watched: false, watchCount: 0 },
-  { id: "omitb-s5e10", season: 5, number: 10, title: "The Last Podcast", runtime: "40 min", releaseDate: "October 28, 2025", watched: false, watchCount: 0 },
-
-  // --- SEASON 6 ---
-  { id: "omitb-s6e1", season: 6, number: 1, title: "TBA", runtime: "TBA", releaseDate: "TBA", watched: false, watchCount: 0 },
-  { id: "omitb-s6e2", season: 6, number: 2, title: "TBA", runtime: "TBA", releaseDate: "TBA", watched: false, watchCount: 0 },
-  { id: "omitb-s6e3", season: 6, number: 3, title: "TBA", runtime: "TBA", releaseDate: "TBA", watched: false, watchCount: 0 },
-  { id: "omitb-s6e4", season: 6, number: 4, title: "TBA", runtime: "TBA", releaseDate: "TBA", watched: false, watchCount: 0 },
-  { id: "omitb-s6e5", season: 6, number: 5, title: "TBA", runtime: "TBA", releaseDate: "TBA", watched: false, watchCount: 0 },
-  { id: "omitb-s6e6", season: 6, number: 6, title: "TBA", runtime: "TBA", releaseDate: "TBA", watched: false, watchCount: 0 },
-  { id: "omitb-s6e7", season: 6, number: 7, title: "TBA", runtime: "TBA", releaseDate: "TBA", watched: false, watchCount: 0 },
-  { id: "omitb-s6e8", season: 6, number: 8, title: "TBA", runtime: "TBA", releaseDate: "TBA", watched: false, watchCount: 0 },
-  { id: "omitb-s6e9", season: 6, number: 9, title: "TBA", runtime: "TBA", releaseDate: "TBA", watched: false, watchCount: 0 },
-  { id: "omitb-s6e10", season: 6, number: 10, title: "TBA", runtime: "TBA", releaseDate: "TBA", watched: false, watchCount: 0 }
-];
-
-
-/* =========================================================
    APP STATE
 ========================================================= */
 
-const STORAGE_KEY = "reeltrack_tv_data_v18";
+const STORAGE_KEY = "reeltrack_tv_data_v19";
 
 let state = {
     tvShows: [],
@@ -1785,12 +1706,11 @@ function now() {
 }
 
 function isReleased(date) {
-    if (!date || date === "TBA" || isNaN(new Date(date).getTime())) return false;
+    if (!date) return true;
     return new Date(date).getTime() <= now().getTime();
 }
 
 function formatDate(date) {
-    if (!date || date === "TBA" || isNaN(new Date(date).getTime())) return "TBA";
     return new Intl.DateTimeFormat(
         "en-ZA",
         {
@@ -1803,7 +1723,6 @@ function formatDate(date) {
 }
 
 function getCountdown(date) {
-    if (!date || date === "TBA" || isNaN(new Date(date).getTime())) return "Release Date TBA";
     const difference = new Date(date).getTime() - now().getTime();
 
     if (difference <= 0) {
@@ -1872,7 +1791,67 @@ function createInitialData() {
             poster: "https://cdn.cinematerial.com/p/297x/ig9ycog4/only-murders-in-the-building-movie-poster-md.jpg?v=1755024213",
             description: "Three strangers who share an obsession with true crime podcasts suddenly find themselves wrapped up in one when a gruesome death occurs inside their exclusive Upper West Side apartment building.",
             isFinished: false,
-            episodesDetails: onlyMurdersEpisodes
+            episodesDetails: [
+                // Season 1
+                { season: 1, number: 1, title: "True Crime", runtime: "34 min", releaseDate: "2021-08-31T00:00:00" },
+                { season: 1, number: 2, title: "Who Is Tim Kono?", runtime: "30 min", releaseDate: "2021-08-31T00:00:00" },
+                { season: 1, number: 3, title: "How Well Do You Know Your Neighbors?", runtime: "35 min", releaseDate: "2021-08-31T00:00:00" },
+                { season: 1, number: 4, title: "The Sting", runtime: "34 min", releaseDate: "2021-09-07T00:00:00" },
+                { season: 1, number: 5, title: "Twist", runtime: "26 min", releaseDate: "2021-09-14T00:00:00" },
+                { season: 1, number: 6, title: "To Protect and Serve", runtime: "33 min", releaseDate: "2021-09-21T00:00:00" },
+                { season: 1, number: 7, title: "The Boy from 6B", runtime: "32 min", releaseDate: "2021-09-28T00:00:00" },
+                { season: 1, number: 8, title: "Fan Fiction", runtime: "32 min", releaseDate: "2021-10-05T00:00:00" },
+                { season: 1, number: 9, title: "Double Time", runtime: "32 min", releaseDate: "2021-10-12T00:00:00" },
+                { season: 1, number: 10, title: "Open and Shut", runtime: "36 min", releaseDate: "2021-10-19T00:00:00" },
+
+                // Season 2
+                { season: 2, number: 1, title: "Persons of Interest", runtime: "36 min", releaseDate: "2022-06-28T00:00:00" },
+                { season: 2, number: 2, title: "Framed", runtime: "35 min", releaseDate: "2022-06-28T00:00:00" },
+                { season: 2, number: 3, title: "The Last Day of Bunny Folger", runtime: "31 min", releaseDate: "2022-07-05T00:00:00" },
+                { season: 2, number: 4, title: "Here's Looking at You", runtime: "37 min", releaseDate: "2022-07-12T00:00:00" },
+                { season: 2, number: 5, title: "The Tell", runtime: "35 min", releaseDate: "2022-07-19T00:00:00" },
+                { season: 2, number: 6, title: "Performance Review", runtime: "33 min", releaseDate: "2022-07-26T00:00:00" },
+                { season: 2, number: 7, title: "Flipping the Pieces", runtime: "32 min", releaseDate: "2022-08-02T00:00:00" },
+                { season: 2, number: 8, title: "Hello, Darkness", runtime: "30 min", releaseDate: "2022-08-09T00:00:00" },
+                { season: 2, number: 9, title: "Sparring Partners", runtime: "29 min", releaseDate: "2022-08-16T00:00:00" },
+                { season: 2, number: 10, title: "I Know Who Did It", runtime: "37 min", releaseDate: "2022-08-23T00:00:00" },
+
+                // Season 3
+                { season: 3, number: 1, title: "The Show Must...", runtime: "37 min", releaseDate: "2023-08-08T00:00:00" },
+                { season: 3, number: 2, title: "The Beat Goes On", runtime: "34 min", releaseDate: "2023-08-08T00:00:00" },
+                { season: 3, number: 3, title: "Grab Your Hankies", runtime: "39 min", releaseDate: "2023-08-15T00:00:00" },
+                { season: 3, number: 4, title: "The White Room", runtime: "35 min", releaseDate: "2023-08-22T00:00:00" },
+                { season: 3, number: 5, title: "Ah, Love!", runtime: "36 min", releaseDate: "2023-08-29T00:00:00" },
+                { season: 3, number: 6, title: "Ghost Light", runtime: "34 min", releaseDate: "2023-09-05T00:00:00" },
+                { season: 3, number: 7, title: "CoBro", runtime: "36 min", releaseDate: "2023-09-12T00:00:00" },
+                { season: 3, number: 8, title: "Sitzprobe", runtime: "39 min", releaseDate: "2023-09-19T00:00:00" },
+                { season: 3, number: 9, title: "Thirty", runtime: "38 min", releaseDate: "2023-09-26T00:00:00" },
+                { season: 3, number: 10, title: "Opening Night", runtime: "38 min", releaseDate: "2023-10-03T00:00:00" },
+
+                // Season 4
+                { season: 4, number: 1, title: "Once Upon a Time in the West", runtime: "39 min", releaseDate: "2024-08-27T00:00:00" },
+                { season: 4, number: 2, title: "Gates of Heaven", runtime: "37 min", releaseDate: "2024-09-03T00:00:00" },
+                { season: 4, number: 3, title: "Two for the Road", runtime: "40 min", releaseDate: "2024-09-10T00:00:00" },
+                { season: 4, number: 4, title: "The Stunt Man", runtime: "35 min", releaseDate: "2024-09-17T00:00:00" },
+                { season: 4, number: 5, title: "Adaptation", runtime: "34 min", releaseDate: "2024-09-24T00:00:00" },
+                { season: 4, number: 6, title: "Blow-Up", runtime: "34 min", releaseDate: "2024-10-01T00:00:00" },
+                { season: 4, number: 7, title: "Valley of the Dolls", runtime: "40 min", releaseDate: "2024-10-08T00:00:00" },
+                { season: 4, number: 8, title: "Lifeboat", runtime: "37 min", releaseDate: "2024-10-15T00:00:00" },
+                { season: 4, number: 9, title: "Escape From Planet Klongo", runtime: "35 min", releaseDate: "2024-10-22T00:00:00" },
+                { season: 4, number: 10, title: "My Best Friend's Wedding", runtime: "36 min", releaseDate: "2024-10-29T00:00:00" },
+
+                // Season 5
+                { season: 5, number: 1, title: "Nail in the Coffin", runtime: "39 min", releaseDate: "2025-09-09T00:00:00" },
+                { season: 5, number: 2, title: "After You", runtime: "32 min", releaseDate: "2025-09-09T00:00:00" },
+                { season: 5, number: 3, title: "Rigor", runtime: "37 min", releaseDate: "2025-09-09T00:00:00" },
+                { season: 5, number: 4, title: "Dirty Birds", runtime: "37 min", releaseDate: "2025-09-16T00:00:00" },
+                { season: 5, number: 5, title: "Tongue Tied", runtime: "36 min", releaseDate: "2025-09-23T00:00:00" },
+                { season: 5, number: 6, title: "Flatbush", runtime: "37 min", releaseDate: "2025-09-30T00:00:00" },
+                { season: 5, number: 7, title: "Cuckoo Chicks", runtime: "39 min", releaseDate: "2025-10-07T00:00:00" },
+                { season: 5, number: 8, title: "The Brothers Caccimelio", runtime: "37 min", releaseDate: "2025-10-14T00:00:00" },
+                { season: 5, number: 9, title: "The Invitation", runtime: "37 min", releaseDate: "2025-10-21T00:00:00" },
+                { season: 5, number: 10, title: "The Last Podcast", runtime: "40 min", releaseDate: "2025-10-28T00:00:00" }
+            ]
         },
         {
             id: "tv-every-year-after",
@@ -1979,7 +1958,7 @@ function createInitialData() {
 
     showsToBuild.forEach(showData => {
         const existingIndex = state.tvShows.findIndex(show => show.id === showData.id);
-
+        
         const show = {
             id: showData.id,
             ownerId: state.activeProfileId,
@@ -1994,22 +1973,48 @@ function createInitialData() {
         if (showData.episodesDetails) {
             showData.episodesDetails.forEach(epData => {
                 show.episodes.push({
-                    id: epData.id || `s${epData.season}e${epData.number}`,
+                    id: `s${epData.season}e${epData.number}`,
                     season: epData.season,
                     number: epData.number,
                     title: epData.title,
                     runtime: epData.runtime || "45 min",
-                    watched: epData.watched || false,
-                    watchCount: epData.watchCount || 0,
+                    watched: false,
+                    watchCount: 0,
                     releaseDate: epData.releaseDate
                 });
+            });
+        } else if (showData.seasonDates) {
+            const seasonNumbers = Object.keys(showData.seasonDates).map(Number);
+            seasonNumbers.forEach(season => {
+                const seasonDateConfig = showData.seasonDates[season];
+                const totalEpisodes = showData.seasonEpisodesCount[season];
+
+                for (let episode = 1; episode <= totalEpisodes; episode++) {
+                    let releaseDate;
+                    if (typeof seasonDateConfig === "object" && seasonDateConfig !== null) {
+                        releaseDate = seasonDateConfig[episode];
+                    } else {
+                        releaseDate = seasonDateConfig;
+                    }
+
+                    show.episodes.push({
+                        id: `s${season}e${episode}`,
+                        season: season,
+                        number: episode,
+                        title: `Episode ${episode}`,
+                        runtime: "45 min",
+                        watched: false,
+                        watchCount: 0,
+                        releaseDate: releaseDate
+                    });
+                }
             });
         }
 
         if (existingIndex > -1) {
             const oldEpisodes = state.tvShows[existingIndex].episodes || [];
             show.episodes.forEach(ep => {
-                const match = oldEpisodes.find(o => o.id === ep.id || (o.season === ep.season && o.number === ep.number));
+                const match = oldEpisodes.find(o => o.id === ep.id);
                 if (match) {
                     ep.watched = match.watched;
                     ep.watchCount = match.watchCount || (match.watched ? 1 : 0);
@@ -2045,7 +2050,7 @@ function getUpcomingEpisodes(show = null) {
 
     shows.forEach(currentShow => {
         currentShow.episodes
-            .filter(episode => episode.releaseDate && episode.releaseDate !== "TBA" && !isReleased(episode.releaseDate))
+            .filter(episode => episode.releaseDate && !isReleased(episode.releaseDate))
             .forEach(episode => {
                 results.push({
                     show: currentShow,
