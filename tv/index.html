@@ -219,6 +219,16 @@ img {
     display: block;
 }
 
+#homePage {
+    display: none;
+    flex-direction: column;
+    gap: 28px;
+}
+
+#homePage.active {
+    display: flex;
+}
+
 /* =========================================================
    SECTIONS
 ========================================================= */
@@ -228,11 +238,7 @@ img {
     align-items: center;
     justify-content: space-between;
 
-    margin: 26px 0 14px;
-}
-
-.section-header:first-child {
-    margin-top: 0;
+    margin: 0 0 14px;
 }
 
 .section-title {
@@ -374,9 +380,7 @@ img {
 .stats {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-
-    margin-top: 14px;
+    gap: 12px;
 }
 
 .stat {
@@ -2321,6 +2325,8 @@ function isTVFinished(show) {
 
 function showPage(page) {
 
+    window.scrollTo(0, 0);
+
     document
         .querySelectorAll(".page")
         .forEach(
@@ -2413,6 +2419,8 @@ function openLibrary(type) {
 
 
 function setLibraryType(type) {
+
+    window.scrollTo(0, 0);
 
     currentLibraryType =
         type;
@@ -2538,6 +2546,8 @@ function renderLibrary() {
 
 function setWatchedType(type) {
 
+    window.scrollTo(0, 0);
+
     currentWatchedType =
         type;
 
@@ -2636,6 +2646,8 @@ function renderWatched() {
 ========================================================= */
 
 function setUpcomingType(type) {
+
+    window.scrollTo(0, 0);
 
     currentUpcomingType =
         type;
@@ -3190,67 +3202,6 @@ function createCard(
     type
 ) {
 
-    let meta = "";
-
-
-    if (
-        type ===
-        "movie"
-    ) {
-
-        meta =
-            item.watched
-                ? "Watched"
-                : "Not watched";
-
-    } else {
-
-        const progress =
-            getTVProgress(
-                item
-            );
-
-
-        meta =
-            `${progress.watched}/${progress.total} episodes`;
-
-    }
-
-
-    let progressHTML =
-        "";
-
-
-    if (
-        type ===
-        "tv"
-    ) {
-
-        const progress =
-            getTVProgress(
-                item
-            );
-
-
-        progressHTML = `
-
-            <div class="progress-bar">
-
-                <div
-                    class="progress-fill"
-                    style="
-                        width:
-                        ${progress.percentage}%;
-                    "
-                ></div>
-
-            </div>
-
-        `;
-
-    }
-
-
     return `
 
         <div
@@ -3298,14 +3249,6 @@ function createCard(
                     item.title
                 )}
             </div>
-
-
-            <div class="card-meta">
-                ${meta}
-            </div>
-
-
-            ${progressHTML}
 
         </div>
 
