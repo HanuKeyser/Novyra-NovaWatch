@@ -2260,12 +2260,33 @@ function openDetails(id) {
 
     currentItem = { id };
 
+    // Auto-detect season you are currently tracking/next unwatched episode
+    const progress = getTVProgress(item);
+    if (progress.nextEpisode) {
+        selectedSeason = Number(progress.nextEpisode.season);
+    } else {
+        const available = getAvailableEpisodes(item);
+        if (available.length > 0) {
+            selectedSeason = Number(available[available.length - 1].season);
+        } else if (item.episodes.length > 0) {
+            selectedSeason = Number(item.episodes[item.episodes.length - 1].season);
+        } else {
+            selectedSeason = 1;
+        }
+    }
+
     document.getElementById("modalTitle").textContent = item.title;
     document.getElementById("modalDescription").textContent = item.description || "No description available.";
     document.getElementById("modalMeta").innerHTML = `<span>${item.year}</span>`;
 
     renderModalActions(item);
     renderEpisodes(item);
+
+    // Scroll modal content to top on open
+    const modalSheet = document.querySelector(".modal-sheet");
+    if (modalSheet) {
+        modalSheet.scrollTop = 0;
+    }
 
     document.getElementById("detailsModal").classList.add("open");
     document.body.style.overflow = "hidden";
@@ -2308,12 +2329,12 @@ function renderEpisodes(show) {
     });
 
     const seasonKeys = Object.keys(seasons).map(Number).sort((a,b) => a - b);
-    const latestReleasedSeason = seasonKeys.find(season =>
-        seasons[season].some(episode => isReleased(episode.releaseDate))
-    );
 
     if (!selectedSeason || !seasonKeys.includes(selectedSeason)) {
-        selectedSeason = latestReleasedSeason || seasonKeys[0];
+        const latestReleasedSeason = [...seasonKeys].reverse().find(season =>
+            seasons[season].some(episode => isReleased(episode.releaseDate))
+        );
+        selectedSeason = latestReleasedSeason || seasonKeys[0] || 1;
     }
 
     container.innerHTML = `
