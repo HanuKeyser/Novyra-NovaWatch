@@ -1767,7 +1767,7 @@ img {
 ========================================================= */
 
 const STORAGE_KEY =
-    "reeltrack_tv_data_v18";
+    "reeltrack_tv_data_v19";
 
 let state = {
     tvShows: [],
@@ -2002,6 +2002,18 @@ function createInitialData() {
             },
             seasonEpisodesCount: {
                 1: 8
+            },
+            seasonEpisodeDetails: {
+                1: {
+                    1: { title: "Pilot", runtime: "49 min" },
+                    2: { title: "No Silly, I Go Here", runtime: "43 min" },
+                    3: { title: "You're Not The Girl I Thought You Were", runtime: "51 min" },
+                    4: { title: "I'm Not Afraid Of A Challenge", runtime: "48 min" },
+                    5: { title: "Trust Me, I Cam Handle Anything", runtime: "46 min" },
+                    6: { title: "Whoever Said Orange Is The New Pink Was Seriously Disturbed", runtime: "49 min" },
+                    7: { title: "You Picked The Wrong Girl", runtime: "47 min" },
+                    8: { title: "What, Like It's Hard", runtime: "56 min" }
+                }
             }
         },
         {
@@ -2049,6 +2061,7 @@ function createInitialData() {
         seasonNumbers.forEach(season => {
             const seasonDateConfig = showData.seasonDates[season];
             const totalEpisodes = showData.seasonEpisodesCount[season];
+            const episodeDetailsMap = showData.seasonEpisodeDetails && showData.seasonEpisodeDetails[season] ? showData.seasonEpisodeDetails[season] : {};
 
             for (let episode = 1; episode <= totalEpisodes; episode++) {
                 let releaseDate;
@@ -2058,12 +2071,14 @@ function createInitialData() {
                     releaseDate = seasonDateConfig;
                 }
 
+                const customDetail = episodeDetailsMap[episode] || {};
+
                 show.episodes.push({
                     id: `s${season}e${episode}`,
                     season: season,
                     number: episode,
-                    title: `Episode ${episode}`,
-                    runtime: "45 min",
+                    title: customDetail.title || `Episode ${episode}`,
+                    runtime: customDetail.runtime || "45 min",
                     watched: false,
                     watchCount: 0,
                     releaseDate: releaseDate
@@ -2078,6 +2093,12 @@ function createInitialData() {
                 if (match) {
                     ep.watched = match.watched;
                     ep.watchCount = match.watchCount || (match.watched ? 1 : 0);
+                    if (match.title && match.title !== `Episode ${ep.number}`) {
+                        ep.title = match.title;
+                    }
+                    if (match.runtime && match.runtime !== "45 min") {
+                        ep.runtime = match.runtime;
+                    }
                 }
             });
             state.tvShows[existingIndex] = show;
