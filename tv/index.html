@@ -1824,12 +1824,16 @@ function createInitialData() {
             poster: "https://cdn.cinematerial.com/p/297x/nsqkkzmj/every-year-after-movie-poster-md.jpg?v=1778795136",
             description: "A drama series following evolving relationships over successive years.",
             isFinished: false,
-            seasonDates: {
-                1: "2026-06-10T00:00:00"
-            },
-            seasonEpisodesCount: {
-                1: 8
-            }
+            episodesDetails: [
+                { season: 1, number: 1, title: "Every Summer After", releaseDate: "2026-06-10T00:00:00", runtime: "55 min" },
+                { season: 1, number: 2, title: "Young Blood", releaseDate: "2026-06-10T00:00:00", runtime: "43 min" },
+                { season: 1, number: 3, title: "Playing with Fire", releaseDate: "2026-06-10T00:00:00", runtime: "51 min" },
+                { season: 1, number: 4, title: "Anatomy of a Romance", releaseDate: "2026-06-10T00:00:00", runtime: "48 min" },
+                { season: 1, number: 5, title: "I Choose You", releaseDate: "2026-06-10T00:00:00", runtime: "50 min" },
+                { season: 1, number: 6, title: "Plan B", releaseDate: "2026-06-10T00:00:00", runtime: "50 min" },
+                { season: 1, number: 7, title: "The Boathouse", releaseDate: "2026-06-10T00:00:00", runtime: "45 min" },
+                { season: 1, number: 8, title: "Goodbye...", releaseDate: "2026-06-10T00:00:00", runtime: "50 min" }
+            ]
         },
         {
             id: "tv-elle",
@@ -1856,20 +1860,63 @@ function createInitialData() {
             poster: "https://cdn.cinematerial.com/p/297x/fkwgg3fd/sweet-magnolias-movie-poster-md.jpg?v=1781279968",
             description: "Lifelong friends Maddie, Helen, and Dana Sue navigate relationships, family, and careers in Serenity.",
             isFinished: false,
-            seasonDates: {
-                1: "2020-05-19T00:00:00",
-                2: "2022-02-04T00:00:00",
-                3: "2023-07-20T00:00:00",
-                4: "2025-02-06T00:00:00",
-                5: "2026-06-11T00:00:00"
-            },
-            seasonEpisodesCount: {
-                1: 10,
-                2: 10,
-                3: 10,
-                4: 10,
-                5: 10
-            }
+            episodesDetails: [
+                // Season 1
+                { season: 1, number: 1, title: "Pour It Out", releaseDate: "2020-05-19T00:00:00", runtime: "52 min" },
+                { season: 1, number: 2, title: "A United Front", releaseDate: "2020-05-19T00:00:00", runtime: "50 min" },
+                { season: 1, number: 3, title: "Give Drink to the Thirsty", releaseDate: "2020-05-19T00:00:00", runtime: "43 min" },
+                { season: 1, number: 4, title: "Lay It All Down", releaseDate: "2020-05-19T00:00:00", runtime: "49 min" },
+                { season: 1, number: 5, title: "Dance First, Think Later", releaseDate: "2020-05-19T00:00:00", runtime: "50 min" },
+                { season: 1, number: 6, title: "All Best Intentions", releaseDate: "2020-05-19T00:00:00", runtime: "45 min" },
+                { season: 1, number: 7, title: "Hold My Hand", releaseDate: "2020-05-19T00:00:00", runtime: "45 min" },
+                { season: 1, number: 8, title: "What Fools These Mortals Be", releaseDate: "2020-05-19T00:00:00", runtime: "49 min" },
+                { season: 1, number: 9, title: "Where You Find Me", releaseDate: "2020-05-19T00:00:00", runtime: "43 min" },
+                { season: 1, number: 10, title: "Storms and Rainbows", releaseDate: "2020-05-19T00:00:00", runtime: "51 min" },
+                // Season 2
+                { season: 2, number: 1, title: "Casseroles and Casualties", releaseDate: "2022-02-04T00:00:00", runtime: "50 min" },
+                { season: 2, number: 2, title: "So Much to Say", releaseDate: "2022-02-04T00:00:00", runtime: "53 min" },
+                { season: 2, number: 3, title: "The More Things Change", releaseDate: "2022-02-04T00:00:00", runtime: "47 min" },
+                { season: 2, number: 4, title: "Walk of Faith", releaseDate: "2022-02-04T00:00:00", runtime: "48 min" },
+                { season: 2, number: 5, title: "Great Expectations", releaseDate: "2022-02-04T00:00:00", runtime: "51 min" },
+                { season: 2, number: 6, title: "Find It in Your Heart", releaseDate: "2022-02-04T00:00:00", runtime: "51 min" },
+                { season: 2, number: 7, title: "Fragile Things", releaseDate: "2022-02-04T00:00:00", runtime: "51 min" },
+                { season: 2, number: 8, title: "The Rules of the Game", releaseDate: "2022-02-04T00:00:00", runtime: "48 min" },
+                { season: 2, number: 9, title: "Dear Heart", releaseDate: "2022-02-04T00:00:00", runtime: "51 min" },
+                { season: 2, number: 10, title: "If Thou Wilt, Remember", releaseDate: "2022-02-04T00:00:00", runtime: "54 min" },
+                // Season 3
+                { season: 3, number: 1, title: "Meaning to Tell You", releaseDate: "2023-07-20T00:00:00", runtime: "50 min" },
+                { season: 3, number: 2, title: "Meet Me Where I Am", releaseDate: "2023-07-20T00:00:00", runtime: "51 min" },
+                { season: 3, number: 3, title: "The Searchers", releaseDate: "2023-07-20T00:00:00", runtime: "52 min" },
+                { season: 3, number: 4, title: "Be Bold", releaseDate: "2023-07-20T00:00:00", runtime: "53 min" },
+                { season: 3, number: 5, title: "On This Foundation", releaseDate: "2023-07-20T00:00:00", runtime: "49 min" },
+                { season: 3, number: 6, title: "And a Star to Steer Her By", releaseDate: "2023-07-20T00:00:00", runtime: "53 min" },
+                { season: 3, number: 7, title: "Somebody I'm Longing to See", releaseDate: "2023-07-20T00:00:00", runtime: "48 min" },
+                { season: 3, number: 8, title: "Beat Me at My Own Game", releaseDate: "2023-07-20T00:00:00", runtime: "51 min" },
+                { season: 3, number: 9, title: "A Game of Telephone", releaseDate: "2023-07-20T00:00:00", runtime: "52 min" },
+                { season: 3, number: 10, title: "Save My Place", releaseDate: "2023-07-20T00:00:00", runtime: "52 min" },
+                // Season 4
+                { season: 4, number: 1, title: "The Other Side of the Veil", releaseDate: "2025-02-06T00:00:00", runtime: "49 min" },
+                { season: 4, number: 2, title: "Practical Dreams", releaseDate: "2025-02-06T00:00:00", runtime: "49 min" },
+                { season: 4, number: 3, title: "Abundant Grace", releaseDate: "2025-02-06T00:00:00", runtime: "52 min" },
+                { season: 4, number: 4, title: "How Great Thou Art", releaseDate: "2025-02-06T00:00:00", runtime: "50 min" },
+                { season: 4, number: 5, title: "True North", releaseDate: "2025-02-06T00:00:00", runtime: "54 min" },
+                { season: 4, number: 6, title: "Ring That Bell", releaseDate: "2025-02-06T00:00:00", runtime: "47 min" },
+                { season: 4, number: 7, title: "Hide and Seek", releaseDate: "2025-02-06T00:00:00", runtime: "52 min" },
+                { season: 4, number: 8, title: "Walls and Doors", releaseDate: "2025-02-06T00:00:00", runtime: "50 min" },
+                { season: 4, number: 9, title: "Dance Your Sugarplum Off", releaseDate: "2025-02-06T00:00:00", runtime: "50 min" },
+                { season: 4, number: 10, title: "Do Not Be Afraid", releaseDate: "2025-02-06T00:00:00", runtime: "51 min" },
+                // Season 5
+                { season: 5, number: 1, title: "The Magnolias Take Manhattan", releaseDate: "2026-06-11T00:00:00", runtime: "45 min" },
+                { season: 5, number: 2, title: "Bigger and Brighter", releaseDate: "2026-06-11T00:00:00", runtime: "48 min" },
+                { season: 5, number: 3, title: "Never Stop Graduating", releaseDate: "2026-06-11T00:00:00", runtime: "48 min" },
+                { season: 5, number: 4, title: "Swing for the Fences", releaseDate: "2026-06-11T00:00:00", runtime: "49 min" },
+                { season: 5, number: 5, title: "Aim Big", releaseDate: "2026-06-11T00:00:00", runtime: "45 min" },
+                { season: 5, number: 6, title: "Smoke and Mirrors", releaseDate: "2026-06-11T00:00:00", runtime: "46 min" },
+                { season: 5, number: 7, title: "Same Sky", releaseDate: "2026-06-11T00:00:00", runtime: "49 min" },
+                { season: 5, number: 8, title: "Everyday, Every Day", releaseDate: "2026-06-11T00:00:00", runtime: "45 min" },
+                { season: 5, number: 9, title: "Common Language", releaseDate: "2026-06-11T00:00:00", runtime: "47 min" },
+                { season: 5, number: 10, title: "Come Home", releaseDate: "2026-06-11T00:00:00", runtime: "46 min" }
+            ]
         }
     ];
 
