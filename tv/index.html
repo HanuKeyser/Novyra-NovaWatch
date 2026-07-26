@@ -503,43 +503,6 @@ img {
 }
 
 /* =========================================================
-   TABS
-========================================================= */
-
-.library-tabs {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-
-    gap: 5px;
-
-    padding: 4px;
-
-    margin-bottom: 18px;
-
-    background: var(--surface);
-
-    border-radius: 12px;
-}
-
-.library-tab {
-    height: 40px;
-
-    border-radius: 9px;
-
-    background: transparent;
-
-    color: var(--text-secondary);
-
-    font-size: 12px;
-    font-weight: 700;
-}
-
-.library-tab.active {
-    background: var(--blue);
-    color: white;
-}
-
-/* =========================================================
    EMPTY STATE
 ========================================================= */
 
@@ -1242,7 +1205,7 @@ img {
                 id="heroDescription"
                 class="hero-description"
             >
-                Track every movie and TV show your household watches.
+                Track every TV show your household watches.
             </p>
 
             <button
@@ -1274,12 +1237,12 @@ img {
         <div class="section-header">
 
             <div class="section-title">
-                Continue TV Shows
+                Continue Watching
             </div>
 
             <button
                 class="section-link"
-                onclick="openLibrary('tv')"
+                onclick="showPage('library')"
             >
                 See All
             </button>
@@ -1343,30 +1306,9 @@ img {
         <input
             id="librarySearchInput"
             type="search"
-            placeholder="Search your library..."
+            placeholder="Search your TV shows..."
             autocomplete="off"
         >
-
-    </div>
-
-
-    <div class="library-tabs">
-
-        <button
-            id="moviesTab"
-            class="library-tab active"
-            onclick="setLibraryType('movie')"
-        >
-            Movies
-        </button>
-
-        <button
-            id="tvTab"
-            class="library-tab"
-            onclick="setLibraryType('tv')"
-        >
-            TV Shows
-        </button>
 
     </div>
 
@@ -1394,27 +1336,6 @@ img {
     </div>
 
 
-    <div class="library-tabs">
-
-        <button
-            id="watchMovieTab"
-            class="library-tab active"
-            onclick="setWatchedType('movie')"
-        >
-            Movies
-        </button>
-
-        <button
-            id="watchTVTab"
-            class="library-tab"
-            onclick="setWatchedType('tv')"
-        >
-            TV Shows
-        </button>
-
-    </div>
-
-
     <div
         id="watchedGrid"
         class="library-grid"
@@ -1434,27 +1355,6 @@ img {
         <div class="section-title">
             Upcoming
         </div>
-
-    </div>
-
-
-    <div class="library-tabs">
-
-        <button
-            id="upcomingTVTab"
-            class="library-tab active"
-            onclick="setUpcomingType('tv')"
-        >
-            TV Shows
-        </button>
-
-        <button
-            id="upcomingMovieTab"
-            class="library-tab"
-            onclick="setUpcomingType('movie')"
-        >
-            Movies
-        </button>
 
     </div>
 
@@ -1675,10 +1575,9 @@ img {
 ========================================================= */
 
 const STORAGE_KEY =
-    "reeltrack_data_v4";
+    "reeltrack_tv_data_v5";
 
 let state = {
-    movies: [],
     tvShows: [],
     profiles: [
         {
@@ -1689,10 +1588,6 @@ let state = {
     ],
     activeProfileId: "profile-hanu"
 };
-
-let currentLibraryType = "movie";
-let currentWatchedType = "movie";
-let currentUpcomingType = "tv";
 
 let currentItem = null;
 let selectedSeason = 1;
@@ -1723,19 +1618,6 @@ function formatDate(date) {
             year: "numeric",
             hour: "2-digit",
             minute: "2-digit"
-        }
-    ).format(new Date(date));
-
-}
-
-function formatReleaseDate(date) {
-
-    return new Intl.DateTimeFormat(
-        "en-ZA",
-        {
-            day: "numeric",
-            month: "short",
-            year: "numeric"
         }
     ).format(new Date(date));
 
@@ -1874,7 +1756,6 @@ function createInitialData() {
         if (!state.tvShows.some(show => show.id === id)) {
             const show = {
                 id: id,
-                type: "tv",
                 ownerId: state.activeProfileId,
                 title: title,
                 year: "2026",
@@ -1917,26 +1798,6 @@ function createInitialData() {
         }
     });
 
-    const movieTitles = ["Movie One", "Movie Two", "Movie Three"];
-
-    movieTitles.forEach((title, index) => {
-        const id = `movie-${index + 1}`;
-        if (!state.movies.some(movie => movie.id === id)) {
-            state.movies.push({
-                id: id,
-                type: "movie",
-                ownerId: state.activeProfileId,
-                title: title,
-                year: "2026",
-                poster: "",
-                backdrop: "",
-                description: `${title} available for viewing and tracking across your household.`,
-                watched: index === 0,
-                releaseDate: index === 2 ? "2026-10-05T00:00:00" : null
-            });
-        }
-    });
-
     saveState();
 
 }
@@ -1946,21 +1807,8 @@ function createInitialData() {
    DATA HELPERS
 ========================================================= */
 
-function getItem(
-    type,
-    id
-) {
-
-    const collection =
-        type === "movie"
-            ? state.movies
-            : state.tvShows;
-
-    return collection.find(
-        item =>
-            item.id === id
-    );
-
+function getItem(id) {
+    return state.tvShows.find(item => item.id === id);
 }
 
 
@@ -2025,29 +1873,6 @@ function getUpcomingEpisodes(show = null) {
         (a, b) =>
             a.date - b.date
     );
-
-}
-
-
-function getUpcomingMovies() {
-
-    return state.movies
-        .filter(
-            movie =>
-                movie.releaseDate &&
-                !isReleased(
-                    movie.releaseDate
-                )
-        )
-        .sort(
-            (a, b) =>
-                new Date(
-                    a.releaseDate
-                ) -
-                new Date(
-                    b.releaseDate
-                )
-        );
 
 }
 
@@ -2200,51 +2025,6 @@ function showPage(page) {
    LIBRARY
 ========================================================= */
 
-function openLibrary(type) {
-
-    currentLibraryType =
-        type;
-
-    showPage(
-        "library"
-    );
-
-}
-
-
-function setLibraryType(type) {
-
-    window.scrollTo(0, 0);
-
-    currentLibraryType =
-        type;
-
-
-    document
-        .getElementById(
-            "moviesTab"
-        )
-        .classList.toggle(
-            "active",
-            type === "movie"
-        );
-
-
-    document
-        .getElementById(
-            "tvTab"
-        )
-        .classList.toggle(
-            "active",
-            type === "tv"
-        );
-
-
-    renderLibrary();
-
-}
-
-
 function renderLibrary() {
 
     const grid =
@@ -2263,26 +2043,7 @@ function renderLibrary() {
             .toLowerCase();
 
 
-    let items =
-        currentLibraryType === "movie"
-            ? state.movies
-            : state.tvShows;
-
-
-    if (
-        currentLibraryType ===
-        "movie"
-    ) {
-
-        items =
-            items.filter(
-                movie =>
-                    isReleased(
-                        movie.releaseDate
-                    )
-            );
-
-    }
+    let items = state.tvShows;
 
 
     if (query) {
@@ -2303,12 +2064,7 @@ function renderLibrary() {
     if (!items.length) {
 
         grid.innerHTML =
-            emptyState(
-                currentLibraryType ===
-                "movie"
-                    ? "No Movies Found"
-                    : "No TV Shows Found"
-            );
+            emptyState("No TV Shows Found");
 
         return;
 
@@ -2319,10 +2075,7 @@ function renderLibrary() {
         items
             .map(
                 item =>
-                    createCard(
-                        item,
-                        currentLibraryType
-                    )
+                    createCard(item)
             )
             .join("");
 
@@ -2333,39 +2086,6 @@ function renderLibrary() {
    WATCHED
 ========================================================= */
 
-function setWatchedType(type) {
-
-    window.scrollTo(0, 0);
-
-    currentWatchedType =
-        type;
-
-
-    document
-        .getElementById(
-            "watchMovieTab"
-        )
-        .classList.toggle(
-            "active",
-            type === "movie"
-        );
-
-
-    document
-        .getElementById(
-            "watchTVTab"
-        )
-        .classList.toggle(
-            "active",
-            type === "tv"
-        );
-
-
-    renderWatched();
-
-}
-
-
 function renderWatched() {
 
     const grid =
@@ -2373,43 +2093,18 @@ function renderWatched() {
             "watchedGrid"
         );
 
-
-    let items;
-
-
-    if (
-        currentWatchedType ===
-        "movie"
-    ) {
-
-        items =
-            state.movies.filter(
-                movie =>
-                    movie.watched
-            );
-
-    } else {
-
-        items =
-            state.tvShows.filter(
-                show =>
-                    isTVFinished(
-                        show
-                    )
-            );
-
-    }
-
+    const items =
+        state.tvShows.filter(
+            show =>
+                isTVFinished(
+                    show
+                )
+        );
 
     if (!items.length) {
 
         grid.innerHTML =
-            emptyState(
-                currentWatchedType ===
-                "movie"
-                    ? "No Movies Watched"
-                    : "No TV Shows Finished"
-            );
+            emptyState("No TV Shows Finished");
 
         return;
 
@@ -2420,10 +2115,7 @@ function renderWatched() {
         items
             .map(
                 item =>
-                    createCard(
-                        item,
-                        currentWatchedType
-                    )
+                    createCard(item)
             )
             .join("");
 
@@ -2434,39 +2126,6 @@ function renderWatched() {
    UPCOMING
 ========================================================= */
 
-function setUpcomingType(type) {
-
-    window.scrollTo(0, 0);
-
-    currentUpcomingType =
-        type;
-
-
-    document
-        .getElementById(
-            "upcomingTVTab"
-        )
-        .classList.toggle(
-            "active",
-            type === "tv"
-        );
-
-
-    document
-        .getElementById(
-            "upcomingMovieTab"
-        )
-        .classList.toggle(
-            "active",
-            type === "movie"
-        );
-
-
-    renderUpcoming();
-
-}
-
-
 function renderUpcoming() {
 
     const container =
@@ -2474,67 +2133,31 @@ function renderUpcoming() {
             "upcomingGrid"
         );
 
-
-    if (
-        currentUpcomingType ===
-        "tv"
-    ) {
-
-        const episodes =
-            getUpcomingEpisodes();
+    const episodes =
+        getUpcomingEpisodes();
 
 
-        if (!episodes.length) {
-
-            container.innerHTML =
-                emptyState(
-                    "No Upcoming TV Episodes"
-                );
-
-            return;
-
-        }
-
+    if (!episodes.length) {
 
         container.innerHTML =
-            episodes
-                .map(
-                    data =>
-                        createUpcomingTVCard(
-                            data
-                        )
-                )
-                .join("");
+            emptyState(
+                "No Upcoming TV Episodes"
+            );
 
-    } else {
-
-        const movies =
-            getUpcomingMovies();
-
-
-        if (!movies.length) {
-
-            container.innerHTML =
-                emptyState(
-                    "No Upcoming Movies"
-                );
-
-            return;
-
-        }
-
-
-        container.innerHTML =
-            movies
-                .map(
-                    movie =>
-                        createUpcomingMovieCard(
-                            movie
-                        )
-                )
-                .join("");
+        return;
 
     }
+
+
+    container.innerHTML =
+        episodes
+            .map(
+                data =>
+                    createUpcomingTVCard(
+                        data
+                    )
+            )
+            .join("");
 
 }
 
@@ -2558,7 +2181,6 @@ function createUpcomingTVCard(data) {
             class="upcoming-card"
             onclick="
                 openDetails(
-                    'tv',
                     '${show.id}'
                 )
             "
@@ -2639,101 +2261,16 @@ function createUpcomingTVCard(data) {
 }
 
 
-function createUpcomingMovieCard(movie) {
-
-    return `
-
-        <div
-            class="upcoming-card"
-            onclick="
-                openDetails(
-                    'movie',
-                    '${movie.id}'
-                )
-            "
-        >
-
-            <div class="upcoming-poster">
-
-                ${
-                    movie.poster
-
-                        ? `
-                            <img
-                                src="${movie.poster}"
-                                alt="${escapeHTML(
-                                    movie.title
-                                )}"
-                            >
-                        `
-
-                        : `
-                            <div
-                                class="
-                                    upcoming-poster-placeholder
-                                "
-                            >
-                                ${escapeHTML(
-                                    movie.title
-                                )}
-                            </div>
-                        `
-                }
-
-            </div>
-
-
-            <div class="upcoming-info">
-
-                <div class="upcoming-type">
-                    Movie
-                </div>
-
-                <div class="upcoming-title">
-                    ${escapeHTML(
-                        movie.title
-                    )}
-                </div>
-
-                <div class="upcoming-date">
-
-                    Release Date
-
-                    <br>
-
-                    ${formatReleaseDate(
-                        movie.releaseDate
-                    )}
-
-                </div>
-
-                <div class="upcoming-countdown">
-
-                    ${getCountdown(
-                        movie.releaseDate
-                    )}
-
-                </div>
-
-            </div>
-
-        </div>
-
-    `;
-
-}
-
-
 /* =========================================================
    HOME
 ========================================================= */
 
 function renderDashboard() {
 
-    const watchedMovies =
-        state.movies.filter(
-            movie =>
-                movie.watched
+    const finishedShows =
+        state.tvShows.filter(
+            show =>
+                isTVFinished(show)
         );
 
 
@@ -2760,11 +2297,11 @@ function renderDashboard() {
             <div class="stat">
 
                 <div class="stat-value">
-                    ${watchedMovies.length}
+                    ${finishedShows.length}
                 </div>
 
                 <div class="stat-label">
-                    Movies Watched
+                    Shows Completed
                 </div>
 
             </div>
@@ -2867,7 +2404,7 @@ function renderDashboard() {
                 "heroDescription"
             )
             .textContent =
-            "Track every movie and TV show your household watches.";
+            "Track every TV show your household watches.";
 
     }
 
@@ -2913,10 +2450,7 @@ function renderRow(
         items
             .map(
                 item =>
-                    createCard(
-                        item,
-                        "tv"
-                    )
+                    createCard(item)
             )
             .join("");
 
@@ -2935,10 +2469,6 @@ function renderHomeUpcoming() {
         getUpcomingEpisodes();
 
 
-    const movies =
-        getUpcomingMovies();
-
-
     const items = [];
 
 
@@ -2947,17 +2477,6 @@ function renderHomeUpcoming() {
         items.push(
             createUpcomingTVCard(
                 tvEpisodes[0]
-            )
-        );
-
-    }
-
-
-    if (movies.length) {
-
-        items.push(
-            createUpcomingMovieCard(
-                movies[0]
             )
         );
 
@@ -2986,10 +2505,7 @@ function renderHomeUpcoming() {
    CARD
 ========================================================= */
 
-function createCard(
-    item,
-    type
-) {
+function createCard(item) {
 
     return `
 
@@ -2997,7 +2513,6 @@ function createCard(
             class="card"
             onclick="
                 openDetails(
-                    '${type}',
                     '${item.id}'
                 )
             "
@@ -3066,10 +2581,7 @@ function continueWatching() {
 
     if (show) {
 
-        openDetails(
-            "tv",
-            show.id
-        );
+        openDetails(show.id);
 
         return;
 
@@ -3087,16 +2599,9 @@ function continueWatching() {
    DETAILS
 ========================================================= */
 
-function openDetails(
-    type,
-    id
-) {
+function openDetails(id) {
 
-    const item =
-        getItem(
-            type,
-            id
-        );
+    const item = getItem(id);
 
 
     if (!item) {
@@ -3104,10 +2609,7 @@ function openDetails(
     }
 
 
-    currentItem = {
-        type,
-        id
-    };
+    currentItem = { id };
 
 
     document
@@ -3134,11 +2636,7 @@ function openDetails(
         .innerHTML = `
 
             <span>
-                ${
-                    type === "tv"
-                        ? "TV Show"
-                        : "Movie"
-                }
+                TV Show
             </span>
 
             <span>•</span>
@@ -3176,30 +2674,10 @@ function openDetails(
     }
 
 
-    renderModalActions(
-        item,
-        type
-    );
+    renderModalActions(item);
 
 
-    if (
-        type === "tv"
-    ) {
-
-        renderEpisodes(
-            item
-        );
-
-    } else {
-
-        document
-            .getElementById(
-                "modalEpisodes"
-            )
-            .innerHTML =
-            "";
-
-    }
+    renderEpisodes(item);
 
 
     document
@@ -3217,80 +2695,12 @@ function openDetails(
 }
 
 
-function renderModalActions(
-    item,
-    type
-) {
+function renderModalActions(item) {
 
     const actions =
         document.getElementById(
             "modalActions"
         );
-
-
-    if (
-        type === "movie"
-    ) {
-
-        if (
-            item.releaseDate &&
-            !isReleased(
-                item.releaseDate
-            )
-        ) {
-
-            actions.innerHTML = `
-
-                <button
-                    class="
-                        action-button
-                        primary
-                    "
-                    onclick="
-                        closeModal()
-                    "
-                >
-
-                    Releases
-                    ${formatReleaseDate(
-                        item.releaseDate
-                    )}
-
-                </button>
-
-            `;
-
-            return;
-
-        }
-
-
-        actions.innerHTML = `
-
-            <button
-                class="
-                    action-button
-                    primary
-                "
-                onclick="
-                    toggleMovieWatched()
-                "
-            >
-
-                ${
-                    item.watched
-                        ? "Mark Unwatched"
-                        : "Mark Watched"
-                }
-
-            </button>
-
-        `;
-
-        return;
-
-    }
-
 
     const progress =
         getTVProgress(
@@ -3501,11 +2911,7 @@ function selectSeason(
         );
 
 
-    const show =
-        getItem(
-            "tv",
-            showId
-        );
+    const show = getItem(showId);
 
 
     renderEpisodes(
@@ -3661,11 +3067,7 @@ function toggleEpisode(
     episodeId
 ) {
 
-    const show =
-        getItem(
-            "tv",
-            showId
-        );
+    const show = getItem(showId);
 
 
     const episode =
@@ -3722,11 +3124,7 @@ function markNextEpisode() {
     }
 
 
-    const show =
-        getItem(
-            "tv",
-            currentItem.id
-        );
+    const show = getItem(currentItem.id);
 
 
     const progress =
@@ -3761,8 +3159,7 @@ function markNextEpisode() {
 
 
     renderModalActions(
-        show,
-        "tv"
+        show
     );
 
 
@@ -3771,70 +3168,6 @@ function markNextEpisode() {
 
     showToast(
         "Episode marked watched"
-    );
-
-}
-
-
-/* =========================================================
-   MOVIE ACTION
-========================================================= */
-
-function toggleMovieWatched() {
-
-    if (!currentItem) {
-        return;
-    }
-
-
-    const movie =
-        getItem(
-            "movie",
-            currentItem.id
-        );
-
-
-    if (
-        !isReleased(
-            movie.releaseDate
-        )
-    ) {
-
-        showToast(
-            "This movie has not been released yet"
-        );
-
-        return;
-
-    }
-
-
-    movie.watched =
-        !movie.watched;
-
-
-    saveState();
-
-
-    renderModalActions(
-        movie,
-        "movie"
-    );
-
-
-    renderDashboard();
-
-
-    renderLibrary();
-
-
-    renderWatched();
-
-
-    showToast(
-        movie.watched
-            ? "Movie marked watched"
-            : "Movie marked unwatched"
     );
 
 }
@@ -4084,19 +3417,12 @@ function refreshApp() {
         currentItem
     ) {
 
-        const item =
-            getItem(
-                currentItem.type,
-                currentItem.id
-            );
+        const item = getItem(currentItem.id);
 
 
         if (item) {
 
-            renderModalActions(
-                item,
-                currentItem.type
-            );
+            renderModalActions(item);
 
         }
 
@@ -4143,18 +3469,6 @@ createInitialData();
 renderProfile();
 
 renderDashboard();
-
-setLibraryType(
-    "movie"
-);
-
-setWatchedType(
-    "movie"
-);
-
-setUpcomingType(
-    "tv"
-);
 
 </script>
 
