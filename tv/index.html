@@ -481,10 +481,11 @@ img {
 
     text-align: center;
 
-    color: var(--text-secondary);
+    color: var(--text);
 
     font-size: 12px;
     font-weight: 700;
+    line-height: 1.3;
 }
 
 /* =========================================================
@@ -641,10 +642,11 @@ img {
 
     text-align: center;
 
-    color: var(--text-secondary);
+    color: var(--text);
 
     font-size: 9px;
     font-weight: 700;
+    line-height: 1.2;
 }
 
 .upcoming-info {
@@ -827,18 +829,36 @@ img {
     color: var(--text-secondary);
 }
 
-.modal-backdrop {
+.modal-backdrop-wrapper {
+    position: relative;
     width: 100%;
     height: 220px;
-
-    object-fit: cover;
-
     background:
         linear-gradient(
             145deg,
             #152033,
             #080b10
         );
+}
+
+.modal-backdrop {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+.modal-backdrop-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text);
 }
 
 .modal-content {
@@ -1194,6 +1214,7 @@ img {
             id="heroImage"
             class="hero-image hidden"
             alt=""
+            onerror="this.style.display='none';"
         >
 
         <div class="hero-overlay"></div>
@@ -1442,7 +1463,6 @@ img {
 
 <!-- =====================================================
      BOTTOM NAVIGATION
-     (ORDER: Home -> Library -> Upcoming -> Watched)
 ===================================================== -->
 
 <nav class="bottom-nav">
@@ -1547,11 +1567,15 @@ img {
         </div>
 
 
-        <img
-            id="modalBackdrop"
-            class="modal-backdrop"
-            alt=""
-        >
+        <div class="modal-backdrop-wrapper">
+            <img
+                id="modalBackdrop"
+                class="modal-backdrop"
+                alt=""
+                onerror="this.style.display='none'; document.getElementById('modalBackdropPlaceholder').style.display='flex';"
+            >
+            <div id="modalBackdropPlaceholder" class="modal-backdrop-placeholder" style="display: none;"></div>
+        </div>
 
 
         <div class="modal-content">
@@ -1604,7 +1628,7 @@ img {
 ========================================================= */
 
 const STORAGE_KEY =
-    "reeltrack_tv_data_v9";
+    "reeltrack_tv_data_v10";
 
 let state = {
     tvShows: [],
@@ -1644,9 +1668,7 @@ function formatDate(date) {
             weekday: "short",
             day: "numeric",
             month: "short",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit"
+            year: "numeric"
         }
     ).format(new Date(date));
 
@@ -1783,8 +1805,8 @@ function createInitialData() {
             id: "tv-only-murders-in-the-building",
             title: "Only Murders in the Building",
             year: "2021",
-            poster: "https://m.media-amazon.com/images/M/MVBmM2FiZTBlMDgtMGM2YS00NzMwLTkyODgtNWMyYTFjN2Y1NmM3XkEyXkFqcGc@._V1_SX300.jpg",
-            backdrop: "https://m.media-amazon.com/images/M/MVBmM2FiZTBlMDgtMGM2YS00NzMwLTkyODgtNWMyYTFjN2Y1NmM3XkEyXkFqcGc@._V1_SX1200.jpg",
+            poster: "https://image.tmdb.org/t/p/w500/A2P341l3P0uV9L3vW8D0q2T4U0n.jpg",
+            backdrop: "https://image.tmdb.org/t/p/w1280/mAJ83Vo12C26R2d0i6a4i4bU56A.jpg",
             description: "Three strangers who share an obsession with true crime podcasts suddenly find themselves wrapped up in one when a gruesome death occurs inside their exclusive Upper West Side apartment building.",
             isFinished: false,
             seasonDates: {
@@ -1792,7 +1814,7 @@ function createInitialData() {
                 2: "2022-06-28T00:00:00",
                 3: "2023-08-08T00:00:00",
                 4: "2024-08-27T00:00:00",
-                5: "2025-09-09T00:00:00"
+                5: "2026-09-08T00:00:00" // Set to future date so S5 is unreleased
             },
             seasonEpisodesCount: {
                 1: 10,
@@ -1806,8 +1828,8 @@ function createInitialData() {
             id: "tv-every-year-after",
             title: "Every Year After",
             year: "2026",
-            poster: "https://m.media-amazon.com/images/M/MVBNjA3Y2U5MmMtM2MwYi00Yzg1LTk4NWUtOTg2NmU4NDc0MjgxXkEyXkFqcGc@._V1_SX300.jpg",
-            backdrop: "https://m.media-amazon.com/images/M/MVBNjA3Y2U5MmMtM2MwYi00Yzg1LTk4NWUtOTg2NmU4NDc0MjgxXkEyXkFqcGc@._V1_SX1200.jpg",
+            poster: "https://image.tmdb.org/t/p/w500/every_year_after_poster.jpg",
+            backdrop: "https://image.tmdb.org/t/p/w1280/every_year_after_backdrop.jpg",
             description: "A drama series following evolving relationships over successive years.",
             isFinished: false,
             seasonDates: {
@@ -1821,8 +1843,8 @@ function createInitialData() {
             id: "tv-elle",
             title: "Elle",
             year: "2026",
-            poster: "https://m.media-amazon.com/images/M/MVBmMDAxYTVkYTUtZjg3Ni00MzBhLTk4ODEtZDA3ZDRjZDIzMGUyXkEyXkFqcGc@._V1_SX300.jpg",
-            backdrop: "https://m.media-amazon.com/images/M/MVBmMDAxYTVkYTUtZjg3Ni00MzBhLTk4ODEtZDA3ZDRjZDIzMGUyXkEyXkFqcGc@._V1_SX1200.jpg",
+            poster: "https://image.tmdb.org/t/p/w500/elle_poster.jpg",
+            backdrop: "https://image.tmdb.org/t/p/w1280/elle_backdrop.jpg",
             description: "Prequel series following the early high school years of Elle Woods.",
             isFinished: false,
             seasonDates: {
@@ -1836,8 +1858,8 @@ function createInitialData() {
             id: "tv-sweet-magnolias",
             title: "Sweet Magnolias",
             year: "2020",
-            poster: "https://m.media-amazon.com/images/M/MVBNzg3MzA2OWEtNzE4Yi00YmU4LTg1YTgtZTAxNzlmMWNhNDBiXkEyXkFqcGc@._V1_SX300.jpg",
-            backdrop: "https://m.media-amazon.com/images/M/MVBNzg3MzA2OWEtNzE4Yi00YmU4LTg1YTgtZTAxNzlmMWNhNDBiXkEyXkFqcGc@._V1_SX1200.jpg",
+            poster: "https://image.tmdb.org/t/p/w500/2L2zT8y8j83m58V2k9k5k4.jpg",
+            backdrop: "https://image.tmdb.org/t/p/w1280/2L2zT8y8j83m58V2k9k5k4_bg.jpg",
             description: "Lifelong friends Maddie, Helen, and Dana Sue navigate relationships, family, and careers in Serenity.",
             isFinished: false,
             seasonDates: {
@@ -1858,38 +1880,48 @@ function createInitialData() {
     ];
 
     showsToBuild.forEach(showData => {
-        if (!state.tvShows.some(show => show.id === showData.id)) {
-            const show = {
-                id: showData.id,
-                ownerId: state.activeProfileId,
-                title: showData.title,
-                year: showData.year,
-                poster: showData.poster || "",
-                backdrop: showData.backdrop || "",
-                description: showData.description,
-                isFinished: showData.isFinished,
-                episodes: []
-            };
+        const existingIndex = state.tvShows.findIndex(show => show.id === showData.id);
+        
+        const show = {
+            id: showData.id,
+            ownerId: state.activeProfileId,
+            title: showData.title,
+            year: showData.year,
+            poster: showData.poster || "",
+            backdrop: showData.backdrop || "",
+            description: showData.description,
+            isFinished: showData.isFinished,
+            episodes: []
+        };
 
-            const seasonNumbers = Object.keys(showData.seasonDates).map(Number);
+        const seasonNumbers = Object.keys(showData.seasonDates).map(Number);
 
-            seasonNumbers.forEach(season => {
-                const releaseDate = showData.seasonDates[season];
-                const totalEpisodes = showData.seasonEpisodesCount[season];
+        seasonNumbers.forEach(season => {
+            const releaseDate = showData.seasonDates[season];
+            const totalEpisodes = showData.seasonEpisodesCount[season];
 
-                for (let episode = 1; episode <= totalEpisodes; episode++) {
-                    show.episodes.push({
-                        id: `s${season}e${episode}`,
-                        season: season,
-                        number: episode,
-                        title: `Episode ${episode}`,
-                        runtime: "45 min",
-                        watched: false,
-                        releaseDate: releaseDate
-                    });
-                }
+            for (let episode = 1; episode <= totalEpisodes; episode++) {
+                show.episodes.push({
+                    id: `s${season}e${episode}`,
+                    season: season,
+                    number: episode,
+                    title: `Episode ${episode}`,
+                    runtime: "45 min",
+                    watched: false,
+                    releaseDate: releaseDate
+                });
+            }
+        });
+
+        if (existingIndex > -1) {
+            // Keep watch history while updating show details/dates
+            const oldEpisodes = state.tvShows[existingIndex].episodes || [];
+            show.episodes.forEach(ep => {
+                const match = oldEpisodes.find(o => o.id === ep.id);
+                if (match) ep.watched = match.watched;
             });
-
+            state.tvShows[existingIndex] = show;
+        } else {
             state.tvShows.push(show);
         }
     });
@@ -2183,18 +2215,15 @@ function renderLibrary() {
 
 function renderWatched() {
 
-    // 1. Continue Watching: Shows with at least 1 watched episode, but not all available episodes watched
     const continueShows = state.tvShows.filter(show => {
         const progress = getTVProgress(show);
         return progress.watched > 0 && progress.watched < progress.total;
     });
 
-    // 2. Up to Date: All currently released episodes watched, but show is NOT finished
     const upToDateShows = state.tvShows.filter(show => {
         return isTVUpToDate(show) && !show.isFinished;
     });
 
-    // 3. Finished: Shows explicitly marked as completed series where all available episodes are watched
     const finishedShows = state.tvShows.filter(show => {
         return isTVUpToDate(show) && show.isFinished;
     });
@@ -2271,32 +2300,17 @@ function createUpcomingTVCard(data) {
         >
 
             <div class="upcoming-poster">
-
-                ${
-                    show.poster
-
-                        ? `
-                            <img
-                                src="${show.poster}"
-                                alt="${escapeHTML(
-                                    show.title
-                                )}"
-                            >
-                        `
-
-                        : `
-                            <div
-                                class="
-                                    upcoming-poster-placeholder
-                                "
-                            >
-                                ${escapeHTML(
-                                    show.title
-                                )}
-                            </div>
-                        `
-                }
-
+                <img
+                    src="${show.poster}"
+                    alt="${escapeHTML(show.title)}"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                >
+                <div
+                    class="upcoming-poster-placeholder"
+                    style="display: none;"
+                >
+                    ${escapeHTML(show.title)}
+                </div>
             </div>
 
 
@@ -2591,7 +2605,7 @@ function renderHomeUpcoming() {
 
 
 /* =========================================================
-   CARD
+   CARD (WITH FALLBACK PLACEHOLDER)
 ========================================================= */
 
 function createCard(item) {
@@ -2608,32 +2622,17 @@ function createCard(item) {
         >
 
             <div class="poster">
-
-                ${
-                    item.poster
-
-                        ? `
-                            <img
-                                src="${item.poster}"
-                                alt="${escapeHTML(
-                                    item.title
-                                )}"
-                            >
-                        `
-
-                        : `
-                            <div
-                                class="
-                                    poster-placeholder
-                                "
-                            >
-                                ${escapeHTML(
-                                    item.title
-                                )}
-                            </div>
-                        `
-                }
-
+                <img
+                    src="${item.poster}"
+                    alt="${escapeHTML(item.title)}"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                >
+                <div
+                    class="poster-placeholder"
+                    style="display: none;"
+                >
+                    ${escapeHTML(item.title)}
+                </div>
             </div>
 
         </div>
@@ -2743,24 +2742,20 @@ function openDetails(id) {
             "modalBackdrop"
         );
 
-
-    if (item.backdrop) {
-
-        backdrop.src =
-            item.backdrop;
-
-        backdrop.style.display =
-            "block";
-
-    } else {
-
-        backdrop.removeAttribute(
-            "src"
+    const backdropPlaceholder =
+        document.getElementById(
+            "modalBackdropPlaceholder"
         );
 
-        backdrop.style.display =
-            "block";
+    backdropPlaceholder.textContent = item.title;
+    backdropPlaceholder.style.display = "none";
+    backdrop.style.display = "block";
 
+    if (item.backdrop) {
+        backdrop.src = item.backdrop;
+    } else {
+        backdrop.style.display = "none";
+        backdropPlaceholder.style.display = "flex";
     }
 
 
