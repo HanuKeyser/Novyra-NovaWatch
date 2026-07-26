@@ -1604,7 +1604,7 @@ img {
 ========================================================= */
 
 const STORAGE_KEY =
-    "reeltrack_tv_data_v5";
+    "reeltrack_tv_data_v6";
 
 let state = {
     tvShows: [],
@@ -1778,39 +1778,75 @@ function loadState() {
 
 function createInitialData() {
 
-    const tvTitles = ["TV One", "TV Two", "TV Three"];
-    
-    tvTitles.forEach((title, index) => {
-        const id = `tv-${index + 1}`;
-        if (!state.tvShows.some(show => show.id === id)) {
+    const showConfigs = [
+        {
+            id: "tv-elle",
+            title: "Elle",
+            year: "2026",
+            poster: "",
+            backdrop: "",
+            description: "Follows Elle Woods in her high school years, giving an insight into her life growing up long before Harvard Law.",
+            isFinished: false,
+            seasonCount: 2,
+            episodesPerSeason: 6,
+            hasUpcoming: true
+        },
+        {
+            id: "tv-every-year-after",
+            title: "Every Year After",
+            year: "2026",
+            poster: "",
+            backdrop: "",
+            description: "A sweeping romantic drama following Percy Fraser and Sam Florek over six summer reunions.",
+            isFinished: false,
+            seasonCount: 2,
+            episodesPerSeason: 6,
+            hasUpcoming: false
+        },
+        {
+            id: "tv-sweet-magnolias",
+            title: "Sweet Magnolias",
+            year: "2020",
+            poster: "",
+            backdrop: "",
+            description: "Lifelong friends Maddie, Helen, and Dana Sue lift each other up as they juggle relationships, family, and careers in Serenity.",
+            isFinished: true,
+            seasonCount: 2,
+            episodesPerSeason: 6,
+            hasUpcoming: false
+        }
+    ];
+
+    showConfigs.forEach((config, index) => {
+        if (!state.tvShows.some(show => show.id === config.id)) {
             const show = {
-                id: id,
+                id: config.id,
                 ownerId: state.activeProfileId,
-                title: title,
-                year: "2026",
-                poster: "",
-                backdrop: "",
-                description: `${title} available for viewing and tracking across your household.`,
-                isFinished: index === 2, // Marks TV Three as a completed series
+                title: config.title,
+                year: config.year,
+                poster: config.poster,
+                backdrop: config.backdrop,
+                description: config.description,
+                isFinished: config.isFinished,
                 episodes: []
             };
 
-            for (let season = 1; season <= 2; season++) {
-                for (let episode = 1; episode <= 6; episode++) {
+            for (let season = 1; season <= config.seasonCount; season++) {
+                for (let episode = 1; episode <= config.episodesPerSeason; episode++) {
                     show.episodes.push({
                         id: `s${season}e${episode}`,
                         season: season,
                         number: episode,
                         title: `Episode ${episode}`,
                         runtime: "45 min",
-                        watched: index === 0 ? (season === 1 && episode <= 2) : (index === 2 ? true : (season === 1 || season === 2)),
+                        watched: index === 0 ? (season === 1 && episode <= 2) : (config.isFinished ? true : (season === 1 || season === 2)),
                         releaseDate: null
                     });
                 }
             }
 
-            // TV One has upcoming episode releases
-            if (index === 0) {
+            // 'Elle' configured with upcoming episode releases
+            if (config.hasUpcoming) {
                 const startDate = new Date("2026-08-03T20:00:00");
                 for (let episode = 1; episode <= 4; episode++) {
                     const releaseDate = new Date(startDate);
@@ -3147,6 +3183,7 @@ function markNextEpisode() {
 
     if (!currentItem) {
         return;
+
     }
 
 
