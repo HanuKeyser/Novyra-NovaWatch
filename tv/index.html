@@ -993,6 +993,26 @@ img {
     color: var(--text);
 }
 
+.episode-unwatch-btn {
+    height: 29px;
+    padding: 0 8px;
+    border-radius: 8px;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    color: var(--danger);
+    font-size: 10px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.episode-unwatch-btn:hover {
+    border-color: var(--danger);
+    background: rgba(255, 82, 104, 0.1);
+}
+
 .episode-rewatch-badge {
     height: 24px;
     padding: 0 6px;
@@ -1487,7 +1507,7 @@ img {
     </div>
 
 
-    <div class="profile-card">
+    <div class="profile-card" style="display: flex; flex-direction: column; gap: 16px;">
 
         <div class="profile-row">
 
@@ -1513,6 +1533,11 @@ img {
 
             </div>
 
+        </div>
+
+        <div style="border-top: 1px solid var(--border); padding-top: 14px;">
+            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">Total Time Watched</div>
+            <div id="totalWatchTime" style="font-size: 18px; font-weight: 800; color: var(--blue-light);">0 days, 0 hours, 0 minutes</div>
         </div>
 
     </div>
@@ -3140,6 +3165,9 @@ function renderSeasonEpisodes(
                                     <button class="episode-rewatch-btn" onclick="addEpisodeRewatch('${show.id}', '${episode.id}')" title="Log another rewatch">
                                         + Rewatch
                                     </button>
+                                    <button class="episode-unwatch-btn" onclick="removeEpisodeRewatch('${show.id}', '${episode.id}')" title="Remove watch count">
+                                        - Unwatch
+                                    </button>
                                 </div>
                             `;
                         } else if (episode.watched) {
@@ -3151,6 +3179,9 @@ function renderSeasonEpisodes(
                                             <path d="M21 3v5h-5"/>
                                         </svg>
                                         Rewatch
+                                    </button>
+                                    <button class="episode-unwatch-btn" onclick="removeEpisodeRewatch('${show.id}', '${episode.id}')" title="Mark unwatched">
+                                        Unwatch
                                     </button>
                                 </div>
                             `;
@@ -3348,6 +3379,29 @@ function addEpisodeRewatch(showId, episodeId) {
     showToast(`Logged rewatch #${episode.watchCount} for S${episode.season}E${episode.number}`);
 }
 
+function removeEpisodeRewatch(showId, episodeId) {
+    const show = getItem(showId);
+    const episode = show.episodes.find(item => item.id === episodeId);
+
+    if (!episode) return;
+
+    if (episode.watchCount > 1) {
+        episode.watchCount -= 1;
+        showToast(`Reduced rewatch count to ${episode.watchCount} for S${episode.season}E${episode.number}`);
+    } else {
+        episode.watchCount = 0;
+        episode.watched = false;
+        showToast(`Episode marked unwatched`);
+    }
+
+    saveState();
+
+    renderEpisodes(show);
+    renderDashboard();
+    renderLibrary();
+    renderWatched();
+}
+
 
 function markNextEpisode() {
 
@@ -3471,6 +3525,30 @@ function renderProfile() {
         )
         .textContent =
         profile.initials;
+
+    // Calculate total watch time in days, hours, and minutes
+    let totalMinutes = 0;
+    state.tvShows.forEach(show => {
+        show.episodes.forEach(ep => {
+            if (ep.watched) {
+                const count = ep.watchCount || 1;
+                // Parse runtime string e.g., "45 min"
+                const match = (ep.runtime || "").match(/(\d+)/);
+                const runtimeMins = match ? parseInt(match[1], 10) : 45;
+                totalMinutes += runtimeMins * count;
+            }
+        });
+    });
+
+    const days = Math.floor(totalMinutes / (24 * 60));
+    const hours = Math.floor((totalMinutes % (24 * 60)) / 60);
+    const minutes = totalMinutes % 60;
+
+    const timeString = `${days} days, ${hours} hours, ${minutes} minutes`;
+    const timeEl = document.getElementById("totalWatchTime");
+    if (timeEl) {
+        timeEl.textContent = timeString;
+    }
 
 }
 
