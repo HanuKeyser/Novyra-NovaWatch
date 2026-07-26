@@ -1767,7 +1767,7 @@ img {
 ========================================================= */
 
 const STORAGE_KEY =
-    "reeltrack_tv_data_v16";
+    "reeltrack_tv_data_v17";
 
 let state = {
     tvShows: [],
@@ -1944,7 +1944,7 @@ function createInitialData() {
             id: "tv-only-murders-in-the-building",
             title: "Only Murders in the Building",
             year: "2021",
-            poster: "https://m.media-amazon.com/images/M/MV5BZTUxOWFkNjgtYTE3OC00YTk5LWJmYzYtZWE0ODhiMThjOWViXkEyXkFqcGc@._V1_.jpg",
+            poster: "http://www.impawards.com/tv/posters/only_murders_in_the_building.jpg",
             backdrop: "https://image.tmdb.org/t/p/w1280/mAJ83Vo12C26R2d0i6a4i4bU56A.jpg",
             description: "Three strangers who share an obsession with true crime podcasts suddenly find themselves wrapped up in one when a gruesome death occurs inside their exclusive Upper West Side apartment building.",
             isFinished: false,
@@ -1978,7 +1978,7 @@ function createInitialData() {
             id: "tv-every-year-after",
             title: "Every Year After",
             year: "2026",
-            poster: "https://image.tmdb.org/t/p/w500/q719jXD8W8wGFTttHC9bCxY8nBm.jpg",
+            poster: "http://www.impawards.com/tv/posters/every_year_after.jpg",
             backdrop: "https://image.tmdb.org/t/p/w1280/every_year_after_backdrop.jpg",
             description: "A drama series following evolving relationships over successive years.",
             isFinished: false,
@@ -1993,7 +1993,7 @@ function createInitialData() {
             id: "tv-elle",
             title: "Elle",
             year: "2026",
-            poster: "https://image.tmdb.org/t/p/w500/5WvKhvWkG9zJ8aKzR2hY0uL8jK1.jpg",
+            poster: "http://www.impawards.com/tv/posters/elle_ver2.jpg",
             backdrop: "https://image.tmdb.org/t/p/w1280/elle_backdrop.jpg",
             description: "Prequel series following the early high school years of Elle Woods.",
             isFinished: false,
@@ -2008,7 +2008,7 @@ function createInitialData() {
             id: "tv-sweet-magnolias",
             title: "Sweet Magnolias",
             year: "2020",
-            poster: "https://image.tmdb.org/t/p/w500/h75w2u5pM5F2K7aC9eXvK8k3vF5.jpg",
+            poster: "https://cdn.cinematerial.com/p/297x/fkwgg3fd/sweet-magnolias-movie-poster-md.jpg?v=1781279968",
             backdrop: "https://image.tmdb.org/t/p/w1280/2L2zT8y8j83m58V2k9k5k4_bg.jpg",
             description: "Lifelong friends Maddie, Helen, and Dana Sue navigate relationships, family, and careers in Serenity.",
             isFinished: false,
@@ -2615,7 +2615,6 @@ function renderDashboard() {
     );
 
 
-    // Render untracked/start watching shows (shows with >0 tracked episodes or 0 watched episodes depending on logic, but ensuring proper filtering so shows with 0 tracked don't mistakenly block)
     const startWatchingShows = state.tvShows.filter(show => {
         const progress = getTVProgress(show);
         return progress.watched === 0;
@@ -2744,7 +2743,6 @@ function renderHomeUpcoming() {
     const items = [];
 
 
-    // Show up to 3 upcoming TV shows/episodes
     for (let i = 0; i < Math.min(3, tvEpisodes.length); i++) {
         items.push(
             createUpcomingTVCard(
@@ -3671,7 +3669,6 @@ function renderProfile() {
         .textContent =
         profile.initials;
 
-    // Calculate total watch time in days, hours, and minutes
     let totalMinutes = 0;
     state.tvShows.forEach(show => {
         show.episodes.forEach(ep => {
