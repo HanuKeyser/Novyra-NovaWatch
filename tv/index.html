@@ -1,1 +1,5245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+/>
 
+<title>ReelTrack</title>
+
+<style>
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+
+    --bg: #05070b;
+    --surface: #0b0f16;
+    --surface-2: #101620;
+    --surface-3: #151c28;
+
+    --blue: #1677ff;
+    --blue-light: #4b9aff;
+    --blue-dark: #0d4fb5;
+
+    --text: #ffffff;
+    --text-secondary: #8d96a5;
+    --text-muted: #5f6876;
+
+    --border: rgba(255,255,255,0.07);
+
+    --success: #24d17e;
+    --danger: #ff5268;
+
+    --radius: 16px;
+    --radius-small: 11px;
+
+}
+
+html {
+    background: var(--bg);
+    color-scheme: dark;
+}
+
+body {
+
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    background:
+        linear-gradient(
+            180deg,
+            #070a10 0%,
+            #05070b 100%
+        );
+
+    color: var(--text);
+
+    min-height: 100vh;
+
+    overflow-x: hidden;
+
+    padding-bottom: 90px;
+
+}
+
+button,
+input {
+
+    font: inherit;
+
+}
+
+button {
+
+    border: 0;
+
+    cursor: pointer;
+
+    color: inherit;
+
+}
+
+img {
+
+    display: block;
+
+    max-width: 100%;
+
+}
+
+
+/* =========================================================
+   SVG ICONS
+========================================================= */
+
+.icon {
+
+    width: 22px;
+
+    height: 22px;
+
+    fill: none;
+
+    stroke: currentColor;
+
+    stroke-width: 1.8;
+
+    stroke-linecap: round;
+
+    stroke-linejoin: round;
+
+}
+
+.icon-small {
+
+    width: 17px;
+
+    height: 17px;
+
+}
+
+.icon-large {
+
+    width: 28px;
+
+    height: 28px;
+
+}
+
+
+/* =========================================================
+   APP
+========================================================= */
+
+.app {
+
+    width: 100%;
+
+    max-width: 600px;
+
+    margin: 0 auto;
+
+    min-height: 100vh;
+
+}
+
+
+/* =========================================================
+   TOP HEADER
+========================================================= */
+
+.header {
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 50;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    height: 68px;
+
+    padding:
+        0 18px;
+
+    background:
+        rgba(5,7,11,0.88);
+
+    backdrop-filter:
+        blur(20px);
+
+    border-bottom:
+        1px solid var(--border);
+
+}
+
+.logo {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    font-size: 20px;
+
+    font-weight: 800;
+
+    letter-spacing: -0.6px;
+
+}
+
+.logo-mark {
+
+    width: 32px;
+
+    height: 32px;
+
+    border-radius: 10px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--blue),
+            #0052d4
+        );
+
+    box-shadow:
+        0 6px 20px
+        rgba(22,119,255,0.3);
+
+}
+
+.profile-button {
+
+    width: 38px;
+
+    height: 38px;
+
+    border-radius: 50%;
+
+    background:
+        var(--surface-3);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    overflow: hidden;
+
+    border:
+        1px solid var(--border);
+
+}
+
+.profile-avatar {
+
+    width: 100%;
+
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--blue),
+            #003f9e
+        );
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+}
+
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.page {
+
+    display: none;
+
+    padding:
+        20px 16px 30px;
+
+}
+
+.page.active {
+
+    display: block;
+
+}
+
+
+/* =========================================================
+   SECTION HEADER
+========================================================= */
+
+.section-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin:
+        26px 0 14px;
+
+}
+
+.section-header:first-child {
+
+    margin-top: 0;
+
+}
+
+.section-title {
+
+    font-size: 18px;
+
+    font-weight: 750;
+
+    letter-spacing: -0.4px;
+
+}
+
+.section-link {
+
+    color: var(--blue-light);
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero {
+
+    position: relative;
+
+    min-height: 330px;
+
+    border-radius:
+        22px;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            145deg,
+            #101827,
+            #080b11
+        );
+
+    border:
+        1px solid var(--border);
+
+}
+
+.hero-image {
+
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+    opacity: 0.55;
+
+}
+
+.hero-image.hidden {
+
+    display: none;
+
+}
+
+.hero-overlay {
+
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(5,7,11,0.05),
+            rgba(5,7,11,0.98)
+        );
+
+}
+
+.hero-content {
+
+    position: relative;
+
+    z-index: 2;
+
+    min-height: 330px;
+
+    padding:
+        22px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: flex-end;
+
+}
+
+.hero-label {
+
+    color:
+        var(--blue-light);
+
+    text-transform:
+        uppercase;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.3px;
+
+    margin-bottom: 8px;
+
+}
+
+.hero-title {
+
+    font-size: 28px;
+
+    line-height: 1.05;
+
+    font-weight: 800;
+
+    letter-spacing: -1px;
+
+    margin-bottom: 9px;
+
+}
+
+.hero-description {
+
+    color:
+        var(--text-secondary);
+
+    font-size: 13px;
+
+    line-height: 1.5;
+
+    max-width: 400px;
+
+    margin-bottom: 16px;
+
+}
+
+.primary-button {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    height: 45px;
+
+    padding:
+        0 18px;
+
+    border-radius:
+        12px;
+
+    background:
+        var(--blue);
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    width: fit-content;
+
+    box-shadow:
+        0 8px 25px
+        rgba(22,119,255,0.25);
+
+}
+
+.primary-button:active {
+
+    transform:
+        scale(0.97);
+
+}
+
+
+/* =========================================================
+   STATS
+========================================================= */
+
+.stats {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 10px;
+
+    margin-top: 14px;
+
+}
+
+.stat {
+
+    background:
+        var(--surface);
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        var(--radius);
+
+    padding:
+        16px;
+
+}
+
+.stat-value {
+
+    font-size: 23px;
+
+    font-weight: 800;
+
+}
+
+.stat-label {
+
+    color:
+        var(--text-secondary);
+
+    font-size: 11px;
+
+    margin-top: 4px;
+
+}
+
+
+/* =========================================================
+   HORIZONTAL ROW
+========================================================= */
+
+.horizontal-row {
+
+    display: flex;
+
+    gap: 12px;
+
+    overflow-x: auto;
+
+    padding-bottom: 5px;
+
+    scrollbar-width: none;
+
+}
+
+.horizontal-row::-webkit-scrollbar {
+
+    display: none;
+
+}
+
+
+/* =========================================================
+   POSTER CARD
+========================================================= */
+
+.card {
+
+    flex:
+        0 0 125px;
+
+    width: 125px;
+
+    cursor: pointer;
+
+}
+
+.poster {
+
+    position: relative;
+
+    width: 125px;
+
+    height: 178px;
+
+    border-radius:
+        13px;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            145deg,
+            #182131,
+            #0b0e14
+        );
+
+    border:
+        1px solid var(--border);
+
+}
+
+.poster img {
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+}
+
+.poster-placeholder {
+
+    width: 100%;
+
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    padding: 12px;
+
+    color:
+        var(--text-secondary);
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+}
+
+.card-title {
+
+    margin-top: 9px;
+
+    font-size: 12px;
+
+    font-weight: 650;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+}
+
+.card-meta {
+
+    margin-top: 4px;
+
+    color:
+        var(--text-muted);
+
+    font-size: 10px;
+
+}
+
+.progress-bar {
+
+    height: 3px;
+
+    width: 100%;
+
+    background:
+        rgba(255,255,255,0.08);
+
+    margin-top: 7px;
+
+    border-radius: 5px;
+
+    overflow: hidden;
+
+}
+
+.progress-fill {
+
+    height: 100%;
+
+    background:
+        var(--blue);
+
+}
+
+
+/* =========================================================
+   LIBRARY
+========================================================= */
+
+.library-tabs {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 5px;
+
+    background:
+        var(--surface);
+
+    padding: 4px;
+
+    border-radius:
+        12px;
+
+    margin-bottom: 18px;
+
+}
+
+.library-tab {
+
+    height: 40px;
+
+    border-radius:
+        9px;
+
+    color:
+        var(--text-secondary);
+
+    background:
+        transparent;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+}
+
+.library-tab.active {
+
+    color:
+        white;
+
+    background:
+        var(--blue);
+
+}
+
+.library-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap:
+        18px 10px;
+
+}
+
+.library-grid .card {
+
+    width: 100%;
+
+}
+
+.library-grid .poster {
+
+    width: 100%;
+
+    height: auto;
+
+    aspect-ratio:
+        0.70;
+
+}
+
+.empty-state {
+
+    text-align: center;
+
+    padding:
+        55px 20px;
+
+    color:
+        var(--text-secondary);
+
+}
+
+.empty-state svg {
+
+    color:
+        var(--text-muted);
+
+    margin-bottom: 15px;
+
+}
+
+.empty-state h3 {
+
+    color:
+        var(--text);
+
+    font-size: 16px;
+
+    margin-bottom: 7px;
+
+}
+
+.empty-state p {
+
+    font-size: 12px;
+
+    line-height: 1.5;
+
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.search-box {
+
+    position: relative;
+
+    margin-bottom: 18px;
+
+}
+
+.search-box input {
+
+    width: 100%;
+
+    height: 48px;
+
+    padding:
+        0 16px 0 45px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        14px;
+
+    background:
+        var(--surface);
+
+    color:
+        white;
+
+    outline: none;
+
+}
+
+.search-box input:focus {
+
+    border-color:
+        rgba(22,119,255,0.6);
+
+}
+
+.search-icon {
+
+    position: absolute;
+
+    left: 16px;
+
+    top: 50%;
+
+    transform:
+        translateY(-50%);
+
+    color:
+        var(--text-muted);
+
+}
+
+
+/* =========================================================
+   BOTTOM NAVIGATION
+========================================================= */
+
+.bottom-nav {
+
+    position: fixed;
+
+    left: 50%;
+
+    bottom: 0;
+
+    transform:
+        translateX(-50%);
+
+    z-index: 100;
+
+    width: 100%;
+
+    max-width: 600px;
+
+    height: 72px;
+
+    padding:
+        7px 12px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    background:
+        rgba(8,11,17,0.94);
+
+    backdrop-filter:
+        blur(20px);
+
+    border-top:
+        1px solid var(--border);
+
+}
+
+.nav-button {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 4px;
+
+    background:
+        transparent;
+
+    color:
+        var(--text-muted);
+
+    font-size: 9px;
+
+    font-weight: 650;
+
+}
+
+.nav-button.active {
+
+    color:
+        var(--blue-light);
+
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.modal {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 200;
+
+    display: none;
+
+    align-items: flex-end;
+
+    background:
+        rgba(0,0,0,0.7);
+
+}
+
+.modal.open {
+
+    display: flex;
+
+}
+
+.modal-sheet {
+
+    width: 100%;
+
+    max-width: 600px;
+
+    max-height: 92vh;
+
+    margin:
+        0 auto;
+
+    overflow-y: auto;
+
+    background:
+        #090d14;
+
+    border-radius:
+        24px 24px 0 0;
+
+    border:
+        1px solid var(--border);
+
+}
+
+.modal-header {
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 5;
+
+    height: 55px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    padding:
+        0 15px;
+
+    background:
+        rgba(9,13,20,0.9);
+
+    backdrop-filter:
+        blur(15px);
+
+}
+
+.close-button {
+
+    width: 36px;
+
+    height: 36px;
+
+    border-radius:
+        50%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        var(--surface-3);
+
+    color:
+        var(--text-secondary);
+
+}
+
+.modal-backdrop {
+
+    width: 100%;
+
+    height: 220px;
+
+    object-fit: cover;
+
+    background:
+        linear-gradient(
+            145deg,
+            #152033,
+            #080b10
+        );
+
+}
+
+.modal-content {
+
+    padding:
+        20px;
+
+}
+
+.modal-title {
+
+    font-size: 25px;
+
+    font-weight: 800;
+
+    letter-spacing: -0.7px;
+
+}
+
+.modal-meta {
+
+    display: flex;
+
+    gap: 8px;
+
+    color:
+        var(--text-secondary);
+
+    font-size: 11px;
+
+    margin:
+        9px 0 16px;
+
+}
+
+.modal-description {
+
+    color:
+        var(--text-secondary);
+
+    font-size: 13px;
+
+    line-height: 1.6;
+
+}
+
+.modal-actions {
+
+    display: flex;
+
+    gap: 8px;
+
+    margin:
+        20px 0;
+
+}
+
+.action-button {
+
+    flex: 1;
+
+    min-height: 43px;
+
+    border-radius:
+        11px;
+
+    background:
+        var(--surface-3);
+
+    color:
+        white;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+}
+
+.action-button.primary {
+
+    background:
+        var(--blue);
+
+}
+
+.season-selector {
+
+    display: flex;
+
+    gap: 7px;
+
+    overflow-x: auto;
+
+    margin:
+        20px 0 14px;
+
+    scrollbar-width: none;
+
+}
+
+.season-selector::-webkit-scrollbar {
+
+    display: none;
+
+}
+
+.season-button {
+
+    flex:
+        0 0 auto;
+
+    height: 36px;
+
+    padding:
+        0 14px;
+
+    border-radius:
+        9px;
+
+    background:
+        var(--surface-3);
+
+    color:
+        var(--text-secondary);
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+}
+
+.season-button.active {
+
+    background:
+        var(--blue);
+
+    color:
+        white;
+
+}
+
+.episode {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding:
+        13px 0;
+
+    border-bottom:
+        1px solid var(--border);
+
+}
+
+.episode-check {
+
+    flex:
+        0 0 29px;
+
+    width: 29px;
+
+    height: 29px;
+
+    border-radius:
+        50%;
+
+    border:
+        1px solid var(--text-muted);
+
+    background:
+        transparent;
+
+    color:
+        white;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+.episode-check.watched {
+
+    background:
+        var(--blue);
+
+    border-color:
+        var(--blue);
+
+}
+
+.episode-info {
+
+    min-width: 0;
+
+}
+
+.episode-title {
+
+    font-size: 12px;
+
+    font-weight: 650;
+
+}
+
+.episode-meta {
+
+    color:
+        var(--text-muted);
+
+    font-size: 10px;
+
+    margin-top: 4px;
+
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+.toast {
+
+    position: fixed;
+
+    left: 50%;
+
+    bottom: 88px;
+
+    transform:
+        translateX(-50%)
+        translateY(20px);
+
+    z-index: 500;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    padding:
+        11px 16px;
+
+    border-radius:
+        10px;
+
+    background:
+        #161d29;
+
+    border:
+        1px solid var(--border);
+
+    color:
+        white;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    transition:
+        0.25s ease;
+
+    white-space: nowrap;
+
+}
+
+.toast.show {
+
+    opacity: 1;
+
+    transform:
+        translateX(-50%)
+        translateY(0);
+
+}
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+.profile-card {
+
+    background:
+        var(--surface);
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        var(--radius);
+
+    padding:
+        20px;
+
+}
+
+.profile-row {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+}
+
+.large-avatar {
+
+    width: 58px;
+
+    height: 58px;
+
+    border-radius:
+        50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--blue),
+            #0045a9
+        );
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 20px;
+
+    font-weight: 800;
+
+}
+
+.profile-name {
+
+    font-size: 17px;
+
+    font-weight: 750;
+
+}
+
+.profile-subtitle {
+
+    color:
+        var(--text-secondary);
+
+    font-size: 11px;
+
+    margin-top: 4px;
+
+}
+
+.profile-list {
+
+    margin-top: 20px;
+
+}
+
+.profile-item {
+
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding:
+        15px 0;
+
+    background:
+        transparent;
+
+    color:
+        var(--text-secondary);
+
+    border-bottom:
+        1px solid var(--border);
+
+    font-size: 12px;
+
+}
+
+.profile-item-left {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (
+    max-width: 360px
+) {
+
+    .page {
+
+        padding-left:
+            12px;
+
+        padding-right:
+            12px;
+
+    }
+
+    .library-grid {
+
+        gap:
+            14px 7px;
+
+    }
+
+    .hero-title {
+
+        font-size:
+            24px;
+
+    }
+
+}
+
+@media (
+    min-width: 500px
+) {
+
+    .library-grid {
+
+        grid-template-columns:
+            repeat(4, 1fr);
+
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<div class="app">
+
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
+<header class="header">
+
+    <div class="logo">
+
+        <div class="logo-mark">
+
+            <svg
+                class="icon"
+                viewBox="0 0 24 24"
+            >
+
+                <rect
+                    x="3"
+                    y="4"
+                    width="18"
+                    height="16"
+                    rx="3"
+                />
+
+                <path
+                    d="M8 4v16"
+                />
+
+                <path
+                    d="M16 4v16"
+                />
+
+            </svg>
+
+        </div>
+
+        ReelTrack
+
+    </div>
+
+
+    <button
+        class="profile-button"
+        onclick="showPage('profile')"
+    >
+
+        <div
+            class="profile-avatar"
+            id="headerAvatar"
+        >
+
+            H
+
+        </div>
+
+    </button>
+
+</header>
+
+
+<!-- =====================================================
+     HOME
+===================================================== -->
+
+<main
+    id="homePage"
+    class="page active"
+>
+
+
+<section class="hero">
+
+    <img
+        id="heroImage"
+        class="hero-image hidden"
+        alt=""
+    >
+
+    <div class="hero-overlay"></div>
+
+    <div class="hero-content">
+
+        <div class="hero-label">
+            Continue Watching
+        </div>
+
+        <h1
+            id="heroTitle"
+            class="hero-title"
+        >
+            Welcome to ReelTrack
+        </h1>
+
+        <p
+            id="heroDescription"
+            class="hero-description"
+        >
+            Track every movie and TV show your household watches.
+        </p>
+
+        <button
+            class="primary-button"
+            onclick="continueWatching()"
+        >
+
+            <svg
+                class="icon icon-small"
+                viewBox="0 0 24 24"
+            >
+
+                <path
+                    d="M8 5l11 7-11 7V5z"
+                />
+
+            </svg>
+
+            Continue Watching
+
+        </button>
+
+    </div>
+
+</section>
+
+
+<div
+    id="dashboardStats"
+    class="stats"
+></div>
+
+
+<div
+    id="continueTVSection"
+>
+
+    <div class="section-header">
+
+        <div class="section-title">
+            Continue TV Shows
+        </div>
+
+        <button
+            class="section-link"
+            onclick="openLibrary('tv')"
+        >
+            See All
+        </button>
+
+    </div>
+
+
+    <div
+        id="continueTVGrid"
+        class="horizontal-row"
+    ></div>
+
+</div>
+
+
+<div
+    id="continueMovieSection"
+>
+
+    <div class="section-header">
+
+        <div class="section-title">
+            Continue Movies
+        </div>
+
+        <button
+            class="section-link"
+            onclick="openLibrary('movie')"
+        >
+            See All
+        </button>
+
+    </div>
+
+
+    <div
+        id="continueMovieGrid"
+        class="horizontal-row"
+    ></div>
+
+</div>
+
+
+<div>
+
+    <div class="section-header">
+
+        <div class="section-title">
+            Recent TV Shows
+        </div>
+
+    </div>
+
+
+    <div
+        id="recentTVGrid"
+        class="horizontal-row"
+    ></div>
+
+</div>
+
+
+<div>
+
+    <div class="section-header">
+
+        <div class="section-title">
+            Recent Movies
+        </div>
+
+    </div>
+
+
+    <div
+        id="recentMovieGrid"
+        class="horizontal-row"
+    ></div>
+
+</div>
+
+
+</main>
+
+
+<!-- =====================================================
+     LIBRARY
+===================================================== -->
+
+<main
+    id="libraryPage"
+    class="page"
+>
+
+
+<div class="section-header">
+
+    <div class="section-title">
+        Library
+    </div>
+
+</div>
+
+
+<div class="library-tabs">
+
+    <button
+        id="moviesTab"
+        class="library-tab active"
+        onclick="setLibraryType('movie')"
+    >
+
+        Movies
+
+    </button>
+
+
+    <button
+        id="tvTab"
+        class="library-tab"
+        onclick="setLibraryType('tv')"
+    >
+
+        TV Shows
+
+    </button>
+
+</div>
+
+
+<div
+    id="libraryGrid"
+    class="library-grid"
+></div>
+
+
+</main>
+
+
+<!-- =====================================================
+     SEARCH
+===================================================== -->
+
+<main
+    id="searchPage"
+    class="page"
+>
+
+
+<div class="section-header">
+
+    <div class="section-title">
+        Search
+    </div>
+
+</div>
+
+
+<div class="search-box">
+
+    <svg
+        class="icon search-icon"
+        viewBox="0 0 24 24"
+    >
+
+        <circle
+            cx="11"
+            cy="11"
+            r="7"
+        />
+
+        <path
+            d="M20 20l-4-4"
+        />
+
+    </svg>
+
+
+    <input
+        id="searchInput"
+        type="search"
+        placeholder="Search movies and TV shows..."
+        autocomplete="off"
+    >
+
+</div>
+
+
+<div
+    id="searchResults"
+></div>
+
+
+</main>
+
+
+<!-- =====================================================
+     WATCHLIST
+===================================================== -->
+
+<main
+    id="watchlistPage"
+    class="page"
+>
+
+
+<div class="section-header">
+
+    <div class="section-title">
+        Watchlist
+    </div>
+
+</div>
+
+
+<div class="library-tabs">
+
+    <button
+        id="watchMovieTab"
+        class="library-tab active"
+        onclick="setWatchlistType('movie')"
+    >
+
+        Movies
+
+    </button>
+
+
+    <button
+        id="watchTVTab"
+        class="library-tab"
+        onclick="setWatchlistType('tv')"
+    >
+
+        TV Shows
+
+    </button>
+
+</div>
+
+
+<div
+    id="watchlistGrid"
+    class="library-grid"
+></div>
+
+
+</main>
+
+
+<!-- =====================================================
+     PROFILE
+===================================================== -->
+
+<main
+    id="profilePage"
+    class="page"
+>
+
+
+<div class="section-header">
+
+    <div class="section-title">
+        Profile
+    </div>
+
+</div>
+
+
+<div class="profile-card">
+
+    <div class="profile-row">
+
+        <div
+            class="large-avatar"
+            id="largeAvatar"
+        >
+            H
+        </div>
+
+
+        <div>
+
+            <div
+                class="profile-name"
+                id="profileName"
+            >
+                Hanu
+            </div>
+
+            <div class="profile-subtitle">
+                ReelTrack household member
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="profile-list">
+
+        <button
+            class="profile-item"
+            onclick="resetDemo()"
+        >
+
+            <div class="profile-item-left">
+
+                <svg
+                    class="icon"
+                    viewBox="0 0 24 24"
+                >
+
+                    <path
+                        d="M3 12a9 9 0 1 0 3-6.7"
+                    />
+
+                    <path
+                        d="M3 4v6h6"
+                    />
+
+                </svg>
+
+                Reset Demo Data
+
+            </div>
+
+
+            <svg
+                class="icon icon-small"
+                viewBox="0 0 24 24"
+            >
+
+                <path
+                    d="M9 18l6-6-6-6"
+                />
+
+            </svg>
+
+        </button>
+
+
+        <button
+            class="profile-item"
+            onclick="clearAllData()"
+        >
+
+            <div class="profile-item-left">
+
+                <svg
+                    class="icon"
+                    viewBox="0 0 24 24"
+                >
+
+                    <path
+                        d="M4 7h16"
+                    />
+
+                    <path
+                        d="M10 11v6"
+                    />
+
+                    <path
+                        d="M14 11v6"
+                    />
+
+                    <path
+                        d="M6 7l1 13h10l1-13"
+                    />
+
+                    <path
+                        d="M9 7V4h6v3"
+                    />
+
+                </svg>
+
+                Clear All Data
+
+            </div>
+
+
+            <svg
+                class="icon icon-small"
+                viewBox="0 0 24 24"
+            >
+
+                <path
+                    d="M9 18l6-6-6-6"
+                />
+
+            </svg>
+
+        </button>
+
+    </div>
+
+</div>
+
+
+</main>
+
+
+<!-- =====================================================
+     BOTTOM NAV
+===================================================== -->
+
+<nav class="bottom-nav">
+
+
+<button
+    id="navHome"
+    class="nav-button active"
+    onclick="showPage('home')"
+>
+
+    <svg
+        class="icon"
+        viewBox="0 0 24 24"
+    >
+
+        <path
+            d="M3 10.5L12 3l9 7.5"
+        />
+
+        <path
+            d="M5 9v11h14V9"
+        />
+
+    </svg>
+
+    Home
+
+</button>
+
+
+<button
+    id="navLibrary"
+    class="nav-button"
+    onclick="showPage('library')"
+>
+
+    <svg
+        class="icon"
+        viewBox="0 0 24 24"
+    >
+
+        <rect
+            x="4"
+            y="3"
+            width="16"
+            height="18"
+            rx="2"
+        />
+
+        <path
+            d="M8 3v18"
+        />
+
+    </svg>
+
+    Library
+
+</button>
+
+
+<button
+    id="navSearch"
+    class="nav-button"
+    onclick="showPage('search')"
+>
+
+    <svg
+        class="icon"
+        viewBox="0 0 24 24"
+    >
+
+        <circle
+            cx="11"
+            cy="11"
+            r="7"
+        />
+
+        <path
+            d="M20 20l-4-4"
+        />
+
+    </svg>
+
+    Search
+
+</button>
+
+
+<button
+    id="navWatchlist"
+    class="nav-button"
+    onclick="showPage('watchlist')"
+>
+
+    <svg
+        class="icon"
+        viewBox="0 0 24 24"
+    >
+
+        <path
+            d="M6 3h12v18l-6-4-6 4V3z"
+        />
+
+    </svg>
+
+    Watchlist
+
+</button>
+
+
+</nav>
+
+
+</div>
+
+
+<!-- =====================================================
+     DETAILS MODAL
+===================================================== -->
+
+<div
+    id="detailsModal"
+    class="modal"
+    onclick="closeModalOutside(event)"
+>
+
+
+<div class="modal-sheet">
+
+
+<div class="modal-header">
+
+    <button
+        class="close-button"
+        onclick="closeModal()"
+    >
+
+        <svg
+            class="icon"
+            viewBox="0 0 24 24"
+        >
+
+            <path
+                d="M6 6l12 12"
+            />
+
+            <path
+                d="M18 6L6 18"
+            />
+
+        </svg>
+
+    </button>
+
+</div>
+
+
+<img
+    id="modalBackdrop"
+    class="modal-backdrop"
+    alt=""
+>
+
+
+<div class="modal-content">
+
+
+<h2
+    id="modalTitle"
+    class="modal-title"
+></h2>
+
+
+<div
+    id="modalMeta"
+    class="modal-meta"
+></div>
+
+
+<p
+    id="modalDescription"
+    class="modal-description"
+></p>
+
+
+<div
+    id="modalActions"
+    class="modal-actions"
+></div>
+
+
+<div
+    id="modalEpisodes"
+></div>
+
+
+</div>
+
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     TOAST
+===================================================== -->
+
+<div
+    id="toast"
+    class="toast"
+></div>
+
+
+<script>
+
+/* =========================================================
+   APPLICATION STATE
+========================================================= */
+
+const STORAGE_KEY =
+    "reeltrack_data_v1";
+
+
+let state = {
+
+    movies: [],
+
+    tvShows: [],
+
+    history: [],
+
+    profiles: [
+
+        {
+            id: "profile-hanu",
+            name: "Hanu",
+            initials: "H"
+        }
+
+    ],
+
+    activeProfileId:
+        "profile-hanu"
+
+};
+
+
+let currentItem = null;
+
+let currentLibraryType =
+    "movie";
+
+let currentWatchlistType =
+    "movie";
+
+
+/* =========================================================
+   LOAD / SAVE
+========================================================= */
+
+function loadState() {
+
+    const saved =
+        localStorage.getItem(
+            STORAGE_KEY
+        );
+
+
+    if (!saved) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const parsed =
+            JSON.parse(
+                saved
+            );
+
+
+        state = {
+
+            ...state,
+
+            ...parsed
+
+        };
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Could not load ReelTrack data",
+            error
+        );
+
+    }
+
+}
+
+
+function saveState() {
+
+    localStorage.setItem(
+
+        STORAGE_KEY,
+
+        JSON.stringify(
+            state
+        )
+
+    );
+
+}
+
+
+/* =========================================================
+   PLACEHOLDER TV SHOW
+========================================================= */
+
+function createPlaceholderTVShow() {
+
+    const exists =
+        state.tvShows.some(
+
+            show =>
+                show.isPlaceholder === true
+
+        );
+
+
+    if (exists) {
+
+        return;
+
+    }
+
+
+    const placeholder = {
+
+        id:
+            "placeholder-tv-show",
+
+        type:
+            "tv",
+
+        ownerId:
+            state.activeProfileId,
+
+        title:
+            "The Placeholder",
+
+        year:
+            "2026",
+
+        poster:
+            "",
+
+        backdrop:
+            "",
+
+        description:
+            "A placeholder TV show used to test ReelTrack. This show contains two seasons with ten episodes in each season.",
+
+        watchlist:
+            false,
+
+        completed:
+            false,
+
+        isPlaceholder:
+            true,
+
+        episodes: []
+
+    };
+
+
+    for (
+        let season = 1;
+        season <= 2;
+        season++
+    ) {
+
+        for (
+            let episode = 1;
+            episode <= 10;
+            episode++
+        ) {
+
+            placeholder.episodes.push({
+
+                id:
+                    `placeholder-s${season}-e${episode}`,
+
+                season:
+                    season,
+
+                number:
+                    episode,
+
+                title:
+                    `Episode ${episode}`,
+
+                runtime:
+                    "45 min",
+
+                watched:
+                    false,
+
+                watchedAt:
+                    null
+
+            });
+
+        }
+
+    }
+
+
+    state.tvShows.push(
+        placeholder
+    );
+
+
+    saveState();
+
+}
+
+
+/* =========================================================
+   FIND ITEM
+========================================================= */
+
+function findItem(
+    type,
+    id
+) {
+
+    if (
+        type ===
+        "movie"
+    ) {
+
+        return state.movies.find(
+
+            movie =>
+                movie.id === id
+
+        );
+
+    }
+
+
+    return state.tvShows.find(
+
+        show =>
+            show.id === id
+
+    );
+
+}
+
+
+/* =========================================================
+   TV PROGRESS
+========================================================= */
+
+function getTVProgress(
+    show
+) {
+
+    if (
+        !show ||
+        !Array.isArray(
+            show.episodes
+        )
+    ) {
+
+        return {
+
+            watched: 0,
+
+            total: 0,
+
+            percentage: 0,
+
+            nextEpisode: null
+
+        };
+
+    }
+
+
+    const total =
+        show.episodes.length;
+
+
+    const watched =
+        show.episodes.filter(
+
+            episode =>
+                episode.watched === true
+
+        ).length;
+
+
+    const nextEpisode =
+        show.episodes.find(
+
+            episode =>
+                !episode.watched
+
+        );
+
+
+    const percentage =
+        total === 0
+
+        ?
+
+        0
+
+        :
+
+        Math.round(
+
+            (
+                watched /
+                total
+            ) * 100
+
+        );
+
+
+    return {
+
+        watched,
+
+        total,
+
+        percentage,
+
+        nextEpisode
+
+    };
+
+}
+
+
+/* =========================================================
+   HISTORY
+========================================================= */
+
+function addHistory(
+    item,
+    action
+) {
+
+    state.history.push({
+
+        id:
+            Date.now(),
+
+        itemId:
+            item.id,
+
+        type:
+            item.type,
+
+        title:
+            item.title,
+
+        action,
+
+        date:
+            new Date()
+                .toISOString(),
+
+        ownerId:
+            state.activeProfileId
+
+    });
+
+
+    if (
+        state.history.length > 100
+    ) {
+
+        state.history =
+            state.history.slice(
+                -100
+            );
+
+    }
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function showPage(
+    page
+) {
+
+    document
+        .querySelectorAll(
+            ".page"
+        )
+        .forEach(
+
+            element => {
+
+                element.classList.remove(
+                    "active"
+                );
+
+            }
+
+        );
+
+
+    const target =
+        document.getElementById(
+
+            page +
+            "Page"
+
+        );
+
+
+    if (target) {
+
+        target.classList.add(
+            "active"
+        );
+
+    }
+
+
+    document
+        .querySelectorAll(
+            ".nav-button"
+        )
+        .forEach(
+
+            button => {
+
+                button.classList.remove(
+                    "active"
+                );
+
+            }
+
+        );
+
+
+    const nav =
+        document.getElementById(
+
+            "nav" +
+            page.charAt(0)
+                .toUpperCase() +
+            page.slice(1)
+
+        );
+
+
+    if (nav) {
+
+        nav.classList.add(
+            "active"
+        );
+
+    }
+
+
+    if (
+        page ===
+        "library"
+    ) {
+
+        renderLibrary();
+
+    }
+
+
+    if (
+        page ===
+        "watchlist"
+    ) {
+
+        renderWatchlist();
+
+    }
+
+
+    if (
+        page ===
+        "search"
+    ) {
+
+        document
+            .getElementById(
+                "searchInput"
+            )
+            .focus();
+
+    }
+
+
+    if (
+        page ===
+        "home"
+    ) {
+
+        renderDashboard();
+
+    }
+
+}
+
+
+/* =========================================================
+   LIBRARY
+========================================================= */
+
+function openLibrary(
+    type
+) {
+
+    currentLibraryType =
+        type;
+
+    showPage(
+        "library"
+    );
+
+}
+
+
+function setLibraryType(
+    type
+) {
+
+    currentLibraryType =
+        type;
+
+
+    document
+        .getElementById(
+            "moviesTab"
+        )
+        .classList.toggle(
+
+            "active",
+
+            type ===
+            "movie"
+
+        );
+
+
+    document
+        .getElementById(
+            "tvTab"
+        )
+        .classList.toggle(
+
+            "active",
+
+            type ===
+            "tv"
+
+        );
+
+
+    renderLibrary();
+
+}
+
+
+function renderLibrary() {
+
+    const grid =
+        document.getElementById(
+            "libraryGrid"
+        );
+
+
+    const items =
+
+        currentLibraryType ===
+        "movie"
+
+        ?
+
+        state.movies.filter(
+
+            item =>
+                item.ownerId ===
+                state.activeProfileId
+
+        )
+
+        :
+
+        state.tvShows.filter(
+
+            item =>
+                item.ownerId ===
+                state.activeProfileId
+
+        );
+
+
+    if (
+        !items.length
+    ) {
+
+        grid.innerHTML = emptyState(
+
+            currentLibraryType ===
+            "movie"
+
+            ?
+
+            "No Movies Yet"
+
+            :
+
+            "No TV Shows Yet"
+
+        );
+
+
+        return;
+
+    }
+
+
+    grid.innerHTML =
+
+        items
+            .map(
+
+                item =>
+                    createCard(
+                        item,
+                        currentLibraryType
+                    )
+
+            )
+            .join("");
+
+}
+
+
+/* =========================================================
+   WATCHLIST
+========================================================= */
+
+function setWatchlistType(
+    type
+) {
+
+    currentWatchlistType =
+        type;
+
+
+    document
+        .getElementById(
+            "watchMovieTab"
+        )
+        .classList.toggle(
+
+            "active",
+
+            type ===
+            "movie"
+
+        );
+
+
+    document
+        .getElementById(
+            "watchTVTab"
+        )
+        .classList.toggle(
+
+            "active",
+
+            type ===
+            "tv"
+
+        );
+
+
+    renderWatchlist();
+
+}
+
+
+function renderWatchlist() {
+
+    const grid =
+        document.getElementById(
+            "watchlistGrid"
+        );
+
+
+    const items =
+
+        currentWatchlistType ===
+        "movie"
+
+        ?
+
+        state.movies
+
+        :
+
+        state.tvShows;
+
+
+    const filtered =
+        items.filter(
+
+            item =>
+
+                item.ownerId ===
+                state.activeProfileId
+
+                &&
+
+                item.watchlist ===
+                true
+
+        );
+
+
+    if (
+        !filtered.length
+    ) {
+
+        grid.innerHTML =
+            emptyState(
+
+                currentWatchlistType ===
+                "movie"
+
+                ?
+
+                "No Movies in Watchlist"
+
+                :
+
+                "No TV Shows in Watchlist"
+
+            );
+
+
+        return;
+
+    }
+
+
+    grid.innerHTML =
+
+        filtered
+            .map(
+
+                item =>
+                    createCard(
+                        item,
+                        currentWatchlistType
+                    )
+
+            )
+            .join("");
+
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+function createCard(
+    item,
+    type
+) {
+
+    let meta = "";
+
+
+    if (
+        type ===
+        "movie"
+    ) {
+
+        meta =
+            item.watched
+            ?
+            "Watched"
+            :
+            "Not watched";
+
+    }
+
+    else {
+
+        const progress =
+            getTVProgress(
+                item
+            );
+
+
+        meta =
+
+            progress.total ===
+            0
+
+            ?
+
+            "No episodes"
+
+            :
+
+            `${progress.watched}/${progress.total} episodes`;
+
+    }
+
+
+    let progressHTML =
+        "";
+
+
+    if (
+        type ===
+        "tv"
+    ) {
+
+        const progress =
+            getTVProgress(
+                item
+            );
+
+
+        progressHTML = `
+
+            <div
+                class="progress-bar"
+            >
+
+                <div
+                    class="progress-fill"
+                    style="
+                        width:
+                        ${progress.percentage}%;
+                    "
+                ></div>
+
+            </div>
+
+        `;
+
+    }
+
+
+    return `
+
+        <div
+            class="card"
+            onclick="
+                openDetails(
+                    '${type}',
+                    '${item.id}'
+                )
+            "
+        >
+
+            <div
+                class="poster"
+            >
+
+                ${
+                    item.poster
+
+                    ?
+
+                    `
+                    <img
+                        src="${item.poster}"
+                        alt="${escapeHTML(item.title)}"
+                    >
+                    `
+
+                    :
+
+                    `
+                    <div
+                        class="poster-placeholder"
+                    >
+
+                        ${escapeHTML(item.title)}
+
+                    </div>
+                    `
+
+                }
+
+            </div>
+
+
+            <div
+                class="card-title"
+            >
+
+                ${escapeHTML(item.title)}
+
+            </div>
+
+
+            <div
+                class="card-meta"
+            >
+
+                ${meta}
+
+            </div>
+
+
+            ${progressHTML}
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   HORIZONTAL ROW
+========================================================= */
+
+function renderRow(
+    elementId,
+    items
+) {
+
+    const element =
+        document.getElementById(
+            elementId
+        );
+
+
+    if (!element) {
+
+        return;
+
+    }
+
+
+    if (
+        !items.length
+    ) {
+
+        element.innerHTML = `
+
+            <div
+                style="
+                    color:
+                        var(--text-muted);
+                    font-size:
+                        12px;
+                    padding:
+                        15px 0;
+                "
+            >
+
+                Nothing here yet.
+
+            </div>
+
+        `;
+
+
+        return;
+
+    }
+
+
+    element.innerHTML =
+
+        items
+            .map(
+
+                item =>
+
+                    createCard(
+
+                        item,
+
+                        item.type
+
+                    )
+
+            )
+            .join("");
+
+}
+
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+function renderDashboard() {
+
+    const profileId =
+        state.activeProfileId;
+
+
+    const movies =
+        state.movies.filter(
+
+            movie =>
+                movie.ownerId ===
+                profileId
+
+        );
+
+
+    const shows =
+        state.tvShows.filter(
+
+            show =>
+                show.ownerId ===
+                profileId
+
+        );
+
+
+    const watchedMovies =
+        movies.filter(
+
+            movie =>
+                movie.watched
+
+        );
+
+
+    const watchedEpisodes =
+        shows.reduce(
+
+            (
+                total,
+                show
+            ) =>
+
+                total +
+                getTVProgress(
+                    show
+                ).watched,
+
+            0
+
+        );
+
+
+    document
+        .getElementById(
+            "dashboardStats"
+        )
+        .innerHTML = `
+
+            <div class="stat">
+
+                <div
+                    class="stat-value"
+                >
+
+                    ${watchedMovies.length}
+
+                </div>
+
+                <div
+                    class="stat-label"
+                >
+
+                    Movies Watched
+
+                </div>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div
+                    class="stat-value"
+                >
+
+                    ${watchedEpisodes}
+
+                </div>
+
+                <div
+                    class="stat-label"
+                >
+
+                    Episodes Watched
+
+                </div>
+
+            </div>
+
+        `;
+
+
+    const continueTV =
+        shows.filter(
+
+            show => {
+
+                const progress =
+                    getTVProgress(
+                        show
+                    );
+
+
+                return (
+
+                    progress.watched >
+                    0
+
+                    &&
+
+                    progress.watched <
+                    progress.total
+
+                );
+
+            }
+
+        );
+
+
+    const continueMovies =
+        movies.filter(
+
+            movie =>
+                !movie.watched
+
+        );
+
+
+    renderRow(
+
+        "continueTVGrid",
+
+        continueTV
+
+    );
+
+
+    renderRow(
+
+        "continueMovieGrid",
+
+        continueMovies
+
+    );
+
+
+    renderRow(
+
+        "recentTVGrid",
+
+        shows.slice(
+            -10
+        ).reverse()
+
+    );
+
+
+    renderRow(
+
+        "recentMovieGrid",
+
+        movies.slice(
+            -10
+        ).reverse()
+
+    );
+
+
+    const heroTitle =
+        document.getElementById(
+            "heroTitle"
+        );
+
+
+    const heroDescription =
+        document.getElementById(
+            "heroDescription"
+        );
+
+
+    const heroImage =
+        document.getElementById(
+            "heroImage"
+        );
+
+
+    if (
+        continueTV.length
+    ) {
+
+        const show =
+            continueTV[0];
+
+
+        const progress =
+            getTVProgress(
+                show
+            );
+
+
+        heroTitle.textContent =
+            show.title;
+
+
+        heroDescription.textContent =
+
+            progress.nextEpisode
+
+            ?
+
+            `Continue with Season ${progress.nextEpisode.season}, Episode ${progress.nextEpisode.number}.`
+
+            :
+
+            "Continue watching this TV show.";
+
+
+        if (
+            show.backdrop ||
+            show.poster
+        ) {
+
+            heroImage.src =
+                show.backdrop ||
+                show.poster;
+
+
+            heroImage.classList.remove(
+                "hidden"
+            );
+
+        }
+
+        else {
+
+            heroImage.classList.add(
+                "hidden"
+            );
+
+        }
+
+    }
+
+    else {
+
+        heroTitle.textContent =
+            "Welcome to ReelTrack";
+
+
+        heroDescription.textContent =
+            "Track every movie and TV show your household watches.";
+
+
+        heroImage.classList.add(
+            "hidden"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   CONTINUE WATCHING
+========================================================= */
+
+function continueWatching() {
+
+    const shows =
+        state.tvShows.filter(
+
+            show =>
+                show.ownerId ===
+                state.activeProfileId
+
+        );
+
+
+    const continueShow =
+        shows.find(
+
+            show => {
+
+                const progress =
+                    getTVProgress(
+                        show
+                    );
+
+
+                return (
+
+                    progress.watched >
+                    0
+
+                    &&
+
+                    progress.watched <
+                    progress.total
+
+                );
+
+            }
+
+        );
+
+
+    if (
+        continueShow
+    ) {
+
+        openDetails(
+
+            "tv",
+
+            continueShow.id
+
+        );
+
+
+        return;
+
+    }
+
+
+    showToast(
+        "Nothing to continue watching"
+    );
+
+}
+
+
+/* =========================================================
+   DETAILS
+========================================================= */
+
+function openDetails(
+    type,
+    id
+) {
+
+    const item =
+        findItem(
+            type,
+            id
+        );
+
+
+    if (!item) {
+
+        return;
+
+    }
+
+
+    currentItem = {
+
+        type,
+
+        id
+
+    };
+
+
+    document
+        .getElementById(
+            "modalTitle"
+        )
+        .textContent =
+        item.title;
+
+
+    document
+        .getElementById(
+            "modalDescription"
+        )
+        .textContent =
+
+        item.description ||
+
+        "No description available.";
+
+
+    const backdrop =
+        document.getElementById(
+            "modalBackdrop"
+        );
+
+
+    if (
+        item.backdrop ||
+        item.poster
+    ) {
+
+        backdrop.src =
+
+            item.backdrop ||
+            item.poster;
+
+    }
+
+    else {
+
+        backdrop.removeAttribute(
+            "src"
+        );
+
+    }
+
+
+    const meta =
+        document.getElementById(
+            "modalMeta"
+        );
+
+
+    if (
+        type ===
+        "movie"
+    ) {
+
+        meta.innerHTML = `
+
+            <span>
+                Movie
+            </span>
+
+            <span>|</span>
+
+            <span>
+                ${item.year || "Unknown"}
+            </span>
+
+            <span>|</span>
+
+            <span>
+                ${
+                    item.watched
+                    ?
+                    "Watched"
+                    :
+                    "Not Watched"
+                }
+            </span>
+
+        `;
+
+    }
+
+    else {
+
+        const progress =
+            getTVProgress(
+                item
+            );
+
+
+        meta.innerHTML = `
+
+            <span>
+                TV Show
+            </span>
+
+            <span>|</span>
+
+            <span>
+                ${item.year || "Unknown"}
+            </span>
+
+            <span>|</span>
+
+            <span>
+                ${progress.watched}/${progress.total}
+                Episodes
+            </span>
+
+        `;
+
+    }
+
+
+    renderModalActions(
+        item,
+        type
+    );
+
+
+    if (
+        type ===
+        "tv"
+    ) {
+
+        renderEpisodes(
+            item
+        );
+
+    }
+
+    else {
+
+        document
+            .getElementById(
+                "modalEpisodes"
+            )
+            .innerHTML =
+            "";
+
+    }
+
+
+    document
+        .getElementById(
+            "detailsModal"
+        )
+        .classList.add(
+            "open"
+        );
+
+
+    document.body.style.overflow =
+        "hidden";
+
+}
+
+
+function renderModalActions(
+    item,
+    type
+) {
+
+    const actions =
+        document.getElementById(
+            "modalActions"
+        );
+
+
+    if (
+        type ===
+        "movie"
+    ) {
+
+        actions.innerHTML = `
+
+            <button
+                class="
+                    action-button
+                    primary
+                "
+                onclick="
+                    toggleMovieFromModal()
+                "
+            >
+
+                ${
+                    item.watched
+                    ?
+                    "Mark Unwatched"
+                    :
+                    "Mark Watched"
+                }
+
+            </button>
+
+
+            <button
+                class="action-button"
+                onclick="
+                    toggleCurrentWatchlist()
+                "
+            >
+
+                ${
+                    item.watchlist
+                    ?
+                    "Remove Watchlist"
+                    :
+                    "Add to Watchlist"
+                }
+
+            </button>
+
+        `;
+
+    }
+
+    else {
+
+        const progress =
+            getTVProgress(
+                item
+            );
+
+
+        actions.innerHTML = `
+
+            <button
+                class="
+                    action-button
+                    primary
+                "
+                onclick="
+                    markNextEpisodeFromModal()
+                "
+            >
+
+                ${
+                    progress.nextEpisode
+
+                    ?
+
+                    `Mark S${progress.nextEpisode.season} E${progress.nextEpisode.number} Watched`
+
+                    :
+
+                    "Show Completed"
+
+                }
+
+            </button>
+
+
+            <button
+                class="action-button"
+                onclick="
+                    toggleCurrentWatchlist()
+                "
+            >
+
+                ${
+                    item.watchlist
+                    ?
+                    "Remove Watchlist"
+                    :
+                    "Add to Watchlist"
+                }
+
+            </button>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   EPISODES
+========================================================= */
+
+function renderEpisodes(
+    show
+) {
+
+    const container =
+        document.getElementById(
+            "modalEpisodes"
+        );
+
+
+    const seasons = {};
+
+
+    show.episodes.forEach(
+
+        episode => {
+
+            if (
+                !seasons[
+                    episode.season
+                ]
+            ) {
+
+                seasons[
+                    episode.season
+                ] = [];
+
+            }
+
+
+            seasons[
+                episode.season
+            ].push(
+                episode
+            );
+
+        }
+
+    );
+
+
+    const seasonKeys =
+        Object.keys(
+            seasons
+        ).sort(
+
+            (
+                a,
+                b
+            ) =>
+                Number(a) -
+                Number(b)
+
+        );
+
+
+    const progress =
+        getTVProgress(
+            show
+        );
+
+
+    container.innerHTML = `
+
+        <div
+            style="
+                font-size:16px;
+                font-weight:750;
+            "
+        >
+
+            Episodes
+
+        </div>
+
+
+        <div
+            style="
+                margin-top:6px;
+                color:
+                    var(--text-secondary);
+                font-size:11px;
+            "
+        >
+
+            ${progress.watched}
+            of
+            ${progress.total}
+            episodes watched
+            (${progress.percentage}%)
+
+        </div>
+
+
+        <div
+            class="season-selector"
+        >
+
+            ${
+                seasonKeys.map(
+
+                    (
+                        season,
+                        index
+                    ) => `
+
+                        <button
+                            class="
+                                season-button
+                                ${
+                                    index === 0
+                                    ?
+                                    "active"
+                                    :
+                                    ""
+                                }
+                            "
+                            onclick="
+                                selectSeason(
+                                    '${show.id}',
+                                    ${season}
+                                )
+                            "
+                        >
+
+                            Season ${season}
+
+                        </button>
+
+                    `
+
+                ).join("")
+            }
+
+        </div>
+
+
+        <div
+            id="episodeList"
+        ></div>
+
+    `;
+
+
+    renderSeasonEpisodes(
+
+        show,
+
+        Number(
+            seasonKeys[0]
+        )
+
+    );
+
+}
+
+
+function selectSeason(
+    showId,
+    season
+) {
+
+    const show =
+        findItem(
+            "tv",
+            showId
+        );
+
+
+    if (
+        !show
+    ) {
+
+        return;
+
+    }
+
+
+    document
+        .querySelectorAll(
+            ".season-button"
+        )
+        .forEach(
+
+            button => {
+
+                button.classList.toggle(
+
+                    "active",
+
+                    button.textContent
+                        .trim()
+                        ===
+                    `Season ${season}`
+
+                );
+
+            }
+
+        );
+
+
+    renderSeasonEpisodes(
+
+        show,
+
+        season
+
+    );
+
+}
+
+
+function renderSeasonEpisodes(
+    show,
+    season
+) {
+
+    const list =
+        document.getElementById(
+            "episodeList"
+        );
+
+
+    if (!list) {
+
+        return;
+
+    }
+
+
+    const episodes =
+        show.episodes.filter(
+
+            episode =>
+                Number(
+                    episode.season
+                ) ===
+                Number(
+                    season
+                )
+
+        ).sort(
+
+            (
+                a,
+                b
+            ) =>
+                a.number -
+                b.number
+
+        );
+
+
+    list.innerHTML =
+
+        episodes
+            .map(
+
+                episode => `
+
+                    <div
+                        class="episode"
+                    >
+
+                        <button
+                            class="
+                                episode-check
+                                ${
+                                    episode.watched
+                                    ?
+                                    "watched"
+                                    :
+                                    ""
+                                }
+                            "
+                            onclick="
+                                toggleEpisode(
+                                    '${show.id}',
+                                    '${episode.id}'
+                                )
+                            "
+                        >
+
+                            ${
+                                episode.watched
+
+                                ?
+
+                                `
+                                <svg
+                                    class="icon icon-small"
+                                    viewBox="0 0 24 24"
+                                >
+
+                                    <path
+                                        d="
+                                            M5 12
+                                            l4 4
+                                            10-10
+                                        "
+                                    />
+
+                                </svg>
+                                `
+
+                                :
+
+                                ""
+
+                            }
+
+                        </button>
+
+
+                        <div
+                            class="episode-info"
+                        >
+
+                            <div
+                                class="episode-title"
+                            >
+
+                                ${episode.number}.
+                                ${escapeHTML(
+                                    episode.title
+                                )}
+
+                            </div>
+
+
+                            <div
+                                class="episode-meta"
+                            >
+
+                                Season
+                                ${episode.season}
+
+                                ·
+
+                                ${episode.runtime}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                `
+
+            )
+            .join("");
+
+}
+
+
+function toggleEpisode(
+    showId,
+    episodeId
+) {
+
+    const show =
+        findItem(
+            "tv",
+            showId
+        );
+
+
+    if (!show) {
+
+        return;
+
+    }
+
+
+    const episode =
+        show.episodes.find(
+
+            item =>
+                item.id ===
+                episodeId
+
+        );
+
+
+    if (!episode) {
+
+        return;
+
+    }
+
+
+    episode.watched =
+        !episode.watched;
+
+
+    if (
+        episode.watched
+    ) {
+
+        episode.watchedAt =
+            new Date()
+                .toISOString();
+
+
+        addHistory(
+
+            show,
+
+            `Season ${episode.season}, Episode ${episode.number} watched`
+
+        );
+
+    }
+
+    else {
+
+        episode.watchedAt =
+            null;
+
+    }
+
+
+    const progress =
+        getTVProgress(
+            show
+        );
+
+
+    show.completed =
+        progress.percentage ===
+        100;
+
+
+    saveState();
+
+
+    renderEpisodes(
+        show
+    );
+
+
+    renderDashboard();
+
+
+    showToast(
+
+        episode.watched
+
+        ?
+
+        "Episode marked watched"
+
+        :
+
+        "Episode marked unwatched"
+
+    );
+
+}
+
+
+/* =========================================================
+   MARK NEXT EPISODE
+========================================================= */
+
+function markNextEpisodeFromModal() {
+
+    if (
+        !currentItem ||
+        currentItem.type !==
+        "tv"
+    ) {
+
+        return;
+
+    }
+
+
+    const show =
+        findItem(
+            "tv",
+            currentItem.id
+        );
+
+
+    const progress =
+        getTVProgress(
+            show
+        );
+
+
+    if (
+        !progress.nextEpisode
+    ) {
+
+        showToast(
+            "This show is already completed"
+        );
+
+        return;
+
+    }
+
+
+    progress.nextEpisode.watched =
+        true;
+
+
+    progress.nextEpisode.watchedAt =
+        new Date()
+            .toISOString();
+
+
+    addHistory(
+
+        show,
+
+        `Season ${progress.nextEpisode.season}, Episode ${progress.nextEpisode.number} watched`
+
+    );
+
+
+    saveState();
+
+
+    renderEpisodes(
+        show
+    );
+
+
+    renderModalActions(
+        show,
+        "tv"
+    );
+
+
+    renderDashboard();
+
+
+    showToast(
+
+        `S${progress.nextEpisode.season} E${progress.nextEpisode.number} marked watched`
+
+    );
+
+}
+
+
+/* =========================================================
+   MOVIES
+========================================================= */
+
+function toggleMovieFromModal() {
+
+    if (
+        !currentItem
+    ) {
+
+        return;
+
+    }
+
+
+    const movie =
+        findItem(
+            "movie",
+            currentItem.id
+        );
+
+
+    if (!movie) {
+
+        return;
+
+    }
+
+
+    movie.watched =
+        !movie.watched;
+
+
+    if (
+        movie.watched
+    ) {
+
+        movie.watchedAt =
+            new Date()
+                .toISOString();
+
+
+        addHistory(
+
+            movie,
+
+            "Movie watched"
+
+        );
+
+    }
+
+    else {
+
+        movie.watchedAt =
+            null;
+
+    }
+
+
+    saveState();
+
+
+    renderModalActions(
+
+        movie,
+
+        "movie"
+
+    );
+
+
+    renderDashboard();
+
+
+    renderLibrary();
+
+
+    showToast(
+
+        movie.watched
+
+        ?
+
+        "Movie marked watched"
+
+        :
+
+        "Movie marked unwatched"
+
+    );
+
+}
+
+
+/* =========================================================
+   WATCHLIST
+========================================================= */
+
+function toggleCurrentWatchlist() {
+
+    if (
+        !currentItem
+    ) {
+
+        return;
+
+    }
+
+
+    const item =
+        findItem(
+
+            currentItem.type,
+
+            currentItem.id
+
+        );
+
+
+    if (!item) {
+
+        return;
+
+    }
+
+
+    item.watchlist =
+        !item.watchlist;
+
+
+    saveState();
+
+
+    renderModalActions(
+
+        item,
+
+        currentItem.type
+
+    );
+
+
+    renderWatchlist();
+
+
+    showToast(
+
+        item.watchlist
+
+        ?
+
+        "Added to watchlist"
+
+        :
+
+        "Removed from watchlist"
+
+    );
+
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+document
+    .getElementById(
+        "searchInput"
+    )
+    .addEventListener(
+
+        "input",
+
+        function () {
+
+            const query =
+                this.value
+                    .trim()
+                    .toLowerCase();
+
+
+            const container =
+                document.getElementById(
+                    "searchResults"
+                );
+
+
+            if (!query) {
+
+                container.innerHTML =
+                    emptyState(
+                        "Search Your Library"
+                    );
+
+
+                return;
+
+            }
+
+
+            const movies =
+                state.movies.filter(
+
+                    movie =>
+
+                        movie.ownerId ===
+                        state.activeProfileId
+
+                        &&
+
+                        movie.title
+                            .toLowerCase()
+                            .includes(
+                                query
+                            )
+
+                );
+
+
+            const shows =
+                state.tvShows.filter(
+
+                    show =>
+
+                        show.ownerId ===
+                        state.activeProfileId
+
+                        &&
+
+                        show.title
+                            .toLowerCase()
+                            .includes(
+                                query
+                            )
+
+                );
+
+
+            let html = "";
+
+
+            if (
+                movies.length
+            ) {
+
+                html += `
+
+                    <div
+                        class="section-header"
+                    >
+
+                        <div
+                            class="section-title"
+                        >
+
+                            Movies
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="library-grid"
+                    >
+
+                        ${
+                            movies.map(
+
+                                movie =>
+                                    createCard(
+                                        movie,
+                                        "movie"
+                                    )
+
+                            ).join("")
+                        }
+
+                    </div>
+
+                `;
+
+            }
+
+
+            if (
+                shows.length
+            ) {
+
+                html += `
+
+                    <div
+                        class="section-header"
+                    >
+
+                        <div
+                            class="section-title"
+                        >
+
+                            TV Shows
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="library-grid"
+                    >
+
+                        ${
+                            shows.map(
+
+                                show =>
+                                    createCard(
+                                        show,
+                                        "tv"
+                                    )
+
+                            ).join("")
+                        }
+
+                    </div>
+
+                `;
+
+            }
+
+
+            if (
+                !movies.length &&
+                !shows.length
+            ) {
+
+                html =
+                    emptyState(
+                        "Nothing Found"
+                    );
+
+            }
+
+
+            container.innerHTML =
+                html;
+
+        }
+
+    );
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+function closeModal() {
+
+    document
+        .getElementById(
+            "detailsModal"
+        )
+        .classList.remove(
+            "open"
+        );
+
+
+    document.body.style.overflow =
+        "";
+
+}
+
+
+function closeModalOutside(
+    event
+) {
+
+    if (
+        event.target.id ===
+        "detailsModal"
+    ) {
+
+        closeModal();
+
+    }
+
+}
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+function renderProfile() {
+
+    const profile =
+        state.profiles.find(
+
+            item =>
+                item.id ===
+                state.activeProfileId
+
+        );
+
+
+    if (!profile) {
+
+        return;
+
+    }
+
+
+    document
+        .getElementById(
+            "profileName"
+        )
+        .textContent =
+        profile.name;
+
+
+    document
+        .getElementById(
+            "headerAvatar"
+        )
+        .textContent =
+        profile.initials;
+
+
+    document
+        .getElementById(
+            "largeAvatar"
+        )
+        .textContent =
+        profile.initials;
+
+}
+
+
+/* =========================================================
+   RESET DEMO
+========================================================= */
+
+function resetDemo() {
+
+    const confirmed =
+        confirm(
+
+            "Reset ReelTrack to the original demo data?"
+
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    localStorage.removeItem(
+        STORAGE_KEY
+    );
+
+
+    location.reload();
+
+}
+
+
+/* =========================================================
+   CLEAR DATA
+========================================================= */
+
+function clearAllData() {
+
+    const confirmed =
+        confirm(
+
+            "This will permanently delete all ReelTrack data. Continue?"
+
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    state.movies = [];
+
+    state.tvShows = [];
+
+    state.history = [];
+
+
+    saveState();
+
+
+    createPlaceholderTVShow();
+
+
+    renderDashboard();
+
+
+    renderLibrary();
+
+
+    renderWatchlist();
+
+
+    showToast(
+        "All data cleared"
+    );
+
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+function emptyState(
+    title
+) {
+
+    return `
+
+        <div
+            class="empty-state"
+            style="
+                grid-column:
+                    1 / -1;
+            "
+        >
+
+            <svg
+                class="icon icon-large"
+                viewBox="0 0 24 24"
+            >
+
+                <rect
+                    x="3"
+                    y="4"
+                    width="18"
+                    height="16"
+                    rx="3"
+                />
+
+                <path
+                    d="M8 4v16"
+                />
+
+                <path
+                    d="M16 4v16"
+                />
+
+            </svg>
+
+
+            <h3>
+                ${title}
+            </h3>
+
+
+            <p>
+                Your library will appear here.
+            </p>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+let toastTimer;
+
+
+function showToast(
+    message
+) {
+
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+
+    toast.textContent =
+        message;
+
+
+    toast.classList.add(
+        "show"
+    );
+
+
+    clearTimeout(
+        toastTimer
+    );
+
+
+    toastTimer =
+        setTimeout(
+
+            () => {
+
+                toast.classList.remove(
+                    "show"
+                );
+
+            },
+
+            2200
+
+        );
+
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHTML(
+    value
+) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+
+    div.textContent =
+        value || "";
+
+
+    return div.innerHTML;
+
+}
+
+
+/* =========================================================
+   INITIALISE
+========================================================= */
+
+loadState();
+
+createPlaceholderTVShow();
+
+renderProfile();
+
+renderDashboard();
+
+setLibraryType(
+    "movie"
+);
+
+setWatchlistType(
+    "movie"
+);
+
+
+/* =========================================================
+   KEYBOARD
+========================================================= */
+
+document
+    .addEventListener(
+
+        "keydown",
+
+        function (
+            event
+        ) {
+
+            if (
+                event.key ===
+                "Escape"
+            ) {
+
+                closeModal();
+
+            }
+
+        }
+
+    );
+
+</script>
+
+</body>
+</html>
