@@ -658,18 +658,6 @@ img {
     justify-content: center;
 }
 
-.upcoming-type {
-    color: var(--blue-light);
-
-    font-size: 9px;
-    font-weight: 800;
-
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-
-    margin-bottom: 5px;
-}
-
 .upcoming-title {
     font-size: 13px;
     font-weight: 700;
@@ -685,7 +673,7 @@ img {
     font-size: 10px;
     line-height: 1.5;
 
-    margin-top: 6px;
+    margin-top: 2px;
 }
 
 .upcoming-countdown {
@@ -2187,7 +2175,7 @@ function renderLibrary() {
             .toLowerCase();
 
 
-    let items = state.tvShows;
+    let items = [...state.tvShows].sort((a, b) => a.title.localeCompare(b.title));
 
 
     if (query) {
@@ -2235,15 +2223,15 @@ function renderWatched() {
     const continueShows = state.tvShows.filter(show => {
         const progress = getTVProgress(show);
         return progress.watched > 0 && progress.watched < progress.total;
-    });
+    }).sort((a, b) => a.title.localeCompare(b.title));
 
     const upToDateShows = state.tvShows.filter(show => {
         return isTVUpToDate(show) && !show.isFinished;
-    });
+    }).sort((a, b) => a.title.localeCompare(b.title));
 
     const finishedShows = state.tvShows.filter(show => {
         return isTVUpToDate(show) && show.isFinished;
-    });
+    }).sort((a, b) => a.title.localeCompare(b.title));
 
     renderRow("watchedContinueGrid", continueShows, "No TV shows currently in progress.");
     renderRow("watchedUpToDateGrid", upToDateShows, "No TV shows currently up to date.");
@@ -2332,10 +2320,6 @@ function createUpcomingTVCard(data) {
 
 
             <div class="upcoming-info">
-
-                <div class="upcoming-type">
-                    TV Show
-                </div>
 
                 <div class="upcoming-title">
                     ${escapeHTML(
@@ -2455,18 +2439,18 @@ function renderDashboard() {
                 );
 
             }
-        );
+        ).sort((a, b) => a.title.localeCompare(b.title));
 
 
     const displayShows =
         continueShows.length
             ? continueShows
-            : state.tvShows.filter(
+            : [...state.tvShows].filter(
                 show =>
                     !isTVUpToDate(
                         show
                     )
-            );
+            ).sort((a, b) => a.title.localeCompare(b.title));
 
 
     renderRow(
