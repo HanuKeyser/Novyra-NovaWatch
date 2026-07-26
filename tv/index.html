@@ -1778,87 +1778,51 @@ function loadState() {
 
 function createInitialData() {
 
-    const showConfigs = [
+    const showsToBuild = [
         {
             id: "tv-elle",
             title: "Elle",
-            year: "2026",
-            poster: "",
-            backdrop: "",
-            description: "Follows Elle Woods in her high school years, giving an insight into her life growing up long before Harvard Law.",
+            year: "2025",
+            description: "Prequel series following the early years of Elle Woods.",
             isFinished: false,
-            seasonCount: 2,
-            episodesPerSeason: 6,
-            hasUpcoming: true
-        },
-        {
-            id: "tv-every-year-after",
-            title: "Every Year After",
-            year: "2026",
-            poster: "",
-            backdrop: "",
-            description: "A sweeping romantic drama following Percy Fraser and Sam Florek over six summer reunions.",
-            isFinished: false,
-            seasonCount: 2,
-            episodesPerSeason: 6,
-            hasUpcoming: false
+            seasonsCount: 2,
+            episodesPerSeason: 8
         },
         {
             id: "tv-sweet-magnolias",
             title: "Sweet Magnolias",
             year: "2020",
-            poster: "",
-            backdrop: "",
-            description: "Lifelong friends Maddie, Helen, and Dana Sue lift each other up as they juggle relationships, family, and careers in Serenity.",
-            isFinished: true,
-            seasonCount: 2,
-            episodesPerSeason: 6,
-            hasUpcoming: false
+            description: "Lifelong friends Maddie, Helen, and Dana Sue navigate relationships, family, and careers in Serenity.",
+            isFinished: false,
+            seasonsCount: 5,
+            episodesPerSeason: 10
         }
     ];
 
-    showConfigs.forEach((config, index) => {
-        if (!state.tvShows.some(show => show.id === config.id)) {
+    showsToBuild.forEach(showData => {
+        if (!state.tvShows.some(show => show.id === showData.id)) {
             const show = {
-                id: config.id,
+                id: showData.id,
                 ownerId: state.activeProfileId,
-                title: config.title,
-                year: config.year,
-                poster: config.poster,
-                backdrop: config.backdrop,
-                description: config.description,
-                isFinished: config.isFinished,
+                title: showData.title,
+                year: showData.year,
+                poster: "",
+                backdrop: "",
+                description: showData.description,
+                isFinished: showData.isFinished,
                 episodes: []
             };
 
-            for (let season = 1; season <= config.seasonCount; season++) {
-                for (let episode = 1; episode <= config.episodesPerSeason; episode++) {
+            for (let season = 1; season <= showData.seasonsCount; season++) {
+                for (let episode = 1; episode <= showData.episodesPerSeason; episode++) {
                     show.episodes.push({
                         id: `s${season}e${episode}`,
                         season: season,
                         number: episode,
                         title: `Episode ${episode}`,
                         runtime: "45 min",
-                        watched: index === 0 ? (season === 1 && episode <= 2) : (config.isFinished ? true : (season === 1 || season === 2)),
-                        releaseDate: null
-                    });
-                }
-            }
-
-            // 'Elle' configured with upcoming episode releases
-            if (config.hasUpcoming) {
-                const startDate = new Date("2026-08-03T20:00:00");
-                for (let episode = 1; episode <= 4; episode++) {
-                    const releaseDate = new Date(startDate);
-                    releaseDate.setDate(startDate.getDate() + ((episode - 1) * 7));
-                    show.episodes.push({
-                        id: `s3e${episode}`,
-                        season: 3,
-                        number: episode,
-                        title: `Episode ${episode}`,
-                        runtime: "45 min",
                         watched: false,
-                        releaseDate: releaseDate.toISOString()
+                        releaseDate: null
                     });
                 }
             }
@@ -2162,7 +2126,7 @@ function renderWatched() {
         return progress.watched > 0 && progress.watched < progress.total;
     });
 
-    // 2. Up to Date: All currently released episodes watched, but show is NOT finished (or status unknown)
+    // 2. Up to Date: All currently released episodes watched, but show is NOT finished
     const upToDateShows = state.tvShows.filter(show => {
         return isTVUpToDate(show) && !show.isFinished;
     });
@@ -2668,6 +2632,7 @@ function openDetails(id) {
 
     if (!item) {
         return;
+
     }
 
 
@@ -2996,6 +2961,7 @@ function renderSeasonEpisodes(
 
     if (!list) {
         return;
+
     }
 
 
@@ -3183,7 +3149,6 @@ function markNextEpisode() {
 
     if (!currentItem) {
         return;
-
     }
 
 
@@ -3270,6 +3235,7 @@ function renderProfile() {
 
     if (!profile) {
         return;
+
     }
 
 
