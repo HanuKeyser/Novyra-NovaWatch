@@ -437,8 +437,8 @@ img {
 ========================================================= */
 
 .card {
-    flex: 0 0 125px;
-    width: 125px;
+    flex: 0 0 120px;
+    width: 120px;
 
     cursor: pointer;
 }
@@ -446,8 +446,8 @@ img {
 .poster {
     position: relative;
 
-    width: 125px;
-    height: 178px;
+    width: 120px;
+    height: 175px;
 
     overflow: hidden;
 
@@ -529,7 +529,7 @@ img {
     width: 100%;
     height: auto;
 
-    aspect-ratio: 0.70;
+    aspect-ratio: 0.685;
 }
 
 /* =========================================================
@@ -924,13 +924,13 @@ img {
     background: var(--blue);
 }
 
-/* Season selector row with Rewatch button integrated */
+/* Season selector row with consistent spacing */
 .season-selector-wrapper {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    margin: 20px 0 14px;
+    margin: 24px 0 14px;
 }
 
 .season-selector {
@@ -1399,6 +1399,31 @@ img {
         <div class="section-header">
 
             <div class="section-title">
+                Start Watching
+            </div>
+
+            <button
+                class="section-link"
+                onclick="showPage('library')"
+            >
+                See All
+            </button>
+
+        </div>
+
+        <div
+            id="startWatchingGrid"
+            class="horizontal-row"
+        ></div>
+
+    </div>
+
+
+    <div>
+
+        <div class="section-header">
+
+            <div class="section-title">
                 Upcoming
             </div>
 
@@ -1739,7 +1764,7 @@ img {
 ========================================================= */
 
 const STORAGE_KEY =
-    "reeltrack_tv_data_v13";
+    "reeltrack_tv_data_v14";
 
 let state = {
     tvShows: [],
@@ -1916,7 +1941,7 @@ function createInitialData() {
             id: "tv-only-murders-in-the-building",
             title: "Only Murders in the Building",
             year: "2021",
-            poster: "https://image.tmdb.org/t/p/w500/rm3854807298",
+            poster: "https://image.tmdb.org/t/p/w500/w7ba395vXv2WqG7q6L3rK5R6B9B.jpg",
             backdrop: "https://image.tmdb.org/t/p/w1280/mAJ83Vo12C26R2d0i6a4i4bU56A.jpg",
             description: "Three strangers who share an obsession with true crime podcasts suddenly find themselves wrapped up in one when a gruesome death occurs inside their exclusive Upper West Side apartment building.",
             isFinished: false,
@@ -1950,7 +1975,7 @@ function createInitialData() {
             id: "tv-every-year-after",
             title: "Every Year After",
             year: "2026",
-            poster: "https://image.tmdb.org/t/p/w500/rm3932408066",
+            poster: "https://image.tmdb.org/t/p/w500/q719jXD8W8wGFTttHC9bCxY8nBm.jpg",
             backdrop: "https://image.tmdb.org/t/p/w1280/every_year_after_backdrop.jpg",
             description: "A drama series following evolving relationships over successive years.",
             isFinished: false,
@@ -1965,7 +1990,7 @@ function createInitialData() {
             id: "tv-elle",
             title: "Elle",
             year: "2026",
-            poster: "https://image.tmdb.org/t/p/w500/rm2590821634",
+            poster: "https://image.tmdb.org/t/p/w500/5WvKhvWkG9zJ8aKzR2hY0uL8jK1.jpg",
             backdrop: "https://image.tmdb.org/t/p/w1280/elle_backdrop.jpg",
             description: "Prequel series following the early high school years of Elle Woods.",
             isFinished: false,
@@ -1980,7 +2005,7 @@ function createInitialData() {
             id: "tv-sweet-magnolias",
             title: "Sweet Magnolias",
             year: "2020",
-            poster: "https://image.tmdb.org/t/p/w500/rm1350748418",
+            poster: "https://image.tmdb.org/t/p/w500/h75w2u5pM5F2K7aC9eXvK8k3vF5.jpg",
             backdrop: "https://image.tmdb.org/t/p/w1280/2L2zT8y8j83m58V2k9k5k4_bg.jpg",
             description: "Lifelong friends Maddie, Helen, and Dana Sue navigate relationships, family, and careers in Serenity.",
             isFinished: false,
@@ -2587,6 +2612,19 @@ function renderDashboard() {
     );
 
 
+    // Render untracked/start watching shows (shows with 0 watched episodes)
+    const startWatchingShows = state.tvShows.filter(show => {
+        const progress = getTVProgress(show);
+        return progress.watched === 0;
+    }).sort((a, b) => a.title.localeCompare(b.title));
+
+    renderRow(
+        "startWatchingGrid",
+        startWatchingShows,
+        "No new TV shows to start."
+    );
+
+
     const firstShow =
         continueShows[0];
 
@@ -2703,14 +2741,13 @@ function renderHomeUpcoming() {
     const items = [];
 
 
-    if (tvEpisodes.length) {
-
+    // Show up to 3 upcoming TV shows/episodes
+    for (let i = 0; i < Math.min(3, tvEpisodes.length); i++) {
         items.push(
             createUpcomingTVCard(
-                tvEpisodes[0]
+                tvEpisodes[i]
             )
         );
-
     }
 
 
