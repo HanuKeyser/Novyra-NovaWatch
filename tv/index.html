@@ -473,46 +473,8 @@ img {
 
     color: var(--text-secondary);
 
-    font-size: 11px;
-    font-weight: 700;
-}
-
-.card-title {
-    margin-top: 9px;
-
     font-size: 12px;
-    font-weight: 650;
-
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.card-meta {
-    margin-top: 4px;
-
-    color: var(--text-muted);
-
-    font-size: 10px;
-}
-
-.progress-bar {
-    width: 100%;
-    height: 3px;
-
-    margin-top: 7px;
-
-    overflow: hidden;
-
-    border-radius: 5px;
-
-    background:
-        rgba(255,255,255,0.08);
-}
-
-.progress-fill {
-    height: 100%;
-    background: var(--blue);
+    font-weight: 700;
 }
 
 /* =========================================================
@@ -525,7 +487,7 @@ img {
     grid-template-columns:
         repeat(3, minmax(0, 1fr));
 
-    gap: 18px 10px;
+    gap: 14px 10px;
 }
 
 .library-grid .card {
@@ -708,7 +670,7 @@ img {
 
     color: var(--text-secondary);
 
-    font-size: 8px;
+    font-size: 9px;
     font-weight: 700;
 }
 
@@ -1713,7 +1675,7 @@ img {
 ========================================================= */
 
 const STORAGE_KEY =
-    "reeltrack_data_v3";
+    "reeltrack_data_v4";
 
 let state = {
     movies: [],
@@ -1900,248 +1862,80 @@ function loadState() {
 
 
 /* =========================================================
-   DEMO DATA
+   INITIAL DATA POPULATION
 ========================================================= */
 
-function createDemoData() {
+function createInitialData() {
 
-    const hasTV =
-        state.tvShows.some(
-            show =>
-                show.id ===
-                "placeholder-tv-show"
-        );
+    const tvTitles = ["TV One", "TV Two", "TV Three"];
+    
+    tvTitles.forEach((title, index) => {
+        const id = `tv-${index + 1}`;
+        if (!state.tvShows.some(show => show.id === id)) {
+            const show = {
+                id: id,
+                type: "tv",
+                ownerId: state.activeProfileId,
+                title: title,
+                year: "2026",
+                poster: "",
+                backdrop: "",
+                description: `${title} available for viewing and tracking across your household.`,
+                episodes: []
+            };
 
-
-    if (!hasTV) {
-
-        const show = {
-
-            id:
-                "placeholder-tv-show",
-
-            type:
-                "tv",
-
-            ownerId:
-                state.activeProfileId,
-
-            title:
-                "The Placeholder",
-
-            year:
-                "2026",
-
-            poster:
-                "",
-
-            backdrop:
-                "",
-
-            description:
-                "A placeholder TV show used to test the ReelTrack tracking system.",
-
-            episodes:
-                []
-
-        };
-
-
-        for (
-            let season = 1;
-            season <= 2;
-            season++
-        ) {
-
-            for (
-                let episode = 1;
-                episode <= 10;
-                episode++
-            ) {
-
-                show.episodes.push({
-
-                    id:
-                        `s${season}e${episode}`,
-
-                    season:
-                        season,
-
-                    number:
-                        episode,
-
-                    title:
-                        `Episode ${episode}`,
-
-                    runtime:
-                        "45 min",
-
-                    watched:
-                        false,
-
-                    releaseDate:
-                        null
-
-                });
-
+            for (let season = 1; season <= 2; season++) {
+                for (let episode = 1; episode <= 6; episode++) {
+                    show.episodes.push({
+                        id: `s${season}e${episode}`,
+                        season: season,
+                        number: episode,
+                        title: `Episode ${episode}`,
+                        runtime: "45 min",
+                        watched: index === 0 && season === 1 && episode <= 2,
+                        releaseDate: null
+                    });
+                }
             }
 
+            const startDate = new Date("2026-08-03T20:00:00");
+            for (let episode = 1; episode <= 4; episode++) {
+                const releaseDate = new Date(startDate);
+                releaseDate.setDate(startDate.getDate() + ((episode - 1) * 7));
+                show.episodes.push({
+                    id: `s3e${episode}`,
+                    season: 3,
+                    number: episode,
+                    title: `Episode ${episode}`,
+                    runtime: "45 min",
+                    watched: false,
+                    releaseDate: releaseDate.toISOString()
+                });
+            }
+
+            state.tvShows.push(show);
         }
+    });
 
+    const movieTitles = ["Movie One", "Movie Two", "Movie Three"];
 
-        const startDate =
-            new Date(
-                "2026-08-03T20:00:00"
-            );
-
-
-        for (
-            let episode = 1;
-            episode <= 10;
-            episode++
-        ) {
-
-            const releaseDate =
-                new Date(
-                    startDate
-                );
-
-            releaseDate.setDate(
-                startDate.getDate() +
-                (
-                    (episode - 1) * 7
-                )
-            );
-
-
-            show.episodes.push({
-
-                id:
-                    `s3e${episode}`,
-
-                season:
-                    3,
-
-                number:
-                    episode,
-
-                title:
-                    `Episode ${episode}`,
-
-                runtime:
-                    "45 min",
-
-                watched:
-                    false,
-
-                releaseDate:
-                    releaseDate.toISOString()
-
+    movieTitles.forEach((title, index) => {
+        const id = `movie-${index + 1}`;
+        if (!state.movies.some(movie => movie.id === id)) {
+            state.movies.push({
+                id: id,
+                type: "movie",
+                ownerId: state.activeProfileId,
+                title: title,
+                year: "2026",
+                poster: "",
+                backdrop: "",
+                description: `${title} available for viewing and tracking across your household.`,
+                watched: index === 0,
+                releaseDate: index === 2 ? "2026-10-05T00:00:00" : null
             });
-
         }
-
-
-        state.tvShows.push(
-            show
-        );
-
-    }
-
-
-    const hasPlaceholderMovie =
-        state.movies.some(
-            movie =>
-                movie.id ===
-                "placeholder-movie"
-        );
-
-
-    if (!hasPlaceholderMovie) {
-
-        state.movies.push({
-
-            id:
-                "placeholder-movie",
-
-            type:
-                "movie",
-
-            ownerId:
-                state.activeProfileId,
-
-            title:
-                "The Placeholder Movie",
-
-            year:
-                "2026",
-
-            poster:
-                "",
-
-            backdrop:
-                "",
-
-            description:
-                "A placeholder movie for testing ReelTrack.",
-
-            watched:
-                false,
-
-            releaseDate:
-                null
-
-        });
-
-    }
-
-
-    const hasUpcomingMovie =
-        state.movies.some(
-            movie =>
-                movie.id ===
-                "upcoming-movie-2026"
-        );
-
-
-    if (!hasUpcomingMovie) {
-
-        state.movies.push({
-
-            id:
-                "upcoming-movie-2026",
-
-            type:
-                "movie",
-
-            ownerId:
-                state.activeProfileId,
-
-            title:
-                "The Upcoming Movie",
-
-            year:
-                "2026",
-
-            poster:
-                "",
-
-            backdrop:
-                "",
-
-            description:
-                "An upcoming movie scheduled for release on 5 October 2026.",
-
-            watched:
-                false,
-
-            releaseDate:
-                "2026-10-05T00:00:00"
-
-        });
-
-    }
-
+    });
 
     saveState();
 
@@ -2474,11 +2268,6 @@ function renderLibrary() {
             ? state.movies
             : state.tvShows;
 
-
-    /*
-       Released movies only appear
-       in the main Movies library.
-    */
 
     if (
         currentLibraryType ===
@@ -3241,13 +3030,6 @@ function createCard(
                         `
                 }
 
-            </div>
-
-
-            <div class="card-title">
-                ${escapeHTML(
-                    item.title
-                )}
             </div>
 
         </div>
@@ -4323,14 +4105,6 @@ function refreshApp() {
 }
 
 
-/*
-    This checks every 30 seconds.
-
-    This means if the website is left open
-    when an episode/movie reaches its release
-    time, the UI updates automatically.
-*/
-
 setInterval(
     refreshApp,
     30000
@@ -4364,7 +4138,7 @@ document.addEventListener(
 
 loadState();
 
-createDemoData();
+createInitialData();
 
 renderProfile();
 
