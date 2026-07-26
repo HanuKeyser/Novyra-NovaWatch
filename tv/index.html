@@ -966,31 +966,34 @@ img {
     color: var(--blue-light);
 }
 
-/* Season Batch Actions */
+/* Season Batch Actions - Clean and unified layout */
 .season-batch-actions {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 14px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 14px 0 18px;
 }
 
 .season-batch-btn {
-    flex: 1;
-    height: 32px;
-    border-radius: 8px;
+    width: 100%;
+    height: 38px;
+    border-radius: 10px;
     background: var(--surface-3);
     border: 1px solid var(--border);
     color: var(--text-secondary);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 5px;
+    gap: 6px;
+    transition: all 0.2s ease;
 }
 
 .season-batch-btn:hover {
     border-color: var(--blue-light);
     color: var(--text);
+    background: var(--surface-2);
 }
 
 /* Per-Episode Rewatch Controls */
@@ -1764,7 +1767,7 @@ img {
 ========================================================= */
 
 const STORAGE_KEY =
-    "reeltrack_tv_data_v14";
+    "reeltrack_tv_data_v15";
 
 let state = {
     tvShows: [],
@@ -2594,21 +2597,10 @@ function renderDashboard() {
         ).sort((a, b) => a.title.localeCompare(b.title));
 
 
-    const displayShows =
-        continueShows.length
-            ? continueShows
-            : [...state.tvShows].filter(
-                show =>
-                    !isTVUpToDate(
-                        show
-                    )
-            ).sort((a, b) => a.title.localeCompare(b.title));
-
-
     renderRow(
         "continueTVGrid",
-        displayShows,
-        "No TV shows to continue yet."
+        continueShows,
+        "No TV shows currently in progress."
     );
 
 
@@ -2770,12 +2762,11 @@ function renderHomeUpcoming() {
 
 
 /* =========================================================
-   CARD (WITH FALLBACK PLACEHOLDER)
+   CARD (WITH ROBUST POSTER HANDLING)
 ========================================================= */
 
 function createCard(item) {
 
-    // Calculate max rewatch count across episodes or check if any episode has been rewatched
     const maxRewatch = item.episodes.reduce((max, ep) => Math.max(max, ep.watchCount || (ep.watched ? 1 : 0)), 0);
     const badgeHTML = maxRewatch > 1 ? `
         <div class="watch-count-badge">
@@ -2786,6 +2777,8 @@ function createCard(item) {
             ${maxRewatch}x
         </div>
     ` : '';
+
+    const hasPoster = item.poster && item.poster.trim() !== "";
 
     return `
 
@@ -2799,17 +2792,27 @@ function createCard(item) {
         >
 
             <div class="poster">
-                <img
-                    src="${item.poster}"
-                    alt="${escapeHTML(item.title)}"
-                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                >
-                <div
-                    class="poster-placeholder"
-                    style="display: none;"
-                >
-                    ${escapeHTML(item.title)}
-                </div>
+                ${hasPoster ? `
+                    <img
+                        src="${item.poster}"
+                        alt="${escapeHTML(item.title)}"
+                        onload="this.style.display='block'; this.nextElementSibling.style.display='none';"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                    >
+                    <div
+                        class="poster-placeholder"
+                        style="display: none;"
+                    >
+                        ${escapeHTML(item.title)}
+                    </div>
+                ` : `
+                    <div
+                        class="poster-placeholder"
+                        style="display: flex;"
+                    >
+                        ${escapeHTML(item.title)}
+                    </div>
+                `}
                 ${badgeHTML}
             </div>
 
@@ -3141,11 +3144,11 @@ function renderEpisodes(
         <div class="season-batch-actions">
             <button class="season-batch-btn" onclick="markSeasonWatched('${show.id}', ${selectedSeason})">
                 <svg class="icon icon-small" style="width:14px;height:14px;" viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg>
-                Mark Season Watched
+                Mark Watched
             </button>
             <button class="season-batch-btn" onclick="markSeasonUnwatched('${show.id}', ${selectedSeason})">
                 <svg class="icon icon-small" style="width:14px;height:14px;" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
-                Mark Season Unwatched
+                Mark Unwatched
             </button>
         </div>
 
@@ -3664,7 +3667,6 @@ function renderProfile() {
         show.episodes.forEach(ep => {
             if (ep.watched) {
                 const count = ep.watchCount || 1;
-                // Parse runtime string e.g., "45 min"
                 const match = (ep.runtime || "").match(/(\d+)/);
                 const runtimeMins = match ? parseInt(match[1], 10) : 45;
                 totalMinutes += runtimeMins * count;
