@@ -229,6 +229,16 @@ img {
     display: flex;
 }
 
+#watchedPage {
+    display: none;
+    flex-direction: column;
+    gap: 28px;
+}
+
+#watchedPage.active {
+    display: flex;
+}
+
 /* =========================================================
    SECTIONS
 ========================================================= */
@@ -507,7 +517,7 @@ img {
 ========================================================= */
 
 .empty-state {
-    padding: 55px 20px;
+    padding: 35px 20px;
 
     text-align: center;
 
@@ -515,16 +525,16 @@ img {
 }
 
 .empty-state svg {
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     color: var(--text-muted);
 }
 
 .empty-state h3 {
     color: var(--text);
 
-    font-size: 16px;
+    font-size: 15px;
 
-    margin-bottom: 7px;
+    margin-bottom: 5px;
 }
 
 .empty-state p {
@@ -1242,7 +1252,7 @@ img {
 
             <button
                 class="section-link"
-                onclick="showPage('library')"
+                onclick="showPage('watched')"
             >
                 See All
             </button>
@@ -1322,29 +1332,6 @@ img {
 
 
 <!-- =====================================================
-     WATCHED
-===================================================== -->
-
-<main id="watchedPage" class="page">
-
-    <div class="section-header">
-
-        <div class="section-title">
-            Watched
-        </div>
-
-    </div>
-
-
-    <div
-        id="watchedGrid"
-        class="library-grid"
-    ></div>
-
-</main>
-
-
-<!-- =====================================================
      UPCOMING
 ===================================================== -->
 
@@ -1360,6 +1347,47 @@ img {
 
 
     <div id="upcomingGrid"></div>
+
+</main>
+
+
+<!-- =====================================================
+     WATCHED
+===================================================== -->
+
+<main id="watchedPage" class="page">
+
+    <div class="section-header">
+
+        <div class="section-title">
+            Watched
+        </div>
+
+    </div>
+
+    <!-- Continue Watching Section -->
+    <div>
+        <div class="section-header">
+            <div class="section-title">Continue Watching</div>
+        </div>
+        <div id="watchedContinueGrid" class="horizontal-row"></div>
+    </div>
+
+    <!-- Up to Date Section -->
+    <div>
+        <div class="section-header">
+            <div class="section-title">Up to Date</div>
+        </div>
+        <div id="watchedUpToDateGrid" class="horizontal-row"></div>
+    </div>
+
+    <!-- Finished Section -->
+    <div>
+        <div class="section-header">
+            <div class="section-title">Finished</div>
+        </div>
+        <div id="watchedFinishedGrid" class="horizontal-row"></div>
+    </div>
 
 </main>
 
@@ -1414,6 +1442,7 @@ img {
 
 <!-- =====================================================
      BOTTOM NAVIGATION
+     (ORDER: Home -> Library -> Upcoming -> Watched)
 ===================================================== -->
 
 <nav class="bottom-nav">
@@ -1451,22 +1480,6 @@ img {
 
 
     <button
-        id="navWatched"
-        class="nav-button"
-        onclick="showPage('watched')"
-    >
-
-        <svg class="icon" viewBox="0 0 24 24">
-            <path d="M5 4h14v16H5z"/>
-            <path d="M8 12l2.5 2.5L16 9"/>
-        </svg>
-
-        Watched
-
-    </button>
-
-
-    <button
         id="navUpcoming"
         class="nav-button"
         onclick="showPage('upcoming')"
@@ -1480,6 +1493,22 @@ img {
         </svg>
 
         Upcoming
+
+    </button>
+
+
+    <button
+        id="navWatched"
+        class="nav-button"
+        onclick="showPage('watched')"
+    >
+
+        <svg class="icon" viewBox="0 0 24 24">
+            <path d="M5 4h14v16H5z"/>
+            <path d="M8 12l2.5 2.5L16 9"/>
+        </svg>
+
+        Watched
 
     </button>
 
@@ -1762,6 +1791,7 @@ function createInitialData() {
                 poster: "",
                 backdrop: "",
                 description: `${title} available for viewing and tracking across your household.`,
+                isFinished: index === 2, // Marks TV Three as a completed series
                 episodes: []
             };
 
@@ -1773,25 +1803,28 @@ function createInitialData() {
                         number: episode,
                         title: `Episode ${episode}`,
                         runtime: "45 min",
-                        watched: index === 0 && season === 1 && episode <= 2,
+                        watched: index === 0 ? (season === 1 && episode <= 2) : (index === 2 ? true : (season === 1 || season === 2)),
                         releaseDate: null
                     });
                 }
             }
 
-            const startDate = new Date("2026-08-03T20:00:00");
-            for (let episode = 1; episode <= 4; episode++) {
-                const releaseDate = new Date(startDate);
-                releaseDate.setDate(startDate.getDate() + ((episode - 1) * 7));
-                show.episodes.push({
-                    id: `s3e${episode}`,
-                    season: 3,
-                    number: episode,
-                    title: `Episode ${episode}`,
-                    runtime: "45 min",
-                    watched: false,
-                    releaseDate: releaseDate.toISOString()
-                });
+            // TV One has upcoming episode releases
+            if (index === 0) {
+                const startDate = new Date("2026-08-03T20:00:00");
+                for (let episode = 1; episode <= 4; episode++) {
+                    const releaseDate = new Date(startDate);
+                    releaseDate.setDate(startDate.getDate() + ((episode - 1) * 7));
+                    show.episodes.push({
+                        id: `s3e${episode}`,
+                        season: 3,
+                        number: episode,
+                        title: `Episode ${episode}`,
+                        runtime: "45 min",
+                        watched: false,
+                        releaseDate: releaseDate.toISOString()
+                    });
+                }
             }
 
             state.tvShows.push(show);
@@ -1922,7 +1955,7 @@ function getTVProgress(show) {
 }
 
 
-function isTVFinished(show) {
+function isTVUpToDate(show) {
 
     const progress =
         getTVProgress(
@@ -1931,8 +1964,7 @@ function isTVFinished(show) {
 
     return (
         progress.total > 0 &&
-        progress.watched ===
-        progress.total
+        progress.watched === progress.total
     );
 
 }
@@ -2006,12 +2038,12 @@ function showPage(page) {
         renderLibrary();
     }
 
-    if (page === "watched") {
-        renderWatched();
-    }
-
     if (page === "upcoming") {
         renderUpcoming();
+    }
+
+    if (page === "watched") {
+        renderWatched();
     }
 
     if (page === "profile") {
@@ -2088,36 +2120,25 @@ function renderLibrary() {
 
 function renderWatched() {
 
-    const grid =
-        document.getElementById(
-            "watchedGrid"
-        );
+    // 1. Continue Watching: Shows with at least 1 watched episode, but not all available episodes watched
+    const continueShows = state.tvShows.filter(show => {
+        const progress = getTVProgress(show);
+        return progress.watched > 0 && progress.watched < progress.total;
+    });
 
-    const items =
-        state.tvShows.filter(
-            show =>
-                isTVFinished(
-                    show
-                )
-        );
+    // 2. Up to Date: All currently released episodes watched, but show is NOT finished (or status unknown)
+    const upToDateShows = state.tvShows.filter(show => {
+        return isTVUpToDate(show) && !show.isFinished;
+    });
 
-    if (!items.length) {
+    // 3. Finished: Shows explicitly marked as completed series where all available episodes are watched
+    const finishedShows = state.tvShows.filter(show => {
+        return isTVUpToDate(show) && show.isFinished;
+    });
 
-        grid.innerHTML =
-            emptyState("No TV Shows Finished");
-
-        return;
-
-    }
-
-
-    grid.innerHTML =
-        items
-            .map(
-                item =>
-                    createCard(item)
-            )
-            .join("");
+    renderRow("watchedContinueGrid", continueShows, "No TV shows currently in progress.");
+    renderRow("watchedUpToDateGrid", upToDateShows, "No TV shows currently up to date.");
+    renderRow("watchedFinishedGrid", finishedShows, "No finished TV shows.");
 
 }
 
@@ -2270,7 +2291,7 @@ function renderDashboard() {
     const finishedShows =
         state.tvShows.filter(
             show =>
-                isTVFinished(show)
+                isTVUpToDate(show)
         );
 
 
@@ -2334,7 +2355,7 @@ function renderDashboard() {
                 return (
                     progress.watched >
                     0 &&
-                    !isTVFinished(
+                    !isTVUpToDate(
                         show
                     )
                 );
@@ -2348,7 +2369,7 @@ function renderDashboard() {
             ? continueShows
             : state.tvShows.filter(
                 show =>
-                    !isTVFinished(
+                    !isTVUpToDate(
                         show
                     )
             );
@@ -2356,7 +2377,8 @@ function renderDashboard() {
 
     renderRow(
         "continueTVGrid",
-        displayShows
+        displayShows,
+        "No TV shows to continue yet."
     );
 
 
@@ -2416,13 +2438,17 @@ function renderDashboard() {
 
 function renderRow(
     elementId,
-    items
+    items,
+    emptyText = "No items to display."
 ) {
 
     const container =
         document.getElementById(
             elementId
         );
+
+
+    if (!container) return;
 
 
     if (!items.length) {
@@ -2436,7 +2462,7 @@ function renderRow(
                     padding: 15px 0;
                 "
             >
-                No TV shows to continue yet.
+                ${emptyText}
             </div>
 
         `;
@@ -3406,9 +3432,9 @@ function refreshApp() {
 
     renderLibrary();
 
-    renderWatched();
-
     renderUpcoming();
+
+    renderWatched();
 
     renderProfile();
 
