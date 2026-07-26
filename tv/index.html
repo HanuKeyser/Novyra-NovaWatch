@@ -1604,7 +1604,7 @@ img {
 ========================================================= */
 
 const STORAGE_KEY =
-    "reeltrack_tv_data_v8";
+    "reeltrack_tv_data_v9";
 
 let state = {
     tvShows: [],
@@ -1780,9 +1780,34 @@ function createInitialData() {
 
     const showsToBuild = [
         {
+            id: "tv-only-murders-in-the-building",
+            title: "Only Murders in the Building",
+            year: "2021",
+            poster: "https://m.media-amazon.com/images/M/MVBmM2FiZTBlMDgtMGM2YS00NzMwLTkyODgtNWMyYTFjN2Y1NmM3XkEyXkFqcGc@._V1_SX300.jpg",
+            backdrop: "https://m.media-amazon.com/images/M/MVBmM2FiZTBlMDgtMGM2YS00NzMwLTkyODgtNWMyYTFjN2Y1NmM3XkEyXkFqcGc@._V1_SX1200.jpg",
+            description: "Three strangers who share an obsession with true crime podcasts suddenly find themselves wrapped up in one when a gruesome death occurs inside their exclusive Upper West Side apartment building.",
+            isFinished: false,
+            seasonDates: {
+                1: "2021-08-31T00:00:00",
+                2: "2022-06-28T00:00:00",
+                3: "2023-08-08T00:00:00",
+                4: "2024-08-27T00:00:00",
+                5: "2025-09-09T00:00:00"
+            },
+            seasonEpisodesCount: {
+                1: 10,
+                2: 10,
+                3: 10,
+                4: 10,
+                5: 10
+            }
+        },
+        {
             id: "tv-every-year-after",
             title: "Every Year After",
             year: "2026",
+            poster: "https://m.media-amazon.com/images/M/MVBNjA3Y2U5MmMtM2MwYi00Yzg1LTk4NWUtOTg2NmU4NDc0MjgxXkEyXkFqcGc@._V1_SX300.jpg",
+            backdrop: "https://m.media-amazon.com/images/M/MVBNjA3Y2U5MmMtM2MwYi00Yzg1LTk4NWUtOTg2NmU4NDc0MjgxXkEyXkFqcGc@._V1_SX1200.jpg",
             description: "A drama series following evolving relationships over successive years.",
             isFinished: false,
             seasonDates: {
@@ -1796,6 +1821,8 @@ function createInitialData() {
             id: "tv-elle",
             title: "Elle",
             year: "2026",
+            poster: "https://m.media-amazon.com/images/M/MVBmMDAxYTVkYTUtZjg3Ni00MzBhLTk4ODEtZDA3ZDRjZDIzMGUyXkEyXkFqcGc@._V1_SX300.jpg",
+            backdrop: "https://m.media-amazon.com/images/M/MVBmMDAxYTVkYTUtZjg3Ni00MzBhLTk4ODEtZDA3ZDRjZDIzMGUyXkEyXkFqcGc@._V1_SX1200.jpg",
             description: "Prequel series following the early high school years of Elle Woods.",
             isFinished: false,
             seasonDates: {
@@ -1809,6 +1836,8 @@ function createInitialData() {
             id: "tv-sweet-magnolias",
             title: "Sweet Magnolias",
             year: "2020",
+            poster: "https://m.media-amazon.com/images/M/MVBNzg3MzA2OWEtNzE4Yi00YmU4LTg1YTgtZTAxNzlmMWNhNDBiXkEyXkFqcGc@._V1_SX300.jpg",
+            backdrop: "https://m.media-amazon.com/images/M/MVBNzg3MzA2OWEtNzE4Yi00YmU4LTg1YTgtZTAxNzlmMWNhNDBiXkEyXkFqcGc@._V1_SX1200.jpg",
             description: "Lifelong friends Maddie, Helen, and Dana Sue navigate relationships, family, and careers in Serenity.",
             isFinished: false,
             seasonDates: {
@@ -1835,8 +1864,8 @@ function createInitialData() {
                 ownerId: state.activeProfileId,
                 title: showData.title,
                 year: showData.year,
-                poster: "",
-                backdrop: "",
+                poster: showData.poster || "",
+                backdrop: showData.backdrop || "",
                 description: showData.description,
                 isFinished: showData.isFinished,
                 episodes: []
