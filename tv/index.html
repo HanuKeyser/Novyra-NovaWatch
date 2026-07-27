@@ -651,11 +651,6 @@ img {
     gap: 8px;
 }
 
-.search-card-rating {
-    color: #ffc107;
-    font-weight: 700;
-}
-
 .search-card-overview {
     font-size: 11px;
     color: var(--text-muted);
@@ -919,20 +914,27 @@ img {
 
 .modal-actions {
     display: flex;
-    flex-wrap: wrap;
     gap: 8px;
     margin: 20px 0;
 }
 
 .action-button {
     flex: 1;
-    min-width: 120px;
+    min-width: 0;
     min-height: 43px;
+    padding: 0 8px;
     border-radius: 11px;
     background: var(--surface-3);
     color: white;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 .action-button.primary {
@@ -990,7 +992,7 @@ img {
 
 .season-batch-actions {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 10px;
     margin: 14px 0 18px;
 }
@@ -1016,10 +1018,11 @@ img {
     background: var(--surface-2);
 }
 
-/* Episode styling with preview thumbnails */
+/* Episode styling with preview thumbnails - Check on the right */
 .episode {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
+    justify-content: space-between;
     gap: 12px;
     padding: 13px 0;
     border-bottom: 1px solid var(--border);
@@ -1036,16 +1039,16 @@ img {
 
 .episode-left {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 12px;
     min-width: 0;
     flex: 1;
 }
 
 .episode-check {
-    flex: 0 0 29px;
-    width: 29px;
-    height: 29px;
+    flex: 0 0 32px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1053,7 +1056,8 @@ img {
     border: 1px solid var(--text-muted);
     background: transparent;
     color: white;
-    margin-top: 16px;
+    flex-shrink: 0;
+    margin-left: 8px;
 }
 
 .episode-check.watched {
@@ -1087,16 +1091,6 @@ img {
     font-size: 10px;
     line-height: 1.5;
     margin-top: 4px;
-}
-
-/* Rating score styling */
-.rating-badge {
-    padding: 2px 7px;
-    border-radius: 6px;
-    font-size: 10px;
-    font-weight: 800;
-    background: rgba(255, 193, 7, 0.2);
-    color: #ffc107;
 }
 
 /* =========================================================
@@ -1671,7 +1665,6 @@ function renderSearchResults(results) {
         const posterUrl = item.poster_path ? `https://image.tmdb.org/t/p/w200${item.poster_path}` : '';
         const airDate = isMovie ? item.release_date : item.first_air_date;
         const year = airDate ? airDate.substring(0, 4) : 'N/A';
-        const rating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A';
         
         const slug = isMovie ? `movie-${item.id}` : "tv-" + (item.name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-");
         const isAdded = state.library.some(s => s.id === slug || s.tmdbId === item.id);
@@ -1688,8 +1681,6 @@ function renderSearchResults(results) {
                         <span>${year}</span>
                         <span>•</span>
                         <span style="text-transform:uppercase;">${isMovie ? 'Movie' : 'TV'}</span>
-                        <span>•</span>
-                        <span class="search-card-rating">★ ${rating}</span>
                     </div>
                     <div class="search-card-overview">${escapeHTML(item.overview || 'No description available.')}</div>
                     
@@ -1736,7 +1727,6 @@ async function openSearchResultDetails(tmdbId, type) {
                 backdrop: movieData.backdrop_path ? `https://image.tmdb.org/t/p/w780${movieData.backdrop_path}` : "",
                 description: movieData.overview || "No description available.",
                 runtime: movieData.runtime ? `${movieData.runtime} min` : "120 min",
-                rating: movieData.vote_average ? movieData.vote_average.toFixed(1) : null,
                 releaseDate: movieData.release_date ? new Date(movieData.release_date).toISOString() : new Date().toISOString(),
                 isPreview: true,
                 watched: false
@@ -1782,7 +1772,6 @@ async function openSearchResultDetails(tmdbId, type) {
                 poster: showData.poster_path ? `https://image.tmdb.org/t/p/w500${showData.poster_path}` : "",
                 backdrop: showData.backdrop_path ? `https://image.tmdb.org/t/p/w780${showData.backdrop_path}` : "",
                 description: showData.overview || "No description available.",
-                rating: showData.vote_average ? showData.vote_average.toFixed(1) : null,
                 isPreview: true,
                 episodes: episodes
             };
@@ -1828,7 +1817,6 @@ async function importMediaData(id, type, buttonElement) {
                 backdrop: movieData.backdrop_path ? `https://image.tmdb.org/t/p/w780${movieData.backdrop_path}` : "",
                 description: movieData.overview || "No description available.",
                 runtime: movieData.runtime ? `${movieData.runtime} min` : "120 min",
-                rating: movieData.vote_average ? movieData.vote_average.toFixed(1) : null,
                 releaseDate: movieData.release_date ? new Date(movieData.release_date).toISOString() : new Date().toISOString(),
                 watched: false,
                 watchCount: 0,
@@ -1896,7 +1884,6 @@ async function importMediaData(id, type, buttonElement) {
                 poster: showData.poster_path ? `https://image.tmdb.org/t/p/w500${showData.poster_path}` : "",
                 backdrop: showData.backdrop_path ? `https://image.tmdb.org/t/p/w780${showData.backdrop_path}` : "",
                 description: showData.overview || "No description available.",
-                rating: showData.vote_average ? showData.vote_average.toFixed(1) : null,
                 isFinished: false,
                 episodes: episodes
             };
@@ -2141,8 +2128,7 @@ function renderMovieLibrary() {
     }
 
     const unwatched = items.filter(item => !item.watched);
-    const watched = sortMoviesByWatchedDate(items.filter(item => item.watched && (item.watchCount || 1) === 1));
-    const rewatched = sortMoviesByWatchedDate(items.filter(item => item.watched && (item.watchCount || 0) > 1));
+    const watched = sortMoviesByWatchedDate(items.filter(item => item.watched));
 
     let html = "";
 
@@ -2151,9 +2137,6 @@ function renderMovieLibrary() {
     }
     if (watched.length > 0) {
         html += renderCategoryBlock("Watched", watched);
-    }
-    if (rewatched.length > 0) {
-        html += renderCategoryBlock("Rewatching / Multiple Watches", rewatched);
     }
 
     if (!html) {
@@ -2218,7 +2201,7 @@ function createCard(item) {
                     item.watched ? `
                         <div class="watch-count-badge movie-badge">
                             <svg class="icon icon-small" viewBox="0 0 24 24" style="width:11px; height:11px;"><path d="M5 12l5 5L20 7"/></svg>
-                            ${(item.watchCount || 1) > 1 ? item.watchCount + 'x' : 'Watched'}
+                            Watched
                         </div>
                     ` : ''
                 ) : (
@@ -2380,14 +2363,14 @@ function renderProfile() {
             if (item.watched) {
                 const match = (item.runtime || "").match(/(\d+)/);
                 const mins = match ? parseInt(match[1], 10) : 120;
-                totalMinutes += mins * (item.watchCount || 1);
+                totalMinutes += mins;
             }
         } else if (item.episodes) {
             item.episodes.forEach(ep => {
                 if (ep.watched) {
                     const match = (ep.runtime || "").match(/(\d+)/);
                     const mins = match ? parseInt(match[1], 10) : 45;
-                    totalMinutes += mins * (ep.watchCount || 1);
+                    totalMinutes += mins;
                 }
             });
         }
@@ -2476,11 +2459,8 @@ function updateModalContent() {
     document.getElementById("modalTitle").textContent = currentItem.title;
     document.getElementById("modalDescription").textContent = currentItem.description;
 
-    const ratingMarkup = currentItem.rating ? `<span class="rating-badge">★ ${currentItem.rating}</span>` : '';
-
     if (currentItem.type === 'movie') {
         const released = isReleased(currentItem.releaseDate);
-        const watchCount = currentItem.watchCount || (currentItem.watched ? 1 : 0);
 
         document.getElementById("modalMeta").innerHTML = `
             <span>${currentItem.year}</span>
@@ -2488,10 +2468,10 @@ function updateModalContent() {
             <span style="text-transform:uppercase;">Movie</span>
             <span>•</span>
             <span>${currentItem.runtime || '120 min'}</span>
-            ${ratingMarkup ? '<span>•</span>' + ratingMarkup : ''}
             <span>•</span>
             <span>${released ? 'Released ' + formatDate(currentItem.releaseDate) : 'Releases ' + formatDate(currentItem.releaseDate)}</span>
-            ${currentItem.watched ? `<span>•</span><span style="color: var(--success); font-weight: 700;">Watched ${watchCount > 1 ? '(' + watchCount + 'x)' : ''}</span>` : '<span>•</span><span style="color: var(--text-muted);">Unwatched</span>'}
+            <span>•</span>
+            <span style="color: ${currentItem.watched ? 'var(--success)' : 'var(--text-muted)'}; font-weight: 700;">${currentItem.watched ? 'Watched' : 'Unwatched'}</span>
         `;
 
         let actionBtns = '';
@@ -2503,15 +2483,9 @@ function updateModalContent() {
         if (currentItem.isPreview) {
             actionBtns += `<button class="action-button primary" onclick="importMediaData(${currentItem.tmdbId}, 'movie', this)">Add to Library</button>`;
         } else if (!currentItem.watched) {
-            actionBtns += `
-                <button class="action-button primary" onclick="startWatchingMovie('${currentItem.id}')">Start Watching</button>
-                <button class="action-button" onclick="toggleMovieWatched('${currentItem.id}')">Mark Watched</button>
-            `;
+            actionBtns += `<button class="action-button primary" onclick="toggleMovieWatched('${currentItem.id}')">Mark Watched</button>`;
         } else {
-            actionBtns += `
-                <button class="action-button primary" onclick="rewatchMovie('${currentItem.id}')">Start Rewatching</button>
-                <button class="action-button" onclick="markMovieUnwatched('${currentItem.id}')">Mark Unwatched</button>
-            `;
+            actionBtns += `<button class="action-button primary" disabled>Watched</button>`;
         }
 
         if (!currentItem.isPreview) {
@@ -2530,7 +2504,6 @@ function updateModalContent() {
         <span>${currentItem.year}</span>
         <span>•</span>
         <span style="text-transform:uppercase;">TV Show</span>
-        ${ratingMarkup ? '<span>•</span>' + ratingMarkup : ''}
         <span>•</span>
         <span>${progress.watched} / ${progress.total} episodes watched (${progress.percentage}%)</span>
         ${isShowFinished ? '<span>•</span><span style="color: var(--success); font-weight: 700;">Finished</span>' : ''}
@@ -2544,21 +2517,8 @@ function updateModalContent() {
 
     if (currentItem.isPreview) {
         tvActions += `<button class="action-button primary" onclick="importMediaData(${currentItem.tmdbId}, 'tv', this)">Add to Library</button>`;
-    } else if (progress.watched === 0) {
-        tvActions += `
-            <button class="action-button primary" onclick="startWatchingTV('${currentItem.id}')">Start Watching</button>
-            <button class="action-button" onclick="markAllWatched()">Mark All Watched</button>
-        `;
-    } else if (isShowFinished) {
-        tvActions += `
-            <button class="action-button primary" onclick="startRewatchingTV('${currentItem.id}')">Start Rewatching</button>
-            <button class="action-button" onclick="markAllUnwatchedTV('${currentItem.id}')">Mark Unwatched</button>
-        `;
     } else {
-        tvActions += `
-            <button class="action-button primary" onclick="markAllWatched()">Mark All Watched</button>
-            <button class="action-button" onclick="markAllUnwatchedTV('${currentItem.id}')">Mark Unwatched</button>
-        `;
+        tvActions += `<button class="action-button primary" onclick="markAllWatched()">Mark All Watched</button>`;
     }
 
     if (!currentItem.isPreview) {
@@ -2582,7 +2542,6 @@ function updateModalContent() {
         ${!currentItem.isPreview ? `
         <div class="season-batch-actions">
             <button class="season-batch-btn" onclick="markSeasonWatched(${selectedSeason})">Mark Season Watched</button>
-            <button class="season-batch-btn" onclick="unmarkSeasonWatched(${selectedSeason})">Unmark Season</button>
         </div>` : ''}
         <div class="episodes-list">
     `;
@@ -2592,18 +2551,18 @@ function updateModalContent() {
         const released = isReleased(ep.releaseDate);
         html += `
             <div class="episode">
-                ${ep.still ? `<img src="${ep.still}" class="episode-still" alt="${escapeHTML(ep.title)}" onerror="this.style.display='none'">` : ''}
                 <div class="episode-left">
-                    ${!currentItem.isPreview ? `
-                    <button class="episode-check ${ep.watched ? 'watched' : ''}" onclick="toggleEpisode('${ep.id}')">
-                        ${ep.watched ? '<svg class="icon icon-small" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>' : ep.number}
-                    </button>` : ''}
+                    ${ep.still ? `<img src="${ep.still}" class="episode-still" alt="${escapeHTML(ep.title)}" onerror="this.style.display='none'">` : ''}
                     <div class="episode-info">
                         <div class="episode-title">E${ep.number}: ${escapeHTML(ep.title)}</div>
                         ${ep.overview ? `<div class="episode-overview">${escapeHTML(ep.overview)}</div>` : ''}
                         <div class="episode-meta">${ep.runtime || '45 min'} • ${released ? formatDate(ep.releaseDate) : 'Coming ' + formatDate(ep.releaseDate)}</div>
                     </div>
                 </div>
+                ${!currentItem.isPreview ? `
+                <button class="episode-check ${ep.watched ? 'watched' : ''}" onclick="toggleEpisode('${ep.id}')">
+                    ${ep.watched ? '<svg class="icon icon-small" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>' : ep.number}
+                </button>` : ''}
             </div>
         `;
     });
@@ -2614,89 +2573,22 @@ function updateModalContent() {
 
 
 /* =========================================================
-   MOVIE ACTIONS (WATCH, REWATCH, UNWATCH)
+   MOVIE ACTIONS
 ========================================================= */
-
-function startWatchingMovie(movieId) {
-    if (!currentItem || currentItem.id !== movieId) return;
-    currentItem.watched = true;
-    currentItem.watchCount = 1;
-    currentItem.lastWatchedAt = new Date().toISOString();
-    saveState();
-    updateModalContent();
-    showToast(`Started watching ${currentItem.title}!`);
-}
 
 function toggleMovieWatched(movieId) {
     if (!currentItem || currentItem.id !== movieId) return;
     currentItem.watched = !currentItem.watched;
-    currentItem.watchCount = currentItem.watched ? 1 : 0;
     currentItem.lastWatchedAt = currentItem.watched ? new Date().toISOString() : null;
     saveState();
     updateModalContent();
     showToast(currentItem.watched ? "Marked movie as watched" : "Marked movie as unwatched");
 }
 
-function rewatchMovie(movieId) {
-    if (!currentItem || currentItem.id !== movieId) return;
-    currentItem.watched = true;
-    currentItem.watchCount = (currentItem.watchCount || 1) + 1;
-    currentItem.lastWatchedAt = new Date().toISOString();
-    saveState();
-    updateModalContent();
-    showToast(`Rewatching ${currentItem.title} (${currentItem.watchCount}x)!`);
-}
-
-function markMovieUnwatched(movieId) {
-    if (!currentItem || currentItem.id !== movieId) return;
-    currentItem.watched = false;
-    currentItem.watchCount = 0;
-    currentItem.lastWatchedAt = null;
-    saveState();
-    updateModalContent();
-    showToast(`Marked ${currentItem.title} as unwatched`);
-}
-
 
 /* =========================================================
-   TV SHOW ACTIONS (WATCH, REWATCH, UNWATCH)
+   TV SHOW ACTIONS
 ========================================================= */
-
-function startWatchingTV(showId) {
-    if (!currentItem || currentItem.id !== showId) return;
-    if (currentItem.episodes && currentItem.episodes.length > 0) {
-        currentItem.episodes[0].watched = true;
-        currentItem.episodes[0].watchCount = 1;
-    }
-    saveState();
-    updateModalContent();
-    showToast(`Started watching ${currentItem.title}!`);
-}
-
-function startRewatchingTV(showId) {
-    if (!currentItem || currentItem.id !== showId) return;
-    currentItem.episodes.forEach(ep => {
-        ep.watched = false;
-    });
-    if (currentItem.episodes.length > 0) {
-        currentItem.episodes[0].watched = true;
-        currentItem.episodes[0].watchCount = (currentItem.episodes[0].watchCount || 1) + 1;
-    }
-    saveState();
-    updateModalContent();
-    showToast(`Started rewatching ${currentItem.title}!`);
-}
-
-function markAllUnwatchedTV(showId) {
-    if (!currentItem || currentItem.id !== showId) return;
-    currentItem.episodes.forEach(ep => {
-        ep.watched = false;
-        ep.watchCount = 0;
-    });
-    saveState();
-    updateModalContent();
-    showToast(`Marked ${currentItem.title} as unwatched`);
-}
 
 function selectSeason(season) {
     selectedSeason = season;
@@ -2709,7 +2601,6 @@ function toggleEpisode(episodeId) {
     if (!ep) return;
 
     ep.watched = !ep.watched;
-    ep.watchCount = ep.watched ? (ep.watchCount || 0) + 1 : 0;
     saveState();
     updateModalContent();
 }
@@ -2719,7 +2610,6 @@ function markAllWatched() {
     currentItem.episodes.forEach(ep => {
         if (isReleased(ep.releaseDate)) {
             ep.watched = true;
-            ep.watchCount = ep.watchCount ? ep.watchCount : 1;
         }
     });
     saveState();
@@ -2732,25 +2622,11 @@ function markSeasonWatched(seasonNum) {
     currentItem.episodes.forEach(ep => {
         if (ep.season === seasonNum && isReleased(ep.releaseDate)) {
             ep.watched = true;
-            ep.watchCount = ep.watchCount ? ep.watchCount : 1;
         }
     });
     saveState();
     updateModalContent();
     showToast(`Marked Season ${seasonNum} as watched`);
-}
-
-function unmarkSeasonWatched(seasonNum) {
-    if (!currentItem) return;
-    currentItem.episodes.forEach(ep => {
-        if (ep.season === seasonNum) {
-            ep.watched = false;
-            ep.watchCount = 0;
-        }
-    });
-    saveState();
-    updateModalContent();
-    showToast(`Unmarked Season ${seasonNum}`);
 }
 
 function deleteItem(itemId) {
