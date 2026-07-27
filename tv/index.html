@@ -1671,7 +1671,7 @@ async function handleCloudSync(userId, currentLibrary) {
             library: mergedLibrary
         };
 
-        safeStorage.setItem('app_state', JSON.stringify(state));
+        safeStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 
     } catch (err) {
         console.error("Full Firebase Error:", err);
@@ -2224,7 +2224,7 @@ function getItem(id) {
 }
 
 function getAvailableEpisodes(show) {
-    if (!show.episodes) return [];
+    if (!show || !show.episodes) return [];
     return show.episodes.filter(episode => isReleased(episode.releaseDate));
 }
 
