@@ -1631,13 +1631,7 @@ function getCountdown(date) {
    STORAGE, CLOUD SYNC & AUTHENTICATION
 ========================================================= */
 async function saveState() {
-
-    alert("saveState() called");
-
     try {
-        safeStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-
-        // Save locally first
         safeStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 
         if (!auth || !auth.currentUser || !db) {
@@ -1645,24 +1639,14 @@ async function saveState() {
             return;
         }
 
-        console.log("Saving library:", state.library);
+        await db.collection("users")
+            .doc(auth.currentUser.uid)
+            .set(state, { merge: true });
 
-await db.collection("users")
-    .doc(auth.currentUser.uid)
-    .set(state, { merge: true });
-
-alert("Firestore save SUCCESS\nLibrary size: " + state.library.length);
-
-catch (err) {
-
-    alert(
-        "Firestore FAILED\n\n" +
-        err.code + "\n\n" +
-        err.message
-    );
-
-    console.error(err);
-
+        console.log("Firestore save SUCCESS");
+    } catch (err) {
+        console.error("Firestore FAILED", err);
+    }
 }
 
 async function loadState() {
@@ -1825,13 +1809,6 @@ if (auth) {
         const outView = document.getElementById("loggedOutView");
         const inView = document.getElementById("loggedInView");
 
-console.log("Project:", firebase.app().options.projectId);
-console.log("UID:", auth.currentUser?.uid);
-alert(
-    "Project: " + firebase.app().options.projectId +
-    "\nUID: " + auth.currentUser?.uid
-);
-       
         if (user) {
             outView.style.display = "none";
             inView.style.display = "block";
@@ -1843,20 +1820,17 @@ alert(
                     if (cloudData) {
                         const mergedLibrary = mergeLibraries(state.library, cloudData.library || []);
                         state = {
-    ...state,
-    ...cloudData,
-    library: mergedLibrary
-};
+                            ...state,
+                            ...cloudData,
+                            library: mergedLibrary
+                        };
 
-// Upload merged library back to Firestore
-await db.collection("users")
-    .doc(user.uid)
-    .set({
-        ...state,
-        library: mergedLibrary
-    }, { merge: true });
-
-console.log("Merged library uploaded to Firestore");
+                        await db.collection("users")
+                            .doc(user.uid)
+                            .set({
+                                ...state,
+                                library: mergedLibrary
+                            }, { merge: true });
                        
                         if (!state.profiles || state.profiles.length === 0) {
                             const name = user.displayName || user.email.split('@')[0];
@@ -1866,28 +1840,27 @@ console.log("Merged library uploaded to Firestore");
                         safeStorage.setItem(STORAGE_KEY, JSON.stringify(state));
                         refreshActivePage();
                         showToast("Synced library with cloud!");
-                       db.collection("users")
-    .doc(user.uid)
-    .onSnapshot((snapshot) => {
 
-        if (!snapshot.exists) return;
+                        db.collection("users")
+                            .doc(user.uid)
+                            .onSnapshot((snapshot) => {
+                                if (!snapshot.exists) return;
 
-        const cloudData = snapshot.data();
+                                const cloudData = snapshot.data();
+                                const mergedLibrary = mergeLibraries(
+                                    state.library,
+                                    cloudData.library || []
+                                );
 
-        const mergedLibrary = mergeLibraries(
-            state.library,
-            cloudData.library || []
-        );
+                                state = {
+                                    ...state,
+                                    ...cloudData,
+                                    library: mergedLibrary
+                                };
 
-        state = {
-            ...state,
-            ...cloudData,
-            library: mergedLibrary
-        };
-
-        safeStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        refreshActivePage();
-    });
+                                safeStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+                                refreshActivePage();
+                            });
                     }
                 } else {
                     if (user.displayName && state.profiles && state.profiles[0]) {
@@ -2237,7 +2210,6 @@ async function importMediaData(id, type, buttonElement) {
             };
 
             state.library.push(newShow);
-           console.log("After push:", state.library);
             saveState();
 
             if (buttonElement) {
