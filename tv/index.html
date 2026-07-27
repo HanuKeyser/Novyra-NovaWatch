@@ -1630,20 +1630,32 @@ function getCountdown(date) {
 /* =========================================================
    STORAGE, CLOUD SYNC & AUTHENTICATION
 ========================================================= */
-function saveState() {
+async function saveState() {
     try {
+
+        // Save locally first
         safeStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        
-        if (auth && auth.currentUser && db) {
-           console.log("Saving to Firestore:", state.library);
-            db.collection("users").doc(auth.currentUser.uid).set(state, { merge: true })
-                .catch(err => {
-                    console.error("Cloud save failed:", err);
-                    showToast("Sync error: Check Firestore rules");
-                });
+
+        if (!auth || !auth.currentUser || !db) {
+            console.log("Not signed in - skipping cloud save");
+            return;
         }
-    } catch (error) {
-        console.error("Could not save data locally:", error);
+
+        console.log("Saving library:", state.library);
+
+        await db.collection("users")
+            .doc(auth.currentUser.uid)
+            .set(state, { merge: true });
+
+        console.log("✅ Firestore save SUCCESS");
+
+    } catch (err) {
+
+        console.error("❌ Firestore save FAILED");
+        console.error(err);
+
+        showToast(err.message);
+
     }
 }
 
