@@ -1779,7 +1779,7 @@ function loadState() {
 
 
 /* =========================================================
-   INITIAL DATA POPULATION
+   INITIAL DATA POPULATION (PRESERVES EXISTING USER HISTORY)
 ========================================================= */
 
 function createInitialData() {
@@ -2055,6 +2055,11 @@ function createInitialData() {
     showsToBuild.forEach(showData => {
         const existingIndex = state.tvShows.findIndex(show => show.id === showData.id);
         
+        // If the show already exists in state, do not overwrite or reset its history/progress!
+        if (existingIndex > -1) {
+            return;
+        }
+
         const show = {
             id: showData.id,
             ownerId: state.activeProfileId,
@@ -2081,19 +2086,7 @@ function createInitialData() {
             });
         }
 
-        if (existingIndex > -1) {
-            const oldEpisodes = state.tvShows[existingIndex].episodes || [];
-            show.episodes.forEach(ep => {
-                const match = oldEpisodes.find(o => o.id === ep.id);
-                if (match) {
-                    ep.watched = match.watched;
-                    ep.watchCount = match.watchCount || (match.watched ? 1 : 0);
-                }
-            });
-            state.tvShows[existingIndex] = show;
-        } else {
-            state.tvShows.push(show);
-        }
+        state.tvShows.push(show);
     });
 
     saveState();
