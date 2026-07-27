@@ -779,7 +779,7 @@ img {
 }
 
 /* =========================================================
-   BOTTOM NAV (4 BUTTONS)
+   BOTTOM NAV (5 BUTTONS)
 ========================================================= */
 
 .bottom-nav {
@@ -791,9 +791,9 @@ img {
     width: 100%;
     max-width: 600px;
     height: 72px;
-    padding: 7px 8px;
+    padding: 7px 4px;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     background: rgba(8,11,17,0.95);
     backdrop-filter: blur(20px);
     border-top: 1px solid var(--border);
@@ -1144,7 +1144,7 @@ img {
     <div>
         <div class="section-header">
             <div class="section-title">Continue Watching</div>
-            <button class="section-link" onclick="showPage('library')">See All Library</button>
+            <button class="section-link" onclick="showPage('tvLibrary')">See TV Library</button>
         </div>
         <div id="continueTVGrid" class="horizontal-row"></div>
     </div>
@@ -1152,7 +1152,7 @@ img {
     <div>
         <div class="section-header">
             <div class="section-title">Unwatched Movies</div>
-            <button class="section-link" onclick="showPage('library')">See Library</button>
+            <button class="section-link" onclick="showPage('movieLibrary')">See Movie Library</button>
         </div>
         <div id="unwatchedMoviesGrid" class="horizontal-row"></div>
     </div>
@@ -1199,12 +1199,12 @@ img {
 
 
 <!-- =====================================================
-     COMBINED LIBRARY & HISTORY
+     TV SHOW LIBRARY
 ===================================================== -->
 
-<main id="libraryPage" class="page">
+<main id="tvLibraryPage" class="page">
     <div class="section-header">
-        <div class="section-title">Library & History</div>
+        <div class="section-title">TV Show Library</div>
     </div>
 
     <div class="library-toolbar">
@@ -1213,19 +1213,45 @@ img {
                 <circle cx="11" cy="11" r="7"/>
                 <path d="M20 20l-4-4"/>
             </svg>
-            <input id="librarySearchInput" type="search" placeholder="Search saved library items..." autocomplete="off">
+            <input id="tvLibrarySearchInput" type="search" placeholder="Search TV shows in library..." autocomplete="off">
         </div>
         <div class="filter-group">
-            <button class="filter-chip active" onclick="setLibraryFilter('all', this)">All Items</button>
-            <button class="filter-chip" onclick="setLibraryFilter('tv', this)">TV Shows</button>
-            <button class="filter-chip" onclick="setLibraryFilter('movie', this)">Movies</button>
-            <button class="filter-chip" onclick="setLibraryFilter('progress', this)">In Progress</button>
-            <button class="filter-chip" onclick="setLibraryFilter('uptodate', this)">Up to Date</button>
-            <button class="filter-chip" onclick="setLibraryFilter('finished', this)">Finished / Watched</button>
+            <button class="filter-chip active" onclick="setTVFilter('all', this)">All Shows</button>
+            <button class="filter-chip" onclick="setTVFilter('progress', this)">In Progress</button>
+            <button class="filter-chip" onclick="setTVFilter('uptodate', this)">Up to Date</button>
+            <button class="filter-chip" onclick="setTVFilter('finished', this)">Finished</button>
         </div>
     </div>
 
-    <div id="libraryGrid" class="library-grid"></div>
+    <div id="tvLibraryGrid" class="library-grid"></div>
+</main>
+
+
+<!-- =====================================================
+     MOVIE LIBRARY
+===================================================== -->
+
+<main id="movieLibraryPage" class="page">
+    <div class="section-header">
+        <div class="section-title">Movie Library</div>
+    </div>
+
+    <div class="library-toolbar">
+        <div class="search-box">
+            <svg class="icon search-icon" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="7"/>
+                <path d="M20 20l-4-4"/>
+            </svg>
+            <input id="movieLibrarySearchInput" type="search" placeholder="Search movies in library..." autocomplete="off">
+        </div>
+        <div class="filter-group">
+            <button class="filter-chip active" onclick="setMovieFilter('all', this)">All Movies</button>
+            <button class="filter-chip" onclick="setMovieFilter('unwatched', this)">Unwatched</button>
+            <button class="filter-chip" onclick="setMovieFilter('watched', this)">Watched</button>
+        </div>
+    </div>
+
+    <div id="movieLibraryGrid" class="library-grid"></div>
 </main>
 
 
@@ -1266,7 +1292,7 @@ img {
 
 
 <!-- =====================================================
-     BOTTOM NAVIGATION (4 BUTTONS)
+     BOTTOM NAVIGATION (5 BUTTONS)
 ===================================================== -->
 
 <nav class="bottom-nav">
@@ -1277,19 +1303,30 @@ img {
         </svg>
         Home
     </button>
+    <button id="navTvLibrary" class="nav-button" onclick="showPage('tvLibrary')">
+        <svg class="icon" viewBox="0 0 24 24">
+            <rect x="2" y="7" width="20" height="13" rx="2"/>
+            <path d="M17 2l-5 5-5-5"/>
+        </svg>
+        TV Shows
+    </button>
+    <button id="navMovieLibrary" class="nav-button" onclick="showPage('movieLibrary')">
+        <svg class="icon" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <path d="M7 3v18"/>
+            <path d="M17 3v18"/>
+            <path d="M3 7h18"/>
+            <path d="M3 12h18"/>
+            <path d="M3 17h18"/>
+        </svg>
+        Movies
+    </button>
     <button id="navSearch" class="nav-button" onclick="showPage('search')">
         <svg class="icon" viewBox="0 0 24 24">
             <circle cx="11" cy="11" r="7"/>
             <path d="M20 20l-4-4"/>
         </svg>
         Search
-    </button>
-    <button id="navLibrary" class="nav-button" onclick="showPage('library')">
-        <svg class="icon" viewBox="0 0 24 24">
-            <rect x="4" y="3" width="16" height="18" rx="2"/>
-            <path d="M8 3v18"/>
-        </svg>
-        Library
     </button>
     <button id="navUpcoming" class="nav-button" onclick="showPage('upcoming')">
         <svg class="icon" viewBox="0 0 24 24">
@@ -1355,7 +1392,8 @@ let state = {
 
 let currentItem = null;
 let selectedSeason = 1;
-let currentLibraryFilter = 'all';
+let currentTVFilter = 'all';
+let currentMovieFilter = 'all';
 let currentSearchType = 'tv';
 let toastTimer = null;
 let searchDebounceTimer = null;
@@ -1422,7 +1460,6 @@ function loadState() {
     try {
         let saved = localStorage.getItem(STORAGE_KEY);
 
-        // Fallback to previous storage keys for seamless migration
         if (!saved) {
             saved = localStorage.getItem("tvtime_tv_data_permanent");
         }
@@ -1832,47 +1869,41 @@ function showPage(page) {
         const query = document.getElementById("onlineSearchInput").value.trim();
         if (!query) fetchTrending();
     }
-    if (page === "library") renderLibrary();
+    if (page === "tvLibrary") renderTVLibrary();
+    if (page === "movieLibrary") renderMovieLibrary();
     if (page === "upcoming") renderUpcoming();
     if (page === "profile") renderProfile();
 }
 
 
 /* =========================================================
-   COMBINED LIBRARY PAGE
+   DEDICATED TV SHOW LIBRARY PAGE
 ========================================================= */
 
-function setLibraryFilter(filter, buttonElement) {
-    currentLibraryFilter = filter;
-    document.querySelectorAll(".filter-chip").forEach(chip => chip.classList.remove("active"));
+function setTVFilter(filter, buttonElement) {
+    currentTVFilter = filter;
+    const group = buttonElement.parentElement;
+    group.querySelectorAll(".filter-chip").forEach(chip => chip.classList.remove("active"));
     buttonElement.classList.add("active");
-    renderLibrary();
+    renderTVLibrary();
 }
 
-function renderLibrary() {
-    const grid = document.getElementById("libraryGrid");
-    const searchInput = document.getElementById("librarySearchInput");
-    const query = searchInput.value.trim().toLowerCase();
+function renderTVLibrary() {
+    const grid = document.getElementById("tvLibraryGrid");
+    const searchInput = document.getElementById("tvLibrarySearchInput");
+    const query = searchInput ? searchInput.value.trim().toLowerCase() : "";
 
-    let items = [...state.library];
+    let items = state.library.filter(i => i.type === 'tv' || !i.type);
 
-    if (currentLibraryFilter === 'tv') {
-        items = items.filter(i => i.type === 'tv' || !i.type);
-    } else if (currentLibraryFilter === 'movie') {
-        items = items.filter(i => i.type === 'movie');
-    } else if (currentLibraryFilter === 'progress') {
+    if (currentTVFilter === 'progress') {
         items = items.filter(item => {
-            if (item.type === 'movie') return false;
             const p = getTVProgress(item);
             return p.watched > 0 && p.watched < p.total;
         });
-    } else if (currentLibraryFilter === 'uptodate') {
-        items = items.filter(item => item.type !== 'movie' && isTVUpToDate(item));
-    } else if (currentLibraryFilter === 'finished') {
-        items = items.filter(item => {
-            if (item.type === 'movie') return item.watched;
-            return isTVFinished(item);
-        });
+    } else if (currentTVFilter === 'uptodate') {
+        items = items.filter(item => isTVUpToDate(item));
+    } else if (currentTVFilter === 'finished') {
+        items = items.filter(item => isTVFinished(item));
     }
 
     if (query) {
@@ -1882,7 +1913,47 @@ function renderLibrary() {
     items.sort((a, b) => a.title.localeCompare(b.title));
 
     if (!items.length) {
-        grid.innerHTML = emptyState("No Items Found", "Your library is empty or no items match your selected filter.");
+        grid.innerHTML = emptyState("No TV Shows Found", "Your TV show library is empty or no items match your selected filter.");
+        return;
+    }
+
+    grid.innerHTML = items.map(item => createCard(item)).join("");
+}
+
+
+/* =========================================================
+   DEDICATED MOVIE LIBRARY PAGE
+========================================================= */
+
+function setMovieFilter(filter, buttonElement) {
+    currentMovieFilter = filter;
+    const group = buttonElement.parentElement;
+    group.querySelectorAll(".filter-chip").forEach(chip => chip.classList.remove("active"));
+    buttonElement.classList.add("active");
+    renderMovieLibrary();
+}
+
+function renderMovieLibrary() {
+    const grid = document.getElementById("movieLibraryGrid");
+    const searchInput = document.getElementById("movieLibrarySearchInput");
+    const query = searchInput ? searchInput.value.trim().toLowerCase() : "";
+
+    let items = state.library.filter(i => i.type === 'movie');
+
+    if (currentMovieFilter === 'unwatched') {
+        items = items.filter(item => !item.watched);
+    } else if (currentMovieFilter === 'watched') {
+        items = items.filter(item => item.watched);
+    }
+
+    if (query) {
+        items = items.filter(item => item.title.toLowerCase().includes(query));
+    }
+
+    items.sort((a, b) => a.title.localeCompare(b.title));
+
+    if (!items.length) {
+        grid.innerHTML = emptyState("No Movies Found", "Your movie library is empty or no items match your selected filter.");
         return;
     }
 
@@ -2130,7 +2201,8 @@ function closeModal() {
     document.getElementById("detailsModal").classList.remove("open");
     currentItem = null;
     renderDashboard();
-    if (document.getElementById("libraryPage").classList.contains("active")) renderLibrary();
+    if (document.getElementById("tvLibraryPage").classList.contains("active")) renderTVLibrary();
+    if (document.getElementById("movieLibraryPage").classList.contains("active")) renderMovieLibrary();
 }
 
 function closeModalOutside(event) {
@@ -2296,7 +2368,8 @@ function deleteItem(itemId) {
     saveState();
     closeModal();
     showToast("Item removed from library");
-    renderLibrary();
+    if (document.getElementById("tvLibraryPage").classList.contains("active")) renderTVLibrary();
+    if (document.getElementById("movieLibraryPage").classList.contains("active")) renderMovieLibrary();
 }
 
 
@@ -2336,9 +2409,14 @@ window.addEventListener("DOMContentLoaded", () => {
     renderDashboard();
     initSearchPage();
 
-    const librarySearch = document.getElementById("librarySearchInput");
-    if (librarySearch) {
-        librarySearch.addEventListener("input", renderLibrary);
+    const tvSearch = document.getElementById("tvLibrarySearchInput");
+    if (tvSearch) {
+        tvSearch.addEventListener("input", renderTVLibrary);
+    }
+
+    const movieSearch = document.getElementById("movieLibrarySearchInput");
+    if (movieSearch) {
+        movieSearch.addEventListener("input", renderMovieLibrary);
     }
 });
 
