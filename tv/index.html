@@ -1459,14 +1459,6 @@ img {
         <div id="watchedUpToDateGrid" class="horizontal-row"></div>
     </div>
 
-    <!-- Finished Section -->
-    <div>
-        <div class="section-header">
-            <div class="section-title">Finished</div>
-        </div>
-        <div id="watchedFinishedGrid" class="horizontal-row"></div>
-    </div>
-
 </main>
 
 
@@ -2055,7 +2047,6 @@ function createInitialData() {
     showsToBuild.forEach(showData => {
         const existingIndex = state.tvShows.findIndex(show => show.id === showData.id);
         
-        // If the show already exists, merge new episodes or details safely without overwriting watched history
         if (existingIndex > -1) {
             const existingShow = state.tvShows[existingIndex];
             if (showData.episodesDetails) {
@@ -2168,6 +2159,12 @@ function isTVUpToDate(show) {
     );
 }
 
+function getLatestEpisodeDate(show) {
+    if (!show.episodes || show.episodes.length === 0) return 0;
+    const dates = show.episodes.map(ep => new Date(ep.releaseDate || 0).getTime());
+    return Math.max(...dates);
+}
+
 
 /* =========================================================
    NAVIGATION
@@ -2233,16 +2230,11 @@ function renderWatched() {
     }).sort((a, b) => a.title.localeCompare(b.title));
 
     const upToDateShows = state.tvShows.filter(show => {
-        return isTVUpToDate(show) && !show.isFinished;
-    }).sort((a, b) => a.title.localeCompare(b.title));
-
-    const finishedShows = state.tvShows.filter(show => {
-        return isTVUpToDate(show) && show.isFinished;
-    }).sort((a, b) => a.title.localeCompare(b.title));
+        return isTVUpToDate(show);
+    }).sort((a, b) => getLatestEpisodeDate(b) - getLatestEpisodeDate(a));
 
     renderRow("watchedContinueGrid", continueShows, "No TV shows currently in progress.");
     renderRow("watchedUpToDateGrid", upToDateShows, "No TV shows currently up to date.");
-    renderRow("watchedFinishedGrid", finishedShows, "No finished TV shows.");
 }
 
 
