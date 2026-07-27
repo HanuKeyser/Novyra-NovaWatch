@@ -1505,7 +1505,7 @@ function setSearchType(type) {
     document.getElementById("searchTypeMovie").classList.toggle("active", type === 'movie');
 
     const searchInput = document.getElementById("onlineSearchInput");
-    const query = searchInput.value.trim();
+    const query = searchInput ? searchInput.value.trim() : "";
 
     if (query) {
         performTMDBSearch(query);
@@ -1651,7 +1651,7 @@ async function importMediaData(id, type, buttonElement) {
             const movieData = await movieRes.json();
 
             const slug = `movie-${movieData.id}`;
-            if (state.library.some(s => s.id === slug)) {
+            if (state.library.some(s => s.id === slug || s.tmdbId === movieData.id)) {
                 showToast("Movie is already in your library!");
                 return;
             }
@@ -1685,7 +1685,7 @@ async function importMediaData(id, type, buttonElement) {
             const showData = await showRes.json();
 
             const slug = "tv-" + showData.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-            if (state.library.some(s => s.id === slug)) {
+            if (state.library.some(s => s.id === slug || s.tmdbId === showData.id)) {
                 showToast("Show is already in your library!");
                 return;
             }
@@ -1859,7 +1859,8 @@ function showPage(page) {
 
     document.querySelectorAll(".nav-button").forEach(button => button.classList.remove("active"));
 
-    const nav = document.getElementById(`nav${page.charAt(0).toUpperCase()}${page.slice(1)}`);
+    const navId = `nav${page.charAt(0).toUpperCase()}${page.slice(1)}`;
+    const nav = document.getElementById(navId);
     if (nav) {
         nav.classList.add("active");
     }
@@ -2200,9 +2201,12 @@ function openDetails(itemId) {
 function closeModal() {
     document.getElementById("detailsModal").classList.remove("open");
     currentItem = null;
+    
+    // Refresh active views
     renderDashboard();
     if (document.getElementById("tvLibraryPage").classList.contains("active")) renderTVLibrary();
     if (document.getElementById("movieLibraryPage").classList.contains("active")) renderMovieLibrary();
+    if (document.getElementById("upcomingPage").classList.contains("active")) renderUpcoming();
 }
 
 function closeModalOutside(event) {
@@ -2368,8 +2372,6 @@ function deleteItem(itemId) {
     saveState();
     closeModal();
     showToast("Item removed from library");
-    if (document.getElementById("tvLibraryPage").classList.contains("active")) renderTVLibrary();
-    if (document.getElementById("movieLibraryPage").classList.contains("active")) renderMovieLibrary();
 }
 
 
