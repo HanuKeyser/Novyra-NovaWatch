@@ -1537,6 +1537,34 @@ try {
 }
 
 /* =========================================================
+   SAFE STORAGE WRAPPER
+========================================================= */
+const safeStorage = {
+    getItem(key) {
+        try {
+            return localStorage.getItem(key);
+        } catch (e) {
+            console.warn("localStorage is blocked or unavailable:", e);
+            return null;
+        }
+    },
+    setItem(key, value) {
+        try {
+            localStorage.setItem(key, value);
+        } catch (e) {
+            console.warn("localStorage is blocked or unavailable:", e);
+        }
+    },
+    removeItem(key) {
+        try {
+            localStorage.removeItem(key);
+        } catch (e) {
+            console.warn("localStorage is blocked or unavailable:", e);
+        }
+    }
+};
+
+/* =========================================================
    APP STATE & CONFIG
 ========================================================= */
 const STORAGE_KEY = "novawatch_data_permanent";
@@ -1604,7 +1632,7 @@ function getCountdown(date) {
 ========================================================= */
 function saveState() {
     try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        safeStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         
         if (auth && auth.currentUser && db) {
             db.collection("users").doc(auth.currentUser.uid).set(state, { merge: true })
@@ -1620,7 +1648,7 @@ function saveState() {
 
 async function loadState() {
     try {
-        let saved = localStorage.getItem(STORAGE_KEY);
+        let saved = safeStorage.getItem(STORAGE_KEY);
         if (saved) {
             const parsed = JSON.parse(saved);
             if (parsed && typeof parsed === "object") {
@@ -1629,6 +1657,29 @@ async function loadState() {
         }
     } catch (error) {
         console.error("Could not load local data:", error);
+    }
+}
+
+async function handleCloudSync(userId, currentLibrary) {
+    try {
+        let cloudData = {}; 
+        let mergedLibrary = currentLibrary;
+
+        state = {
+            ...state,
+            ...cloudData,
+            library: mergedLibrary
+        };
+
+        safeStorage.setItem('app_state', JSON.stringify(state));
+
+    } catch (err) {
+        console.error("Full Firebase Error:", err);
+
+        alert(
+            "Error Code: " + (err.code || "unknown") + "\n\n" +
+            "Message: " + (err.message || err)
+        );
     }
 }
 
@@ -1795,7 +1846,7 @@ if (auth) {
                             state.profiles = [{ id: "profile-hanu", name: name, initials: name.charAt(0).toUpperCase() }];
                         }
                         
-                        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+                        safeStorage.setItem(STORAGE_KEY, JSON.stringify(state));
                         refreshActivePage();
                         showToast("Synced library with cloud!");
                     }
