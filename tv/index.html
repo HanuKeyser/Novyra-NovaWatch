@@ -1819,6 +1819,13 @@ if (auth) {
         const outView = document.getElementById("loggedOutView");
         const inView = document.getElementById("loggedInView");
 
+console.log("Project:", firebase.app().options.projectId);
+console.log("UID:", auth.currentUser?.uid);
+alert(
+    "Project: " + firebase.app().options.projectId +
+    "\nUID: " + auth.currentUser?.uid
+);
+       
         if (user) {
             outView.style.display = "none";
             inView.style.display = "block";
