@@ -1150,6 +1150,14 @@ img {
 
     <div>
         <div class="section-header">
+            <div class="section-title">Start Watching</div>
+            <button class="section-link" onclick="showPage('tvLibrary')">See TV Library</button>
+        </div>
+        <div id="startTVGrid" class="horizontal-row"></div>
+    </div>
+
+    <div>
+        <div class="section-header">
             <div class="section-title">Unwatched Movies</div>
             <button class="section-link" onclick="showPage('movieLibrary')">See Movie Library</button>
         </div>
@@ -1163,6 +1171,18 @@ img {
         </div>
         <div id="homeUpcoming"></div>
     </div>
+</main>
+
+
+<!-- =====================================================
+     UPCOMING
+===================================================== -->
+
+<main id="upcomingPage" class="page">
+    <div class="section-header">
+        <div class="section-title">Upcoming Releases</div>
+    </div>
+    <div id="upcomingGrid"></div>
 </main>
 
 
@@ -1244,18 +1264,6 @@ img {
 
 
 <!-- =====================================================
-     UPCOMING
-===================================================== -->
-
-<main id="upcomingPage" class="page">
-    <div class="section-header">
-        <div class="section-title">Upcoming Releases</div>
-    </div>
-    <div id="upcomingGrid"></div>
-</main>
-
-
-<!-- =====================================================
      PROFILE
 ===================================================== -->
 
@@ -1291,6 +1299,22 @@ img {
         </svg>
         Home
     </button>
+    <button id="navUpcoming" class="nav-button" onclick="showPage('upcoming')">
+        <svg class="icon" viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="17" rx="2"/>
+            <path d="M16 2v4"/>
+            <path d="M8 2v4"/>
+            <path d="M3 10h18"/>
+        </svg>
+        Upcoming
+    </button>
+    <button id="navSearch" class="nav-button" onclick="showPage('search')">
+        <svg class="icon" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="7"/>
+            <path d="M20 20l-4-4"/>
+        </svg>
+        Search
+    </button>
     <button id="navTvLibrary" class="nav-button" onclick="showPage('tvLibrary')">
         <svg class="icon" viewBox="0 0 24 24">
             <rect x="2" y="7" width="20" height="13" rx="2"/>
@@ -1308,22 +1332,6 @@ img {
             <path d="M3 17h18"/>
         </svg>
         Movies
-    </button>
-    <button id="navSearch" class="nav-button" onclick="showPage('search')">
-        <svg class="icon" viewBox="0 0 24 24">
-            <circle cx="11" cy="11" r="7"/>
-            <path d="M20 20l-4-4"/>
-        </svg>
-        Search
-    </button>
-    <button id="navUpcoming" class="nav-button" onclick="showPage('upcoming')">
-        <svg class="icon" viewBox="0 0 24 24">
-            <rect x="3" y="4" width="18" height="17" rx="2"/>
-            <path d="M16 2v4"/>
-            <path d="M8 2v4"/>
-            <path d="M3 10h18"/>
-        </svg>
-        Upcoming
     </button>
 </nav>
 
@@ -1829,22 +1837,18 @@ function isTVFinished(show) {
     );
 }
 
-// Get latest aired episode date timestamp for sorting TV Shows
 function getLatestAiredEpisodeDate(show) {
     if (!show.episodes || show.episodes.length === 0) return 0;
     const releasedEps = show.episodes.filter(ep => isReleased(ep.releaseDate));
     if (releasedEps.length === 0) return 0;
     
-    // Find highest release date timestamp
     return Math.max(...releasedEps.map(ep => new Date(ep.releaseDate || 0).getTime()));
 }
 
-// Sort TV shows by latest aired episode date (newest first)
 function sortTVShowsByLatestAired(shows) {
     return shows.sort((a, b) => getLatestAiredEpisodeDate(b) - getLatestAiredEpisodeDate(a));
 }
 
-// Sort Movies by watch timestamp / state
 function sortMoviesByWatchedDate(movies) {
     return movies.sort((a, b) => {
         const timeA = a.lastWatchedAt ? new Date(a.lastWatchedAt).getTime() : 0;
@@ -1908,7 +1912,6 @@ function renderTVLibrary() {
         return;
     }
 
-    // Classify TV shows into categories
     const inProgress = sortTVShowsByLatestAired(items.filter(item => {
         const p = getTVProgress(item);
         return p.watched > 0 && p.watched < p.total;
@@ -1964,7 +1967,6 @@ function renderMovieLibrary() {
         return;
     }
 
-    // Classify movies into categories & sort by watched date
     const unwatched = items.filter(item => !item.watched);
     const watched = sortMoviesByWatchedDate(items.filter(item => item.watched && (item.watchCount || 1) === 1));
     const rewatched = sortMoviesByWatchedDate(items.filter(item => item.watched && (item.watchCount || 0) > 1));
@@ -2119,9 +2121,16 @@ function renderDashboard() {
         return progress.watched > 0 && progress.watched < progress.total;
     }));
 
+    const startShows = sortTVShowsByLatestAired(state.library.filter(item => {
+        if (item.type === 'movie') return false;
+        const progress = getTVProgress(item);
+        return progress.watched === 0;
+    }));
+
     const unwatchedMovies = state.library.filter(item => item.type === 'movie' && !item.watched);
 
     renderRow("continueTVGrid", continueShows, "No TV shows currently in progress.");
+    renderRow("startTVGrid", startShows, "No unwatched TV shows to start.");
     renderRow("unwatchedMoviesGrid", unwatchedMovies, "No unwatched movies in your library.");
 
     const upcomingContainer = document.getElementById("homeUpcoming");
@@ -2243,7 +2252,6 @@ function closeModal() {
     document.getElementById("detailsModal").classList.remove("open");
     currentItem = null;
     
-    // Refresh active views
     renderDashboard();
     if (document.getElementById("tvLibraryPage").classList.contains("active")) renderTVLibrary();
     if (document.getElementById("movieLibraryPage").classList.contains("active")) renderMovieLibrary();
