@@ -6,6 +6,11 @@
 <meta name="theme-color" content="#05070b">
 <title>NovaWatch</title>
 
+<!-- Firebase App & Services CDNs -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
 <style>
 /* =========================================================
    RESET & VARIABLES
@@ -1044,7 +1049,6 @@ img {
     background: var(--surface-2);
 }
 
-/* Episode styling with preview thumbnails - Check on the right */
 .episode {
     display: flex;
     align-items: center;
@@ -1120,7 +1124,7 @@ img {
 }
 
 /* =========================================================
-   PROFILE & TOAST
+   PROFILE & AUTH INPUTS
 ========================================================= */
 
 .profile-card {
@@ -1157,6 +1161,51 @@ img {
     color: var(--text-secondary);
     font-size: 11px;
     margin-top: 4px;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.auth-input {
+    width: 100%;
+    height: 42px;
+    padding: 0 14px;
+    outline: none;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: white;
+    font-size: 13px;
+}
+
+.auth-input:focus {
+    border-color: rgba(22,119,255,0.6);
+}
+
+.auth-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.auth-btn {
+    flex: 1;
+    height: 38px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    background: var(--blue);
+    color: white;
+}
+
+.auth-btn.secondary {
+    background: var(--surface-3);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
 }
 
 .toast {
@@ -1365,21 +1414,51 @@ img {
 
 
 <!-- =====================================================
-     PROFILE
+     PROFILE & CLOUD ACCOUNT
 ================================================     -->
 
 <main id="profilePage" class="page">
     <div class="section-header">
-        <div class="section-title">Profile</div>
+        <div class="section-title">Profile & Account</div>
     </div>
+    
     <div class="profile-card" style="display: flex; flex-direction: column; gap: 16px;">
         <div class="profile-row">
             <div class="large-avatar" id="largeAvatar">H</div>
             <div>
-                <div class="profile-name" id="profileName">Hanu</div>
-                <div class="profile-subtitle">NovaWatch household member</div>
+                <div class="profile-name" id="profileName">Guest User</div>
+                <div class="profile-subtitle" id="profileEmailSubtitle">Not signed in (Local mode)</div>
             </div>
         </div>
+
+        <!-- Username Customization Field -->
+        <div style="border-top: 1px solid var(--border); padding-top: 14px;">
+            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">Your Username</div>
+            <div style="display: flex; gap: 8px;">
+                <input type="text" id="customUsernameInput" class="auth-input" placeholder="Enter username..." maxlength="20">
+                <button class="auth-btn" style="width: 100px;" onclick="saveCustomUsername()">Save</button>
+            </div>
+        </div>
+
+        <!-- Auth Section -->
+        <div id="authSection" style="border-top: 1px solid var(--border); padding-top: 14px;">
+            <div id="loggedOutView">
+                <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">Sign in to sync your library across devices:</div>
+                <div class="auth-form">
+                    <input type="email" id="authEmail" class="auth-input" placeholder="Email address">
+                    <input type="password" id="authPassword" class="auth-input" placeholder="Password">
+                    <div class="auth-actions">
+                        <button class="auth-btn" onclick="handleSignIn()">Sign In</button>
+                        <button class="auth-btn secondary" onclick="handleSignUp()">Register</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="loggedInView" style="display: none;">
+                <button class="auth-btn secondary" style="width: 100%;" onclick="handleSignOut()">Sign Out</button>
+            </div>
+        </div>
+
         <div style="border-top: 1px solid var(--border); padding-top: 14px;">
             <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">Total Watch Time</div>
             <div id="totalWatchTime" style="font-size: 18px; font-weight: 800; color: var(--blue-light);">0 days, 0 hours, 0 minutes</div>
@@ -1476,6 +1555,35 @@ img {
 <script>
 
 /* =========================================================
+   FIREBASE CONFIG & INITIALIZATION
+========================================================= */
+const firebaseConfig = {
+    apiKey: "AIzaSyCzUprsMVHt_-YHvLImvanTlTXsyQ9sqOU",
+    authDomain: "novawatch-b3ccd.firebaseapp.com",
+    projectId: "novawatch-b3ccd",
+    storageBucket: "novawatch-b3ccd.firebasestorage.app",
+    messagingSenderId: "836164657360",
+    appId: "1:836164657360:web:b3de1169942816d0d27ed5",
+    measurementId: "G-H6TMK6C7D0"
+};
+
+// Initialize Firebase (Safely check if config is filled)
+let db = null;
+let auth = null;
+let currentUser = null;
+
+try {
+    if (firebaseConfig.apiKey !== "YOUR_FIREBASE_API_KEY") {
+        firebase.initializeApp(firebaseConfig);
+        auth = firebase.auth();
+        db = firebase.firestore();
+    }
+} catch (e) {
+    console.warn("Firebase initialization skipped or failed. Running in LocalStorage mode.", e);
+}
+
+
+/* =========================================================
    APP STATE & CONFIG
 ========================================================= */
 
@@ -1546,54 +1654,123 @@ function getCountdown(date) {
 
 
 /* =========================================================
-   STORAGE & MIGRATION
+   STORAGE, CLOUD SYNC & AUTHENTICATION
 ========================================================= */
 
 function saveState() {
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        
+        // If logged in, save to Cloud Firestore under user UID
+        if (auth && auth.currentUser && db) {
+            db.collection("users").doc(auth.currentUser.uid).set(state)
+                .catch(err => console.error("Error saving to cloud:", err));
+        }
     } catch (error) {
         console.error("Could not save data:", error);
         showToast("Could not save changes");
     }
 }
 
-function loadState() {
+async function loadState() {
     try {
         let saved = localStorage.getItem(STORAGE_KEY);
-
-        if (!saved) {
-            saved = localStorage.getItem("tvtime_tv_data_permanent");
-        }
-
-        if (!saved) {
-            for (let i = 30; i >= 1; i--) {
-                saved = localStorage.getItem(`tvtime_tv_data_v${i}`);
-                if (saved) break;
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            if (parsed && typeof parsed === "object") {
+                state = { ...state, ...parsed };
             }
         }
-
-        if (!saved) return;
-
-        const parsed = JSON.parse(saved);
-        if (parsed && typeof parsed === "object") {
-            state = {
-                ...state,
-                ...parsed
-            };
-
-            if (parsed.tvShows && (!parsed.library || parsed.library.length === 0)) {
-                state.library = parsed.tvShows.map(show => ({
-                    ...show,
-                    type: show.type || 'tv'
-                }));
-            }
-        }
-
-        if (!state.library) state.library = [];
     } catch (error) {
-        console.error("Could not load saved data:", error);
+        console.error("Could not load local data:", error);
     }
+}
+
+// Authentication Handlers
+async function handleSignUp() {
+    const email = document.getElementById("authEmail").value.trim();
+    const password = document.getElementById("authPassword").value;
+
+    if (!auth) {
+        showToast("Cloud sync not configured yet.");
+        return;
+    }
+
+    try {
+        const cred = await auth.createUserWithEmailAndPassword(email, password);
+        showToast("Account created & logged in!");
+        saveState(); // push current local state to new cloud account
+    } catch (err) {
+        showToast(err.message);
+    }
+}
+
+async function handleSignIn() {
+    const email = document.getElementById("authEmail").value.trim();
+    const password = document.getElementById("authPassword").value;
+
+    if (!auth) {
+        showToast("Cloud sync not configured yet.");
+        return;
+    }
+
+    try {
+        await auth.signInWithEmailAndPassword(email, password);
+        showToast("Signed in successfully!");
+    } catch (err) {
+        showToast(err.message);
+    }
+}
+
+async function handleSignOut() {
+    if (!auth) return;
+    try {
+        await auth.signOut();
+        showToast("Signed out successfully.");
+    } catch (err) {
+        showToast(err.message);
+    }
+}
+
+// Listen to Auth State Changes
+if (auth) {
+    auth.onAuthStateChanged(async (user) => {
+        currentUser = user;
+        const nameEl = document.getElementById("profileName");
+        const subEl = document.getElementById("profileEmailSubtitle");
+        const outView = document.getElementById("loggedOutView");
+        const inView = document.getElementById("loggedInView");
+
+        if (user) {
+            nameEl.textContent = user.email.split('@')[0];
+            subEl.textContent = user.email;
+            outView.style.display = "none";
+            inView.style.display = "block";
+
+            // Fetch user data from Firestore cloud database
+            try {
+                const doc = await db.collection("users").doc(user.uid).get();
+                if (doc.exists) {
+                    const cloudData = doc.data();
+                    if (cloudData && cloudData.library) {
+                        state = { ...state, ...cloudData };
+                        saveState(); // Update local storage cache
+                        renderDashboard();
+                        updateProfileUI();
+                        showToast("Synced library from cloud!");
+                    }
+                }
+            } catch (err) {
+                console.error("Error fetching cloud data:", err);
+            }
+        } else {
+            nameEl.textContent = "Guest User";
+            subEl.textContent = "Not signed in (Local mode)";
+            outView.style.display = "block";
+            inView.style.display = "none";
+            updateProfileUI();
+        }
+    });
 }
 
 
@@ -2416,6 +2593,57 @@ function renderProfile() {
     const minutes = totalMinutes % 60;
 
     document.getElementById("totalWatchTime").textContent = `${days} days, ${hours} hours, ${minutes} minutes`;
+    updateProfileUI();
+}
+
+
+/* =========================================================
+   USERNAME CUSTOMIZATION FUNCTIONS
+========================================================= */
+
+function saveCustomUsername() {
+    const input = document.getElementById("customUsernameInput");
+    const newUsername = input.value.trim();
+
+    if (!newUsername) {
+        showToast("Username cannot be empty");
+        return;
+    }
+
+    if (!state.profiles || state.profiles.length === 0) {
+        state.profiles = [{ id: "profile-hanu", name: newUsername, initials: newUsername.charAt(0).toUpperCase() }];
+    } else {
+        state.profiles[0].name = newUsername;
+        state.profiles[0].initials = newUsername.charAt(0).toUpperCase();
+    }
+
+    saveState();
+    updateProfileUI();
+    showToast("Username updated successfully!");
+}
+
+function updateProfileUI() {
+    const currentProfile = state.profiles && state.profiles.length > 0 ? state.profiles[0] : { name: "Guest User", initials: "G" };
+    
+    const profileNameEl = document.getElementById("profileName");
+    if (profileNameEl && (!auth || !auth.currentUser)) {
+        profileNameEl.textContent = currentProfile.name;
+    }
+    
+    const largeAvatarEl = document.getElementById("largeAvatar");
+    if (largeAvatarEl) {
+        largeAvatarEl.textContent = currentProfile.initials;
+    }
+
+    const headerAvatarEl = document.getElementById("headerAvatar");
+    if (headerAvatarEl) {
+        headerAvatarEl.textContent = currentProfile.initials;
+    }
+
+    const usernameInput = document.getElementById("customUsernameInput");
+    if (usernameInput && currentProfile.name) {
+        usernameInput.value = currentProfile.name;
+    }
 }
 
 
@@ -2481,7 +2709,6 @@ function closeModalOutside(event) {
 function updateModalContent() {
     if (!currentItem) return;
 
-    // Header backdrop image setup
     const backdropHeader = document.getElementById("modalBackdropHeader");
     const backdropUrl = currentItem.backdrop || currentItem.poster;
     if (backdropUrl) {
@@ -2737,10 +2964,11 @@ function escapeHTML(str) {
    INITIALIZATION
 ========================================================= */
 
-window.addEventListener("DOMContentLoaded", () => {
-    loadState();
+window.addEventListener("DOMContentLoaded", async () => {
+    await loadState();
     renderDashboard();
     initSearchPage();
+    updateProfileUI();
 
     setupSearchClear("onlineSearchInput");
     setupSearchClear("tvLibrarySearchInput");
