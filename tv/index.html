@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#05070b">
-<title>Username</title>
+<title>NovaWatch</title>
 
 <!-- Firebase App & Services CDNs -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -1291,7 +1291,7 @@ img {
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
             </svg>
         </div>
-        Username
+        NovaWatch
     </div>
     <button class="profile-button" onclick="showPage('profile')" aria-label="Open profile">
         <div class="profile-avatar" id="headerAvatar">H</div>
@@ -1307,7 +1307,7 @@ img {
     <section class="hero">
         <div class="hero-content">
             <div class="hero-label">Continue Watching</div>
-            <h1 id="heroTitle" class="hero-title">Welcome to Username</h1>
+            <h1 id="heroTitle" class="hero-title">Welcome to NovaWatch</h1>
             <p id="heroDescription" class="hero-description">Track TV shows and movies your household watches.</p>
             <div class="hero-buttons">
                 <button class="primary-button" onclick="continueWatching()">
@@ -1609,9 +1609,9 @@ img {
 ========================================================= */
 const firebaseConfig = {
     apiKey: "AIzaSyCzUprsMVHt_-YHvLImvanTlTXsyQ9sqOU",
-    authDomain: "Username-b3ccd.firebaseapp.com",
-    projectId: "Username-b3ccd",
-    storageBucket: "Username-b3ccd.firebasestorage.app",
+    authDomain: "novawatch-b3ccd.firebaseapp.com",
+    projectId: "novawatch-b3ccd",
+    storageBucket: "novawatch-b3ccd.firebasestorage.app",
     messagingSenderId: "836164657360",
     appId: "1:836164657360:web:b3de1169942816d0d27ed5",
     measurementId: "G-H6TMK6C7D0"
@@ -1637,7 +1637,7 @@ try {
    APP STATE & CONFIG
 ========================================================= */
 
-const STORAGE_KEY = "Username_data_permanent";
+const STORAGE_KEY = "novawatch_data_permanent";
 const TMDB_API_KEY = "c8dc4239290060d91afd45c40d8182b7";
 
 let state = {
@@ -1810,7 +1810,7 @@ async function handleGoogleSignIn() {
 }
 
 async function handleSignUp() {
-    const Username = document.getElementById("authUsername").value.trim();
+    const username = document.getElementById("authUsername").value.trim();
     const email = document.getElementById("authEmail").value.trim();
     const password = document.getElementById("authPassword").value;
 
@@ -1819,8 +1819,8 @@ async function handleSignUp() {
         return;
     }
 
-    if (!Username) {
-        showToast("Please enter a Username to register.");
+    if (!username) {
+        showToast("Please enter a username to register.");
         return;
     }
 
@@ -1829,15 +1829,15 @@ async function handleSignUp() {
         
         // Update Firebase Auth Display Name
         await userCredential.user.updateProfile({
-            displayName: Username
+            displayName: username
         });
         
         // Update Local State Profiles
         if (!state.profiles || state.profiles.length === 0) {
-            state.profiles = [{ id: "profile-Username", name: Username, initials: Username.charAt(0).toUpperCase() }];
+            state.profiles = [{ id: "profile-Username", name: username, initials: username.charAt(0).toUpperCase() }];
         } else {
-            state.profiles[0].name = Username;
-            state.profiles[0].initials = Username.charAt(0).toUpperCase();
+            state.profiles[0].name = username;
+            state.profiles[0].initials = username.charAt(0).toUpperCase();
         }
         
         saveState();
@@ -2730,7 +2730,7 @@ function renderDashboard() {
         document.getElementById("heroTitle").textContent = heroItem.title;
         document.getElementById("heroDescription").textContent = heroItem.description;
     } else {
-        document.getElementById("heroTitle").textContent = "Welcome to Username";
+        document.getElementById("heroTitle").textContent = "Welcome to NovaWatch";
         document.getElementById("heroDescription").textContent = "Track TV shows and movies. Click 'Search' to start building your library.";
     }
 }
