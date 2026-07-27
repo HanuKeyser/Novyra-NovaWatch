@@ -1647,20 +1647,22 @@ async function saveState() {
 
         console.log("Saving library:", state.library);
 
-        await db.collection("users")
-            .doc(auth.currentUser.uid)
-            .set(state, { merge: true });
+await db.collection("users")
+    .doc(auth.currentUser.uid)
+    .set(state, { merge: true });
 
-        console.log("✅ Firestore save SUCCESS");
+alert("Firestore save SUCCESS\nLibrary size: " + state.library.length);
 
-    } catch (err) {
+catch (err) {
 
-        console.error("❌ Firestore save FAILED");
-        console.error(err);
+    alert(
+        "Firestore FAILED\n\n" +
+        err.code + "\n\n" +
+        err.message
+    );
 
-        showToast(err.message);
+    console.error(err);
 
-    }
 }
 
 async function loadState() {
@@ -2170,7 +2172,6 @@ async function importMediaData(id, type, buttonElement) {
             };
 
             state.library.push(newMovie);
-           state.library.push(newMovie);
             saveState();
 
             if (buttonElement) {
