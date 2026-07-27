@@ -1829,7 +1829,11 @@ if (auth) {
                     const cloudData = doc.data();
                     if (cloudData) {
                         const mergedLibrary = mergeLibraries(state.library, cloudData.library || []);
-                        state = { ...state, ...cloudData, library: mergedLibrary };
+                        state = {
+    ...state,
+    ...cloudData,
+    library: mergedLibrary
+};
                         
                         if (!state.profiles || state.profiles.length === 0) {
                             const name = user.displayName || user.email.split('@')[0];
