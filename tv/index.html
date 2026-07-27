@@ -2218,7 +2218,13 @@ function renderWatched() {
     const continueShows = state.tvShows.filter(show => {
         const progress = getTVProgress(show);
         return progress.watched > 0 && progress.watched < progress.total;
-    }).sort((a, b) => a.title.localeCompare(b.title));
+    }).sort((a, b) => {
+        const progA = getTVProgress(a);
+        const progB = getTVProgress(b);
+        const dateA = progA.nextEpisode ? new Date(progA.nextEpisode.releaseDate).getTime() : 0;
+        const dateB = progB.nextEpisode ? new Date(progB.nextEpisode.releaseDate).getTime() : 0;
+        return dateB - dateA;
+    });
 
     const upToDateShows = state.tvShows.filter(show => {
         return isTVUpToDate(show) && !show.isFinished;
@@ -2309,7 +2315,13 @@ function renderDashboard() {
     const continueShows = state.tvShows.filter(show => {
         const progress = getTVProgress(show);
         return progress.watched > 0 && !isTVUpToDate(show);
-    }).sort((a, b) => a.title.localeCompare(b.title));
+    }).sort((a, b) => {
+        const progA = getTVProgress(a);
+        const progB = getTVProgress(b);
+        const dateA = progA.nextEpisode ? new Date(progA.nextEpisode.releaseDate).getTime() : 0;
+        const dateB = progB.nextEpisode ? new Date(progB.nextEpisode.releaseDate).getTime() : 0;
+        return dateB - dateA;
+    });
 
     renderRow("continueTVGrid", continueShows, "No TV shows currently in progress.");
 
@@ -2407,10 +2419,18 @@ function createCard(item) {
 ========================================================= */
 
 function continueWatching() {
-    const show = state.tvShows.find(currentShow => {
-        const progress = getTVProgress(currentShow);
-        return progress.watched > 0 && progress.nextEpisode;
+    const continueShows = state.tvShows.filter(show => {
+        const progress = getTVProgress(show);
+        return progress.watched > 0 && !isTVUpToDate(show);
+    }).sort((a, b) => {
+        const progA = getTVProgress(a);
+        const progB = getTVProgress(b);
+        const dateA = progA.nextEpisode ? new Date(progA.nextEpisode.releaseDate).getTime() : 0;
+        const dateB = progB.nextEpisode ? new Date(progB.nextEpisode.releaseDate).getTime() : 0;
+        return dateB - dateA;
     });
+
+    const show = continueShows[0];
 
     if (show) {
         openDetails(show.id);
@@ -2556,7 +2576,9 @@ function renderSeasonEpisodes(show, season) {
     const list = document.getElementById("episodeList");
     if (!list) return;
 
-    const episodes = show.episodes.filter(episode => Number(episode.season) === Number(season));
+    const episodes = show.episodes
+        .filter(episode => Number(episode.season) === Number(season))
+        .sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate));
 
     list.innerHTML = episodes.map(episode => {
         const upcoming = !isReleased(episode.releaseDate);
