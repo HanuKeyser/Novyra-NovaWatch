@@ -1605,7 +1605,7 @@ img {
 <script>
 
 /* =========================================================
-   FIREBASE CONFIG & INITIALIZATION
+   1. SECURE FIREBASE INITIALIZATION
 ========================================================= */
 const firebaseConfig = {
     apiKey: "AIzaSyCzUprsMVHt_-YHvLImvanTlTXsyQ9sqOU",
@@ -1617,19 +1617,23 @@ const firebaseConfig = {
     measurementId: "G-H6TMK6C7D0"
 };
 
-// Initialize Firebase (Safely check if config is filled)
-let db = null;
+let app = null;
 let auth = null;
+let db = null;
 let currentUser = null;
 
 try {
-    if (firebaseConfig.apiKey !== "YOUR_FIREBASE_API_KEY") {
-        firebase.initializeApp(firebaseConfig);
+    if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_FIREBASE_API_KEY") {
+        if (!firebase.apps.length) {
+            app = firebase.initializeApp(firebaseConfig);
+        } else {
+            app = firebase.app();
+        }
         auth = firebase.auth();
         db = firebase.firestore();
     }
-} catch (e) {
-    console.warn("Firebase initialization skipped or failed. Running in LocalStorage mode.", e);
+} catch (error) {
+    console.error("Firebase initialization error (Check for configuration-not-found):", error);
 }
 
 
@@ -1704,20 +1708,48 @@ function getCountdown(date) {
 
 
 /* =========================================================
-   STORAGE, CLOUD SYNC & AUTHENTICATION
+   2. ROBUST CLOUD SYNC WITH UID VERIFICATION & FALLBACK
 ========================================================= */
 
-function saveState() {
+async function syncLibraryData(libraryData) {
+    // 1. Check if auth and current user session exist
+    if (!auth || !auth.currentUser || !db) {
+        console.warn("Sync skipped: User is not authenticated. Saving to local storage fallback.");
+        localStorage.setItem("novawatch_library_fallback", JSON.stringify(libraryData));
+        return { success: false, reason: "unauthenticated" };
+    }
+
+    const userId = auth.currentUser.uid;
+    const userDocRef = db.collection("users").doc(userId);
+
+    try {
+        // 2. Push state to Firestore under the user's secure path with UID verification
+        await userDocRef.set({
+            library: libraryData,
+            updatedAt: new Date().toISOString()
+        }, { merge: true });
+
+        console.log("Library successfully synced for UID:", userId);
+        
+        // Clear local fallback once cloud sync succeeds
+        localStorage.removeItem("novawatch_library_fallback");
+        return { success: true };
+
+    } catch (error) {
+        // 3. Capture detailed error codes (e.g., permission-denied, unavailable)
+        console.error("Cloud sync failed with error code:", error.code, "-", error.message);
+        
+        // Fallback preservation to ensure tracking data is never lost on failure
+        localStorage.setItem("novawatch_library_fallback", JSON.stringify(libraryData));
+        showToast("Cloud sync failed. Saved locally.");
+        return { success: false, error: error.message };
+    }
+}
+
+async function saveState() {
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        
-        if (auth && auth.currentUser && db) {
-            db.collection("users").doc(auth.currentUser.uid).set(state, { merge: true })
-                .catch(err => {
-                    console.error("Cloud save failed:", err);
-                    showToast("Sync error: Check Firestore rules");
-                });
-        }
+        await syncLibraryData(state.library);
     } catch (error) {
         console.error("Could not save data locally:", error);
     }
@@ -1828,12 +1860,10 @@ async function handleSignUp() {
     try {
         const userCredential = await auth.createUserWithEmailAndPassword(email, password);
         
-        // Update Firebase Auth Display Name
         await userCredential.user.updateProfile({
             displayName: username
         });
         
-        // Update Local State Profiles
         if (!state.profiles || state.profiles.length === 0) {
             state.profiles = [{ id: "profile-hanu", name: username, initials: username.charAt(0).toUpperCase() }];
         } else {
@@ -1896,7 +1926,8 @@ if (auth) {
             inView.style.display = "block";
 
             try {
-                const doc = await db.collection("users").doc(user.uid).get();
+                const docRef = db.collection("users").doc(user.uid);
+                const doc = await docRef.get();
                 if (doc.exists) {
                     const cloudData = doc.data();
                     if (cloudData) {
@@ -2674,7 +2705,7 @@ function renderDashboard() {
     const totalMovies = state.library.filter(i => i.type === 'movie').length;
     
     let totalWatchedEpisodes = 0;
-    let totalMinutes = 0; // Calculated for Total Watch Time block
+    let totalMinutes = 0;
 
     state.library.forEach(item => {
         if (item.type === 'movie') {
@@ -2695,7 +2726,6 @@ function renderDashboard() {
         }
     });
 
-    // Populate Total Watch Time
     const days = Math.floor(totalMinutes / 1440);
     const hours = Math.floor((totalMinutes % 1440) / 60);
     const minutes = totalMinutes % 60;
