@@ -1388,13 +1388,13 @@ img {
             <div class="large-avatar" id="largeAvatar">H</div>
             <div>
                 <div class="profile-name" id="profileName">Guest User</div>
-                <div class="profile-subtitle" id="profileEmailSubtitle">Not signed in (Local mode)</div>
+                <div class="profile-subtitle" id="profileEmailSubtitle">Not signed in</div>
             </div>
         </div>
 
         <div id="authSection" style="border-top: 1px solid var(--border); padding-top: 14px;">
             <div id="loggedOutView">
-                <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Sign in to sync your library across devices:</div>
+                <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Sign in to load and sync your library via Firebase:</div>
                 
                 <button class="google-auth-btn" onclick="handleGoogleSignIn()">
                     <svg width="18" height="18" viewBox="0 0 24 24">
@@ -1533,41 +1533,12 @@ try {
         db = firebase.firestore();
     }
 } catch (e) {
-    console.warn("Firebase initialization skipped or failed. Running in LocalStorage mode.", e);
+    console.warn("Firebase initialization failed.", e);
 }
-
-/* =========================================================
-   SAFE STORAGE WRAPPER
-========================================================= */
-const safeStorage = {
-    getItem(key) {
-        try {
-            return localStorage.getItem(key);
-        } catch (e) {
-            console.warn("localStorage is blocked or unavailable:", e);
-            return null;
-        }
-    },
-    setItem(key, value) {
-        try {
-            localStorage.setItem(key, value);
-        } catch (e) {
-            console.warn("localStorage is blocked or unavailable:", e);
-        }
-    },
-    removeItem(key) {
-        try {
-            localStorage.removeItem(key);
-        } catch (e) {
-            console.warn("localStorage is blocked or unavailable:", e);
-        }
-    }
-};
 
 /* =========================================================
    APP STATE & CONFIG
 ========================================================= */
-const STORAGE_KEY = "novawatch_data_permanent";
 const TMDB_API_KEY = "c8dc4239290060d91afd45c40d8182b7";
 
 let state = {
@@ -1628,12 +1599,10 @@ function getCountdown(date) {
 }
 
 /* =========================================================
-   STORAGE, CLOUD SYNC & AUTHENTICATION
+   FIREBASE CLOUD SYNC & AUTHENTICATION
 ========================================================= */
 async function saveState() {
     try {
-        safeStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-
         if (!auth || !auth.currentUser || !db) {
             console.log("Not signed in - skipping cloud save");
             return;
@@ -1646,20 +1615,6 @@ async function saveState() {
         console.log("Firestore save SUCCESS");
     } catch (err) {
         console.error("Firestore FAILED", err);
-    }
-}
-
-async function loadState() {
-    try {
-        let saved = safeStorage.getItem(STORAGE_KEY);
-        if (saved) {
-            const parsed = JSON.parse(saved);
-            if (parsed && typeof parsed === "object") {
-                state = { ...state, ...parsed };
-            }
-        }
-    } catch (error) {
-        console.error("Could not load local data:", error);
     }
 }
 
@@ -1788,6 +1743,8 @@ async function handleSignOut() {
     if (!auth) return;
     try {
         await auth.signOut();
+        state.library = [];
+        refreshActivePage();
         showToast("Signed out successfully.");
     } catch (err) {
         showToast(err.message);
@@ -1837,9 +1794,8 @@ if (auth) {
                             state.profiles = [{ id: "profile-hanu", name: name, initials: name.charAt(0).toUpperCase() }];
                         }
                         
-                        safeStorage.setItem(STORAGE_KEY, JSON.stringify(state));
                         refreshActivePage();
-                        showToast("Synced library with cloud!");
+                        showToast("Loaded library from Firebase!");
 
                         db.collection("users")
                             .doc(user.uid)
@@ -1858,7 +1814,6 @@ if (auth) {
                                     library: mergedLibrary
                                 };
 
-                                safeStorage.setItem(STORAGE_KEY, JSON.stringify(state));
                                 refreshActivePage();
                             });
                     }
@@ -1869,16 +1824,17 @@ if (auth) {
                     }
                     saveState();
                     refreshActivePage();
-                    showToast("Synced local library to cloud!");
+                    showToast("Initialized new Firebase cloud library!");
                 }
             } catch (err) {
                 console.error("Error fetching cloud data:", err);
-                showToast("Cloud sync failed. Check console.");
+                showToast("Firebase sync failed. Check console.");
                 refreshActivePage();
             }
         } else {
             outView.style.display = "block";
             inView.style.display = "none";
+            state.library = [];
             refreshActivePage();
         }
     });
@@ -2109,6 +2065,11 @@ async function openSearchResultDetails(tmdbId, type) {
 }
 
 async function importMediaData(id, type, buttonElement) {
+    if (!auth || !auth.currentUser) {
+        showToast("Please sign in to add items to your Firebase library.");
+        return;
+    }
+
     if (buttonElement) {
         buttonElement.disabled = true;
         buttonElement.textContent = "Adding...";
@@ -2145,7 +2106,7 @@ async function importMediaData(id, type, buttonElement) {
             };
 
             state.library.push(newMovie);
-            saveState();
+            await saveState();
 
             if (buttonElement) {
                 buttonElement.className = "search-add-btn added";
@@ -2210,7 +2171,7 @@ async function importMediaData(id, type, buttonElement) {
             };
 
             state.library.push(newShow);
-            saveState();
+            await saveState();
 
             if (buttonElement) {
                 buttonElement.className = "search-add-btn added";
@@ -2651,7 +2612,7 @@ function renderDashboard() {
         document.getElementById("heroDescription").textContent = heroItem.description;
     } else {
         document.getElementById("heroTitle").textContent = "Welcome to NovaWatch";
-        document.getElementById("heroDescription").textContent = "Track TV shows and movies. Click 'Search' to start building your library.";
+        document.getElementById("heroDescription").textContent = "Sign in to load your Firebase library, or click 'Search' to add new shows and movies.";
     }
 }
 
@@ -2681,11 +2642,11 @@ function renderProfile() {
 function updateProfileUI() {
     let displayName = "";
 
-    if (state.profiles && state.profiles[0] && state.profiles[0].name) {
-        displayName = state.profiles[0].name;
-    } else if (auth && auth.currentUser) {
+    if (auth && auth.currentUser) {
         const user = auth.currentUser;
         displayName = user.displayName || user.email.split('@')[0];
+    } else if (state.profiles && state.profiles[0] && state.profiles[0].name) {
+        displayName = state.profiles[0].name;
     } else {
         displayName = "Guest User";
     }
@@ -2699,7 +2660,7 @@ function updateProfileUI() {
     if (profileEmailSub) {
         profileEmailSub.textContent = (auth && auth.currentUser) 
             ? auth.currentUser.email 
-            : "Not signed in (Local mode)";
+            : "Not signed in";
     }
 
     const largeAvatarEl = document.getElementById("largeAvatar");
@@ -3013,8 +2974,7 @@ function escapeHTML(str) {
 /* =========================================================
    INITIALIZATION
 ========================================================= */
-window.addEventListener("DOMContentLoaded", async () => {
-    await loadState();
+window.addEventListener("DOMContentLoaded", () => {
     renderDashboard();
     initSearchPage();
     updateProfileUI();
