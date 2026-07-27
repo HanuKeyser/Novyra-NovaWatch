@@ -1163,11 +1163,52 @@ img {
     margin-top: 4px;
 }
 
+.google-auth-btn {
+    width: 100%;
+    height: 42px;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #1f1f1f;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.google-auth-btn:active {
+    transform: scale(0.98);
+}
+
+.auth-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 14px 0 10px;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--border);
+}
+
+.auth-divider span {
+    padding: 0 10px;
+}
+
 .auth-form {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    margin-top: 14px;
+    margin-top: 10px;
 }
 
 .auth-input {
@@ -1279,7 +1320,14 @@ img {
         </div>
     </section>
 
-    <div id="dashboardStats" class="stats"></div>
+    <!-- Total Watch Time & Stats -->
+    <div>
+        <div class="stat" style="margin-bottom: 10px; text-align: center; padding: 16px;">
+            <div class="stat-label" style="font-size: 11px; margin-top: 0; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Total Watch Time</div>
+            <div id="totalWatchTime" class="stat-value" style="color: var(--blue-light);">0 days, 0 hours, 0 minutes</div>
+        </div>
+        <div id="dashboardStats" class="stats"></div>
+    </div>
 
     <div>
         <div class="section-header">
@@ -1431,20 +1479,27 @@ img {
             </div>
         </div>
 
-        <!-- Username Customization Field -->
-        <div style="border-top: 1px solid var(--border); padding-top: 14px;">
-            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">Your Username</div>
-            <div style="display: flex; gap: 8px;">
-                <input type="text" id="customUsernameInput" class="auth-input" placeholder="Enter username..." maxlength="20">
-                <button class="auth-btn" style="width: 100px;" onclick="saveCustomUsername()">Save</button>
-            </div>
-        </div>
-
         <!-- Auth Section -->
         <div id="authSection" style="border-top: 1px solid var(--border); padding-top: 14px;">
             <div id="loggedOutView">
-                <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">Sign in to sync your library across devices:</div>
+                <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Sign in to sync your library across devices:</div>
+                
+                <button class="google-auth-btn" onclick="handleGoogleSignIn()">
+                    <svg width="18" height="18" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                    </svg>
+                    Continue with Google
+                </button>
+
+                <div class="auth-divider">
+                    <span>OR</span>
+                </div>
+
                 <div class="auth-form">
+                    <input type="text" id="authnovaWatch" class="auth-input" placeholder="novaWatch (Required for registration)">
                     <input type="email" id="authEmail" class="auth-input" placeholder="Email address">
                     <input type="password" id="authPassword" class="auth-input" placeholder="Password">
                     <div class="auth-actions">
@@ -1457,11 +1512,6 @@ img {
             <div id="loggedInView" style="display: none;">
                 <button class="auth-btn secondary" style="width: 100%;" onclick="handleSignOut()">Sign Out</button>
             </div>
-        </div>
-
-        <div style="border-top: 1px solid var(--border); padding-top: 14px;">
-            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">Total Watch Time</div>
-            <div id="totalWatchTime" style="font-size: 18px; font-weight: 800; color: var(--blue-light);">0 days, 0 hours, 0 minutes</div>
         </div>
     </div>
 </main>
@@ -1594,12 +1644,12 @@ let state = {
     library: [],
     profiles: [
         {
-            id: "profile-hanu",
-            name: "Hanu",
+            id: "profile-novaWatch",
+            name: "novaWatch",
             initials: "H"
         }
     ],
-    activeProfileId: "profile-hanu"
+    activeProfileId: "profile-novaWatch"
 };
 
 let currentItem = null;
@@ -1663,7 +1713,7 @@ function saveState() {
         
         // If logged in, save to Cloud Firestore under user UID
         if (auth && auth.currentUser && db) {
-            db.collection("users").doc(auth.currentUser.uid).set(state)
+            db.collection("users").doc(auth.currentUser.uid).set(state, { merge: true })
                 .catch(err => console.error("Error saving to cloud:", err));
         }
     } catch (error) {
@@ -1686,8 +1736,81 @@ async function loadState() {
     }
 }
 
+// Merge Local Storage Library with Cloud Firestore Library (Prevents Data Loss)
+function mergeLibraries(localLib = [], cloudLib = []) {
+    const map = new Map();
+
+    const getKey = (item) => {
+        if (!item) return '';
+        if (item.tmdbId) return `${item.type || 'tv'}-${item.tmdbId}`;
+        return item.id || '';
+    };
+
+    cloudLib.forEach(item => {
+        if (!item) return;
+        const key = getKey(item);
+        if (key) map.set(key, JSON.parse(JSON.stringify(item)));
+    });
+
+    localLib.forEach(localItem => {
+        if (!localItem) return;
+        const key = getKey(localItem);
+        if (!key) return;
+
+        if (!map.has(key)) {
+            map.set(key, JSON.parse(JSON.stringify(localItem)));
+        } else {
+            const cloudItem = map.get(key);
+
+            if (localItem.type === 'movie') {
+                cloudItem.watched = Boolean(cloudItem.watched || localItem.watched);
+                if (localItem.lastWatchedAt && (!cloudItem.lastWatchedAt || new Date(localItem.lastWatchedAt) > new Date(cloudItem.lastWatchedAt))) {
+                    cloudItem.lastWatchedAt = localItem.lastWatchedAt;
+                }
+            } else {
+                cloudItem.isFinished = Boolean(cloudItem.isFinished || localItem.isFinished);
+                
+                if (localItem.episodes && cloudItem.episodes) {
+                    const epMap = new Map();
+                    cloudItem.episodes.forEach(ep => epMap.set(ep.id, ep));
+
+                    localItem.episodes.forEach(locEp => {
+                        if (epMap.has(locEp.id)) {
+                            const cEp = epMap.get(locEp.id);
+                            cEp.watched = Boolean(cEp.watched || locEp.watched);
+                        } else {
+                            cloudItem.episodes.push(JSON.parse(JSON.stringify(locEp)));
+                        }
+                    });
+                } else if (localItem.episodes && !cloudItem.episodes) {
+                    cloudItem.episodes = JSON.parse(JSON.stringify(localItem.episodes));
+                }
+            }
+        }
+    });
+
+    return Array.from(map.values());
+}
+
 // Authentication Handlers
+async function handleGoogleSignIn() {
+    if (!auth) {
+        showToast("Cloud sync not configured yet.");
+        return;
+    }
+
+    try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        await auth.signInWithPopup(provider);
+        showToast("Signed in with Google!");
+    } catch (err) {
+        console.error("Google Sign-In Error:", err);
+        showToast(err.message || "Failed to sign in with Google.");
+    }
+}
+
 async function handleSignUp() {
+    const novaWatch = document.getElementById("authnovaWatch").value.trim();
     const email = document.getElementById("authEmail").value.trim();
     const password = document.getElementById("authPassword").value;
 
@@ -1696,10 +1819,29 @@ async function handleSignUp() {
         return;
     }
 
+    if (!novaWatch) {
+        showToast("Please enter a novaWatch to register.");
+        return;
+    }
+
     try {
-        const cred = await auth.createUserWithEmailAndPassword(email, password);
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        
+        // Update Firebase Auth Display Name
+        await userCredential.user.updateProfile({
+            displayName: novaWatch
+        });
+        
+        // Update Local State Profiles
+        if (!state.profiles || state.profiles.length === 0) {
+            state.profiles = [{ id: "profile-novaWatch", name: novaWatch, initials: novaWatch.charAt(0).toUpperCase() }];
+        } else {
+            state.profiles[0].name = novaWatch;
+            state.profiles[0].initials = novaWatch.charAt(0).toUpperCase();
+        }
+        
+        saveState();
         showToast("Account created & logged in!");
-        saveState(); // push current local state to new cloud account
     } catch (err) {
         showToast(err.message);
     }
@@ -1732,18 +1874,23 @@ async function handleSignOut() {
     }
 }
 
+function refreshActivePage() {
+    renderDashboard();
+    updateProfileUI();
+    if (document.getElementById("tvLibraryPage").classList.contains("active")) renderTVLibrary();
+    if (document.getElementById("movieLibraryPage").classList.contains("active")) renderMovieLibrary();
+    if (document.getElementById("upcomingPage").classList.contains("active")) renderUpcoming();
+    if (document.getElementById("profilePage").classList.contains("active")) renderProfile();
+}
+
 // Listen to Auth State Changes
 if (auth) {
     auth.onAuthStateChanged(async (user) => {
         currentUser = user;
-        const nameEl = document.getElementById("profileName");
-        const subEl = document.getElementById("profileEmailSubtitle");
         const outView = document.getElementById("loggedOutView");
         const inView = document.getElementById("loggedInView");
 
         if (user) {
-            nameEl.textContent = user.email.split('@')[0];
-            subEl.textContent = user.email;
             outView.style.display = "none";
             inView.style.display = "block";
 
@@ -1752,23 +1899,38 @@ if (auth) {
                 const doc = await db.collection("users").doc(user.uid).get();
                 if (doc.exists) {
                     const cloudData = doc.data();
-                    if (cloudData && cloudData.library) {
-                        state = { ...state, ...cloudData };
-                        saveState(); // Update local storage cache
-                        renderDashboard();
-                        updateProfileUI();
-                        showToast("Synced library from cloud!");
+                    if (cloudData) {
+                        const mergedLibrary = mergeLibraries(state.library, cloudData.library || []);
+                        state = { ...state, ...cloudData, library: mergedLibrary };
+                        
+                        // Sync custom profile name with user display name if not explicitly set
+                        if (!state.profiles || state.profiles.length === 0) {
+                            const name = user.displayName || user.email.split('@')[0];
+                            state.profiles = [{ id: "profile-novaWatch", name: name, initials: name.charAt(0).toUpperCase() }];
+                        }
+                        
+                        saveState(); // Update local storage cache & push merged cloud state
+                        refreshActivePage();
+                        showToast("Synced library with cloud!");
                     }
+                } else {
+                    // Upload local state to new cloud user profile
+                    if (user.displayName && state.profiles && state.profiles[0]) {
+                        state.profiles[0].name = user.displayName;
+                        state.profiles[0].initials = user.displayName.charAt(0).toUpperCase();
+                    }
+                    saveState();
+                    refreshActivePage();
+                    showToast("Synced local library to cloud!");
                 }
             } catch (err) {
                 console.error("Error fetching cloud data:", err);
+                refreshActivePage();
             }
         } else {
-            nameEl.textContent = "Guest User";
-            subEl.textContent = "Not signed in (Local mode)";
             outView.style.display = "block";
             inView.style.display = "none";
-            updateProfileUI();
+            refreshActivePage();
         }
     });
 }
@@ -2513,11 +2675,33 @@ function renderDashboard() {
     const totalMovies = state.library.filter(i => i.type === 'movie').length;
     
     let totalWatchedEpisodes = 0;
+    let totalMinutes = 0; // Calculated for Total Watch Time block
+
     state.library.forEach(item => {
-        if (item.type !== 'movie' && item.episodes) {
-            totalWatchedEpisodes += item.episodes.filter(ep => ep.watched).length;
+        if (item.type === 'movie') {
+            if (item.watched) {
+                const match = (item.runtime || "").match(/(\d+)/);
+                const mins = match ? parseInt(match[1], 10) : 120;
+                totalMinutes += mins;
+            }
+        } else if (item.episodes) {
+            let watchedEps = item.episodes.filter(ep => ep.watched);
+            totalWatchedEpisodes += watchedEps.length;
+            
+            watchedEps.forEach(ep => {
+                const match = (ep.runtime || "").match(/(\d+)/);
+                const mins = match ? parseInt(match[1], 10) : 45;
+                totalMinutes += mins;
+            });
         }
     });
+
+    // Populate Total Watch Time
+    const days = Math.floor(totalMinutes / 1440);
+    const hours = Math.floor((totalMinutes % 1440) / 60);
+    const minutes = totalMinutes % 60;
+    
+    document.getElementById("totalWatchTime").textContent = `${days} days, ${hours} hours, ${minutes} minutes`;
 
     document.getElementById("dashboardStats").innerHTML = `
         <div class="stat">
@@ -2568,82 +2752,43 @@ function continueWatching() {
 }
 
 function renderProfile() {
-    let totalMinutes = 0;
-
-    state.library.forEach(item => {
-        if (item.type === 'movie') {
-            if (item.watched) {
-                const match = (item.runtime || "").match(/(\d+)/);
-                const mins = match ? parseInt(match[1], 10) : 120;
-                totalMinutes += mins;
-            }
-        } else if (item.episodes) {
-            item.episodes.forEach(ep => {
-                if (ep.watched) {
-                    const match = (ep.runtime || "").match(/(\d+)/);
-                    const mins = match ? parseInt(match[1], 10) : 45;
-                    totalMinutes += mins;
-                }
-            });
-        }
-    });
-
-    const days = Math.floor(totalMinutes / 1440);
-    const hours = Math.floor((totalMinutes % 1440) / 60);
-    const minutes = totalMinutes % 60;
-
-    document.getElementById("totalWatchTime").textContent = `${days} days, ${hours} hours, ${minutes} minutes`;
     updateProfileUI();
 }
 
 
 /* =========================================================
-   USERNAME CUSTOMIZATION FUNCTIONS
+   PROFILE UI HANDLING
 ========================================================= */
 
-function saveCustomUsername() {
-    const input = document.getElementById("customUsernameInput");
-    const newUsername = input.value.trim();
-
-    if (!newUsername) {
-        showToast("Username cannot be empty");
-        return;
-    }
-
-    if (!state.profiles || state.profiles.length === 0) {
-        state.profiles = [{ id: "profile-hanu", name: newUsername, initials: newUsername.charAt(0).toUpperCase() }];
-    } else {
-        state.profiles[0].name = newUsername;
-        state.profiles[0].initials = newUsername.charAt(0).toUpperCase();
-    }
-
-    saveState();
-    updateProfileUI();
-    showToast("Username updated successfully!");
-}
-
 function updateProfileUI() {
-    const currentProfile = state.profiles && state.profiles.length > 0 ? state.profiles[0] : { name: "Guest User", initials: "G" };
-    
+    let displayName = "";
+
+    if (state.profiles && state.profiles[0] && state.profiles[0].name) {
+        displayName = state.profiles[0].name;
+    } else if (auth && auth.currentUser) {
+        const user = auth.currentUser;
+        displayName = user.displayName || user.email.split('@')[0];
+    } else {
+        displayName = "Guest User";
+    }
+
+    const initial = displayName.charAt(0).toUpperCase() || "G";
+
     const profileNameEl = document.getElementById("profileName");
-    if (profileNameEl && (!auth || !auth.currentUser)) {
-        profileNameEl.textContent = currentProfile.name;
+    if (profileNameEl) profileNameEl.textContent = displayName;
+
+    const profileEmailSub = document.getElementById("profileEmailSubtitle");
+    if (profileEmailSub) {
+        profileEmailSub.textContent = (auth && auth.currentUser) 
+            ? auth.currentUser.email 
+            : "Not signed in (Local mode)";
     }
-    
+
     const largeAvatarEl = document.getElementById("largeAvatar");
-    if (largeAvatarEl) {
-        largeAvatarEl.textContent = currentProfile.initials;
-    }
+    if (largeAvatarEl) largeAvatarEl.textContent = initial;
 
     const headerAvatarEl = document.getElementById("headerAvatar");
-    if (headerAvatarEl) {
-        headerAvatarEl.textContent = currentProfile.initials;
-    }
-
-    const usernameInput = document.getElementById("customUsernameInput");
-    if (usernameInput && currentProfile.name) {
-        usernameInput.value = currentProfile.name;
-    }
+    if (headerAvatarEl) headerAvatarEl.textContent = initial;
 }
 
 
