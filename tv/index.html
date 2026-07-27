@@ -544,7 +544,7 @@ img {
 .search-box input {
     width: 100%;
     height: 48px;
-    padding: 0 16px 0 45px;
+    padding: 0 42px 0 45px;
     outline: none;
     background: var(--surface);
     border: 1px solid var(--border);
@@ -563,6 +563,32 @@ img {
     top: 50%;
     transform: translateY(-50%);
     color: var(--text-muted);
+}
+
+.search-clear-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+}
+
+.search-clear-btn:hover {
+    color: var(--text);
+    background: var(--surface-3);
+}
+
+.search-box.has-text .search-clear-btn {
+    display: flex;
 }
 
 /* =========================================================
@@ -1272,6 +1298,9 @@ img {
             <path d="M20 20l-4-4"/>
         </svg>
         <input id="onlineSearchInput" type="search" placeholder="Search thousands of TV shows & movies..." autocomplete="off">
+        <button class="search-clear-btn" type="button" onclick="clearSearch('onlineSearchInput')" aria-label="Clear search">
+            <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+        </button>
     </div>
 
     <div style="margin-top: 18px;">
@@ -1299,6 +1328,9 @@ img {
                 <path d="M20 20l-4-4"/>
             </svg>
             <input id="tvLibrarySearchInput" type="search" placeholder="Search TV shows..." autocomplete="off">
+            <button class="search-clear-btn" type="button" onclick="clearSearch('tvLibrarySearchInput')" aria-label="Clear search">
+                <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+            </button>
         </div>
     </div>
 
@@ -1322,6 +1354,9 @@ img {
                 <path d="M20 20l-4-4"/>
             </svg>
             <input id="movieLibrarySearchInput" type="search" placeholder="Search movies..." autocomplete="off">
+            <button class="search-clear-btn" type="button" onclick="clearSearch('movieLibrarySearchInput')" aria-label="Clear search">
+                <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+            </button>
         </div>
     </div>
 
@@ -2640,6 +2675,38 @@ function deleteItem(itemId) {
 
 
 /* =========================================================
+   SEARCH CLEAR UTILITY
+========================================================= */
+
+function setupSearchClear(inputId) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const box = input.closest('.search-box');
+    
+    function updateState() {
+        if (input.value.trim().length > 0) {
+            box.classList.add('has-text');
+        } else {
+            box.classList.remove('has-text');
+        }
+    }
+
+    input.addEventListener('input', updateState);
+    updateState();
+}
+
+function clearSearch(inputId) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    input.value = '';
+    const box = input.closest('.search-box');
+    box.classList.remove('has-text');
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.focus();
+}
+
+
+/* =========================================================
    TOAST NOTIFICATION
 ========================================================= */
 
@@ -2674,6 +2741,10 @@ window.addEventListener("DOMContentLoaded", () => {
     loadState();
     renderDashboard();
     initSearchPage();
+
+    setupSearchClear("onlineSearchInput");
+    setupSearchClear("tvLibrarySearchInput");
+    setupSearchClear("movieLibrarySearchInput");
 
     const tvSearch = document.getElementById("tvLibrarySearchInput");
     if (tvSearch) {
