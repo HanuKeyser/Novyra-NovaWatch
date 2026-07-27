@@ -6,11 +6,15 @@
 <meta name="theme-color" content="#05070b">
 <title>NovaWatch</title>
 
+<!-- Firebase App & Services CDNs -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
 <style>
 /* =========================================================
    RESET & VARIABLES
 ========================================================= */
-
 * {
     box-sizing: border-box;
     margin: 0;
@@ -46,28 +50,15 @@ html {
 }
 
 body {
-    font-family:
-        Inter,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-
-    background:
-        linear-gradient(
-            180deg,
-            #070a10 0%,
-            #05070b 100%
-        );
-
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: linear-gradient(180deg, #070a10 0%, #05070b 100%);
     color: var(--text);
     min-height: 100vh;
     overflow-x: hidden;
     padding-bottom: 86px;
 }
 
-button,
-input {
+button, input {
     font: inherit;
 }
 
@@ -91,7 +82,6 @@ img {
 /* =========================================================
    SVG ICONS
 ========================================================= */
-
 .icon {
     width: 22px;
     height: 22px;
@@ -115,7 +105,6 @@ img {
 /* =========================================================
    APP CONTAINER
 ========================================================= */
-
 .app {
     width: 100%;
     max-width: 600px;
@@ -126,22 +115,17 @@ img {
 /* =========================================================
    HEADER
 ========================================================= */
-
 .header {
     position: sticky;
     top: 0;
     z-index: 50;
-
     height: 68px;
     padding: 0 17px;
-
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     background: rgba(5,7,11,0.9);
     backdrop-filter: blur(20px);
-
     border-bottom: 1px solid var(--border);
 }
 
@@ -149,7 +133,6 @@ img {
     display: flex;
     align-items: center;
     gap: 9px;
-
     font-size: 20px;
     font-weight: 800;
     letter-spacing: -0.6px;
@@ -158,29 +141,37 @@ img {
 .logo-mark {
     width: 33px;
     height: 33px;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     border-radius: 10px;
+    background: linear-gradient(135deg, var(--blue), #0052d4);
+    box-shadow: 0 6px 20px rgba(22,119,255,0.3);
+}
 
-    background:
-        linear-gradient(
-            135deg,
-            var(--blue),
-            #0052d4
-        );
+.profile-button {
+    width: 39px;
+    height: 39px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+}
 
-    box-shadow:
-        0 6px 20px
-        rgba(22,119,255,0.3);
+.profile-avatar {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--blue), #003f9e);
+    font-size: 14px;
+    font-weight: 800;
 }
 
 /* =========================================================
    PAGES
 ========================================================= */
-
 .page {
     display: none;
     padding: 20px 16px 30px;
@@ -203,12 +194,10 @@ img {
 /* =========================================================
    SECTIONS
 ========================================================= */
-
 .section-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     margin: 0 0 14px;
 }
 
@@ -221,7 +210,6 @@ img {
 .section-link {
     background: transparent;
     color: var(--blue-light);
-
     font-size: 13px;
     font-weight: 650;
 }
@@ -251,7 +239,6 @@ img {
 /* =========================================================
    HERO & STATS
 ========================================================= */
-
 .hero {
     position: relative;
     padding: 24px;
@@ -270,12 +257,10 @@ img {
 
 .hero-label {
     color: var(--blue-light);
-
     font-size: 10px;
     font-weight: 800;
     letter-spacing: 1.3px;
     text-transform: uppercase;
-
     margin-bottom: 8px;
 }
 
@@ -284,18 +269,14 @@ img {
     line-height: 1.1;
     font-weight: 800;
     letter-spacing: -1px;
-
     margin-bottom: 9px;
 }
 
 .hero-description {
     max-width: 410px;
-
     color: var(--text-secondary);
-
     font-size: 13px;
     line-height: 1.5;
-
     margin-bottom: 16px;
 }
 
@@ -308,24 +289,16 @@ img {
 .primary-button {
     width: fit-content;
     min-height: 45px;
-
     padding: 0 18px;
-
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-
     border-radius: 12px;
-
     background: var(--blue);
-
     font-size: 13px;
     font-weight: 700;
-
-    box-shadow:
-        0 8px 25px
-        rgba(22,119,255,0.25);
+    box-shadow: 0 8px 25px rgba(22,119,255,0.25);
 }
 
 .primary-button:active {
@@ -360,7 +333,6 @@ img {
 /* =========================================================
    HORIZONTAL ROW & CARDS
 ========================================================= */
-
 .horizontal-row {
     display: flex;
     gap: 12px;
@@ -450,7 +422,6 @@ img {
 /* =========================================================
    3 COLUMN GRID (LIBRARY)
 ========================================================= */
-
 .library-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -471,7 +442,6 @@ img {
 /* =========================================================
    EMPTY STATE
 ========================================================= */
-
 .empty-state {
     padding: 40px 20px;
     text-align: center;
@@ -498,7 +468,6 @@ img {
 /* =========================================================
    LIBRARY CONTROLS & SEARCH
 ========================================================= */
-
 .library-toolbar {
     display: flex;
     flex-direction: column;
@@ -564,7 +533,6 @@ img {
 /* =========================================================
    SEARCH & DISCOVER VIEW
 ========================================================= */
-
 .search-type-toggle {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -702,7 +670,6 @@ img {
 /* =========================================================
    UPCOMING CARDS
 ========================================================= */
-
 .upcoming-card {
     display: flex;
     gap: 12px;
@@ -773,9 +740,8 @@ img {
 }
 
 /* =========================================================
-   BOTTOM NAV (4 Tabs now)
+   BOTTOM NAV
 ========================================================= */
-
 .bottom-nav {
     position: fixed;
     left: 50%;
@@ -787,7 +753,7 @@ img {
     height: 72px;
     padding: 7px 4px;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     background: rgba(8,11,17,0.95);
     backdrop-filter: blur(20px);
     border-top: 1px solid var(--border);
@@ -812,7 +778,6 @@ img {
 /* =========================================================
    MODAL & LANDSCAPE BACKDROP
 ========================================================= */
-
 .modal {
     position: fixed;
     inset: 0;
@@ -1088,6 +1053,131 @@ img {
     margin-top: 4px;
 }
 
+/* =========================================================
+   PROFILE & AUTH INPUTS
+========================================================= */
+.profile-card {
+    padding: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.profile-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.large-avatar {
+    width: 58px;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.profile-name {
+    font-size: 17px;
+    font-weight: 750;
+}
+
+.profile-subtitle {
+    color: var(--text-secondary);
+    font-size: 11px;
+    margin-top: 4px;
+}
+
+.google-auth-btn {
+    width: 100%;
+    height: 42px;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #1f1f1f;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.google-auth-btn:active {
+    transform: scale(0.98);
+}
+
+.auth-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 14px 0 10px;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--border);
+}
+
+.auth-divider span {
+    padding: 0 10px;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.auth-input {
+    width: 100%;
+    height: 42px;
+    padding: 0 14px;
+    outline: none;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: white;
+    font-size: 13px;
+}
+
+.auth-input:focus {
+    border-color: rgba(22,119,255,0.6);
+}
+
+.auth-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.auth-btn {
+    flex: 1;
+    height: 38px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    background: var(--blue);
+    color: white;
+}
+
+.auth-btn.secondary {
+    background: var(--surface-3);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+}
+
 .toast {
     position: fixed;
     left: 50%;
@@ -1111,18 +1201,15 @@ img {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
 }
-
 </style>
 </head>
 
 <body>
-
 <div class="app">
 
 <!-- =====================================================
      HEADER
 ================================================     -->
-
 <header class="header">
     <div class="logo">
         <div class="logo-mark">
@@ -1132,19 +1219,20 @@ img {
         </div>
         NovaWatch
     </div>
+    <button class="profile-button" onclick="showPage('profile')" aria-label="Open profile">
+        <div class="profile-avatar" id="headerAvatar">H</div>
+    </button>
 </header>
-
 
 <!-- =====================================================
      HOME
 ================================================     -->
-
 <main id="homePage" class="page active">
     <section class="hero">
         <div class="hero-content">
             <div class="hero-label">Continue Watching</div>
             <h1 id="heroTitle" class="hero-title">Welcome to NovaWatch</h1>
-            <p id="heroDescription" class="hero-description">Track TV shows and movies in one unified library.</p>
+            <p id="heroDescription" class="hero-description">Track TV shows and movies your household watches.</p>
             <div class="hero-buttons">
                 <button class="primary-button" onclick="continueWatching()">
                     <svg class="icon icon-small" viewBox="0 0 24 24">
@@ -1156,7 +1244,6 @@ img {
         </div>
     </section>
 
-    <!-- Total Watch Time & Stats -->
     <div>
         <div class="stat" style="margin-bottom: 10px; text-align: center; padding: 16px;">
             <div class="stat-label" style="font-size: 11px; margin-top: 0; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Total Watch Time</div>
@@ -1168,7 +1255,7 @@ img {
     <div>
         <div class="section-header">
             <div class="section-title">Continue Watching</div>
-            <button class="section-link" onclick="showPage('library')">See Library</button>
+            <button class="section-link" onclick="showPage('tvLibrary')">See TV Library</button>
         </div>
         <div id="continueTVGrid" class="horizontal-row"></div>
     </div>
@@ -1176,7 +1263,7 @@ img {
     <div>
         <div class="section-header">
             <div class="section-title">Start Watching</div>
-            <button class="section-link" onclick="showPage('library')">See Library</button>
+            <button class="section-link" onclick="showPage('tvLibrary')">See TV Library</button>
         </div>
         <div id="startTVGrid" class="horizontal-row"></div>
     </div>
@@ -1184,7 +1271,7 @@ img {
     <div>
         <div class="section-header">
             <div class="section-title">Unwatched Movies</div>
-            <button class="section-link" onclick="showPage('library')">See Library</button>
+            <button class="section-link" onclick="showPage('movieLibrary')">See Movie Library</button>
         </div>
         <div id="unwatchedMoviesGrid" class="horizontal-row"></div>
     </div>
@@ -1198,11 +1285,9 @@ img {
     </div>
 </main>
 
-
 <!-- =====================================================
      UPCOMING
 ================================================     -->
-
 <main id="upcomingPage" class="page">
     <div class="section-header">
         <div class="section-title">Upcoming Releases</div>
@@ -1210,11 +1295,9 @@ img {
     <div id="upcomingGrid"></div>
 </main>
 
-
 <!-- =====================================================
      SEARCH & DISCOVER PAGE
 ================================================     -->
-
 <main id="searchPage" class="page">
     <div class="section-header">
         <div class="section-title">Search & Discover</div>
@@ -1244,14 +1327,12 @@ img {
     </div>
 </main>
 
-
 <!-- =====================================================
-     UNIFIED LIBRARY PAGE (TV TIME STYLE COMBINED)
+     TV SHOW LIBRARY
 ================================================     -->
-
-<main id="libraryPage" class="page">
+<main id="tvLibraryPage" class="page">
     <div class="section-header">
-        <div class="section-title">My Library</div>
+        <div class="section-title">TV Show Library</div>
     </div>
 
     <div class="library-toolbar">
@@ -1260,21 +1341,96 @@ img {
                 <circle cx="11" cy="11" r="7"/>
                 <path d="M20 20l-4-4"/>
             </svg>
-            <input id="librarySearchInput" type="search" placeholder="Search shows & movies..." autocomplete="off">
-            <button class="search-clear-btn" type="button" onclick="clearSearch('librarySearchInput')" aria-label="Clear search">
+            <input id="tvLibrarySearchInput" type="search" placeholder="Search TV shows..." autocomplete="off">
+            <button class="search-clear-btn" type="button" onclick="clearSearch('tvLibrarySearchInput')" aria-label="Clear search">
                 <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
             </button>
         </div>
     </div>
 
-    <div id="libraryCategories"></div>
+    <div id="tvLibraryCategories"></div>
 </main>
 
+<!-- =====================================================
+     MOVIE LIBRARY
+================================================     -->
+<main id="movieLibraryPage" class="page">
+    <div class="section-header">
+        <div class="section-title">Movie Library</div>
+    </div>
+
+    <div class="library-toolbar">
+        <div class="search-box">
+            <svg class="icon search-icon" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="7"/>
+                <path d="M20 20l-4-4"/>
+            </svg>
+            <input id="movieLibrarySearchInput" type="search" placeholder="Search movies..." autocomplete="off">
+            <button class="search-clear-btn" type="button" onclick="clearSearch('movieLibrarySearchInput')" aria-label="Clear search">
+                <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <div id="movieLibraryCategories"></div>
+</main>
 
 <!-- =====================================================
-     BOTTOM NAVIGATION (4 Tabs)
+     PROFILE & CLOUD ACCOUNT
 ================================================     -->
+<main id="profilePage" class="page">
+    <div class="section-header">
+        <div class="section-title">Profile & Account</div>
+    </div>
+    
+    <div class="profile-card" style="display: flex; flex-direction: column; gap: 16px;">
+        <div class="profile-row">
+            <div class="large-avatar" id="largeAvatar">H</div>
+            <div>
+                <div class="profile-name" id="profileName">Guest User</div>
+                <div class="profile-subtitle" id="profileEmailSubtitle">Not signed in (Local mode)</div>
+            </div>
+        </div>
 
+        <div id="authSection" style="border-top: 1px solid var(--border); padding-top: 14px;">
+            <div id="loggedOutView">
+                <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Sign in to sync your library across devices:</div>
+                
+                <button class="google-auth-btn" onclick="handleGoogleSignIn()">
+                    <svg width="18" height="18" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                    </svg>
+                    Continue with Google
+                </button>
+
+                <div class="auth-divider">
+                    <span>OR</span>
+                </div>
+
+                <div class="auth-form">
+                    <input type="text" id="authUsername" class="auth-input" placeholder="Username (Required for registration)">
+                    <input type="email" id="authEmail" class="auth-input" placeholder="Email address">
+                    <input type="password" id="authPassword" class="auth-input" placeholder="Password">
+                    <div class="auth-actions">
+                        <button class="auth-btn" onclick="handleSignIn()">Sign In</button>
+                        <button class="auth-btn secondary" onclick="handleSignUp()">Register</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="loggedInView" style="display: none;">
+                <button class="auth-btn secondary" style="width: 100%;" onclick="handleSignOut()">Sign Out</button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- =====================================================
+     BOTTOM NAVIGATION
+================================================     -->
 <nav class="bottom-nav">
     <button id="navHome" class="nav-button active" onclick="showPage('home')">
         <svg class="icon" viewBox="0 0 24 24">
@@ -1299,23 +1455,30 @@ img {
         </svg>
         Search
     </button>
-    <button id="navLibrary" class="nav-button" onclick="showPage('library')">
+    <button id="navTvLibrary" class="nav-button" onclick="showPage('tvLibrary')">
         <svg class="icon" viewBox="0 0 24 24">
-            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
-            <path d="M6 6h12"/>
-            <path d="M6 10h12"/>
+            <rect x="2" y="7" width="20" height="13" rx="2"/>
+            <path d="M17 2l-5 5-5-5"/>
         </svg>
-        Library
+        TV Shows
+    </button>
+    <button id="navMovieLibrary" class="nav-button" onclick="showPage('movieLibrary')">
+        <svg class="icon" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <path d="M7 3v18"/>
+            <path d="M17 3v18"/>
+            <path d="M3 7h18"/>
+            <path d="M3 12h18"/>
+            <path d="M3 17h18"/>
+        </svg>
+        Movies
     </button>
 </nav>
-
 </div>
-
 
 <!-- =====================================================
      DETAILS MODAL
 ================================================     -->
-
 <div id="detailsModal" class="modal" onclick="closeModalOutside(event)">
     <div class="modal-sheet">
         <div class="modal-header-nav">
@@ -1345,18 +1508,78 @@ img {
 
 <div id="toast" class="toast"></div>
 
-
 <script>
+/* =========================================================
+   FIREBASE CONFIG & INITIALIZATION
+========================================================= */
+const firebaseConfig = {
+    apiKey: "AIzaSyCzUprsMVHt_-YHvLImvanTlTXsyQ9sqOU",
+    authDomain: "novawatch-b3ccd.firebaseapp.com",
+    projectId: "novawatch-b3ccd",
+    storageBucket: "novawatch-b3ccd.firebasestorage.app",
+    messagingSenderId: "836164657360",
+    appId: "1:836164657360:web:b3de1169942816d0d27ed5",
+    measurementId: "G-H6TMK6C7D0"
+};
+
+let db = null;
+let auth = null;
+let currentUser = null;
+
+try {
+    if (firebaseConfig.apiKey !== "YOUR_FIREBASE_API_KEY") {
+        firebase.initializeApp(firebaseConfig);
+        auth = firebase.auth();
+        db = firebase.firestore();
+    }
+} catch (e) {
+    console.warn("Firebase initialization skipped or failed. Running in LocalStorage mode.", e);
+}
+
+/* =========================================================
+   SAFE STORAGE WRAPPER
+========================================================= */
+const safeStorage = {
+    getItem(key) {
+        try {
+            return localStorage.getItem(key);
+        } catch (e) {
+            console.warn("localStorage is blocked or unavailable:", e);
+            return null;
+        }
+    },
+    setItem(key, value) {
+        try {
+            localStorage.setItem(key, value);
+        } catch (e) {
+            console.warn("localStorage is blocked or unavailable:", e);
+        }
+    },
+    removeItem(key) {
+        try {
+            localStorage.removeItem(key);
+        } catch (e) {
+            console.warn("localStorage is blocked or unavailable:", e);
+        }
+    }
+};
 
 /* =========================================================
    APP STATE & CONFIG
 ========================================================= */
-
 const STORAGE_KEY = "novawatch_data_permanent";
 const TMDB_API_KEY = "c8dc4239290060d91afd45c40d8182b7";
 
 let state = {
-    library: []
+    library: [],
+    profiles: [
+        {
+            id: "profile-hanu",
+            name: "Hanu",
+            initials: "H"
+        }
+    ],
+    activeProfileId: "profile-hanu"
 };
 
 let currentItem = null;
@@ -1365,11 +1588,9 @@ let currentSearchType = 'tv';
 let toastTimer = null;
 let searchDebounceTimer = null;
 
-
 /* =========================================================
    DATE HELPERS
 ========================================================= */
-
 function now() {
     return new Date();
 }
@@ -1381,15 +1602,12 @@ function isReleased(date) {
 
 function formatDate(date) {
     if (!date) return "TBA";
-    return new Intl.DateTimeFormat(
-        "en-ZA",
-        {
-            weekday: "short",
-            day: "numeric",
-            month: "short",
-            year: "numeric"
-        }
-    ).format(new Date(date));
+    return new Intl.DateTimeFormat("en-ZA", {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+    }).format(new Date(date));
 }
 
 function getCountdown(date) {
@@ -1409,23 +1627,28 @@ function getCountdown(date) {
     return `${minutes}m until release`;
 }
 
-
 /* =========================================================
-   LOCAL STORAGE MANAGEMENT
+   STORAGE, CLOUD SYNC & AUTHENTICATION
 ========================================================= */
-
 function saveState() {
     try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        safeStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        
+        if (auth && auth.currentUser && db) {
+            db.collection("users").doc(auth.currentUser.uid).set(state, { merge: true })
+                .catch(err => {
+                    console.error("Cloud save failed:", err);
+                    showToast("Sync error: Check Firestore rules");
+                });
+        }
     } catch (error) {
-        console.error("Could not save data:", error);
-        showToast("Could not save changes");
+        console.error("Could not save data locally:", error);
     }
 }
 
 async function loadState() {
     try {
-        let saved = localStorage.getItem(STORAGE_KEY);
+        let saved = safeStorage.getItem(STORAGE_KEY);
         if (saved) {
             const parsed = JSON.parse(saved);
             if (parsed && typeof parsed === "object") {
@@ -1437,17 +1660,221 @@ async function loadState() {
     }
 }
 
-function refreshActivePage() {
-    renderDashboard();
-    if (document.getElementById("libraryPage").classList.contains("active")) renderLibrary();
-    if (document.getElementById("upcomingPage").classList.contains("active")) renderUpcoming();
+async function handleCloudSync(userId, currentLibrary) {
+    try {
+        let cloudData = {}; 
+        let mergedLibrary = currentLibrary;
+
+        state = {
+            ...state,
+            ...cloudData,
+            library: mergedLibrary
+        };
+
+        safeStorage.setItem('app_state', JSON.stringify(state));
+
+    } catch (err) {
+        console.error("Full Firebase Error:", err);
+
+        alert(
+            "Error Code: " + (err.code || "unknown") + "\n\n" +
+            "Message: " + (err.message || err)
+        );
+    }
 }
 
+function mergeLibraries(localLib = [], cloudLib = []) {
+    const map = new Map();
+
+    const getKey = (item) => {
+        if (!item) return '';
+        if (item.tmdbId) return `${item.type || 'tv'}-${item.tmdbId}`;
+        return item.id || '';
+    };
+
+    cloudLib.forEach(item => {
+        if (!item) return;
+        const key = getKey(item);
+        if (key) map.set(key, JSON.parse(JSON.stringify(item)));
+    });
+
+    localLib.forEach(localItem => {
+        if (!localItem) return;
+        const key = getKey(localItem);
+        if (!key) return;
+
+        if (!map.has(key)) {
+            map.set(key, JSON.parse(JSON.stringify(localItem)));
+        } else {
+            const cloudItem = map.get(key);
+
+            if (localItem.type === 'movie') {
+                cloudItem.watched = Boolean(cloudItem.watched || localItem.watched);
+                if (localItem.lastWatchedAt && (!cloudItem.lastWatchedAt || new Date(localItem.lastWatchedAt) > new Date(cloudItem.lastWatchedAt))) {
+                    cloudItem.lastWatchedAt = localItem.lastWatchedAt;
+                }
+            } else {
+                cloudItem.isFinished = Boolean(cloudItem.isFinished || localItem.isFinished);
+                
+                if (localItem.episodes && cloudItem.episodes) {
+                    const epMap = new Map();
+                    cloudItem.episodes.forEach(ep => epMap.set(ep.id, ep));
+
+                    localItem.episodes.forEach(locEp => {
+                        if (epMap.has(locEp.id)) {
+                            const cEp = epMap.get(locEp.id);
+                            cEp.watched = Boolean(cEp.watched || locEp.watched);
+                        } else {
+                            cloudItem.episodes.push(JSON.parse(JSON.stringify(locEp)));
+                        }
+                    });
+                } else if (localItem.episodes && !cloudItem.episodes) {
+                    cloudItem.episodes = JSON.parse(JSON.stringify(localItem.episodes));
+                }
+            }
+        }
+    });
+
+    return Array.from(map.values());
+}
+
+async function handleGoogleSignIn() {
+    if (!auth) {
+        showToast("Cloud sync not configured yet.");
+        return;
+    }
+
+    try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        await auth.signInWithPopup(provider);
+        showToast("Signed in with Google!");
+    } catch (err) {
+        console.error("Google Sign-In Error:", err);
+        showToast(err.message || "Failed to sign in with Google.");
+    }
+}
+
+async function handleSignUp() {
+    const username = document.getElementById("authUsername").value.trim();
+    const email = document.getElementById("authEmail").value.trim();
+    const password = document.getElementById("authPassword").value;
+
+    if (!auth) {
+        showToast("Cloud sync not configured yet.");
+        return;
+    }
+
+    if (!username) {
+        showToast("Please enter a username to register.");
+        return;
+    }
+
+    try {
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        await userCredential.user.updateProfile({ displayName: username });
+        
+        if (!state.profiles || state.profiles.length === 0) {
+            state.profiles = [{ id: "profile-hanu", name: username, initials: username.charAt(0).toUpperCase() }];
+        } else {
+            state.profiles[0].name = username;
+            state.profiles[0].initials = username.charAt(0).toUpperCase();
+        }
+        
+        saveState();
+        showToast("Account created & logged in!");
+    } catch (err) {
+        showToast(err.message);
+    }
+}
+
+async function handleSignIn() {
+    const email = document.getElementById("authEmail").value.trim();
+    const password = document.getElementById("authPassword").value;
+
+    if (!auth) {
+        showToast("Cloud sync not configured yet.");
+        return;
+    }
+
+    try {
+        await auth.signInWithEmailAndPassword(email, password);
+        showToast("Signed in successfully!");
+    } catch (err) {
+        showToast(err.message);
+    }
+}
+
+async function handleSignOut() {
+    if (!auth) return;
+    try {
+        await auth.signOut();
+        showToast("Signed out successfully.");
+    } catch (err) {
+        showToast(err.message);
+    }
+}
+
+function refreshActivePage() {
+    renderDashboard();
+    updateProfileUI();
+    if (document.getElementById("tvLibraryPage").classList.contains("active")) renderTVLibrary();
+    if (document.getElementById("movieLibraryPage").classList.contains("active")) renderMovieLibrary();
+    if (document.getElementById("upcomingPage").classList.contains("active")) renderUpcoming();
+    if (document.getElementById("profilePage").classList.contains("active")) renderProfile();
+}
+
+if (auth) {
+    auth.onAuthStateChanged(async (user) => {
+        currentUser = user;
+        const outView = document.getElementById("loggedOutView");
+        const inView = document.getElementById("loggedInView");
+
+        if (user) {
+            outView.style.display = "none";
+            inView.style.display = "block";
+
+            try {
+                const doc = await db.collection("users").doc(user.uid).get();
+                if (doc.exists) {
+                    const cloudData = doc.data();
+                    if (cloudData) {
+                        const mergedLibrary = mergeLibraries(state.library, cloudData.library || []);
+                        state = { ...state, ...cloudData, library: mergedLibrary };
+                        
+                        if (!state.profiles || state.profiles.length === 0) {
+                            const name = user.displayName || user.email.split('@')[0];
+                            state.profiles = [{ id: "profile-hanu", name: name, initials: name.charAt(0).toUpperCase() }];
+                        }
+                        
+                        safeStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+                        refreshActivePage();
+                        showToast("Synced library with cloud!");
+                    }
+                } else {
+                    if (user.displayName && state.profiles && state.profiles[0]) {
+                        state.profiles[0].name = user.displayName;
+                        state.profiles[0].initials = user.displayName.charAt(0).toUpperCase();
+                    }
+                    saveState();
+                    refreshActivePage();
+                    showToast("Synced local library to cloud!");
+                }
+            } catch (err) {
+                console.error("Error fetching cloud data:", err);
+                showToast("Cloud sync failed. Check console.");
+                refreshActivePage();
+            }
+        } else {
+            outView.style.display = "block";
+            inView.style.display = "none";
+            refreshActivePage();
+        }
+    });
+}
 
 /* =========================================================
    TMDB SEARCH & DISCOVER
 ========================================================= */
-
 function setSearchType(type) {
     currentSearchType = type;
     document.getElementById("searchTypeTV").classList.toggle("active", type === 'tv');
@@ -1692,6 +2119,7 @@ async function importMediaData(id, type, buttonElement) {
                 id: slug,
                 tmdbId: movieData.id,
                 type: 'movie',
+                ownerId: state.activeProfileId,
                 title: movieData.title,
                 year: movieData.release_date ? movieData.release_date.substring(0, 4) : "2026",
                 poster: movieData.poster_path ? `https://image.tmdb.org/t/p/w500${movieData.poster_path}` : "",
@@ -1759,6 +2187,7 @@ async function importMediaData(id, type, buttonElement) {
                 id: slug,
                 tmdbId: showData.id,
                 type: 'tv',
+                ownerId: state.activeProfileId,
                 title: showData.name,
                 year: showData.first_air_date ? showData.first_air_date.substring(0, 4) : "2026",
                 poster: showData.poster_path ? `https://image.tmdb.org/t/p/w500${showData.poster_path}` : "",
@@ -1787,11 +2216,9 @@ async function importMediaData(id, type, buttonElement) {
     }
 }
 
-
 /* =========================================================
    DATA HELPERS & SORTING
 ========================================================= */
-
 function getItem(id) {
     return state.library.find(item => item.id === id);
 }
@@ -1885,23 +2312,21 @@ function getLatestAiredEpisodeDate(show) {
     return Math.max(...releasedEps.map(ep => new Date(ep.releaseDate || 0).getTime()));
 }
 
-function sortItemsByLatestActivity(items) {
-    return items.sort((a, b) => {
-        const timeA = a.type === 'movie' 
-            ? (a.lastWatchedAt ? new Date(a.lastWatchedAt).getTime() : 0)
-            : getLatestAiredEpisodeDate(a);
-        const timeB = b.type === 'movie' 
-            ? (b.lastWatchedAt ? new Date(b.lastWatchedAt).getTime() : 0)
-            : getLatestAiredEpisodeDate(b);
+function sortTVShowsByLatestAired(shows) {
+    return shows.sort((a, b) => getLatestAiredEpisodeDate(b) - getLatestAiredEpisodeDate(a));
+}
+
+function sortMoviesByWatchedDate(movies) {
+    return movies.sort((a, b) => {
+        const timeA = a.lastWatchedAt ? new Date(a.lastWatchedAt).getTime() : 0;
+        const timeB = b.lastWatchedAt ? new Date(b.lastWatchedAt).getTime() : 0;
         return timeB - timeA;
     });
 }
 
-
 /* =========================================================
    NAVIGATION
 ========================================================= */
-
 function showPage(page) {
     window.scrollTo(0, 0);
 
@@ -1925,72 +2350,86 @@ function showPage(page) {
         const query = document.getElementById("onlineSearchInput").value.trim();
         if (!query) fetchTrending();
     }
-    if (page === "library") renderLibrary();
+    if (page === "tvLibrary") renderTVLibrary();
+    if (page === "movieLibrary") renderMovieLibrary();
     if (page === "upcoming") renderUpcoming();
+    if (page === "profile") renderProfile();
 }
 
-
 /* =========================================================
-   UNIFIED LIBRARY PAGE (TV TIME STYLE)
+   CATEGORIZED TV SHOW LIBRARY PAGE
 ========================================================= */
-
-function renderLibrary() {
-    const container = document.getElementById("libraryCategories");
-    const searchInput = document.getElementById("librarySearchInput");
+function renderTVLibrary() {
+    const container = document.getElementById("tvLibraryCategories");
+    const searchInput = document.getElementById("tvLibrarySearchInput");
     const query = searchInput ? searchInput.value.trim().toLowerCase() : "";
 
-    let items = state.library;
+    let items = state.library.filter(i => i.type === 'tv' || !i.type);
 
     if (query) {
         items = items.filter(item => item.title.toLowerCase().includes(query));
     }
 
     if (!items.length) {
-        container.innerHTML = emptyState("No Items Found", "Your library is empty. Search for shows or movies to add.");
+        container.innerHTML = emptyState("No TV Shows Found", "Your TV show library is empty.");
         return;
     }
 
-    // TV Show Buckets
-    const tvShows = items.filter(i => i.type === 'tv' || !i.type);
-    const inProgressTV = sortItemsByLatestActivity(tvShows.filter(item => {
+    const inProgress = sortTVShowsByLatestAired(items.filter(item => {
         const p = getTVProgress(item);
         return p.watched > 0 && p.watched < p.total;
     }));
-    const upToDateTV = sortItemsByLatestActivity(tvShows.filter(item => isTVUpToDate(item)));
-    const finishedTV = sortItemsByLatestActivity(tvShows.filter(item => isTVFinished(item)));
-    const unwatchedTV = sortItemsByLatestActivity(tvShows.filter(item => {
+
+    const upToDate = sortTVShowsByLatestAired(items.filter(item => isTVUpToDate(item)));
+    const finished = sortTVShowsByLatestAired(items.filter(item => isTVFinished(item)));
+    const unwatched = sortTVShowsByLatestAired(items.filter(item => {
         const p = getTVProgress(item);
         return p.watched === 0;
     }));
 
-    // Movie Buckets
-    const movies = items.filter(i => i.type === 'movie');
-    const unwatchedMovies = movies.filter(item => !item.watched);
-    const watchedMovies = sortItemsByLatestActivity(movies.filter(item => item.watched));
+    let html = "";
+
+    if (inProgress.length > 0) html += renderCategoryBlock("In Progress", inProgress);
+    if (upToDate.length > 0) html += renderCategoryBlock("Up to Date", upToDate);
+    if (finished.length > 0) html += renderCategoryBlock("Finished", finished);
+    if (unwatched.length > 0) html += renderCategoryBlock("Unwatched", unwatched);
+
+    if (!html) {
+        html = emptyState("No TV Shows Matching", "No TV shows match your search query.");
+    }
+
+    container.innerHTML = html;
+}
+
+/* =========================================================
+   CATEGORIZED MOVIE LIBRARY PAGE
+========================================================= */
+function renderMovieLibrary() {
+    const container = document.getElementById("movieLibraryCategories");
+    const searchInput = document.getElementById("movieLibrarySearchInput");
+    const query = searchInput ? searchInput.value.trim().toLowerCase() : "";
+
+    let items = state.library.filter(i => i.type === 'movie');
+
+    if (query) {
+        items = items.filter(item => item.title.toLowerCase().includes(query));
+    }
+
+    if (!items.length) {
+        container.innerHTML = emptyState("No Movies Found", "Your movie library is empty.");
+        return;
+    }
+
+    const unwatched = items.filter(item => !item.watched);
+    const watched = sortMoviesByWatchedDate(items.filter(item => item.watched));
 
     let html = "";
 
-    if (inProgressTV.length > 0) {
-        html += renderCategoryBlock("TV Shows - In Progress", inProgressTV);
-    }
-    if (upToDateTV.length > 0) {
-        html += renderCategoryBlock("TV Shows - Up to Date", upToDateTV);
-    }
-    if (finishedTV.length > 0) {
-        html += renderCategoryBlock("TV Shows - Finished", finishedTV);
-    }
-    if (unwatchedTV.length > 0) {
-        html += renderCategoryBlock("TV Shows - Unwatched", unwatchedTV);
-    }
-    if (unwatchedMovies.length > 0) {
-        html += renderCategoryBlock("Movies - Unwatched", unwatchedMovies);
-    }
-    if (watchedMovies.length > 0) {
-        html += renderCategoryBlock("Movies - Watched", watchedMovies);
-    }
+    if (unwatched.length > 0) html += renderCategoryBlock("Unwatched", unwatched);
+    if (watched.length > 0) html += renderCategoryBlock("Watched", watched);
 
     if (!html) {
-        html = emptyState("No Items Matching", "No items match your search query.");
+        html = emptyState("No Movies Matching", "No movies match your search query.");
     }
 
     container.innerHTML = html;
@@ -2010,11 +2449,9 @@ function renderCategoryBlock(title, items) {
     `;
 }
 
-
 /* =========================================================
    UPCOMING
 ========================================================= */
-
 function renderUpcoming() {
     const container = document.getElementById("upcomingGrid");
     const items = getUpcomingItems();
@@ -2027,11 +2464,9 @@ function renderUpcoming() {
     container.innerHTML = items.map(data => createUpcomingCard(data)).join("");
 }
 
-
 /* =========================================================
    CARDS & RENDER HELPERS
 ========================================================= */
-
 function createCard(item) {
     const isMovie = item.type === 'movie';
     const progress = getTVProgress(item);
@@ -2115,19 +2550,17 @@ function emptyState(title, message = "Check back later or search for new shows a
     `;
 }
 
-
 /* =========================================================
-   DASHBOARD RENDERING
+   DASHBOARD & PROFILE RENDERING
 ========================================================= */
-
 function renderDashboard() {
-    const continueShows = sortItemsByLatestActivity(state.library.filter(item => {
+    const continueShows = sortTVShowsByLatestAired(state.library.filter(item => {
         if (item.type === 'movie') return false;
         const progress = getTVProgress(item);
         return progress.watched > 0 && progress.watched < progress.total;
     }));
 
-    const startShows = sortItemsByLatestActivity(state.library.filter(item => {
+    const startShows = sortTVShowsByLatestAired(state.library.filter(item => {
         if (item.type === 'movie') return false;
         const progress = getTVProgress(item);
         return progress.watched === 0;
@@ -2211,7 +2644,7 @@ function renderDashboard() {
 }
 
 function continueWatching() {
-    const continueShows = sortItemsByLatestActivity(state.library.filter(item => {
+    const continueShows = sortTVShowsByLatestAired(state.library.filter(item => {
         if (item.type === 'movie') return false;
         const progress = getTVProgress(item);
         return progress.watched > 0 && progress.watched < progress.total;
@@ -2226,11 +2659,47 @@ function continueWatching() {
     }
 }
 
+function renderProfile() {
+    updateProfileUI();
+}
+
+/* =========================================================
+   PROFILE UI HANDLING
+========================================================= */
+function updateProfileUI() {
+    let displayName = "";
+
+    if (state.profiles && state.profiles[0] && state.profiles[0].name) {
+        displayName = state.profiles[0].name;
+    } else if (auth && auth.currentUser) {
+        const user = auth.currentUser;
+        displayName = user.displayName || user.email.split('@')[0];
+    } else {
+        displayName = "Guest User";
+    }
+
+    const initial = displayName.charAt(0).toUpperCase() || "G";
+
+    const profileNameEl = document.getElementById("profileName");
+    if (profileNameEl) profileNameEl.textContent = displayName;
+
+    const profileEmailSub = document.getElementById("profileEmailSubtitle");
+    if (profileEmailSub) {
+        profileEmailSub.textContent = (auth && auth.currentUser) 
+            ? auth.currentUser.email 
+            : "Not signed in (Local mode)";
+    }
+
+    const largeAvatarEl = document.getElementById("largeAvatar");
+    if (largeAvatarEl) largeAvatarEl.textContent = initial;
+
+    const headerAvatarEl = document.getElementById("headerAvatar");
+    if (headerAvatarEl) headerAvatarEl.textContent = initial;
+}
 
 /* =========================================================
    DETAILS MODAL & TRAILERS
 ========================================================= */
-
 async function playTrailer(tmdbId, type) {
     showToast("Finding trailer...");
     try {
@@ -2275,7 +2744,8 @@ function closeModal() {
     currentItem = null;
     
     renderDashboard();
-    if (document.getElementById("libraryPage").classList.contains("active")) renderLibrary();
+    if (document.getElementById("tvLibraryPage").classList.contains("active")) renderTVLibrary();
+    if (document.getElementById("movieLibraryPage").classList.contains("active")) renderMovieLibrary();
     if (document.getElementById("upcomingPage").classList.contains("active")) renderUpcoming();
 }
 
@@ -2412,11 +2882,9 @@ function updateModalContent() {
     document.getElementById("modalEpisodes").innerHTML = html;
 }
 
-
 /* =========================================================
    MOVIE ACTIONS
 ========================================================= */
-
 function toggleMovieWatched(movieId) {
     if (!currentItem || currentItem.id !== movieId) return;
     currentItem.watched = !currentItem.watched;
@@ -2426,11 +2894,9 @@ function toggleMovieWatched(movieId) {
     showToast(currentItem.watched ? "Marked movie as watched" : "Marked movie as unwatched");
 }
 
-
 /* =========================================================
    TV SHOW ACTIONS
 ========================================================= */
-
 function selectSeason(season) {
     selectedSeason = season;
     updateModalContent();
@@ -2479,11 +2945,9 @@ function deleteItem(itemId) {
     showToast("Item removed from library");
 }
 
-
 /* =========================================================
    SEARCH CLEAR UTILITY
 ========================================================= */
-
 function setupSearchClear(inputId) {
     const input = document.getElementById(inputId);
     if (!input) return;
@@ -2511,11 +2975,9 @@ function clearSearch(inputId) {
     input.focus();
 }
 
-
 /* =========================================================
    TOAST NOTIFICATION
 ========================================================= */
-
 function showToast(message) {
     const toast = document.getElementById("toast");
     toast.textContent = message;
@@ -2527,36 +2989,38 @@ function showToast(message) {
     }, 2500);
 }
 
-
 /* =========================================================
    UTILS
 ========================================================= */
-
 function escapeHTML(str) {
     return (str || "").replace(/[&<>'"]/g, 
         tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
     );
 }
 
-
 /* =========================================================
    INITIALIZATION
 ========================================================= */
-
 window.addEventListener("DOMContentLoaded", async () => {
     await loadState();
     renderDashboard();
     initSearchPage();
+    updateProfileUI();
 
     setupSearchClear("onlineSearchInput");
-    setupSearchClear("librarySearchInput");
+    setupSearchClear("tvLibrarySearchInput");
+    setupSearchClear("movieLibrarySearchInput");
 
-    const librarySearch = document.getElementById("librarySearchInput");
-    if (librarySearch) {
-        librarySearch.addEventListener("input", renderLibrary);
+    const tvSearch = document.getElementById("tvLibrarySearchInput");
+    if (tvSearch) {
+        tvSearch.addEventListener("input", renderTVLibrary);
+    }
+
+    const movieSearch = document.getElementById("movieLibrarySearchInput");
+    if (movieSearch) {
+        movieSearch.addEventListener("input", renderMovieLibrary);
     }
 });
-
 </script>
 </body>
 </html>
