@@ -1841,7 +1841,17 @@ alert(
     ...cloudData,
     library: mergedLibrary
 };
-                        
+
+// Upload merged library back to Firestore
+await db.collection("users")
+    .doc(user.uid)
+    .set({
+        ...state,
+        library: mergedLibrary
+    }, { merge: true });
+
+console.log("Merged library uploaded to Firestore");
+                       
                         if (!state.profiles || state.profiles.length === 0) {
                             const name = user.displayName || user.email.split('@')[0];
                             state.profiles = [{ id: "profile-hanu", name: name, initials: name.charAt(0).toUpperCase() }];
