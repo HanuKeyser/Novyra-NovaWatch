@@ -358,22 +358,7 @@ img {
         rgba(22,119,255,0.25);
 }
 
-.secondary-button {
-    width: fit-content;
-    min-height: 45px;
-    padding: 0 18px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    border-radius: 12px;
-    background: var(--surface-3);
-    border: 1px solid var(--border);
-    font-size: 13px;
-    font-weight: 700;
-}
-
-.primary-button:active, .secondary-button:active {
+.primary-button:active {
     transform: scale(0.97);
 }
 
@@ -1187,7 +1172,7 @@ img {
 
 <!-- =====================================================
      HEADER
-===================================================== -->
+================================================     -->
 
 <header class="header">
     <div class="logo">
@@ -1206,7 +1191,7 @@ img {
 
 <!-- =====================================================
      HOME
-===================================================== -->
+================================================     -->
 
 <main id="homePage" class="page active">
     <section class="hero">
@@ -1220,9 +1205,6 @@ img {
                         <path d="M8 5l11 7-11 7V5z"/>
                     </svg>
                     Continue Watching
-                </button>
-                <button class="secondary-button" onclick="surpriseMe()">
-                    🎲 Surprise Me
                 </button>
             </div>
         </div>
@@ -1266,7 +1248,7 @@ img {
 
 <!-- =====================================================
      UPCOMING
-===================================================== -->
+================================================     -->
 
 <main id="upcomingPage" class="page">
     <div class="section-header">
@@ -1278,7 +1260,7 @@ img {
 
 <!-- =====================================================
      SEARCH & DISCOVER PAGE
-===================================================== -->
+================================================     -->
 
 <main id="searchPage" class="page">
     <div class="section-header">
@@ -1309,7 +1291,7 @@ img {
 
 <!-- =====================================================
      TV SHOW LIBRARY (CATEGORIZED VIEW)
-===================================================== -->
+================================================     -->
 
 <main id="tvLibraryPage" class="page">
     <div class="section-header">
@@ -1332,7 +1314,7 @@ img {
 
 <!-- =====================================================
      MOVIE LIBRARY (CATEGORIZED VIEW)
-===================================================== -->
+================================================     -->
 
 <main id="movieLibraryPage" class="page">
     <div class="section-header">
@@ -1355,7 +1337,7 @@ img {
 
 <!-- =====================================================
      PROFILE
-===================================================== -->
+================================================     -->
 
 <main id="profilePage" class="page">
     <div class="section-header">
@@ -1379,7 +1361,7 @@ img {
 
 <!-- =====================================================
      BOTTOM NAVIGATION
-===================================================== -->
+================================================     -->
 
 <nav class="bottom-nav">
     <button id="navHome" class="nav-button active" onclick="showPage('home')">
@@ -1430,7 +1412,7 @@ img {
 
 <!-- =====================================================
      DETAILS MODAL
-===================================================== -->
+================================================     -->
 
 <div id="detailsModal" class="modal" onclick="closeModalOutside(event)">
     <div class="modal-sheet">
@@ -2388,16 +2370,6 @@ function continueWatching() {
     } else {
         showToast("No items in your library!");
     }
-}
-
-function surpriseMe() {
-    if (state.library.length === 0) {
-        showToast("Add items to your library first!");
-        return;
-    }
-    const randomIndex = Math.floor(Math.random() * state.library.length);
-    const randomItem = state.library[randomIndex];
-    openDetails(randomItem.id);
 }
 
 function renderProfile() {
