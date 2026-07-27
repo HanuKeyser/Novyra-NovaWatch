@@ -1631,7 +1631,11 @@ function getCountdown(date) {
    STORAGE, CLOUD SYNC & AUTHENTICATION
 ========================================================= */
 async function saveState() {
+
+    alert("saveState() called");
+
     try {
+        safeStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 
         // Save locally first
         safeStorage.setItem(STORAGE_KEY, JSON.stringify(state));
