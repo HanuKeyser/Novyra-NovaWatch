@@ -1635,6 +1635,7 @@ function saveState() {
         safeStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         
         if (auth && auth.currentUser && db) {
+           console.log("Saving to Firestore:", state.library);
             db.collection("users").doc(auth.currentUser.uid).set(state, { merge: true })
                 .catch(err => {
                     console.error("Cloud save failed:", err);
@@ -2132,6 +2133,7 @@ async function importMediaData(id, type, buttonElement) {
             };
 
             state.library.push(newMovie);
+           state.library.push(newMovie);
             saveState();
 
             if (buttonElement) {
@@ -2197,6 +2199,7 @@ async function importMediaData(id, type, buttonElement) {
             };
 
             state.library.push(newShow);
+           console.log("After push:", state.library);
             saveState();
 
             if (buttonElement) {
