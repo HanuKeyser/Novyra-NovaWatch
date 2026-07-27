@@ -1660,29 +1660,6 @@ async function loadState() {
     }
 }
 
-async function handleCloudSync(userId, currentLibrary) {
-    try {
-        let cloudData = {}; 
-        let mergedLibrary = currentLibrary;
-
-        state = {
-            ...state,
-            ...cloudData,
-            library: mergedLibrary
-        };
-
-        safeStorage.setItem('app_state', JSON.stringify(state));
-
-    } catch (err) {
-        console.error("Full Firebase Error:", err);
-
-        alert(
-            "Error Code: " + (err.code || "unknown") + "\n\n" +
-            "Message: " + (err.message || err)
-        );
-    }
-}
-
 function mergeLibraries(localLib = [], cloudLib = []) {
     const map = new Map();
 
