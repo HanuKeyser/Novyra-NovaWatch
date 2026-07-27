@@ -15,7 +15,6 @@
 /* =========================================================
    RESET & VARIABLES
 ========================================================= */
-
 * {
     box-sizing: border-box;
     margin: 0;
@@ -51,28 +50,15 @@ html {
 }
 
 body {
-    font-family:
-        Inter,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-
-    background:
-        linear-gradient(
-            180deg,
-            #070a10 0%,
-            #05070b 100%
-        );
-
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: linear-gradient(180deg, #070a10 0%, #05070b 100%);
     color: var(--text);
     min-height: 100vh;
     overflow-x: hidden;
     padding-bottom: 86px;
 }
 
-button,
-input {
+button, input {
     font: inherit;
 }
 
@@ -96,7 +82,6 @@ img {
 /* =========================================================
    SVG ICONS
 ========================================================= */
-
 .icon {
     width: 22px;
     height: 22px;
@@ -120,7 +105,6 @@ img {
 /* =========================================================
    APP CONTAINER
 ========================================================= */
-
 .app {
     width: 100%;
     max-width: 600px;
@@ -131,22 +115,17 @@ img {
 /* =========================================================
    HEADER
 ========================================================= */
-
 .header {
     position: sticky;
     top: 0;
     z-index: 50;
-
     height: 68px;
     padding: 0 17px;
-
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     background: rgba(5,7,11,0.9);
     backdrop-filter: blur(20px);
-
     border-bottom: 1px solid var(--border);
 }
 
@@ -154,7 +133,6 @@ img {
     display: flex;
     align-items: center;
     gap: 9px;
-
     font-size: 20px;
     font-weight: 800;
     letter-spacing: -0.6px;
@@ -163,32 +141,19 @@ img {
 .logo-mark {
     width: 33px;
     height: 33px;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     border-radius: 10px;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--blue),
-            #0052d4
-        );
-
-    box-shadow:
-        0 6px 20px
-        rgba(22,119,255,0.3);
+    background: linear-gradient(135deg, var(--blue), #0052d4);
+    box-shadow: 0 6px 20px rgba(22,119,255,0.3);
 }
 
 .profile-button {
     width: 39px;
     height: 39px;
-
     border-radius: 50%;
     overflow: hidden;
-
     background: var(--surface-3);
     border: 1px solid var(--border);
 }
@@ -196,18 +161,10 @@ img {
 .profile-avatar {
     width: 100%;
     height: 100%;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--blue),
-            #003f9e
-        );
-
+    background: linear-gradient(135deg, var(--blue), #003f9e);
     font-size: 14px;
     font-weight: 800;
 }
@@ -215,7 +172,6 @@ img {
 /* =========================================================
    PAGES
 ========================================================= */
-
 .page {
     display: none;
     padding: 20px 16px 30px;
@@ -238,12 +194,10 @@ img {
 /* =========================================================
    SECTIONS
 ========================================================= */
-
 .section-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     margin: 0 0 14px;
 }
 
@@ -256,7 +210,6 @@ img {
 .section-link {
     background: transparent;
     color: var(--blue-light);
-
     font-size: 13px;
     font-weight: 650;
 }
@@ -286,7 +239,6 @@ img {
 /* =========================================================
    HERO & STATS
 ========================================================= */
-
 .hero {
     position: relative;
     padding: 24px;
@@ -305,12 +257,10 @@ img {
 
 .hero-label {
     color: var(--blue-light);
-
     font-size: 10px;
     font-weight: 800;
     letter-spacing: 1.3px;
     text-transform: uppercase;
-
     margin-bottom: 8px;
 }
 
@@ -319,18 +269,14 @@ img {
     line-height: 1.1;
     font-weight: 800;
     letter-spacing: -1px;
-
     margin-bottom: 9px;
 }
 
 .hero-description {
     max-width: 410px;
-
     color: var(--text-secondary);
-
     font-size: 13px;
     line-height: 1.5;
-
     margin-bottom: 16px;
 }
 
@@ -343,24 +289,16 @@ img {
 .primary-button {
     width: fit-content;
     min-height: 45px;
-
     padding: 0 18px;
-
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-
     border-radius: 12px;
-
     background: var(--blue);
-
     font-size: 13px;
     font-weight: 700;
-
-    box-shadow:
-        0 8px 25px
-        rgba(22,119,255,0.25);
+    box-shadow: 0 8px 25px rgba(22,119,255,0.25);
 }
 
 .primary-button:active {
@@ -395,7 +333,6 @@ img {
 /* =========================================================
    HORIZONTAL ROW & CARDS
 ========================================================= */
-
 .horizontal-row {
     display: flex;
     gap: 12px;
@@ -485,7 +422,6 @@ img {
 /* =========================================================
    3 COLUMN GRID (LIBRARY)
 ========================================================= */
-
 .library-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -506,7 +442,6 @@ img {
 /* =========================================================
    EMPTY STATE
 ========================================================= */
-
 .empty-state {
     padding: 40px 20px;
     text-align: center;
@@ -533,7 +468,6 @@ img {
 /* =========================================================
    LIBRARY CONTROLS & SEARCH
 ========================================================= */
-
 .library-toolbar {
     display: flex;
     flex-direction: column;
@@ -599,7 +533,6 @@ img {
 /* =========================================================
    SEARCH & DISCOVER VIEW
 ========================================================= */
-
 .search-type-toggle {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -737,7 +670,6 @@ img {
 /* =========================================================
    UPCOMING CARDS
 ========================================================= */
-
 .upcoming-card {
     display: flex;
     gap: 12px;
@@ -810,7 +742,6 @@ img {
 /* =========================================================
    BOTTOM NAV
 ========================================================= */
-
 .bottom-nav {
     position: fixed;
     left: 50%;
@@ -847,7 +778,6 @@ img {
 /* =========================================================
    MODAL & LANDSCAPE BACKDROP
 ========================================================= */
-
 .modal {
     position: fixed;
     inset: 0;
@@ -1126,7 +1056,6 @@ img {
 /* =========================================================
    PROFILE & AUTH INPUTS
 ========================================================= */
-
 .profile-card {
     padding: 20px;
     background: var(--surface);
@@ -1272,18 +1201,15 @@ img {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
 }
-
 </style>
 </head>
 
 <body>
-
 <div class="app">
 
 <!-- =====================================================
      HEADER
 ================================================     -->
-
 <header class="header">
     <div class="logo">
         <div class="logo-mark">
@@ -1298,11 +1224,9 @@ img {
     </button>
 </header>
 
-
 <!-- =====================================================
      HOME
 ================================================     -->
-
 <main id="homePage" class="page active">
     <section class="hero">
         <div class="hero-content">
@@ -1320,7 +1244,6 @@ img {
         </div>
     </section>
 
-    <!-- Total Watch Time & Stats -->
     <div>
         <div class="stat" style="margin-bottom: 10px; text-align: center; padding: 16px;">
             <div class="stat-label" style="font-size: 11px; margin-top: 0; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Total Watch Time</div>
@@ -1362,11 +1285,9 @@ img {
     </div>
 </main>
 
-
 <!-- =====================================================
      UPCOMING
 ================================================     -->
-
 <main id="upcomingPage" class="page">
     <div class="section-header">
         <div class="section-title">Upcoming Releases</div>
@@ -1374,11 +1295,9 @@ img {
     <div id="upcomingGrid"></div>
 </main>
 
-
 <!-- =====================================================
      SEARCH & DISCOVER PAGE
 ================================================     -->
-
 <main id="searchPage" class="page">
     <div class="section-header">
         <div class="section-title">Search & Discover</div>
@@ -1408,11 +1327,9 @@ img {
     </div>
 </main>
 
-
 <!-- =====================================================
-     TV SHOW LIBRARY (CATEGORIZED VIEW)
+     TV SHOW LIBRARY
 ================================================     -->
-
 <main id="tvLibraryPage" class="page">
     <div class="section-header">
         <div class="section-title">TV Show Library</div>
@@ -1434,11 +1351,9 @@ img {
     <div id="tvLibraryCategories"></div>
 </main>
 
-
 <!-- =====================================================
-     MOVIE LIBRARY (CATEGORIZED VIEW)
+     MOVIE LIBRARY
 ================================================     -->
-
 <main id="movieLibraryPage" class="page">
     <div class="section-header">
         <div class="section-title">Movie Library</div>
@@ -1460,11 +1375,9 @@ img {
     <div id="movieLibraryCategories"></div>
 </main>
 
-
 <!-- =====================================================
      PROFILE & CLOUD ACCOUNT
 ================================================     -->
-
 <main id="profilePage" class="page">
     <div class="section-header">
         <div class="section-title">Profile & Account</div>
@@ -1479,7 +1392,6 @@ img {
             </div>
         </div>
 
-        <!-- Auth Section -->
         <div id="authSection" style="border-top: 1px solid var(--border); padding-top: 14px;">
             <div id="loggedOutView">
                 <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Sign in to sync your library across devices:</div>
@@ -1516,11 +1428,9 @@ img {
     </div>
 </main>
 
-
 <!-- =====================================================
      BOTTOM NAVIGATION
 ================================================     -->
-
 <nav class="bottom-nav">
     <button id="navHome" class="nav-button active" onclick="showPage('home')">
         <svg class="icon" viewBox="0 0 24 24">
@@ -1564,14 +1474,11 @@ img {
         Movies
     </button>
 </nav>
-
 </div>
-
 
 <!-- =====================================================
      DETAILS MODAL
 ================================================     -->
-
 <div id="detailsModal" class="modal" onclick="closeModalOutside(event)">
     <div class="modal-sheet">
         <div class="modal-header-nav">
@@ -1601,11 +1508,9 @@ img {
 
 <div id="toast" class="toast"></div>
 
-
 <script>
-
 /* =========================================================
-   1. SECURE FIREBASE INITIALIZATION
+   FIREBASE CONFIG & INITIALIZATION
 ========================================================= */
 const firebaseConfig = {
     apiKey: "AIzaSyCzUprsMVHt_-YHvLImvanTlTXsyQ9sqOU",
@@ -1617,30 +1522,23 @@ const firebaseConfig = {
     measurementId: "G-H6TMK6C7D0"
 };
 
-let app = null;
-let auth = null;
 let db = null;
+let auth = null;
 let currentUser = null;
 
 try {
-    if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_FIREBASE_API_KEY") {
-        if (!firebase.apps.length) {
-            app = firebase.initializeApp(firebaseConfig);
-        } else {
-            app = firebase.app();
-        }
+    if (firebaseConfig.apiKey !== "YOUR_FIREBASE_API_KEY") {
+        firebase.initializeApp(firebaseConfig);
         auth = firebase.auth();
         db = firebase.firestore();
     }
-} catch (error) {
-    console.error("Firebase initialization error (Check for configuration-not-found):", error);
+} catch (e) {
+    console.warn("Firebase initialization skipped or failed. Running in LocalStorage mode.", e);
 }
-
 
 /* =========================================================
    APP STATE & CONFIG
 ========================================================= */
-
 const STORAGE_KEY = "novawatch_data_permanent";
 const TMDB_API_KEY = "c8dc4239290060d91afd45c40d8182b7";
 
@@ -1662,11 +1560,9 @@ let currentSearchType = 'tv';
 let toastTimer = null;
 let searchDebounceTimer = null;
 
-
 /* =========================================================
    DATE HELPERS
 ========================================================= */
-
 function now() {
     return new Date();
 }
@@ -1678,15 +1574,12 @@ function isReleased(date) {
 
 function formatDate(date) {
     if (!date) return "TBA";
-    return new Intl.DateTimeFormat(
-        "en-ZA",
-        {
-            weekday: "short",
-            day: "numeric",
-            month: "short",
-            year: "numeric"
-        }
-    ).format(new Date(date));
+    return new Intl.DateTimeFormat("en-ZA", {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+    }).format(new Date(date));
 }
 
 function getCountdown(date) {
@@ -1706,50 +1599,20 @@ function getCountdown(date) {
     return `${minutes}m until release`;
 }
 
-
 /* =========================================================
-   2. ROBUST CLOUD SYNC WITH UID VERIFICATION & FALLBACK
+   STORAGE, CLOUD SYNC & AUTHENTICATION
 ========================================================= */
-
-async function syncLibraryData(libraryData) {
-    // 1. Check if auth and current user session exist
-    if (!auth || !auth.currentUser || !db) {
-        console.warn("Sync skipped: User is not authenticated. Saving to local storage fallback.");
-        localStorage.setItem("novawatch_library_fallback", JSON.stringify(libraryData));
-        return { success: false, reason: "unauthenticated" };
-    }
-
-    const userId = auth.currentUser.uid;
-    const userDocRef = db.collection("users").doc(userId);
-
-    try {
-        // 2. Push state to Firestore under the user's secure path with UID verification
-        await userDocRef.set({
-            library: libraryData,
-            updatedAt: new Date().toISOString()
-        }, { merge: true });
-
-        console.log("Library successfully synced for UID:", userId);
-        
-        // Clear local fallback once cloud sync succeeds
-        localStorage.removeItem("novawatch_library_fallback");
-        return { success: true };
-
-    } catch (error) {
-        // 3. Capture detailed error codes (e.g., permission-denied, unavailable)
-        console.error("Cloud sync failed with error code:", error.code, "-", error.message);
-        
-        // Fallback preservation to ensure tracking data is never lost on failure
-        localStorage.setItem("novawatch_library_fallback", JSON.stringify(libraryData));
-        showToast("Cloud sync failed. Saved locally.");
-        return { success: false, error: error.message };
-    }
-}
-
-async function saveState() {
+function saveState() {
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        await syncLibraryData(state.library);
+        
+        if (auth && auth.currentUser && db) {
+            db.collection("users").doc(auth.currentUser.uid).set(state, { merge: true })
+                .catch(err => {
+                    console.error("Cloud save failed:", err);
+                    showToast("Sync error: Check Firestore rules");
+                });
+        }
     } catch (error) {
         console.error("Could not save data locally:", error);
     }
@@ -1769,7 +1632,6 @@ async function loadState() {
     }
 }
 
-// Merge Local Storage Library with Cloud Firestore Library (Prevents Data Loss)
 function mergeLibraries(localLib = [], cloudLib = []) {
     const map = new Map();
 
@@ -1825,7 +1687,6 @@ function mergeLibraries(localLib = [], cloudLib = []) {
     return Array.from(map.values());
 }
 
-// Authentication Handlers
 async function handleGoogleSignIn() {
     if (!auth) {
         showToast("Cloud sync not configured yet.");
@@ -1859,10 +1720,7 @@ async function handleSignUp() {
 
     try {
         const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        
-        await userCredential.user.updateProfile({
-            displayName: username
-        });
+        await userCredential.user.updateProfile({ displayName: username });
         
         if (!state.profiles || state.profiles.length === 0) {
             state.profiles = [{ id: "profile-hanu", name: username, initials: username.charAt(0).toUpperCase() }];
@@ -1914,7 +1772,6 @@ function refreshActivePage() {
     if (document.getElementById("profilePage").classList.contains("active")) renderProfile();
 }
 
-// Listen to Auth State Changes
 if (auth) {
     auth.onAuthStateChanged(async (user) => {
         currentUser = user;
@@ -1926,8 +1783,7 @@ if (auth) {
             inView.style.display = "block";
 
             try {
-                const docRef = db.collection("users").doc(user.uid);
-                const doc = await docRef.get();
+                const doc = await db.collection("users").doc(user.uid).get();
                 if (doc.exists) {
                     const cloudData = doc.data();
                     if (cloudData) {
@@ -1965,11 +1821,9 @@ if (auth) {
     });
 }
 
-
 /* =========================================================
    TMDB SEARCH & DISCOVER
 ========================================================= */
-
 function setSearchType(type) {
     currentSearchType = type;
     document.getElementById("searchTypeTV").classList.toggle("active", type === 'tv');
@@ -2311,11 +2165,9 @@ async function importMediaData(id, type, buttonElement) {
     }
 }
 
-
 /* =========================================================
    DATA HELPERS & SORTING
 ========================================================= */
-
 function getItem(id) {
     return state.library.find(item => item.id === id);
 }
@@ -2421,11 +2273,9 @@ function sortMoviesByWatchedDate(movies) {
     });
 }
 
-
 /* =========================================================
    NAVIGATION
 ========================================================= */
-
 function showPage(page) {
     window.scrollTo(0, 0);
 
@@ -2455,11 +2305,9 @@ function showPage(page) {
     if (page === "profile") renderProfile();
 }
 
-
 /* =========================================================
    CATEGORIZED TV SHOW LIBRARY PAGE
 ========================================================= */
-
 function renderTVLibrary() {
     const container = document.getElementById("tvLibraryCategories");
     const searchInput = document.getElementById("tvLibrarySearchInput");
@@ -2490,18 +2338,10 @@ function renderTVLibrary() {
 
     let html = "";
 
-    if (inProgress.length > 0) {
-        html += renderCategoryBlock("In Progress", inProgress);
-    }
-    if (upToDate.length > 0) {
-        html += renderCategoryBlock("Up to Date", upToDate);
-    }
-    if (finished.length > 0) {
-        html += renderCategoryBlock("Finished", finished);
-    }
-    if (unwatched.length > 0) {
-        html += renderCategoryBlock("Unwatched", unwatched);
-    }
+    if (inProgress.length > 0) html += renderCategoryBlock("In Progress", inProgress);
+    if (upToDate.length > 0) html += renderCategoryBlock("Up to Date", upToDate);
+    if (finished.length > 0) html += renderCategoryBlock("Finished", finished);
+    if (unwatched.length > 0) html += renderCategoryBlock("Unwatched", unwatched);
 
     if (!html) {
         html = emptyState("No TV Shows Matching", "No TV shows match your search query.");
@@ -2510,11 +2350,9 @@ function renderTVLibrary() {
     container.innerHTML = html;
 }
 
-
 /* =========================================================
    CATEGORIZED MOVIE LIBRARY PAGE
 ========================================================= */
-
 function renderMovieLibrary() {
     const container = document.getElementById("movieLibraryCategories");
     const searchInput = document.getElementById("movieLibrarySearchInput");
@@ -2536,12 +2374,8 @@ function renderMovieLibrary() {
 
     let html = "";
 
-    if (unwatched.length > 0) {
-        html += renderCategoryBlock("Unwatched", unwatched);
-    }
-    if (watched.length > 0) {
-        html += renderCategoryBlock("Watched", watched);
-    }
+    if (unwatched.length > 0) html += renderCategoryBlock("Unwatched", unwatched);
+    if (watched.length > 0) html += renderCategoryBlock("Watched", watched);
 
     if (!html) {
         html = emptyState("No Movies Matching", "No movies match your search query.");
@@ -2564,11 +2398,9 @@ function renderCategoryBlock(title, items) {
     `;
 }
 
-
 /* =========================================================
    UPCOMING
 ========================================================= */
-
 function renderUpcoming() {
     const container = document.getElementById("upcomingGrid");
     const items = getUpcomingItems();
@@ -2581,11 +2413,9 @@ function renderUpcoming() {
     container.innerHTML = items.map(data => createUpcomingCard(data)).join("");
 }
 
-
 /* =========================================================
    CARDS & RENDER HELPERS
 ========================================================= */
-
 function createCard(item) {
     const isMovie = item.type === 'movie';
     const progress = getTVProgress(item);
@@ -2669,11 +2499,9 @@ function emptyState(title, message = "Check back later or search for new shows a
     `;
 }
 
-
 /* =========================================================
    DASHBOARD & PROFILE RENDERING
 ========================================================= */
-
 function renderDashboard() {
     const continueShows = sortTVShowsByLatestAired(state.library.filter(item => {
         if (item.type === 'movie') return false;
@@ -2784,11 +2612,9 @@ function renderProfile() {
     updateProfileUI();
 }
 
-
 /* =========================================================
    PROFILE UI HANDLING
 ========================================================= */
-
 function updateProfileUI() {
     let displayName = "";
 
@@ -2820,11 +2646,9 @@ function updateProfileUI() {
     if (headerAvatarEl) headerAvatarEl.textContent = initial;
 }
 
-
 /* =========================================================
    DETAILS MODAL & TRAILERS
 ========================================================= */
-
 async function playTrailer(tmdbId, type) {
     showToast("Finding trailer...");
     try {
@@ -3007,11 +2831,9 @@ function updateModalContent() {
     document.getElementById("modalEpisodes").innerHTML = html;
 }
 
-
 /* =========================================================
    MOVIE ACTIONS
 ========================================================= */
-
 function toggleMovieWatched(movieId) {
     if (!currentItem || currentItem.id !== movieId) return;
     currentItem.watched = !currentItem.watched;
@@ -3021,11 +2843,9 @@ function toggleMovieWatched(movieId) {
     showToast(currentItem.watched ? "Marked movie as watched" : "Marked movie as unwatched");
 }
 
-
 /* =========================================================
    TV SHOW ACTIONS
 ========================================================= */
-
 function selectSeason(season) {
     selectedSeason = season;
     updateModalContent();
@@ -3074,11 +2894,9 @@ function deleteItem(itemId) {
     showToast("Item removed from library");
 }
 
-
 /* =========================================================
    SEARCH CLEAR UTILITY
 ========================================================= */
-
 function setupSearchClear(inputId) {
     const input = document.getElementById(inputId);
     if (!input) return;
@@ -3106,11 +2924,9 @@ function clearSearch(inputId) {
     input.focus();
 }
 
-
 /* =========================================================
    TOAST NOTIFICATION
 ========================================================= */
-
 function showToast(message) {
     const toast = document.getElementById("toast");
     toast.textContent = message;
@@ -3122,22 +2938,18 @@ function showToast(message) {
     }, 2500);
 }
 
-
 /* =========================================================
    UTILS
 ========================================================= */
-
 function escapeHTML(str) {
     return (str || "").replace(/[&<>'"]/g, 
         tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
     );
 }
 
-
 /* =========================================================
    INITIALIZATION
 ========================================================= */
-
 window.addEventListener("DOMContentLoaded", async () => {
     await loadState();
     renderDashboard();
@@ -3158,7 +2970,6 @@ window.addEventListener("DOMContentLoaded", async () => {
         movieSearch.addEventListener("input", renderMovieLibrary);
     }
 });
-
 </script>
 </body>
 </html>
