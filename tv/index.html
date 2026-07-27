@@ -2055,8 +2055,27 @@ function createInitialData() {
     showsToBuild.forEach(showData => {
         const existingIndex = state.tvShows.findIndex(show => show.id === showData.id);
         
-        // If the show already exists in state, do not overwrite or reset its history/progress!
+        // If the show already exists, merge new episodes or details safely without overwriting watched history
         if (existingIndex > -1) {
+            const existingShow = state.tvShows[existingIndex];
+            if (showData.episodesDetails) {
+                showData.episodesDetails.forEach(epData => {
+                    const epId = `s${epData.season}e${epData.number}`;
+                    const existingEp = existingShow.episodes.find(e => e.id === epId);
+                    if (!existingEp) {
+                        existingShow.episodes.push({
+                            id: epId,
+                            season: epData.season,
+                            number: epData.number,
+                            title: epData.title,
+                            runtime: epData.runtime || "45 min",
+                            watched: false,
+                            watchCount: 0,
+                            releaseDate: epData.releaseDate
+                        });
+                    }
+                });
+            }
             return;
         }
 
