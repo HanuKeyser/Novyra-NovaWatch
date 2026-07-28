@@ -795,16 +795,27 @@ img {
 }
 
 .modal-actions {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 8px;
     margin: 20px 0;
 }
 
+.modal-actions.movie-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.modal-actions.movie-actions-grid .action-button {
+    width: 100%;
+}
+
 .action-button {
-    flex: 1;
+    width: 100%;
     min-width: 0;
     min-height: 43px;
-    padding: 0 8px;
+    padding: 0 6px;
     border-radius: 11px;
     background: var(--surface-3);
     color: white;
@@ -897,11 +908,17 @@ img {
 
 .episode {
     display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.episode-main {
+    display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding: 13px 0;
-    border-bottom: 1px solid var(--border);
 }
 
 .episode-still {
@@ -919,26 +936,6 @@ img {
     gap: 12px;
     min-width: 0;
     flex: 1;
-}
-
-.episode-check {
-    flex: 0 0 32px;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    border: 1px solid var(--text-muted);
-    background: transparent;
-    color: white;
-    flex-shrink: 0;
-    margin-left: 8px;
-}
-
-.episode-check.watched {
-    background: var(--blue);
-    border-color: var(--blue);
 }
 
 .episode-info {
@@ -967,6 +964,37 @@ img {
     font-size: 10px;
     line-height: 1.5;
     margin-top: 4px;
+}
+
+.episode-buttons {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+}
+
+.episode-action-btn {
+    flex: 1;
+    height: 32px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--surface-3);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.episode-action-btn.watched-active {
+    background: var(--blue);
+    color: white;
+    border-color: var(--blue);
+}
+
+.episode-action-btn.unwatched-active {
+    background: var(--surface-3);
+    color: var(--text-secondary);
 }
 
 /* =========================================================
@@ -1808,7 +1836,6 @@ function initSearchPage() {
             return;
         }
 
-        // Optimized debounce timer for faster search feel
         searchDebounceTimer = setTimeout(() => {
             performTMDBSearch(query);
         }, 200);
@@ -1952,7 +1979,6 @@ async function openSearchResultDetails(tmdbId, type) {
 
             let episodes = [];
             
-            // Promise.all added here to heavily boost loading speed for seasons
             if (showData.seasons && showData.seasons.length > 0) {
                 const validSeasons = showData.seasons.filter(s => s.season_number > 0);
                 const seasonPromises = validSeasons.map(season => 
@@ -2068,7 +2094,6 @@ async function importMediaData(id, type, buttonElement) {
 
             let episodes = [];
 
-            // Promise.all to fetch seasons significantly faster for imports
             if (showData.seasons && showData.seasons.length > 0) {
                 const validSeasons = showData.seasons.filter(s => s.season_number > 0);
                 const seasonPromises = validSeasons.map(season => 
@@ -2479,7 +2504,7 @@ function renderMovieLibrarySection() {
 
     let html = "";
 
-    if (unwatched.length > 0) html += renderCategoryBlock("Unwatched", unwwatched);
+    if (unwatched.length > 0) html += renderCategoryBlock("Unwatched", unwatched);
     if (watched.length > 0) html += renderCategoryBlock("Watched", watched);
 
     if (!html) {
@@ -2693,22 +2718,28 @@ function updateModalContent() {
         let actionBtns = '';
 
         if (currentItem.tmdbId) {
-            actionBtns += `<button class="action-button trailer" onclick="playTrailer(${currentItem.tmdbId}, 'movie')">▶ Trailer</button>`;
+            actionBtns += `<button class="action-button trailer" onclick="playTrailer(${currentItem.tmdbId}, 'movie')">Trailer</button>`;
         }
 
         if (currentItem.isPreview) {
             actionBtns += `<button class="action-button primary" onclick="importMediaData(${currentItem.tmdbId}, 'movie', this)">Add to Library</button>`;
         } else if (!currentItem.watched) {
-            actionBtns += `<button class="action-button primary" onclick="toggleMovieWatched('${currentItem.id}')">Mark Watched</button>`;
+            actionBtns += `<button class="action-button primary" onclick="setMovieWatchedState(true)">Watched</button>`;
         } else {
-            actionBtns += `<button class="action-button primary" disabled>Watched</button>`;
+            actionBtns += `<button class="action-button primary" onclick="setMovieWatchedState(true)">Rewatch</button>`;
         }
 
         if (!currentItem.isPreview) {
-            actionBtns += `<button class="action-button danger" onclick="deleteItem('${currentItem.id}')">Remove Movie</button>`;
+            actionBtns += `<button class="action-button primary" onclick="setMovieWatchedState(false)">Unwatched</button>`;
         }
 
-        document.getElementById("modalActions").innerHTML = actionBtns;
+        if (!currentItem.isPreview) {
+            actionBtns += `<button class="action-button danger" onclick="deleteItem('${currentItem.id}')">Remove</button>`;
+        }
+
+        const actionsContainer = document.getElementById("modalActions");
+        actionsContainer.className = "modal-actions movie-actions-grid";
+        actionsContainer.innerHTML = actionBtns;
         document.getElementById("modalEpisodes").innerHTML = "";
         return;
     }
@@ -2728,7 +2759,7 @@ function updateModalContent() {
     let tvActions = '';
 
     if (currentItem.tmdbId) {
-        tvActions += `<button class="action-button trailer" onclick="playTrailer(${currentItem.tmdbId}, 'tv')">▶ Trailer</button>`;
+        tvActions += `<button class="action-button trailer" onclick="playTrailer(${currentItem.tmdbId}, 'tv')">Trailer</button>`;
     }
 
     if (currentItem.isPreview) {
@@ -2738,10 +2769,12 @@ function updateModalContent() {
     }
 
     if (!currentItem.isPreview) {
-        tvActions += `<button class="action-button danger" onclick="deleteItem('${currentItem.id}')">Remove Show</button>`;
+        tvActions += `<button class="action-button danger" onclick="deleteItem('${currentItem.id}')">Remove</button>`;
     }
 
-    document.getElementById("modalActions").innerHTML = tvActions;
+    const tvActionsContainer = document.getElementById("modalActions");
+    tvActionsContainer.className = "modal-actions";
+    tvActionsContainer.innerHTML = tvActions;
 
     const seasons = [...new Set(currentItem.episodes.map(ep => ep.season))].sort((a, b) => a - b);
     
@@ -2767,18 +2800,25 @@ function updateModalContent() {
         const released = isReleased(ep.releaseDate);
         html += `
             <div class="episode">
-                <div class="episode-left">
-                    ${ep.still ? `<img src="${ep.still}" class="episode-still" alt="${escapeHTML(ep.title)}" loading="lazy" onerror="this.style.display='none'">` : ''}
-                    <div class="episode-info">
-                        <div class="episode-title">E${ep.number}: ${escapeHTML(ep.title)}</div>
-                        ${ep.overview ? `<div class="episode-overview">${escapeHTML(ep.overview)}</div>` : ''}
-                        <div class="episode-meta">${ep.runtime || '45 min'} • ${released ? formatDate(ep.releaseDate) : 'Coming ' + formatDate(ep.releaseDate)}</div>
+                <div class="episode-main">
+                    <div class="episode-left">
+                        ${ep.still ? `<img src="${ep.still}" class="episode-still" alt="${escapeHTML(ep.title)}" loading="lazy" onerror="this.style.display='none'">` : ''}
+                        <div class="episode-info">
+                            <div class="episode-title">E${ep.number}: ${escapeHTML(ep.title)}</div>
+                            ${ep.overview ? `<div class="episode-overview">${escapeHTML(ep.overview)}</div>` : ''}
+                            <div class="episode-meta">${ep.runtime || '45 min'} • ${released ? formatDate(ep.releaseDate) : 'Coming ' + formatDate(ep.releaseDate)}</div>
+                        </div>
                     </div>
                 </div>
                 ${!currentItem.isPreview ? `
-                <button class="episode-check ${ep.watched ? 'watched' : ''}" onclick="toggleEpisode('${ep.id}')">
-                    ${ep.watched ? '<svg class="icon icon-small" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>' : ep.number}
-                </button>` : ''}
+                <div class="episode-buttons">
+                    <button class="episode-action-btn ${ep.watched ? 'watched-active' : ''}" onclick="setEpisodeState('${ep.id}', true)">
+                        ${ep.watched ? 'Rewatch' : 'Watched'}
+                    </button>
+                    <button class="episode-action-btn ${!ep.watched ? 'watched-active' : ''}" onclick="setEpisodeState('${ep.id}', false)">
+                        Unwatched
+                    </button>
+                </div>` : ''}
             </div>
         `;
     });
@@ -2790,13 +2830,13 @@ function updateModalContent() {
 /* =========================================================
    MOVIE ACTIONS
 ========================================================= */
-function toggleMovieWatched(movieId) {
-    if (!currentItem || currentItem.id !== movieId) return;
-    currentItem.watched = !currentItem.watched;
-    currentItem.lastWatchedAt = currentItem.watched ? new Date().toISOString() : null;
+function setMovieWatchedState(watchedStatus) {
+    if (!currentItem) return;
+    currentItem.watched = watchedStatus;
+    currentItem.lastWatchedAt = watchedStatus ? new Date().toISOString() : null;
     saveState();
     updateModalContent();
-    showToast(currentItem.watched ? "Marked movie as watched" : "Marked movie as unwatched");
+    showToast(watchedStatus ? "Marked movie as watched" : "Marked movie as unwatched");
 }
 
 /* =========================================================
@@ -2807,12 +2847,12 @@ function selectSeason(season) {
     updateModalContent();
 }
 
-function toggleEpisode(episodeId) {
+function setEpisodeState(episodeId, watchedStatus) {
     if (!currentItem) return;
     const ep = currentItem.episodes.find(e => e.id === episodeId);
     if (!ep) return;
 
-    ep.watched = !ep.watched;
+    ep.watched = watchedStatus;
     saveState();
     updateModalContent();
 }
@@ -2907,7 +2947,6 @@ function escapeHTML(str) {
    INITIALIZATION
 ========================================================= */
 window.addEventListener("DOMContentLoaded", () => {
-    // Default Landing Tab set to Home
     showPage('home');
     initSearchPage();
     updateHomeUI();
