@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#f1f5f9">
-<title>NovaWatch</title>
+<title>NovaWatch Test</title>
 
 <!-- Preconnect for faster API calls -->
 <link rel="preconnect" href="https://api.themoviedb.org">
@@ -1458,8 +1458,8 @@ img {
                     </div>
 
                     <div class="auth-form">
-                        <input type="text" id="authUsername" class="auth-input" placeholder="Username (Required for registration)">
-                        <input type="email" id="authEmail" class="auth-input" placeholder="Email address">
+                        <input type="text" id="authUsername" class="auth-input" placeholder="Username">
+                        <input type="email" id="authEmail" class="auth-input" placeholder="Email Address">
                         <input type="password" id="authPassword" class="auth-input" placeholder="Password">
                         <div class="auth-actions">
                             <button class="auth-btn" onclick="handleSignIn()">Sign In</button>
@@ -1759,31 +1759,36 @@ async function saveUserState() {
 }
 
 async function loadUserLibraryFromFirestore(userId) {
-    const moviesSnapshot = await db.collection("users").doc(userId).collection("movies").get();
-    const movies = [];
-    moviesSnapshot.forEach(doc => {
-        movies.push({ id: doc.id, type: 'movie', ...doc.data() });
-    });
-
-    const tvShowsSnapshot = await db.collection("users").doc(userId).collection("tvShows").get();
-    const tvShows = [];
-
-    for (const showDoc of tvShowsSnapshot.docs) {
-        const showData = showDoc.data();
-        const episodesSnapshot = await showDoc.ref.collection("episodes").get();
-        const episodes = [];
-        episodesSnapshot.forEach(epDoc => {
-            episodes.push({ id: epDoc.id, ...epDoc.data() });
+    try {
+        const moviesSnapshot = await db.collection("users").doc(userId).collection("movies").get();
+        const movies = [];
+        moviesSnapshot.forEach(doc => {
+            movies.push({ id: doc.id, type: 'movie', ...doc.data() });
         });
-        tvShows.push({
-            id: showDoc.id,
-            type: 'tv',
-            ...showData,
-            episodes: episodes
-        });
+
+        const tvShowsSnapshot = await db.collection("users").doc(userId).collection("tvShows").get();
+        const tvShows = [];
+
+        for (const showDoc of tvShowsSnapshot.docs) {
+            const showData = showDoc.data();
+            const episodesSnapshot = await showDoc.ref.collection("episodes").get();
+            const episodes = [];
+            episodesSnapshot.forEach(epDoc => {
+                episodes.push({ id: epDoc.id, ...epDoc.data() });
+            });
+            tvShows.push({
+                id: showDoc.id,
+                type: 'tv',
+                ...showData,
+                episodes: episodes
+            });
+        }
+
+        return [...tvShows, ...movies];
+    } catch (err) {
+        console.error("Error loading library from Firestore:", err);
+        return [];
     }
-
-    return [...tvShows, ...movies];
 }
 
 function setupFirestoreListeners(userId) {
@@ -2075,10 +2080,8 @@ if (auth) {
                         state.profiles = userData.profiles;
                     }
                 } else {
-                    if (user.displayName && state.profiles && state.profiles[0]) {
-                        state.profiles[0].name = user.displayName;
-                        state.profiles[0].initials = user.displayName.charAt(0).toUpperCase();
-                    }
+                    const defaultName = user.displayName || (user.email ? user.email.split('@')[0] : "User");
+                    state.profiles = [{ id: "profile-hanu", name: defaultName, initials: defaultName.charAt(0).toUpperCase() }];
                     await db.collection("users").doc(user.uid).set({ profiles: state.profiles }, { merge: true });
                 }
 
@@ -2086,7 +2089,7 @@ if (auth) {
                 state.library = library;
 
                 if (!state.profiles || state.profiles.length === 0) {
-                    const name = user.displayName || user.email.split('@')[0];
+                    const name = user.displayName || (user.email ? user.email.split('@')[0] : "User");
                     state.profiles = [{ id: "profile-hanu", name: name, initials: name.charAt(0).toUpperCase() }];
                 }
                 
@@ -2951,7 +2954,7 @@ function updateHomeUI() {
 
     if (auth && auth.currentUser) {
         const user = auth.currentUser;
-        displayName = user.displayName || user.email.split('@')[0];
+        displayName = user.displayName || (user.email ? user.email.split('@')[0] : "User");
     } else if (state.profiles && state.profiles[0] && state.profiles[0].name && auth && auth.currentUser) {
         displayName = state.profiles[0].name;
     } else {
@@ -2966,7 +2969,7 @@ function updateHomeUI() {
     const homeEmailSub = document.getElementById("homeEmailSubtitle");
     if (homeEmailSub) {
         homeEmailSub.textContent = (auth && auth.currentUser) 
-            ? auth.currentUser.email 
+            ? (auth.currentUser.email || "Authenticated User") 
             : "Guest Account";
     }
 
@@ -3115,194 +3118,188 @@ function updateModalContent() {
     if (currentItem.isPreview) {
         tvActions += `<button class="action-button primary" onclick="importMediaData(${currentItem.tmdbId}, 'tv', this)">Add to Library</button>`;
     } else {
-        tvActions += `<button class="action-button primary" onclick="markAllWatched()">Mark Watched</button>`;
-    }
-
-    if (!currentItem.isPreview) {
         tvActions += `<button class="action-button danger" onclick="deleteItem('${currentItem.id}')">Remove</button>`;
     }
 
-    const tvActionsContainer = document.getElementById("modalActions");
-    tvActionsContainer.className = "modal-actions";
-    tvActionsContainer.innerHTML = tvActions;
+    const actionsContainer = document.getElementById("modalActions");
+    actionsContainer.className = "modal-actions";
+    actionsContainer.innerHTML = tvActions;
 
-    const seasons = [...new Set(currentItem.episodes.map(ep => ep.season))].sort((a, b) => a - b);
+    const availableSeasons = [...new Set(currentItem.episodes.map(ep => ep.season))].sort((a, b) => a - b);
     
-    let html = `
+    if (availableSeasons.length === 0) {
+        document.getElementById("modalEpisodes").innerHTML = `<div style="font-size:13px; color:var(--text-muted); text-align:center; padding:20px;">No episodes available.</div>`;
+        return;
+    }
+
+    if (!availableSeasons.includes(selectedSeason)) {
+        selectedSeason = availableSeasons[0];
+    }
+
+    const seasonSelectorHTML = `
         <div class="season-selector-wrapper">
             <div class="season-selector">
-                ${seasons.map(s => `
-                    <button class="season-button ${selectedSeason === s ? 'active' : ''}" onclick="selectSeason(${s})">
-                        Season ${s}
+                ${availableSeasons.map(seasonNum => `
+                    <button class="season-button ${seasonNum === selectedSeason ? 'active' : ''}" onclick="selectSeason(${seasonNum})">
+                        Season ${seasonNum}
                     </button>
                 `).join("")}
             </div>
         </div>
-        ${!currentItem.isPreview ? `
         <div class="season-batch-actions">
-            <button class="season-batch-btn" onclick="markSeasonWatched(${selectedSeason})">Mark Season Watched</button>
-        </div>` : ''}
-        <div class="episodes-list">
+            <button class="season-batch-btn" onclick="setSeasonWatchedState(${JSON.stringify(currentItem.id)}, ${selectedSeason}, true)">
+                <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+                Mark Season ${selectedSeason} as Watched
+            </button>
+            <button class="season-batch-btn" onclick="setSeasonWatchedState(${JSON.stringify(currentItem.id)}, ${selectedSeason}, false)">
+                <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+                Mark Season ${selectedSeason} as Unwatched
+            </button>
+        </div>
     `;
 
-    const seasonEpisodes = currentItem.episodes.filter(ep => ep.season === selectedSeason);
-    seasonEpisodes.forEach(ep => {
+    const seasonEpisodes = currentItem.episodes
+        .filter(ep => ep.season === selectedSeason)
+        .sort((a, b) => a.number - b.number);
+
+    const episodesHTML = seasonEpisodes.map(ep => {
         const released = isReleased(ep.releaseDate);
-        html += `
+        return `
             <div class="episode">
                 <div class="episode-main">
                     <div class="episode-left">
-                        ${ep.still ? `<img src="${ep.still}" class="episode-still" alt="${escapeHTML(ep.title)}" loading="lazy" onerror="this.style.display='none'">` : ''}
+                        ${ep.still ? `
+                            <img src="${ep.still}" class="episode-still" alt="Still" loading="lazy" onerror="this.style.display='none'">
+                        ` : `
+                            <div class="episode-still" style="display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--text-muted);">S${ep.season}E${ep.number}</div>
+                        `}
                         <div class="episode-info">
-                            <div class="episode-title">E${ep.number}: ${escapeHTML(ep.title)}</div>
-                            ${ep.overview ? `<div class="episode-overview">${escapeHTML(ep.overview)}</div>` : ''}
-                            <div class="episode-meta">${ep.runtime || '45 min'} • ${released ? formatDate(ep.releaseDate) : 'Coming ' + formatDate(ep.releaseDate)}${ep.watchCount && ep.watchCount > 0 ? ' • Rewatches: ' + ep.watchCount : ''}</div>
+                            <div class="episode-title">${ep.number}. ${escapeHTML(ep.title)}</div>
+                            <div class="episode-overview">${escapeHTML(ep.overview || 'No overview available.')}</div>
+                            <div class="episode-meta">
+                                <span>${ep.runtime || '45 min'}</span>
+                                <span>•</span>
+                                <span>${released ? formatDate(ep.releaseDate) : 'Releases ' + formatDate(ep.releaseDate)}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-                ${!currentItem.isPreview ? `
-                <div class="episode-buttons">
-                    <button class="episode-action-btn ${ep.watched ? 'watched-active' : ''}" onclick="setEpisodeState('${ep.id}', true)">
-                        ${ep.watched ? 'Rewatch' : 'Watch'}
-                    </button>
-                    <button class="episode-action-btn ${!ep.watched ? 'watched-active' : ''}" onclick="setEpisodeState('${ep.id}', false)">
-                        Unwatched
-                    </button>
-                </div>` : ''}
+                ${released ? `
+                    <div class="episode-buttons">
+                        <button class="episode-action-btn ${ep.watched ? 'watched-active' : ''}" onclick="toggleEpisodeWatched('${currentItem.id}', '${ep.id}')">
+                            ${ep.watched ? 'Watched' : 'Mark Watched'}
+                        </button>
+                    </div>
+                ` : `
+                    <div style="font-size: 11px; color: var(--blue); font-weight: 700; margin-top: 4px;">${getCountdown(ep.releaseDate)}</div>
+                `}
             </div>
         `;
-    });
+    }).join("");
 
-    html += `</div>`;
-    document.getElementById("modalEpisodes").innerHTML = html;
-
-    const newSeasonSelector = document.querySelector('.season-selector');
-    if (newSeasonSelector) {
-        newSeasonSelector.scrollLeft = savedScrollLeft;
-    }
+    document.getElementById("modalEpisodes").innerHTML = seasonSelectorHTML + episodesHTML;
 }
 
-/* =========================================================
-   MOVIE ACTIONS
-========================================================= */
-async function setMovieWatchedState(watchedStatus) {
+function selectSeason(seasonNum) {
+    selectedSeason = seasonNum;
+    updateModalContent();
+}
+
+async function setMovieWatchedState(watched) {
     if (!currentItem) return;
-    currentItem.watched = watchedStatus;
-    if (watchedStatus) {
-        currentItem.watchCount = (currentItem.watchCount || 0) + 1;
+    if (currentItem.isPreview) {
+        showToast("Please add the movie to your library first.");
+        return;
     }
-    currentItem.lastWatchedAt = watchedStatus ? new Date().toISOString() : null;
+
+    currentItem.watched = watched;
+    currentItem.watchCount = watched ? (currentItem.watchCount || 0) + 1 : 0;
+    currentItem.lastWatchedAt = watched ? new Date().toISOString() : null;
 
     if (auth && auth.currentUser && db) {
-        await db.collection("users").doc(auth.currentUser.uid).collection("movies").doc(currentItem.id).set({
-            watched: currentItem.watched,
-            watchCount: currentItem.watchCount,
-            lastWatchedAt: currentItem.lastWatchedAt
-        }, { merge: true });
+        try {
+            await db.collection("users").doc(auth.currentUser.uid).collection("movies").doc(currentItem.id).update({
+                watched: currentItem.watched,
+                watchCount: currentItem.watchCount,
+                lastWatchedAt: currentItem.lastWatchedAt
+            });
+            showToast(watched ? "Movie marked as watched!" : "Movie marked as unwatched.");
+        } catch (err) {
+            console.error("Failed to update movie watch state:", err);
+            showToast("Failed to update status.");
+        }
+    } else {
+        showToast(watched ? "Movie marked as watched!" : "Movie marked as unwatched.");
     }
 
     updateModalContent();
-    showToast(watchedStatus ? "Marked movie as watched" : "Marked movie as unwatched");
+    refreshActivePage();
 }
 
-/* =========================================================
-   TV SHOW ACTIONS
-========================================================= */
-function selectSeason(season) {
-    selectedSeason = season;
-    updateModalContent();
-}
+async function toggleEpisodeWatched(showId, episodeId) {
+    const show = getItem(showId);
+    if (!show || !show.episodes) return;
 
-async function setEpisodeState(episodeId, watchedStatus) {
-    if (!currentItem) return;
-    if (!currentItem.episodes) currentItem.episodes = [];
-
-    const ep = currentItem.episodes.find(e => e.id === episodeId);
+    const ep = show.episodes.find(e => e.id === episodeId);
     if (!ep) return;
 
-    ep.watched = watchedStatus;
-    if (watchedStatus) {
-        ep.watchCount = (ep.watchCount || 0) + 1;
-    }
+    ep.watched = !ep.watched;
+    ep.watchCount = ep.watched ? (ep.watchCount || 0) + 1 : 0;
 
-    if (auth && auth.currentUser && db && !currentItem.isPreview) {
+    if (auth && auth.currentUser && db) {
         try {
-            const epRef = db.collection("users").doc(auth.currentUser.uid).collection("tvShows").doc(currentItem.id).collection("episodes").doc(episodeId);
-            await epRef.set({
+            await db.collection("users").doc(auth.currentUser.uid).collection("tvShows").doc(showId).collection("episodes").doc(episodeId).update({
                 watched: ep.watched,
-                watchCount: ep.watchCount || 0
-            }, { merge: true });
+                watchCount: ep.watchCount
+            });
+            showToast(ep.watched ? `Marked S${ep.season}E${ep.number} watched` : `Marked S${ep.season}E${ep.number} unwatched`);
         } catch (err) {
-            console.error("Failed to update episode state:", err);
+            console.error("Failed to update episode status:", err);
+            showToast("Failed to update episode.");
         }
+    } else {
+        showToast(ep.watched ? `Marked S${ep.season}E${ep.number} watched` : `Marked S${ep.season}E${ep.number} unwatched`);
     }
 
     updateModalContent();
-    showToast(watchedStatus ? `Marked S${ep.season}E${ep.number} as watched` : `Marked S${ep.season}E${ep.number} as unwatched`);
+    refreshActivePage();
 }
 
-async function markAllWatched() {
-    if (!currentItem || currentItem.type === 'movie' || !currentItem.episodes) return;
+async function setSeasonWatchedState(showId, seasonNum, watched) {
+    const show = getItem(showId);
+    if (!show || !show.episodes) return;
 
-    currentItem.episodes.forEach(ep => {
-        if (isReleased(ep.releaseDate)) {
-            if (!ep.watched) {
-                ep.watched = true;
-                ep.watchCount = (ep.watchCount || 0) + 1;
-            }
-        }
+    const seasonEpisodes = show.episodes.filter(ep => ep.season === seasonNum && isReleased(ep.releaseDate));
+    if (seasonEpisodes.length === 0) {
+        showToast("No released episodes in this season.");
+        return;
+    }
+
+    seasonEpisodes.forEach(ep => {
+        ep.watched = watched;
+        ep.watchCount = watched ? (ep.watchCount || 0) + 1 : 0;
     });
 
-    if (auth && auth.currentUser && db && !currentItem.isPreview) {
+    if (auth && auth.currentUser && db) {
         try {
-            const showRef = db.collection("users").doc(auth.currentUser.uid).collection("tvShows").doc(currentItem.id);
+            const showRef = db.collection("users").doc(auth.currentUser.uid).collection("tvShows").doc(showId);
             const batch = db.batch();
-            currentItem.episodes.forEach(ep => {
-                if (isReleased(ep.releaseDate)) {
-                    const epRef = showRef.collection("episodes").doc(ep.id);
-                    batch.set(epRef, { watched: ep.watched, watchCount: ep.watchCount }, { merge: true });
-                }
+            seasonEpisodes.forEach(ep => {
+                const epRef = showRef.collection("episodes").doc(ep.id);
+                batch.update(epRef, { watched: ep.watched, watchCount: ep.watchCount });
             });
             await batch.commit();
+            showToast(watched ? `Season ${seasonNum} marked watched!` : `Season ${seasonNum} marked unwatched.`);
         } catch (err) {
-            console.error("Failed to mark all watched:", err);
+            console.error("Failed to update season status:", err);
+            showToast("Failed to update season.");
         }
+    } else {
+        showToast(watched ? `Season ${seasonNum} marked watched!` : `Season ${seasonNum} marked unwatched.`);
     }
 
     updateModalContent();
-    showToast("Marked all released episodes as watched");
-}
-
-async function markSeasonWatched(seasonNum) {
-    if (!currentItem || currentItem.type === 'movie' || !currentItem.episodes) return;
-
-    currentItem.episodes.forEach(ep => {
-        if (ep.season === seasonNum && isReleased(ep.releaseDate)) {
-            if (!ep.watched) {
-                ep.watched = true;
-                ep.watchCount = (ep.watchCount || 0) + 1;
-            }
-        }
-    });
-
-    if (auth && auth.currentUser && db && !currentItem.isPreview) {
-        try {
-            const showRef = db.collection("users").doc(auth.currentUser.uid).collection("tvShows").doc(currentItem.id);
-            const batch = db.batch();
-            currentItem.episodes.forEach(ep => {
-                if (ep.season === seasonNum && isReleased(ep.releaseDate)) {
-                    const epRef = showRef.collection("episodes").doc(ep.id);
-                    batch.set(epRef, { watched: ep.watched, watchCount: ep.watchCount }, { merge: true });
-                }
-            });
-            await batch.commit();
-        } catch (err) {
-            console.error("Failed to mark season watched:", err);
-        }
-    }
-
-    updateModalContent();
-    showToast(`Marked Season ${seasonNum} as watched`);
+    refreshActivePage();
 }
 
 async function deleteItem(itemId) {
@@ -3313,61 +3310,40 @@ async function deleteItem(itemId) {
         return;
     }
 
-    try {
-        if (auth && auth.currentUser && db) {
-            const col = item.type === 'movie' ? 'movies' : 'tvShows';
-            const docRef = db.collection("users").doc(auth.currentUser.uid).collection(col).doc(itemId);
-            
-            if (item.type === 'tv') {
-                const eps = await docRef.collection("episodes").get();
+    const index = state.library.findIndex(i => i.id === itemId);
+    if (index >= 0) {
+        state.library.splice(index, 1);
+    }
+
+    if (auth && auth.currentUser && db) {
+        try {
+            if (item.type === 'movie') {
+                await db.collection("users").doc(auth.currentUser.uid).collection("movies").doc(itemId).delete();
+            } else {
+                const showRef = db.collection("users").doc(auth.currentUser.uid).collection("tvShows").doc(itemId);
+                const epsSnap = await showRef.collection("episodes").get();
                 const batch = db.batch();
-                eps.forEach(doc => batch.delete(doc.ref));
+                epsSnap.forEach(doc => batch.delete(doc.ref));
+                batch.delete(showRef);
                 await batch.commit();
-            }
-            
-            await docRef.delete();
-        }
 
-        state.library = state.library.filter(i => i.id !== itemId);
-        closeModal();
-        refreshActivePage();
-        showToast(`Removed "${item.title}" from library`);
-    } catch (err) {
-        console.error("Error deleting item:", err);
-        showToast("Failed to remove item.");
-    }
-}
-
-// Initializing search inputs and listeners on load
-document.addEventListener("DOMContentLoaded", () => {
-    initSearchPage();
-    
-    ['onlineSearchInput', 'tvLibrarySearchInput', 'movieLibrarySearchInput'].forEach(id => {
-        const input = document.getElementById(id);
-        if (input) {
-            input.addEventListener("input", (e) => {
-                const box = input.closest('.search-box');
-                if (box) {
-                    if (e.target.value.trim().length > 0) {
-                        box.classList.add('has-text');
-                    } else {
-                        box.classList.remove('has-text');
-                    }
+                if (episodeUnsubs.has(itemId)) {
+                    episodeUnsubs.get(itemId)();
+                    episodeUnsubs.delete(itemId);
                 }
-            });
+            }
+            showToast("Removed from library.");
+        } catch (err) {
+            console.error("Failed to delete item from Firestore:", err);
+            showToast("Failed to remove item.");
         }
-    });
-
-    const tvLibInput = document.getElementById("tvLibrarySearchInput");
-    if (tvLibInput) {
-        tvLibInput.addEventListener("input", () => renderTVLibrarySection());
+    } else {
+        showToast("Removed from library.");
     }
 
-    const movieLibInput = document.getElementById("movieLibrarySearchInput");
-    if (movieLibInput) {
-        movieLibInput.addEventListener("input", () => renderMovieLibrarySection());
-    }
-});
+    closeModal();
+    refreshActivePage();
+}
 </script>
 </body>
 </html>
