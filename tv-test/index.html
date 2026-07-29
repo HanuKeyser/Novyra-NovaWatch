@@ -325,8 +325,8 @@ img {
 }
 .analytics-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
     position: relative;
     z-index: 2;
 }
@@ -334,18 +334,18 @@ img {
     text-align: center;
     background: rgba(255, 255, 255, 0.15);
     border-radius: 16px;
-    padding: 14px 4px;
+    padding: 16px 8px;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 .analytics-stat-value {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 800;
     margin-bottom: 4px;
 }
 .analytics-stat-label {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 650;
     opacity: 0.9;
 }
@@ -507,7 +507,7 @@ img {
     transform: translateY(-50%);
     background: transparent;
     border: none;
-    color: var(--blue);
+    color: var(--text-muted);
     cursor: pointer;
     display: none;
     align-items: center;
@@ -518,7 +518,7 @@ img {
 }
 
 .search-clear-btn:hover {
-    color: var(--blue-dark);
+    color: var(--text);
     background: var(--surface-2);
 }
 
@@ -1059,9 +1059,6 @@ img {
 .episode-title {
     font-size: 13px;
     font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 8px;
 }
 
 .episode-overview {
@@ -1418,6 +1415,10 @@ img {
 ================================================     -->
 <main id="homePage" class="page active">
     <div class="tab-content-wrapper">
+        <div class="section-header">
+            <div class="section-title">Home</div>
+        </div>
+        
         <div class="home-card" style="display: flex; flex-direction: column; gap: 18px;">
             <div class="home-row">
                 <div class="large-avatar" id="largeAvatar">G</div>
@@ -1535,11 +1536,12 @@ img {
     </button>
     <button id="navMovies" class="nav-button" onclick="showPage('movies')">
         <svg class="icon" viewBox="0 0 24 24">
-            <rect x="2" y="4" width="20" height="16" rx="2.5" />
-            <path d="M2 8h20" />
-            <path d="M6 4l3 4" />
-            <path d="M11 4l3 4" />
-            <path d="M16 4l3 4" />
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <path d="M7 3v18"/>
+            <path d="M17 3v18"/>
+            <path d="M3 7h18"/>
+            <path d="M3 12h18"/>
+            <path d="M3 17h18"/>
         </svg>
         Movies
     </button>
@@ -1693,12 +1695,15 @@ function getCountdown(date) {
 }
 
 /* =========================================================
-   FIREBASE CLOUD SYNC & AUTHENTICATION (PURE FIREBASE ONLY)
+   FIREBASE CLOUD SYNC & AUTHENTICATION
 ========================================================= */
 async function saveState() {
     try {
+        // Cache instantly for local fast load
+        localStorage.setItem('novawatch_state', JSON.stringify(state));
+
         if (!auth || !auth.currentUser || !db) {
-            console.log("Firebase storage not ready - skipping save");
+            console.log("Not signed in - skipping cloud save");
             return;
         }
 
@@ -1710,6 +1715,61 @@ async function saveState() {
     } catch (err) {
         console.error("Firestore FAILED", err);
     }
+}
+
+function mergeLibraries(localLib = [], cloudLib = []) {
+    const map = new Map();
+
+    const getKey = (item) => {
+        if (!item) return '';
+        if (item.tmdbId) return `${item.type || 'tv'}-${item.tmdbId}`;
+        return item.id || '';
+    };
+
+    cloudLib.forEach(item => {
+        if (!item) return;
+        const key = getKey(item);
+        if (key) map.set(key, JSON.parse(JSON.stringify(item)));
+    });
+
+    localLib.forEach(localItem => {
+        if (!localItem) return;
+        const key = getKey(localItem);
+        if (!key) return;
+
+        if (!map.has(key)) {
+            map.set(key, JSON.parse(JSON.stringify(localItem)));
+        } else {
+            const cloudItem = map.get(key);
+
+            if (localItem.type === 'movie') {
+                cloudItem.watched = Boolean(cloudItem.watched || localItem.watched);
+                if (localItem.lastWatchedAt && (!cloudItem.lastWatchedAt || new Date(localItem.lastWatchedAt) > new Date(cloudItem.lastWatchedAt))) {
+                    cloudItem.lastWatchedAt = localItem.lastWatchedAt;
+                }
+            } else {
+                cloudItem.isFinished = Boolean(cloudItem.isFinished || localItem.isFinished);
+                
+                if (localItem.episodes && cloudItem.episodes) {
+                    const epMap = new Map();
+                    cloudItem.episodes.forEach(ep => epMap.set(ep.id, ep));
+
+                    localItem.episodes.forEach(locEp => {
+                        if (epMap.has(locEp.id)) {
+                            const cEp = epMap.get(locEp.id);
+                            cEp.watched = Boolean(cEp.watched || locEp.watched);
+                        } else {
+                            cloudItem.episodes.push(JSON.parse(JSON.stringify(locEp)));
+                        }
+                    });
+                } else if (localItem.episodes && !cloudItem.episodes) {
+                    cloudItem.episodes = JSON.parse(JSON.stringify(localItem.episodes));
+                }
+            }
+        }
+    });
+
+    return Array.from(map.values());
 }
 
 async function handleGoogleSignIn() {
@@ -1754,7 +1814,7 @@ async function handleSignUp() {
             state.profiles[0].initials = username.charAt(0).toUpperCase();
         }
         
-        await saveState();
+        saveState();
         showToast("Account created & logged in!");
     } catch (err) {
         showToast(err.message);
@@ -1783,6 +1843,7 @@ async function handleSignOut() {
     try {
         await auth.signOut();
         state.library = [];
+        localStorage.removeItem('novawatch_state');
         refreshActivePage();
         showToast("Signed out successfully.");
     } catch (err) {
@@ -1800,56 +1861,60 @@ function refreshActivePage() {
 
 if (auth) {
     auth.onAuthStateChanged(async (user) => {
-        if (!user) {
-            try {
-                await auth.signInAnonymously();
-                return;
-            } catch (e) {
-                console.error("Anonymous authentication error:", e);
-            }
-        }
-
         currentUser = user;
         const outView = document.getElementById("loggedOutView");
         const inView = document.getElementById("loggedInView");
 
-        if (user && !user.isAnonymous) {
-            if (outView) outView.style.display = "none";
-            if (inView) inView.style.display = "block";
-        } else {
-            if (outView) outView.style.display = "block";
-            if (inView) inView.style.display = "none";
-        }
-
         if (user) {
+            outView.style.display = "none";
+            inView.style.display = "block";
+
             try {
                 const doc = await db.collection("users").doc(user.uid).get();
                 if (doc.exists) {
                     const cloudData = doc.data();
                     if (cloudData) {
+                        const mergedLibrary = mergeLibraries(state.library, cloudData.library || []);
                         state = {
                             ...state,
                             ...cloudData,
-                            library: cloudData.library || []
+                            library: mergedLibrary
                         };
 
+                        localStorage.setItem('novawatch_state', JSON.stringify(state));
+
+                        await db.collection("users")
+                            .doc(user.uid)
+                            .set({
+                                ...state,
+                                library: mergedLibrary
+                            }, { merge: true });
+                       
                         if (!state.profiles || state.profiles.length === 0) {
-                            const name = user.displayName || (user.email ? user.email.split('@')[0] : "Guest");
+                            const name = user.displayName || user.email.split('@')[0];
                             state.profiles = [{ id: "profile-hanu", name: name, initials: name.charAt(0).toUpperCase() }];
                         }
                         
                         refreshActivePage();
+                        showToast("Loaded library!");
 
                         db.collection("users")
                             .doc(user.uid)
                             .onSnapshot((snapshot) => {
                                 if (!snapshot.exists) return;
+
                                 const cloudData = snapshot.data();
+                                const mergedLibrary = mergeLibraries(
+                                    state.library,
+                                    cloudData.library || []
+                                );
+
                                 state = {
                                     ...state,
                                     ...cloudData,
-                                    library: cloudData.library || []
+                                    library: mergedLibrary
                                 };
+                                localStorage.setItem('novawatch_state', JSON.stringify(state));
                                 refreshActivePage();
                             });
                     }
@@ -1858,13 +1923,20 @@ if (auth) {
                         state.profiles[0].name = user.displayName;
                         state.profiles[0].initials = user.displayName.charAt(0).toUpperCase();
                     }
-                    await saveState();
+                    saveState();
                     refreshActivePage();
+                    showToast("Initialized new library!");
                 }
             } catch (err) {
                 console.error("Error fetching cloud data:", err);
+                showToast("Library sync failed.");
                 refreshActivePage();
             }
+        } else {
+            outView.style.display = "block";
+            inView.style.display = "none";
+            state.library = [];
+            refreshActivePage();
         }
     });
 }
@@ -1894,12 +1966,6 @@ function initSearchPage() {
     searchInput.addEventListener("input", (e) => {
         clearTimeout(searchDebounceTimer);
         const query = e.target.value.trim();
-
-        if (query) {
-            searchInput.parentElement.classList.add("has-text");
-        } else {
-            searchInput.parentElement.classList.remove("has-text");
-        }
 
         if (!query) {
             fetchTrending();
@@ -2041,8 +2107,7 @@ async function openSearchResultDetails(tmdbId, type) {
                 runtime: movieData.runtime ? `${movieData.runtime} min` : "120 min",
                 releaseDate: movieData.release_date ? new Date(movieData.release_date).toISOString() : new Date().toISOString(),
                 isPreview: true,
-                watched: false,
-                watchCount: 0
+                watched: false
             };
         } else {
             const showRes = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${TMDB_API_KEY}`);
@@ -2072,7 +2137,6 @@ async function openSearchResultDetails(tmdbId, type) {
                                 still: ep.still_path ? `https://image.tmdb.org/t/p/w300${ep.still_path}` : '',
                                 runtime: ep.runtime ? `${ep.runtime} min` : "45 min",
                                 watched: false,
-                                watchCount: 0,
                                 releaseDate: ep.air_date ? new Date(ep.air_date).toISOString() : new Date().toISOString()
                             });
                         });
@@ -2105,6 +2169,11 @@ async function openSearchResultDetails(tmdbId, type) {
 }
 
 async function importMediaData(id, type, buttonElement) {
+    if (!auth || !auth.currentUser) {
+        showToast("Please sign in to add items to your library.");
+        return;
+    }
+
     if (buttonElement) {
         buttonElement.disabled = true;
         buttonElement.textContent = "Adding...";
@@ -2398,10 +2467,9 @@ function renderTVShowsTab() {
         return progress.watched > 0 && progress.watched < progress.total;
     });
 
-    // Unreleased TV Shows will not appear in start watching as they have not been released yet
     let startList = shows.filter(show => {
         const progress = getTVProgress(show);
-        return progress.total > 0 && progress.watched === 0;
+        return progress.watched === 0;
     });
 
     continueList = sortTVShowsByLatestAired(continueList);
@@ -2505,7 +2573,7 @@ function updateHomeUI() {
         document.getElementById("headerAvatar").textContent = activeProfile.initials || "G";
     }
 
-    if (currentUser && !currentUser.isAnonymous) {
+    if (currentUser) {
         document.getElementById("homeEmailSubtitle").textContent = currentUser.email || "Signed In";
     } else {
         document.getElementById("homeEmailSubtitle").textContent = "Local Account";
@@ -2516,25 +2584,21 @@ function renderHomeTab() {
     const totalShows = state.library.filter(i => i.type === 'tv').length;
     const totalMovies = state.library.filter(i => i.type === 'movie').length;
     let totalWatchedEpisodes = 0;
-    let totalRewatches = 0;
+    
     let totalWatchTimeMinutes = 0;
 
     state.library.forEach(item => {
         if (item.type === 'tv' && item.episodes) {
             item.episodes.forEach(ep => {
                 if (ep.watched) {
-                    const count = Math.max(1, ep.watchCount || 1);
-                    totalWatchedEpisodes += count;
-                    if (count > 1) totalRewatches += (count - 1);
+                    totalWatchedEpisodes += Math.max(1, ep.watchCount || 1);
                     const minutes = parseInt((ep.runtime || "45").replace(/[^0-9]/g, "")) || 45;
-                    totalWatchTimeMinutes += minutes * count;
+                    totalWatchTimeMinutes += minutes * Math.max(1, ep.watchCount || 1);
                 }
             });
         } else if (item.type === 'movie' && item.watched) {
-            const count = Math.max(1, item.watchCount || 1);
-            if (count > 1) totalRewatches += (count - 1);
             const minutes = parseInt((item.runtime || "120").replace(/[^0-9]/g, "")) || 120;
-            totalWatchTimeMinutes += minutes * count;
+            totalWatchTimeMinutes += minutes * Math.max(1, item.watchCount || 1);
         }
     });
 
@@ -2556,10 +2620,6 @@ function renderHomeTab() {
         <div class="analytics-stat">
             <div class="analytics-stat-value">${totalWatchedEpisodes}</div>
             <div class="analytics-stat-label">Episodes</div>
-        </div>
-        <div class="analytics-stat">
-            <div class="analytics-stat-value">${totalRewatches}</div>
-            <div class="analytics-stat-label">Rewatches</div>
         </div>
     `;
 
@@ -2724,17 +2784,9 @@ function generateCardHTML(item) {
     if (item.type === 'tv') {
         const progress = getTVProgress(item);
         if (progress.percentage > 0) {
-            // Updated Progress Bar Colors: Red for finished, Green for up-to-date, Blue for continue watching
-            let barColor = 'var(--blue)';
-            if (isTVFinished(item)) {
-                barColor = 'var(--danger)';
-            } else if (isTVUpToDate(item)) {
-                barColor = 'var(--success)';
-            }
-
             progressHTML = `
                 <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 5px; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);">
-                    <div style="width: ${progress.percentage}%; height: 100%; background: ${barColor};"></div>
+                    <div style="width: ${progress.percentage}%; height: 100%; background: ${progress.percentage === 100 ? 'var(--success)' : 'var(--blue)'};"></div>
                 </div>
             `;
         }
@@ -2762,7 +2814,6 @@ function generateCardHTML(item) {
                 </div>
                 <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
                     ${item.year} • ${item.type === 'movie' ? 'Movie' : 'TV'}
-                    ${(item.watchCount && item.watchCount > 1) ? `• ↺ ${item.watchCount - 1}` : ''}
                 </div>
             </div>
         </div>
@@ -2773,9 +2824,6 @@ function clearSearch(inputId) {
     const input = document.getElementById(inputId);
     if (input) {
         input.value = "";
-        if (input.parentElement) {
-            input.parentElement.classList.remove("has-text");
-        }
         input.dispatchEvent(new Event("input"));
         input.focus();
     }
@@ -2874,9 +2922,6 @@ function updateModalContent() {
         episodes.innerHTML = renderEpisodesSection();
     } else {
         metaHTML += `<span style="opacity:0.5">•</span><span>${currentItem.runtime}</span>`;
-        if (currentItem.watchCount && currentItem.watchCount > 0) {
-            metaHTML += `<span style="opacity:0.5">•</span><span>Watched ${currentItem.watchCount}x</span>`;
-        }
         
         let movieActions = ``;
         if (currentItem.isPreview) {
@@ -2945,7 +2990,6 @@ function renderEpisodesSection() {
 
     epsToRender.forEach(ep => {
         const released = isReleased(ep.releaseDate);
-        const rewatchBadge = (ep.watchCount && ep.watchCount > 1) ? `<span class="category-count" style="margin-left:6px; color:var(--blue);">Rewatched ${ep.watchCount - 1}x</span>` : '';
         
         html += `
             <div class="episode" style="${!released ? 'opacity:0.5;' : ''}">
@@ -2955,7 +2999,7 @@ function renderEpisodesSection() {
                         `<div class="episode-still" style="display:flex; align-items:center; justify-content:center; text-align:center; font-size:10px; color:var(--text-muted); padding:5px;">No Image</div>`
                     }
                     <div class="episode-info">
-                        <div class="episode-title">${ep.number}. ${escapeHTML(ep.title)} ${rewatchBadge}</div>
+                        <div class="episode-title">${ep.number}. ${escapeHTML(ep.title)}</div>
                         <div class="episode-meta">
                             ${formatDate(ep.releaseDate)} • ${ep.runtime}
                             ${!released ? `<br><span style="color:var(--blue);font-weight:600;">${getCountdown(ep.releaseDate)}</span>` : ''}
@@ -2987,7 +3031,7 @@ function selectSeason(season) {
 }
 
 /* =========================================================
-   ACTIONS (MARK WATCHED, REWATCH, REMOVE, TRAILER)
+   ACTIONS (MARK WATCHED, REMOVE, TRAILER)
 ========================================================= */
 function markAllWatched() {
     if (!currentItem || currentItem.type !== 'tv') return;
@@ -3012,39 +3056,33 @@ function markSeasonWatched(season) {
     
     let marked = 0;
     currentItem.episodes.forEach(ep => {
-        if (ep.season === season && isReleased(ep.releaseDate)) {
-            if (!ep.watched) {
-                ep.watched = true;
-                ep.watchCount = (ep.watchCount || 0) + 1;
-                marked++;
-            }
+        if (ep.season === season && isReleased(ep.releaseDate) && !ep.watched) {
+            ep.watched = true;
+            ep.watchCount = (ep.watchCount || 0) + 1;
+            marked++;
         }
     });
     
-    saveState();
-    updateModalContent();
-    refreshActivePage();
-    showToast(`Marked Season ${season} as watched!`);
+    if (marked > 0) {
+        saveState();
+        updateModalContent();
+        refreshActivePage();
+        showToast(`Marked Season ${season} as watched!`);
+    } else {
+        showToast(`Season ${season} is already fully watched.`);
+    }
 }
 
-function setEpisodeState(epId, watched) {
-    if (!currentItem || !currentItem.episodes) return;
+function toggleMovieWatched() {
+    if (!currentItem || currentItem.type !== 'movie') return;
     
-    const ep = currentItem.episodes.find(e => e.id === epId);
-    if (!ep) return;
-    
-    if (watched) {
-        if (ep.watched) {
-            ep.watchCount = (ep.watchCount || 1) + 1;
-            showToast(`Rewatched S${ep.season} E${ep.number} (${ep.watchCount}x)!`);
-        } else {
-            ep.watched = true;
-            ep.watchCount = (ep.watchCount || 0) + 1;
-            showToast(`Marked S${ep.season} E${ep.number} as watched!`);
-        }
+    currentItem.watched = !currentItem.watched;
+    if (currentItem.watched) {
+        currentItem.watchCount = (currentItem.watchCount || 0) + 1;
+        currentItem.lastWatchedAt = new Date().toISOString();
+        showToast("Marked movie as watched!");
     } else {
-        ep.watched = false;
-        showToast(`Marked S${ep.season} E${ep.number} as unwatched.`);
+        showToast("Marked movie as unwatched.");
     }
     
     saveState();
@@ -3052,18 +3090,16 @@ function setEpisodeState(epId, watched) {
     refreshActivePage();
 }
 
-function toggleMovieWatched() {
-    if (!currentItem || currentItem.type !== 'movie') return;
+function setEpisodeState(epId, isWatched) {
+    if (!currentItem || currentItem.type !== 'tv') return;
+    const ep = currentItem.episodes.find(e => e.id === epId);
+    if (!ep) return;
     
-    if (currentItem.watched) {
-        currentItem.watchCount = (currentItem.watchCount || 1) + 1;
-        currentItem.lastWatchedAt = new Date().toISOString();
-        showToast(`Rewatched ${currentItem.title} (${currentItem.watchCount}x)!`);
+    if (isWatched) {
+        ep.watched = true;
+        ep.watchCount = (ep.watchCount || 0) + 1;
     } else {
-        currentItem.watched = true;
-        currentItem.watchCount = (currentItem.watchCount || 0) + 1;
-        currentItem.lastWatchedAt = new Date().toISOString();
-        showToast(`Marked ${currentItem.title} as watched!`);
+        ep.watched = false;
     }
     
     saveState();
@@ -3074,26 +3110,37 @@ function toggleMovieWatched() {
 function removeCurrentItem() {
     if (!currentItem) return;
     
-    const index = state.library.findIndex(item => item.id === currentItem.id);
-    if (index !== -1) {
-        state.library.splice(index, 1);
+    if (confirm(`Remove "${currentItem.title}" from your library?`)) {
+        state.library = state.library.filter(item => item.id !== currentItem.id);
         saveState();
-        refreshActivePage();
         closeModal();
-        showToast("Removed from library.");
+        refreshActivePage();
+        showToast("Item removed.");
     }
 }
 
 function openTrailerSearch() {
     if (!currentItem) return;
-    const query = encodeURIComponent(`${currentItem.title} ${currentItem.type === 'movie' ? 'movie' : 'tv show'} official trailer`);
+    const query = encodeURIComponent(`${currentItem.title} ${currentItem.year} trailer`);
     window.open(`https://www.youtube.com/results?search_query=${query}`, '_blank');
 }
 
 /* =========================================================
    INITIALIZATION
 ========================================================= */
-document.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", () => {
+    // Initial load from fast LocalStorage cache
+    const cached = localStorage.getItem('novawatch_state');
+    if (cached) {
+        try {
+            const parsed = JSON.parse(cached);
+            if (parsed.library) {
+                state = parsed;
+            }
+        } catch(e) {}
+    }
+
+    showPage('home');
     initSearchPage();
     updateHomeUI();
 });
