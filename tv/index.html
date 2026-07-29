@@ -2050,48 +2050,22 @@ function setSearchType(type) {
 }
 
 function initSearchPage() {
-    const onlineInput = document.getElementById("onlineSearchInput");
-    if (onlineInput) {
-        onlineInput.addEventListener("input", (e) => {
-            const searchBox = e.target.closest('.search-box');
-            if (searchBox) {
-                searchBox.classList.toggle('has-text', e.target.value.length > 0);
-            }
-            clearTimeout(searchDebounceTimer);
-            const query = e.target.value.trim();
+    const searchInput = document.getElementById("onlineSearchInput");
+    if (!searchInput) return;
 
-            if (!query) {
-                fetchTrending();
-                return;
-            }
+    searchInput.addEventListener("input", (e) => {
+        clearTimeout(searchDebounceTimer);
+        const query = e.target.value.trim();
 
-            searchDebounceTimer = setTimeout(() => {
-                performTMDBSearch(query);
-            }, 200);
-        });
-    }
+        if (!query) {
+            fetchTrending();
+            return;
+        }
 
-    const tvLibInput = document.getElementById("tvLibrarySearchInput");
-    if (tvLibInput) {
-        tvLibInput.addEventListener("input", (e) => {
-            const searchBox = e.target.closest('.search-box');
-            if (searchBox) {
-                searchBox.classList.toggle('has-text', e.target.value.length > 0);
-            }
-            renderTVLibrarySection();
-        });
-    }
-
-    const movieLibInput = document.getElementById("movieLibrarySearchInput");
-    if (movieLibInput) {
-        movieLibInput.addEventListener("input", (e) => {
-            const searchBox = e.target.closest('.search-box');
-            if (searchBox) {
-                searchBox.classList.toggle('has-text', e.target.value.length > 0);
-            }
-            renderMovieLibrarySection();
-        });
-    }
+        searchDebounceTimer = setTimeout(() => {
+            performTMDBSearch(query);
+        }, 200);
+    });
 
     fetchTrending();
 }
@@ -3203,9 +3177,30 @@ function escapeHTML(str) {
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 }
 
-initSearchPage();
+function showToast(message) {
+    const toast = document.getElementById("toast");
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+        toast.classList.remove("show");
+    }, 2500);
+}
+
+// Initialize app on load
+window.addEventListener("DOMContentLoaded", () => {
+    initSearchPage();
+    updateHomeUI();
+
+    setTimeout(() => {
+        checkLibraryForUpdates();
+    }, 1500);
+});
 </script>
 </body>
 </html>
