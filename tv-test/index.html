@@ -325,8 +325,8 @@ img {
 }
 .analytics-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
     position: relative;
     z-index: 2;
 }
@@ -334,18 +334,18 @@ img {
     text-align: center;
     background: rgba(255, 255, 255, 0.15);
     border-radius: 16px;
-    padding: 16px 8px;
+    padding: 16px 6px;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 .analytics-stat-value {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 800;
     margin-bottom: 4px;
 }
 .analytics-stat-label {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 650;
     opacity: 0.9;
 }
@@ -507,7 +507,7 @@ img {
     transform: translateY(-50%);
     background: transparent;
     border: none;
-    color: var(--text-muted);
+    color: var(--blue);
     cursor: pointer;
     display: none;
     align-items: center;
@@ -518,7 +518,7 @@ img {
 }
 
 .search-clear-btn:hover {
-    color: var(--text);
+    color: var(--blue-dark);
     background: var(--surface-2);
 }
 
@@ -1415,10 +1415,6 @@ img {
 ================================================     -->
 <main id="homePage" class="page active">
     <div class="tab-content-wrapper">
-        <div class="section-header">
-            <div class="section-title">Home</div>
-        </div>
-        
         <div class="home-card" style="display: flex; flex-direction: column; gap: 18px;">
             <div class="home-row">
                 <div class="large-avatar" id="largeAvatar">G</div>
@@ -1536,12 +1532,11 @@ img {
     </button>
     <button id="navMovies" class="nav-button" onclick="showPage('movies')">
         <svg class="icon" viewBox="0 0 24 24">
-            <rect x="3" y="3" width="18" height="18" rx="2"/>
-            <path d="M7 3v18"/>
-            <path d="M17 3v18"/>
-            <path d="M3 7h18"/>
-            <path d="M3 12h18"/>
-            <path d="M3 17h18"/>
+            <rect x="2" y="4" width="20" height="16" rx="2"/>
+            <path d="M2 8h20"/>
+            <path d="M6 4l2 4"/>
+            <path d="M11 4l2 4"/>
+            <path d="M16 4l2 4"/>
         </svg>
         Movies
     </button>
@@ -1966,6 +1961,12 @@ function initSearchPage() {
     searchInput.addEventListener("input", (e) => {
         clearTimeout(searchDebounceTimer);
         const query = e.target.value.trim();
+
+        if (query) {
+            searchInput.parentElement.classList.add("has-text");
+        } else {
+            searchInput.parentElement.classList.remove("has-text");
+        }
 
         if (!query) {
             fetchTrending();
@@ -2469,7 +2470,7 @@ function renderTVShowsTab() {
 
     let startList = shows.filter(show => {
         const progress = getTVProgress(show);
-        return progress.watched === 0;
+        return progress.total > 0 && progress.watched === 0;
     });
 
     continueList = sortTVShowsByLatestAired(continueList);
@@ -2584,7 +2585,7 @@ function renderHomeTab() {
     const totalShows = state.library.filter(i => i.type === 'tv').length;
     const totalMovies = state.library.filter(i => i.type === 'movie').length;
     let totalWatchedEpisodes = 0;
-    
+    let totalRewatches = 0;
     let totalWatchTimeMinutes = 0;
 
     state.library.forEach(item => {
@@ -2595,10 +2596,18 @@ function renderHomeTab() {
                     const minutes = parseInt((ep.runtime || "45").replace(/[^0-9]/g, "")) || 45;
                     totalWatchTimeMinutes += minutes * Math.max(1, ep.watchCount || 1);
                 }
+                if (ep.watchCount > 1) {
+                    totalRewatches += (ep.watchCount - 1);
+                }
             });
-        } else if (item.type === 'movie' && item.watched) {
-            const minutes = parseInt((item.runtime || "120").replace(/[^0-9]/g, "")) || 120;
-            totalWatchTimeMinutes += minutes * Math.max(1, item.watchCount || 1);
+        } else if (item.type === 'movie') {
+            if (item.watched) {
+                const minutes = parseInt((item.runtime || "120").replace(/[^0-9]/g, "")) || 120;
+                totalWatchTimeMinutes += minutes * Math.max(1, item.watchCount || 1);
+            }
+            if (item.watchCount > 1) {
+                totalRewatches += (item.watchCount - 1);
+            }
         }
     });
 
@@ -2620,6 +2629,10 @@ function renderHomeTab() {
         <div class="analytics-stat">
             <div class="analytics-stat-value">${totalWatchedEpisodes}</div>
             <div class="analytics-stat-label">Episodes</div>
+        </div>
+        <div class="analytics-stat">
+            <div class="analytics-stat-value">${totalRewatches}</div>
+            <div class="analytics-stat-label">Rewatches</div>
         </div>
     `;
 
@@ -2690,7 +2703,10 @@ function renderTVLibrarySection(searchQuery = "") {
         },
         {
             title: "Not Started",
-            items: sortTVShowsByLatestAired(items.filter(show => getTVProgress(show).watched === 0))
+            items: sortTVShowsByLatestAired(items.filter(show => {
+                const p = getTVProgress(show);
+                return p.total > 0 && p.watched === 0;
+            }))
         }
     ];
 
@@ -2786,7 +2802,7 @@ function generateCardHTML(item) {
         if (progress.percentage > 0) {
             progressHTML = `
                 <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 5px; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);">
-                    <div style="width: ${progress.percentage}%; height: 100%; background: ${progress.percentage === 100 ? 'var(--success)' : 'var(--blue)'};"></div>
+                    <div style="width: ${progress.percentage}%; height: 100%; background: ${progress.percentage === 100 ? 'var(--danger)' : 'var(--blue)'};"></div>
                 </div>
             `;
         }
@@ -2824,6 +2840,7 @@ function clearSearch(inputId) {
     const input = document.getElementById(inputId);
     if (input) {
         input.value = "";
+        input.parentElement.classList.remove("has-text");
         input.dispatchEvent(new Event("input"));
         input.focus();
     }
@@ -2906,6 +2923,16 @@ function updateModalContent() {
         if (!currentItem.isPreview) {
             const progress = getTVProgress(currentItem);
             metaHTML += `<span style="opacity:0.5">•</span><span>${progress.percentage}% Watched</span>`;
+            
+            let totalShowRewatches = 0;
+            if (currentItem.episodes) {
+                currentItem.episodes.forEach(ep => {
+                    if (ep.watchCount > 1) totalShowRewatches += (ep.watchCount - 1);
+                });
+            }
+            if (totalShowRewatches > 0) {
+                metaHTML += `<span style="opacity:0.5">•</span><span>${totalShowRewatches} Rewatch${totalShowRewatches > 1 ? 'es' : ''}</span>`;
+            }
         }
         
         let tvActions = ``;
@@ -2922,6 +2949,10 @@ function updateModalContent() {
         episodes.innerHTML = renderEpisodesSection();
     } else {
         metaHTML += `<span style="opacity:0.5">•</span><span>${currentItem.runtime}</span>`;
+        if (currentItem.watchCount > 1) {
+            const rewatches = currentItem.watchCount - 1;
+            metaHTML += `<span style="opacity:0.5">•</span><span>${rewatches} Rewatch${rewatches > 1 ? 'es' : ''}</span>`;
+        }
         
         let movieActions = ``;
         if (currentItem.isPreview) {
@@ -3002,6 +3033,7 @@ function renderEpisodesSection() {
                         <div class="episode-title">${ep.number}. ${escapeHTML(ep.title)}</div>
                         <div class="episode-meta">
                             ${formatDate(ep.releaseDate)} • ${ep.runtime}
+                            ${ep.watchCount > 1 ? ` • <span style="color:var(--blue);font-weight:600;">${ep.watchCount - 1} Rewatch${ep.watchCount - 1 > 1 ? 'es' : ''}</span>` : ''}
                             ${!released ? `<br><span style="color:var(--blue);font-weight:600;">${getCountdown(ep.releaseDate)}</span>` : ''}
                         </div>
                     </div>
