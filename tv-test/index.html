@@ -1669,6 +1669,42 @@ let currentUpcomingType = 'tv';
 let toastTimer = null;
 let searchDebounceTimer = null;
 
+let unsubMovies = null;
+let unsubTVShows = null;
+let episodeUnsubs = new Map();
+
+/* =========================================================
+   UTILITY HELPERS (`showToast`, `clearSearch`, `escapeHTML`)
+========================================================= */
+function showToast(message, duration = 3000) {
+    const toast = document.getElementById("toast");
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+        toast.classList.remove("show");
+    }, duration);
+}
+
+function clearSearch(inputId) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    input.value = "";
+    input.dispatchEvent(new Event('input'));
+    input.focus();
+}
+
+function escapeHTML(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 /* =========================================================
    DATE HELPERS
 ========================================================= */
@@ -1709,80 +1745,140 @@ function getCountdown(date) {
 }
 
 /* =========================================================
-   FIREBASE CLOUD SYNC & AUTHENTICATION
+   FIRESTORE CLOUD SYNC & AUTHENTICATION
 ========================================================= */
-async function saveState() {
+async function saveUserState() {
     try {
-        if (!auth || !auth.currentUser || !db) {
-            console.log("Not signed in - skipping cloud save");
-            return;
-        }
-
-        await db.collection("users")
-            .doc(auth.currentUser.uid)
-            .set(state, { merge: true });
-
-        console.log("Firestore save SUCCESS");
+        if (!auth || !auth.currentUser || !db) return;
+        await db.collection("users").doc(auth.currentUser.uid).set({
+            profiles: state.profiles
+        }, { merge: true });
     } catch (err) {
-        console.error("Firestore FAILED", err);
+        console.error("Failed to save user profile", err);
     }
 }
 
-function mergeLibraries(localLib = [], cloudLib = []) {
-    const map = new Map();
-
-    const getKey = (item) => {
-        if (!item) return '';
-        if (item.tmdbId) return `${item.type || 'tv'}-${item.tmdbId}`;
-        return item.id || '';
-    };
-
-    cloudLib.forEach(item => {
-        if (!item) return;
-        const key = getKey(item);
-        if (key) map.set(key, JSON.parse(JSON.stringify(item)));
+async function loadUserLibraryFromFirestore(userId) {
+    const moviesSnapshot = await db.collection("users").doc(userId).collection("movies").get();
+    const movies = [];
+    moviesSnapshot.forEach(doc => {
+        movies.push({ id: doc.id, type: 'movie', ...doc.data() });
     });
 
-    localLib.forEach(localItem => {
-        if (!localItem) return;
-        const key = getKey(localItem);
-        if (!key) return;
+    const tvShowsSnapshot = await db.collection("users").doc(userId).collection("tvShows").get();
+    const tvShows = [];
 
-        if (!map.has(key)) {
-            map.set(key, JSON.parse(JSON.stringify(localItem)));
-        } else {
-            const cloudItem = map.get(key);
+    for (const showDoc of tvShowsSnapshot.docs) {
+        const showData = showDoc.data();
+        const episodesSnapshot = await showDoc.ref.collection("episodes").get();
+        const episodes = [];
+        episodesSnapshot.forEach(epDoc => {
+            episodes.push({ id: epDoc.id, ...epDoc.data() });
+        });
+        tvShows.push({
+            id: showDoc.id,
+            type: 'tv',
+            ...showData,
+            episodes: episodes
+        });
+    }
 
-            if (localItem.type === 'movie') {
-                cloudItem.watched = Boolean(cloudItem.watched || localItem.watched);
-                cloudItem.watchCount = Math.max(cloudItem.watchCount || 0, localItem.watchCount || 0);
-                if (localItem.lastWatchedAt && (!cloudItem.lastWatchedAt || new Date(localItem.lastWatchedAt) > new Date(cloudItem.lastWatchedAt))) {
-                    cloudItem.lastWatchedAt = localItem.lastWatchedAt;
+    return [...tvShows, ...movies];
+}
+
+function setupFirestoreListeners(userId) {
+    if (unsubMovies) unsubMovies();
+    if (unsubTVShows) unsubTVShows();
+    episodeUnsubs.forEach(unsub => unsub());
+    episodeUnsubs.clear();
+
+    unsubMovies = db.collection("users").doc(userId).collection("movies").onSnapshot(snapshot => {
+        snapshot.docChanges().forEach(change => {
+            const movieData = { id: change.doc.id, type: 'movie', ...change.doc.data() };
+            const index = state.library.findIndex(i => i.id === movieData.id);
+            if (change.type === "added" || change.type === "modified") {
+                if (index >= 0) {
+                    state.library[index] = movieData;
+                } else {
+                    state.library.push(movieData);
                 }
-            } else {
-                cloudItem.isFinished = Boolean(cloudItem.isFinished || localItem.isFinished);
-                
-                if (localItem.episodes && cloudItem.episodes) {
-                    const epMap = new Map();
-                    cloudItem.episodes.forEach(ep => epMap.set(ep.id, ep));
-
-                    localItem.episodes.forEach(locEp => {
-                        if (epMap.has(locEp.id)) {
-                            const cEp = epMap.get(locEp.id);
-                            cEp.watched = Boolean(cEp.watched || locEp.watched);
-                            cEp.watchCount = Math.max(cEp.watchCount || 0, locEp.watchCount || 0);
-                        } else {
-                            cloudItem.episodes.push(JSON.parse(JSON.stringify(locEp)));
-                        }
-                    });
-                } else if (localItem.episodes && !cloudItem.episodes) {
-                    cloudItem.episodes = JSON.parse(JSON.stringify(localItem.episodes));
+            } else if (change.type === "removed") {
+                if (index >= 0) {
+                    state.library.splice(index, 1);
                 }
             }
-        }
+        });
+        refreshActivePage();
     });
 
-    return Array.from(map.values());
+    unsubTVShows = db.collection("users").doc(userId).collection("tvShows").onSnapshot(snapshot => {
+        snapshot.docChanges().forEach(async change => {
+            const showId = change.doc.id;
+            const showData = { id: showId, type: 'tv', ...change.doc.data() };
+
+            if (change.type === "added" || change.type === "modified") {
+                const epsSnapshot = await change.doc.ref.collection("episodes").get();
+                const episodes = [];
+                epsSnapshot.forEach(epDoc => {
+                    episodes.push({ id: epDoc.id, ...epDoc.data() });
+                });
+                showData.episodes = episodes;
+
+                const index = state.library.findIndex(i => i.id === showId);
+                if (index >= 0) {
+                    const existingEpisodes = state.library[index].episodes || [];
+                    showData.episodes = showData.episodes.map(newEp => {
+                        const existingEp = existingEpisodes.find(e => e.id === newEp.id);
+                        return existingEp ? { ...newEp, ...existingEp } : newEp;
+                    });
+                    state.library[index] = { ...state.library[index], ...showData };
+                } else {
+                    state.library.push(showData);
+                }
+
+                setupEpisodeListener(userId, showId);
+
+            } else if (change.type === "removed") {
+                const index = state.library.findIndex(i => i.id === showId);
+                if (index >= 0) {
+                    state.library.splice(index, 1);
+                }
+                if (episodeUnsubs.has(showId)) {
+                    episodeUnsubs.get(showId)();
+                    episodeUnsubs.delete(showId);
+                }
+            }
+        });
+        refreshActivePage();
+    });
+}
+
+function setupEpisodeListener(userId, showId) {
+    if (episodeUnsubs.has(showId)) return;
+
+    const unsub = db.collection("users").doc(userId).collection("tvShows").doc(showId).collection("episodes").onSnapshot(snapshot => {
+        const show = state.library.find(i => i.id === showId);
+        if (!show) return;
+        if (!show.episodes) show.episodes = [];
+
+        snapshot.docChanges().forEach(change => {
+            const epData = { id: change.doc.id, ...change.doc.data() };
+            const epIndex = show.episodes.findIndex(e => e.id === epData.id);
+            if (change.type === "added" || change.type === "modified") {
+                if (epIndex >= 0) {
+                    show.episodes[epIndex] = { ...show.episodes[epIndex], ...epData };
+                } else {
+                    show.episodes.push(epData);
+                }
+            } else if (change.type === "removed") {
+                if (epIndex >= 0) {
+                    show.episodes.splice(epIndex, 1);
+                }
+            }
+        });
+        refreshActivePage();
+    });
+    episodeUnsubs.set(showId, unsub);
 }
 
 async function handleGoogleSignIn() {
@@ -1827,7 +1923,7 @@ async function handleSignUp() {
             state.profiles[0].initials = username.charAt(0).toUpperCase();
         }
         
-        saveState();
+        await saveUserState();
         showToast("Account created & logged in!");
     } catch (err) {
         showToast(err.message);
@@ -1856,6 +1952,10 @@ async function handleSignOut() {
     try {
         await auth.signOut();
         state.library = [];
+        if (unsubMovies) { unsubMovies(); unsubMovies = null; }
+        if (unsubTVShows) { unsubTVShows(); unsubTVShows = null; }
+        episodeUnsubs.forEach(unsub => unsub());
+        episodeUnsubs.clear();
         refreshActivePage();
         showToast("Signed out successfully.");
     } catch (err) {
@@ -1913,11 +2013,13 @@ async function checkLibraryForUpdates() {
                     }
                 });
 
-                if (newEpisodes.length > 0 && item.episodes) {
+                if (newEpisodes.length > 0) {
                     const epMap = new Map();
-                    item.episodes.forEach(ep => epMap.set(ep.id, ep));
+                    (item.episodes || []).forEach(ep => epMap.set(ep.id, ep));
 
                     let hasNewContent = false;
+                    const episodesToSave = [];
+
                     newEpisodes.forEach(newEp => {
                         if (epMap.has(newEp.id)) {
                             const existing = epMap.get(newEp.id);
@@ -1926,15 +2028,23 @@ async function checkLibraryForUpdates() {
                         } else {
                             hasNewContent = true;
                         }
+                        episodesToSave.push(newEp);
                     });
 
-                    if (hasNewContent || newEpisodes.length !== item.episodes.length) {
-                        item.episodes = newEpisodes;
+                    if (hasNewContent || episodesToSave.length !== (item.episodes || []).length) {
+                        item.episodes = episodesToSave;
                         updated = true;
+
+                        if (auth && auth.currentUser && db) {
+                            const showRef = db.collection("users").doc(auth.currentUser.uid).collection("tvShows").doc(item.id);
+                            const batch = db.batch();
+                            item.episodes.forEach(ep => {
+                                const epRef = showRef.collection("episodes").doc(ep.id);
+                                batch.set(epRef, ep, { merge: true });
+                            });
+                            await batch.commit();
+                        }
                     }
-                } else if (!item.episodes && newEpisodes.length > 0) {
-                    item.episodes = newEpisodes;
-                    updated = true;
                 }
             } catch (err) {
                 console.error(`Failed to check updates for show ${item.title}:`, err);
@@ -1943,7 +2053,6 @@ async function checkLibraryForUpdates() {
     }
 
     if (updated) {
-        await saveState();
         refreshActivePage();
     }
 }
@@ -1959,63 +2068,34 @@ if (auth) {
             inView.style.display = "block";
 
             try {
-                const doc = await db.collection("users").doc(user.uid).get();
-                if (doc.exists) {
-                    const cloudData = doc.data();
-                    if (cloudData) {
-                        const mergedLibrary = mergeLibraries(state.library, cloudData.library || []);
-                        state = {
-                            ...state,
-                            ...cloudData,
-                            library: mergedLibrary
-                        };
-
-                        await db.collection("users")
-                            .doc(user.uid)
-                            .set({
-                                ...state,
-                                library: mergedLibrary
-                            }, { merge: true });
-                       
-                        if (!state.profiles || state.profiles.length === 0) {
-                            const name = user.displayName || user.email.split('@')[0];
-                            state.profiles = [{ id: "profile-hanu", name: name, initials: name.charAt(0).toUpperCase() }];
-                        }
-                        
-                        refreshActivePage();
-                        showToast("Loaded library!");
-
-                        await checkLibraryForUpdates();
-
-                        db.collection("users")
-                            .doc(user.uid)
-                            .onSnapshot((snapshot) => {
-                                if (!snapshot.exists) return;
-
-                                const cloudData = snapshot.data();
-                                const mergedLibrary = mergeLibraries(
-                                    state.library,
-                                    cloudData.library || []
-                                );
-
-                                state = {
-                                    ...state,
-                                    ...cloudData,
-                                    library: mergedLibrary
-                                };
-
-                                refreshActivePage();
-                            });
+                const userDoc = await db.collection("users").doc(user.uid).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    if (userData && userData.profiles) {
+                        state.profiles = userData.profiles;
                     }
                 } else {
                     if (user.displayName && state.profiles && state.profiles[0]) {
                         state.profiles[0].name = user.displayName;
                         state.profiles[0].initials = user.displayName.charAt(0).toUpperCase();
                     }
-                    saveState();
-                    refreshActivePage();
-                    showToast("Initialized new library!");
+                    await db.collection("users").doc(user.uid).set({ profiles: state.profiles }, { merge: true });
                 }
+
+                const library = await loadUserLibraryFromFirestore(user.uid);
+                state.library = library;
+
+                if (!state.profiles || state.profiles.length === 0) {
+                    const name = user.displayName || user.email.split('@')[0];
+                    state.profiles = [{ id: "profile-hanu", name: name, initials: name.charAt(0).toUpperCase() }];
+                }
+                
+                refreshActivePage();
+                showToast("Loaded library!");
+
+                await checkLibraryForUpdates();
+                setupFirestoreListeners(user.uid);
+
             } catch (err) {
                 console.error("Error fetching cloud data:", err);
                 showToast("Library sync failed.");
@@ -2025,6 +2105,10 @@ if (auth) {
             outView.style.display = "block";
             inView.style.display = "none";
             state.library = [];
+            if (unsubMovies) { unsubMovies(); unsubMovies = null; }
+            if (unsubTVShows) { unsubTVShows(); unsubTVShows = null; }
+            episodeUnsubs.forEach(unsub => unsub());
+            episodeUnsubs.clear();
             refreshActivePage();
         }
     });
@@ -2301,8 +2385,8 @@ async function importMediaData(id, type, buttonElement) {
                 lastWatchedAt: null
             };
 
+            await db.collection("users").doc(auth.currentUser.uid).collection("movies").doc(newMovie.id).set(newMovie);
             state.library.push(newMovie);
-            await saveState();
 
             if (buttonElement) {
                 buttonElement.className = "search-add-btn added";
@@ -2363,12 +2447,21 @@ async function importMediaData(id, type, buttonElement) {
                 backdrop: showData.backdrop_path ? `https://image.tmdb.org/t/p/w780${showData.backdrop_path}` : "",
                 description: showData.overview || "No description available.",
                 releaseDate: showData.first_air_date ? new Date(showData.first_air_date).toISOString() : null,
-                isFinished: false,
-                episodes: episodes
+                isFinished: false
             };
 
+            const showRef = db.collection("users").doc(auth.currentUser.uid).collection("tvShows").doc(newShow.id);
+            await showRef.set(newShow);
+
+            const batch = db.batch();
+            episodes.forEach(ep => {
+                const epRef = showRef.collection("episodes").doc(ep.id);
+                batch.set(epRef, ep);
+            });
+            await batch.commit();
+
+            newShow.episodes = episodes;
             state.library.push(newShow);
-            await saveState();
 
             if (buttonElement) {
                 buttonElement.className = "search-add-btn added";
@@ -3039,67 +3132,48 @@ function updateModalContent() {
         <div class="season-selector-wrapper">
             <div class="season-selector">
                 ${seasons.map(s => `
-                    <button class="season-button ${s === selectedSeason ? 'active' : ''}" onclick="selectSeason(${s})">Season ${s}</button>
+                    <button class="season-button ${selectedSeason === s ? 'active' : ''}" onclick="selectSeason(${s})">
+                        Season ${s}
+                    </button>
                 `).join("")}
             </div>
         </div>
+        ${!currentItem.isPreview ? `
         <div class="season-batch-actions">
-            <button class="season-batch-btn" onclick="markSeasonWatched(${selectedSeason})">
-                <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>
-                Mark Season ${selectedSeason} Watched
-            </button>
-        </div>
+            <button class="season-batch-btn" onclick="markSeasonWatched(${selectedSeason})">Mark Season Watched</button>
+        </div>` : ''}
+        <div class="episodes-list">
     `;
 
     const seasonEpisodes = currentItem.episodes.filter(ep => ep.season === selectedSeason);
-
-    if (seasonEpisodes.length === 0) {
-        html += `<div style="font-size:12px; color:var(--text-muted); padding:20px 0; text-align:center;">No episodes available for this season.</div>`;
-    } else {
-        html += seasonEpisodes.map(ep => {
-            const isReleasedEp = isReleased(ep.releaseDate);
-            return `
-                <div class="episode">
-                    <div class="episode-main">
-                        <div class="episode-left">
-                            ${ep.still ? `
-                                <img src="${ep.still}" class="episode-still" alt="${escapeHTML(ep.title)}" loading="lazy" onerror="this.style.display='none'">
-                            ` : `
-                                <div class="episode-still" style="display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--text-secondary); text-align:center;">S${ep.season}E${ep.number}</div>
-                            `}
-                            <div class="episode-info">
-                                <div class="episode-title">${ep.number}. ${escapeHTML(ep.title)}</div>
-                                <div class="episode-overview">${escapeHTML(ep.overview || 'No overview available.')}</div>
-                                <div class="episode-meta">
-                                    <span>${isReleasedEp ? formatDate(ep.releaseDate) : 'Releases ' + formatDate(ep.releaseDate)}</span>
-                                    <span>•</span>
-                                    <span>${ep.runtime || '45 min'}</span>
-                                    ${ep.watchCount && ep.watchCount > 0 ? `<span>•</span><span>Watches: ${ep.watchCount}</span>` : ''}
-                                </div>
-                            </div>
+    seasonEpisodes.forEach(ep => {
+        const released = isReleased(ep.releaseDate);
+        html += `
+            <div class="episode">
+                <div class="episode-main">
+                    <div class="episode-left">
+                        ${ep.still ? `<img src="${ep.still}" class="episode-still" alt="${escapeHTML(ep.title)}" loading="lazy" onerror="this.style.display='none'">` : ''}
+                        <div class="episode-info">
+                            <div class="episode-title">E${ep.number}: ${escapeHTML(ep.title)}</div>
+                            ${ep.overview ? `<div class="episode-overview">${escapeHTML(ep.overview)}</div>` : ''}
+                            <div class="episode-meta">${ep.runtime || '45 min'} • ${released ? formatDate(ep.releaseDate) : 'Coming ' + formatDate(ep.releaseDate)}${ep.watchCount && ep.watchCount > 0 ? ' • Rewatches: ' + ep.watchCount : ''}</div>
                         </div>
                     </div>
-                    <div class="episode-buttons">
-                        ${isReleasedEp ? `
-                            <button class="episode-action-btn ${ep.watched ? 'watched-active' : 'unwatched-active'}" onclick="toggleEpisodeWatched('${ep.id}')">
-                                ${ep.watched ? 'Watched' : 'Mark Watched'}
-                            </button>
-                            ${ep.watched ? `
-                                <button class="episode-action-btn unwatched-active" onclick="toggleEpisodeWatched('${ep.id}', true)">
-                                    Rewatch
-                                </button>
-                            ` : ''}
-                        ` : `
-                            <button class="episode-action-btn" disabled style="opacity:0.5; cursor:not-allowed;">
-                                Unreleased (${getCountdown(ep.releaseDate)})
-                            </button>
-                        `}
-                    </div>
                 </div>
-            `;
-        }).join("");
-    }
+                ${!currentItem.isPreview ? `
+                <div class="episode-buttons">
+                    <button class="episode-action-btn ${ep.watched ? 'watched-active' : ''}" onclick="setEpisodeState('${ep.id}', true)">
+                        ${ep.watched ? 'Rewatch' : 'Watch'}
+                    </button>
+                    <button class="episode-action-btn ${!ep.watched ? 'watched-active' : ''}" onclick="setEpisodeState('${ep.id}', false)">
+                        Unwatched
+                    </button>
+                </div>` : ''}
+            </div>
+        `;
+    });
 
+    html += `</div>`;
     document.getElementById("modalEpisodes").innerHTML = html;
 
     const newSeasonSelector = document.querySelector('.season-selector');
@@ -3108,160 +3182,191 @@ function updateModalContent() {
     }
 }
 
-function selectSeason(seasonNum) {
-    selectedSeason = seasonNum;
-    updateModalContent();
-}
+/* =========================================================
+   MOVIE ACTIONS
+========================================================= */
+async function setMovieWatchedState(watchedStatus) {
+    if (!currentItem) return;
+    currentItem.watched = watchedStatus;
+    if (watchedStatus) {
+        currentItem.watchCount = (currentItem.watchCount || 0) + 1;
+    }
+    currentItem.lastWatchedAt = watchedStatus ? new Date().toISOString() : null;
 
-async function toggleEpisodeWatched(episodeId, isRewatch = false) {
-    if (!currentItem || currentItem.isPreview) return;
-
-    const episode = currentItem.episodes.find(ep => ep.id === episodeId);
-    if (!episode) return;
-
-    if (isRewatch) {
-        episode.watchCount = (episode.watchCount || 0) + 1;
-        episode.watched = true;
-        showToast(`Rewatched S${episode.season} E${episode.number}`);
-    } else {
-        episode.watched = !episode.watched;
-        episode.watchCount = episode.watched ? Math.max(1, episode.watchCount || 1) : 0;
-        showToast(episode.watched ? `Marked S${episode.season} E${episode.number} Watched` : `Marked Unwatched`);
+    if (auth && auth.currentUser && db) {
+        await db.collection("users").doc(auth.currentUser.uid).collection("movies").doc(currentItem.id).set({
+            watched: currentItem.watched,
+            watchCount: currentItem.watchCount,
+            lastWatchedAt: currentItem.lastWatchedAt
+        }, { merge: true });
     }
 
-    await saveState();
     updateModalContent();
-    refreshActivePage();
+    showToast(watchedStatus ? "Marked movie as watched" : "Marked movie as unwatched");
 }
 
-async function markSeasonWatched(seasonNum) {
-    if (!currentItem || currentItem.isPreview) return;
+/* =========================================================
+   TV SHOW ACTIONS
+========================================================= */
+function selectSeason(season) {
+    selectedSeason = season;
+    updateModalContent();
+}
 
-    let updatedCount = 0;
+async function setEpisodeState(episodeId, watchedStatus) {
+    if (!currentItem) return;
+    if (!currentItem.episodes) currentItem.episodes = [];
+
+    const ep = currentItem.episodes.find(e => e.id === episodeId);
+    if (!ep) return;
+
+    ep.watched = watchedStatus;
+    if (watchedStatus) {
+        ep.watchCount = (ep.watchCount || 0) + 1;
+    }
+
+    if (auth && auth.currentUser && db && !currentItem.isPreview) {
+        try {
+            const epRef = db.collection("users").doc(auth.currentUser.uid).collection("tvShows").doc(currentItem.id).collection("episodes").doc(episodeId);
+            await epRef.set({
+                watched: ep.watched,
+                watchCount: ep.watchCount || 0
+            }, { merge: true });
+        } catch (err) {
+            console.error("Failed to update episode state:", err);
+        }
+    }
+
+    updateModalContent();
+    showToast(watchedStatus ? `Marked S${ep.season}E${ep.number} as watched` : `Marked S${ep.season}E${ep.number} as unwatched`);
+}
+
+async function markAllWatched() {
+    if (!currentItem || currentItem.type === 'movie' || !currentItem.episodes) return;
+
     currentItem.episodes.forEach(ep => {
-        if (ep.season === seasonNum && isReleased(ep.releaseDate)) {
+        if (isReleased(ep.releaseDate)) {
             if (!ep.watched) {
                 ep.watched = true;
-                ep.watchCount = 1;
-                updatedCount++;
+                ep.watchCount = (ep.watchCount || 0) + 1;
             }
         }
     });
 
-    if (updatedCount > 0) {
-        await saveState();
-        showToast(`Season ${seasonNum} marked as watched!`);
-        updateModalContent();
-        refreshActivePage();
-    } else {
-        showToast(`All available episodes in Season ${seasonNum} already watched.`);
+    if (auth && auth.currentUser && db && !currentItem.isPreview) {
+        try {
+            const showRef = db.collection("users").doc(auth.currentUser.uid).collection("tvShows").doc(currentItem.id);
+            const batch = db.batch();
+            currentItem.episodes.forEach(ep => {
+                if (isReleased(ep.releaseDate)) {
+                    const epRef = showRef.collection("episodes").doc(ep.id);
+                    batch.set(epRef, { watched: ep.watched, watchCount: ep.watchCount }, { merge: true });
+                }
+            });
+            await batch.commit();
+        } catch (err) {
+            console.error("Failed to mark all watched:", err);
+        }
     }
+
+    updateModalContent();
+    showToast("Marked all released episodes as watched");
 }
 
-async function markAllWatched() {
-    if (!currentItem || currentItem.isPreview) return;
+async function markSeasonWatched(seasonNum) {
+    if (!currentItem || currentItem.type === 'movie' || !currentItem.episodes) return;
 
     currentItem.episodes.forEach(ep => {
-        if (isReleased(ep.releaseDate) && !ep.watched) {
-            ep.watched = true;
-            ep.watchCount = 1;
+        if (ep.season === seasonNum && isReleased(ep.releaseDate)) {
+            if (!ep.watched) {
+                ep.watched = true;
+                ep.watchCount = (ep.watchCount || 0) + 1;
+            }
         }
     });
 
-    await saveState();
-    showToast(`Marked all available episodes watched!`);
-    updateModalContent();
-    refreshActivePage();
-}
-
-async function setMovieWatchedState(watched) {
-    if (!currentItem || currentItem.isPreview) return;
-
-    if (watched) {
-        currentItem.watched = true;
-        currentItem.watchCount = (currentItem.watchCount || 0) + 1;
-        currentItem.lastWatchedAt = new Date().toISOString();
-        showToast(`Marked "${currentItem.title}" as watched!`);
-    } else {
-        currentItem.watched = false;
-        currentItem.watchCount = 0;
-        currentItem.lastWatchedAt = null;
-        showToast(`Marked "${currentItem.title}" as unwatched.`);
+    if (auth && auth.currentUser && db && !currentItem.isPreview) {
+        try {
+            const showRef = db.collection("users").doc(auth.currentUser.uid).collection("tvShows").doc(currentItem.id);
+            const batch = db.batch();
+            currentItem.episodes.forEach(ep => {
+                if (ep.season === seasonNum && isReleased(ep.releaseDate)) {
+                    const epRef = showRef.collection("episodes").doc(ep.id);
+                    batch.set(epRef, { watched: ep.watched, watchCount: ep.watchCount }, { merge: true });
+                }
+            });
+            await batch.commit();
+        } catch (err) {
+            console.error("Failed to mark season watched:", err);
+        }
     }
 
-    await saveState();
     updateModalContent();
-    refreshActivePage();
+    showToast(`Marked Season ${seasonNum} as watched`);
 }
 
 async function deleteItem(itemId) {
-    if (!confirm("Are you sure you want to remove this item from your library?")) return;
+    const item = getItem(itemId);
+    if (!item) return;
 
-    state.library = state.library.filter(i => i.id !== itemId);
-    await saveState();
-    closeModal();
-    refreshActivePage();
-    showToast("Removed from library.");
+    if (!confirm(`Are you sure you want to remove "${item.title}" from your library?`)) {
+        return;
+    }
+
+    try {
+        if (auth && auth.currentUser && db) {
+            const col = item.type === 'movie' ? 'movies' : 'tvShows';
+            const docRef = db.collection("users").doc(auth.currentUser.uid).collection(col).doc(itemId);
+            
+            if (item.type === 'tv') {
+                const eps = await docRef.collection("episodes").get();
+                const batch = db.batch();
+                eps.forEach(doc => batch.delete(doc.ref));
+                await batch.commit();
+            }
+            
+            await docRef.delete();
+        }
+
+        state.library = state.library.filter(i => i.id !== itemId);
+        closeModal();
+        refreshActivePage();
+        showToast(`Removed "${item.title}" from library`);
+    } catch (err) {
+        console.error("Error deleting item:", err);
+        showToast("Failed to remove item.");
+    }
 }
 
-function escapeHTML(str) {
-    if (!str) return '';
-    return str.replace(/[&<>'"]/g, 
-        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-    );
-}
-
-function showToast(message) {
-    const toast = document.getElementById("toast");
-    if (!toast) return;
-
-    toast.textContent = message;
-    toast.classList.add("show");
-
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => {
-        toast.classList.remove("show");
-    }, 2500);
-}
-
-function clearSearch(inputId) {
-    const input = document.getElementById(inputId);
-    if (!input) return;
-    input.value = "";
-    input.dispatchEvent(new Event('input'));
-    input.focus();
-}
-
-/* =========================================================
-   INITIALIZATION
-========================================================= */
+// Initializing search inputs and listeners on load
 document.addEventListener("DOMContentLoaded", () => {
     initSearchPage();
-
-    ["onlineSearchInput", "tvLibrarySearchInput", "movieLibrarySearchInput"].forEach(id => {
+    
+    ['onlineSearchInput', 'tvLibrarySearchInput', 'movieLibrarySearchInput'].forEach(id => {
         const input = document.getElementById(id);
-        if (!input) return;
-
-        const container = input.closest(".search-box");
-        if (container) {
-            input.addEventListener("input", () => {
-                container.classList.toggle("has-text", input.value.trim().length > 0);
+        if (input) {
+            input.addEventListener("input", (e) => {
+                const box = input.closest('.search-box');
+                if (box) {
+                    if (e.target.value.trim().length > 0) {
+                        box.classList.add('has-text');
+                    } else {
+                        box.classList.remove('has-text');
+                    }
+                }
             });
-            container.classList.toggle("has-text", input.value.trim().length > 0);
         }
     });
 
-    const tvSearchInput = document.getElementById("tvLibrarySearchInput");
-    if (tvSearchInput) {
-        tvSearchInput.addEventListener("input", () => renderTVLibrarySection());
+    const tvLibInput = document.getElementById("tvLibrarySearchInput");
+    if (tvLibInput) {
+        tvLibInput.addEventListener("input", () => renderTVLibrarySection());
     }
 
-    const movieSearchInput = document.getElementById("movieLibrarySearchInput");
-    if (movieSearchInput) {
-        movieSearchInput.addEventListener("input", () => renderMovieLibrarySection());
+    const movieLibInput = document.getElementById("movieLibrarySearchInput");
+    if (movieLibInput) {
+        movieLibInput.addEventListener("input", () => renderMovieLibrarySection());
     }
-
-    showPage('home');
 });
 </script>
 </body>
