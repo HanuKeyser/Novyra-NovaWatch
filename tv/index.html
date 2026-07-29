@@ -1872,7 +1872,7 @@ function refreshActivePage() {
 }
 
 /* =========================================================
-   AUTOMATIC TV SHOW UPDATES & STATUS DETECTION [source: 1]
+   AUTOMATIC TV SHOW UPDATES & STATUS DETECTION
 ========================================================= */
 async function checkLibraryForUpdates() {
     if (!state.library || state.library.length === 0) return;
@@ -1985,7 +1985,7 @@ if (auth) {
                         refreshActivePage();
                         showToast("Loaded library!");
 
-                        // Automatically check for new seasons or episodes from API [source: 1]
+                        // Automatically check for new seasons or episodes from API
                         await checkLibraryForUpdates();
 
                         db.collection("users")
@@ -3194,6 +3194,34 @@ function showToast(message) {
 
 // Initialize app on load
 window.addEventListener("DOMContentLoaded", () => {
+    // Handle clear button visibility for all search boxes
+    document.querySelectorAll('.search-box input').forEach(input => {
+        // Check initial state
+        if (input.value.length > 0) {
+            input.closest('.search-box').classList.add('has-text');
+        }
+        // Add listener
+        input.addEventListener('input', (e) => {
+            const box = e.target.closest('.search-box');
+            if (e.target.value.length > 0) {
+                box.classList.add('has-text');
+            } else {
+                box.classList.remove('has-text');
+            }
+        });
+    });
+
+    // Add live search functionality to Home Tab libraries
+    const tvSearchInput = document.getElementById("tvLibrarySearchInput");
+    if (tvSearchInput) {
+        tvSearchInput.addEventListener("input", renderTVLibrarySection);
+    }
+
+    const movieSearchInput = document.getElementById("movieLibrarySearchInput");
+    if (movieSearchInput) {
+        movieSearchInput.addEventListener("input", renderMovieLibrarySection);
+    }
+
     initSearchPage();
     updateHomeUI();
 
