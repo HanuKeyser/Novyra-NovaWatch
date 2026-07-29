@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#05070b">
+<meta name="theme-color" content="#f1f5f9">
 <title>NovaWatch</title>
 
 <!-- Preconnect for faster API calls -->
@@ -17,57 +17,62 @@
 
 <style>
 /* =========================================================
-   RESET & VARIABLES
+   RESET & APPLE GLASS VARIABLES
 ========================================================= */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
     -webkit-tap-highlight-color: transparent;
-    
-    /* Completely remove scrollbars globally for mobile */
-    -ms-overflow-style: none !important;  /* IE and Edge */
-    scrollbar-width: none !important;  /* Firefox */
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
 }
 
 *::-webkit-scrollbar {
-    display: none !important; /* Chrome, Safari and Opera */
+    display: none !important;
 }
 
 :root {
-    --bg: #05070b;
-    --surface: #0b0f16;
-    --surface-2: #101620;
-    --surface-3: #151c28;
+    --bg-mesh: linear-gradient(135deg, #e2e8f0 0%, #f8fafc 50%, #eff6ff 100%);
+    --surface: rgba(255, 255, 255, 0.72);
+    --surface-2: rgba(255, 255, 255, 0.50);
+    --surface-3: rgba(255, 255, 255, 0.35);
 
-    --blue: #1677ff;
-    --blue-light: #4b9aff;
-    --blue-dark: #0d4fb5;
+    --glass-border: rgba(255, 255, 255, 0.85);
+    --glass-border-subtle: rgba(255, 255, 255, 0.5);
+    --glass-shadow: 0 20px 40px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    --glass-shadow-sm: 0 8px 24px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8);
 
-    --text: #ffffff;
-    --text-secondary: #8d96a5;
-    --text-muted: #5f6876;
+    --blue: #0066cc;      /* Apple System Blue */
+    --blue-light: #4792ff; 
+    --blue-dark: #004c99;
 
-    --border: rgba(255,255,255,0.07);
+    --text: #1d1d1f;
+    --text-secondary: #424245;
+    --text-muted: #86868b;
 
-    --success: #24d17e;
-    --danger: #ff5268;
+    --border: rgba(0, 0, 0, 0.08);
 
-    --radius: 16px;
+    --success: #34c759;
+    --danger: #ff3b30;
+
+    --radius: 20px;
 }
 
 html {
-    background: var(--bg);
-    color-scheme: dark;
+    background: #e2e8f0;
+    color-scheme: light;
 }
 
 body {
-    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background: linear-gradient(180deg, #070a10 0%, #05070b 100%);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", sans-serif;
+    background: var(--bg-mesh);
+    background-attachment: fixed;
     color: var(--text);
     min-height: 100vh;
     overflow-x: hidden;
-    padding-bottom: 86px;
+    padding-bottom: 96px;
+    -webkit-font-smoothing: antialiased;
 }
 
 button, input {
@@ -78,7 +83,7 @@ button {
     border: 0;
     color: inherit;
     cursor: pointer;
-    transition: opacity 0.15s ease, transform 0.15s ease, background-color 0.15s ease;
+    transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 button:disabled {
@@ -99,7 +104,7 @@ img {
     height: 22px;
     fill: none;
     stroke: currentColor;
-    stroke-width: 1.8;
+    stroke-width: 2;
     stroke-linecap: round;
     stroke-linejoin: round;
 }
@@ -110,8 +115,8 @@ img {
 }
 
 .icon-large {
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
 }
 
 /* =========================================================
@@ -125,49 +130,57 @@ img {
 }
 
 /* =========================================================
-   HEADER
+   HEADER (Ultra-Glass Apple Style)
 ========================================================= */
 .header {
     position: sticky;
     top: 0;
     z-index: 50;
     height: 68px;
-    padding: 0 17px;
+    padding: 0 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: rgba(5,7,11,0.9);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(50px) saturate(210%);
+    -webkit-backdrop-filter: blur(50px) saturate(210%);
+    border-bottom: 1px solid var(--glass-border);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03), inset 0 -1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .logo {
     display: flex;
     align-items: center;
-    gap: 9px;
+    gap: 10px;
     font-size: 20px;
-    font-weight: 800;
-    letter-spacing: -0.6px;
+    font-weight: 750;
+    letter-spacing: -0.5px;
 }
 
 .logo-mark {
-    width: 33px;
-    height: 33px;
+    width: 34px;
+    height: 34px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 10px;
-    background: linear-gradient(135deg, var(--blue), #0052d4);
-    box-shadow: 0 6px 20px rgba(22,119,255,0.3);
+    background: transparent;
+}
+
+.logo-mark img {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
 }
 
 .home-button {
-    width: 39px;
-    height: 39px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     overflow: hidden;
-    background: var(--surface-3);
-    border: 1px solid var(--border);
+    background: var(--surface-2);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow-sm);
 }
 
 .home-avatar {
@@ -176,9 +189,10 @@ img {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--blue), #003f9e);
-    font-size: 14px;
-    font-weight: 800;
+    background: linear-gradient(135deg, var(--blue-light), var(--blue));
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
 }
 
 /* =========================================================
@@ -186,7 +200,7 @@ img {
 ========================================================= */
 .page {
     display: none;
-    padding: 20px 16px 30px;
+    padding: 24px 18px 36px;
 }
 
 .page.active {
@@ -196,7 +210,7 @@ img {
 .tab-content-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 26px;
 }
 
 /* =========================================================
@@ -210,33 +224,36 @@ img {
 }
 
 .section-title {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 750;
-    letter-spacing: -0.4px;
+    letter-spacing: -0.5px;
 }
 
 .tab-nav-footer {
     margin-top: 12px;
     padding-top: 20px;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--glass-border-subtle);
     display: flex;
     justify-content: center;
 }
 
 .footer-browse-button {
     width: 100%;
-    min-height: 48px;
+    min-height: 52px;
     padding: 0 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    border-radius: 14px;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    color: var(--blue-light);
+    border-radius: 16px;
+    background: var(--surface);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    color: var(--blue);
     font-size: 14px;
     font-weight: 700;
+    box-shadow: var(--glass-shadow-sm);
 }
 
 .footer-browse-button:active {
@@ -244,7 +261,7 @@ img {
 }
 
 .category-block {
-    margin-bottom: 24px;
+    margin-bottom: 26px;
 }
 
 .category-title {
@@ -259,38 +276,93 @@ img {
 
 .category-count {
     font-size: 11px;
-    background: var(--surface-3);
+    background: var(--surface-2);
+    border: 1px solid var(--glass-border-subtle);
     padding: 2px 8px;
     border-radius: 10px;
-    color: var(--text-muted);
+    color: var(--text-secondary);
 }
 
 /* =========================================================
-   STATS
+   STATS (Frosted Glass Cards)
 ========================================================= */
 .stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
+    gap: 12px;
 }
 
 .stat {
-    padding: 14px 10px;
+    padding: 16px 12px;
     text-align: center;
     background: var(--surface);
-    border: 1px solid var(--border);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border: 1px solid var(--glass-border);
     border-radius: var(--radius);
+    box-shadow: var(--glass-shadow-sm);
 }
 
 .stat-value {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 800;
+    letter-spacing: -0.5px;
 }
 
 .stat-label {
     color: var(--text-secondary);
-    font-size: 10px;
+    font-size: 11px;
+    font-weight: 600;
     margin-top: 4px;
+}
+
+/* =========================================================
+   VIEWING ANALYTICS (Modern Polished UI)
+========================================================= */
+.analytics-section {
+    margin-bottom: 24px;
+}
+
+.analytics-card {
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.88) 0%, rgba(235,244,255,0.75) 100%);
+    backdrop-filter: blur(40px) saturate(200%);
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
+    border: 1px solid rgba(0, 102, 204, 0.22);
+    border-radius: var(--radius);
+    box-shadow: 0 16px 40px rgba(0, 102, 204, 0.08), inset 0 1px 0 rgba(255,255,255,0.95);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.analytics-main {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(0, 102, 204, 0.12);
+}
+
+.analytics-icon-badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--blue-light), var(--blue));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.4);
+    flex-shrink: 0;
+}
+
+.analytics-card .stat-value.highlight {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--blue);
+    margin-top: 2px;
+    letter-spacing: -0.3px;
 }
 
 /* =========================================================
@@ -298,25 +370,31 @@ img {
 ========================================================= */
 .horizontal-row {
     display: flex;
-    gap: 12px;
+    gap: 14px;
     overflow-x: auto;
-    padding-bottom: 5px;
+    padding-bottom: 6px;
 }
 
 .card {
-    flex: 0 0 120px;
-    width: 120px;
+    flex: 0 0 126px;
+    width: 126px;
     cursor: pointer;
+    transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.card:active {
+    transform: scale(0.96);
 }
 
 .poster {
     position: relative;
-    width: 120px;
-    height: 175px;
+    width: 126px;
+    height: 184px;
     overflow: hidden;
-    border-radius: 13px;
-    background: linear-gradient(145deg, #182131, #0b0e14);
-    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--surface-2);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow-sm);
 }
 
 .poster img {
@@ -334,7 +412,7 @@ img {
     align-items: center;
     justify-content: center;
     text-align: center;
-    color: var(--text);
+    color: var(--text-secondary);
     font-size: 12px;
     font-weight: 700;
     line-height: 1.3;
@@ -346,7 +424,7 @@ img {
 .library-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 14px 10px;
+    gap: 16px 12px;
 }
 
 .library-grid .card {
@@ -364,10 +442,15 @@ img {
    EMPTY STATE
 ========================================================= */
 .empty-state {
-    padding: 40px 20px;
+    padding: 44px 20px;
     text-align: center;
     color: var(--text-secondary);
     grid-column: 1 / -1;
+    background: var(--surface);
+    backdrop-filter: blur(30px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    box-shadow: var(--glass-shadow-sm);
 }
 
 .empty-state svg {
@@ -377,12 +460,13 @@ img {
 
 .empty-state h3 {
     color: var(--text);
-    font-size: 15px;
-    margin-bottom: 5px;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 6px;
 }
 
 .empty-state p {
-    font-size: 12px;
+    font-size: 13px;
     line-height: 1.5;
 }
 
@@ -403,18 +487,24 @@ img {
 
 .search-box input {
     width: 100%;
-    height: 48px;
-    padding: 0 42px 0 45px;
+    height: 50px;
+    padding: 0 44px 0 46px;
     outline: none;
     background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    color: white;
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    color: var(--text);
     font-size: 14px;
+    box-shadow: var(--glass-shadow-sm);
+    transition: all 0.2s ease;
 }
 
 .search-box input:focus {
-    border-color: rgba(22,119,255,0.6);
+    border-color: var(--blue);
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.15), var(--glass-shadow-sm);
 }
 
 .search-icon {
@@ -427,12 +517,12 @@ img {
 
 .search-clear-btn {
     position: absolute;
-    right: 12px;
+    right: 14px;
     top: 50%;
     transform: translateY(-50%);
     background: transparent;
     border: none;
-    color: var(--text-muted);
+    color: var(--blue);
     cursor: pointer;
     display: none;
     align-items: center;
@@ -443,8 +533,8 @@ img {
 }
 
 .search-clear-btn:hover {
-    color: var(--text);
-    background: var(--surface-3);
+    color: var(--blue-dark);
+    background: var(--surface-2);
 }
 
 .search-box.has-text .search-clear-btn {
@@ -458,57 +548,64 @@ img {
     display: grid;
     grid-template-columns: 1fr 1fr;
     background: var(--surface);
-    padding: 4px;
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    margin-bottom: 14px;
+    backdrop-filter: blur(30px);
+    padding: 5px;
+    border-radius: 14px;
+    border: 1px solid var(--glass-border);
+    margin-bottom: 16px;
+    box-shadow: var(--glass-shadow-sm);
 }
 
 .search-type-btn {
-    height: 36px;
-    border-radius: 9px;
+    height: 38px;
+    border-radius: 10px;
     background: transparent;
     color: var(--text-secondary);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 700;
 }
 
 .search-type-btn.active {
-    background: var(--surface-3);
-    color: white;
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255,255,255,0.9);
 }
 
 .search-results-grid {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
     margin-top: 16px;
 }
 
 .search-card {
     display: flex;
     gap: 14px;
-    padding: 12px;
+    padding: 14px;
     background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
+    backdrop-filter: blur(35px) saturate(180%);
+    -webkit-backdrop-filter: blur(35px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
     align-items: center;
-    transition: border-color 0.15s ease, background-color 0.15s ease;
+    transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
     cursor: pointer;
+    box-shadow: var(--glass-shadow-sm);
 }
 
 .search-card:hover {
-    border-color: rgba(22, 119, 255, 0.4);
-    background: var(--surface-2);
+    border-color: rgba(0, 102, 204, 0.4);
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 12px 30px rgba(0, 102, 204, 0.1);
 }
 
 .search-card-poster {
-    flex: 0 0 70px;
-    width: 70px;
-    height: 102px;
-    border-radius: 10px;
+    flex: 0 0 74px;
+    width: 74px;
+    height: 108px;
+    border-radius: 12px;
     object-fit: cover;
-    background: var(--surface-3);
+    background: var(--surface-2);
 }
 
 .search-card-info {
@@ -520,7 +617,7 @@ img {
 }
 
 .search-card-title {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 750;
     color: var(--text);
     white-space: nowrap;
@@ -529,7 +626,7 @@ img {
 }
 
 .search-card-meta {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--text-secondary);
     display: flex;
     align-items: center;
@@ -537,7 +634,7 @@ img {
 }
 
 .search-card-overview {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--text-muted);
     line-height: 1.4;
     display: -webkit-box;
@@ -548,24 +645,26 @@ img {
 }
 
 .search-add-btn {
-    height: 36px;
-    padding: 0 14px;
-    border-radius: 10px;
+    height: 38px;
+    padding: 0 16px;
+    border-radius: 12px;
     background: var(--blue);
     color: white;
     font-size: 12px;
     font-weight: 700;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    margin-top: 6px;
+    gap: 6px;
+    margin-top: 8px;
     align-self: flex-start;
+    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3), inset 0 1px 0 rgba(255,255,255,0.4);
 }
 
 .search-add-btn.added {
-    background: var(--surface-3);
+    background: var(--surface-2);
     color: var(--success);
-    border: 1px solid rgba(36,209,126,0.25);
+    border: 1px solid rgba(52, 199, 89, 0.3);
+    box-shadow: none;
     cursor: default;
 }
 
@@ -576,10 +675,10 @@ img {
 }
 
 .spinner {
-    width: 32px;
-    height: 32px;
-    border: 3px solid rgba(255,255,255,0.1);
-    border-top-color: var(--blue-light);
+    width: 34px;
+    height: 34px;
+    border: 3px solid rgba(0, 0, 0, 0.08);
+    border-top-color: var(--blue);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
@@ -593,22 +692,30 @@ img {
 ========================================================= */
 .upcoming-card {
     display: flex;
-    gap: 12px;
-    padding: 12px;
-    margin-bottom: 10px;
+    gap: 14px;
+    padding: 14px;
+    margin-bottom: 12px;
     background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
+    backdrop-filter: blur(35px) saturate(180%);
+    -webkit-backdrop-filter: blur(35px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
     cursor: pointer;
+    box-shadow: var(--glass-shadow-sm);
+    transition: transform 0.2s ease;
+}
+
+.upcoming-card:active {
+    transform: scale(0.98);
 }
 
 .upcoming-poster {
-    flex: 0 0 62px;
-    width: 62px;
-    height: 88px;
+    flex: 0 0 66px;
+    width: 66px;
+    height: 94px;
     overflow: hidden;
-    border-radius: 9px;
-    background: linear-gradient(145deg, #182131, #0b0e14);
+    border-radius: 12px;
+    background: var(--surface-2);
 }
 
 .upcoming-poster img {
@@ -625,8 +732,8 @@ img {
     align-items: center;
     justify-content: center;
     text-align: center;
-    color: var(--text);
-    font-size: 9px;
+    color: var(--text-secondary);
+    font-size: 10px;
     font-weight: 700;
     line-height: 1.2;
 }
@@ -640,8 +747,8 @@ img {
 }
 
 .upcoming-title {
-    font-size: 13px;
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: 750;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -649,19 +756,20 @@ img {
 
 .upcoming-date {
     color: var(--text-secondary);
-    font-size: 10px;
+    font-size: 11px;
     line-height: 1.5;
     margin-top: 2px;
 }
 
 .upcoming-countdown {
-    color: var(--text-muted);
-    font-size: 10px;
-    margin-top: 3px;
+    color: var(--blue);
+    font-weight: 750;
+    font-size: 11px;
+    margin-top: 4px;
 }
 
 /* =========================================================
-   BOTTOM NAV (5 TABS)
+   BOTTOM NAV (Floating Liquid Glass)
 ========================================================= */
 .bottom-nav {
     position: fixed;
@@ -671,13 +779,15 @@ img {
     z-index: 100;
     width: 100%;
     max-width: 600px;
-    height: 72px;
-    padding: 7px 4px;
+    height: 76px;
+    padding: 8px 6px;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    background: rgba(8,11,17,0.95);
-    backdrop-filter: blur(20px);
-    border-top: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(50px) saturate(210%);
+    -webkit-backdrop-filter: blur(50px) saturate(210%);
+    border-top: 1px solid var(--glass-border);
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .nav-button {
@@ -688,16 +798,16 @@ img {
     gap: 4px;
     background: transparent;
     color: var(--text-muted);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 650;
 }
 
 .nav-button.active {
-    color: var(--blue-light);
+    color: var(--blue);
 }
 
 /* =========================================================
-   MODAL & LANDSCAPE BACKDROP
+   MODAL & BACKDROP (Frosted Glass Sheet)
 ========================================================= */
 .modal {
     position: fixed;
@@ -705,8 +815,9 @@ img {
     z-index: 200;
     display: none;
     align-items: flex-end;
-    background: rgba(0,0,0,0.8);
-    backdrop-filter: blur(6px);
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
 }
 
 .modal.open {
@@ -719,48 +830,52 @@ img {
     max-height: 92vh;
     margin: 0 auto;
     overflow-y: auto;
-    background: #090d14;
-    border-radius: 24px 24px 0 0;
-    border: 1px solid var(--border);
+    background: rgba(248, 250, 252, 0.82);
+    backdrop-filter: blur(60px) saturate(220%);
+    -webkit-backdrop-filter: blur(60px) saturate(220%);
+    border-radius: 28px 28px 0 0;
+    border: 1px solid rgba(255, 255, 255, 0.9);
     position: relative;
+    box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
 .modal-backdrop-header {
     width: 100%;
-    height: 220px;
+    height: 240px;
     position: relative;
     background-size: cover;
     background-position: center;
     display: flex;
     align-items: flex-end;
     padding: 20px;
-    border-radius: 24px 24px 0 0;
+    border-radius: 28px 28px 0 0;
 }
 
 .modal-backdrop-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(9,13,20,0.2) 0%, rgba(9,13,20,0.95) 100%);
+    background: linear-gradient(180deg, rgba(248,250,252,0.05) 0%, rgba(248,250,252,0.96) 100%);
 }
 
 .modal-header-nav {
     position: absolute;
-    top: 12px;
-    right: 15px;
+    top: 14px;
+    right: 16px;
     z-index: 10;
 }
 
 .close-button {
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: rgba(0,0,0,0.6);
+    background: rgba(255, 255, 255, 0.75);
     color: var(--text);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--border);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow-sm);
 }
 
 .modal-hero-title-container {
@@ -769,11 +884,11 @@ img {
 }
 
 .modal-content {
-    padding: 20px;
+    padding: 22px;
 }
 
 .modal-title {
-    font-size: 25px;
+    font-size: 26px;
     font-weight: 800;
     letter-spacing: -0.7px;
 }
@@ -783,28 +898,28 @@ img {
     flex-wrap: wrap;
     gap: 8px;
     color: var(--text-secondary);
-    font-size: 11px;
-    margin: 9px 0 16px;
+    font-size: 12px;
+    margin: 10px 0 16px;
     align-items: center;
 }
 
 .modal-description {
     color: var(--text-secondary);
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.6;
 }
 
 .modal-actions {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin: 20px 0;
+    gap: 10px;
+    margin: 22px 0;
 }
 
 .modal-actions.movie-actions-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    gap: 10px;
 }
 
 .modal-actions.movie-actions-grid .action-button {
@@ -814,12 +929,14 @@ img {
 .action-button {
     width: 100%;
     min-width: 0;
-    min-height: 43px;
-    padding: 0 6px;
-    border-radius: 11px;
-    background: var(--surface-3);
-    color: white;
-    font-size: 11px;
+    min-height: 46px;
+    padding: 0 8px;
+    border-radius: 14px;
+    background: var(--surface);
+    backdrop-filter: blur(20px);
+    color: var(--text);
+    border: 1px solid var(--glass-border);
+    font-size: 12px;
     font-weight: 700;
     white-space: nowrap;
     overflow: hidden;
@@ -828,22 +945,26 @@ img {
     align-items: center;
     justify-content: center;
     text-align: center;
+    box-shadow: var(--glass-shadow-sm);
 }
 
 .action-button.primary {
     background: var(--blue);
+    color: white;
+    border: none;
+    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3), inset 0 1px 0 rgba(255,255,255,0.4);
 }
 
 .action-button.trailer {
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(5px);
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px);
 }
 
 .action-button.danger {
-    background: rgba(255, 82, 104, 0.15);
+    background: rgba(255, 59, 48, 0.1);
     color: var(--danger);
-    border: 1px solid rgba(255, 82, 104, 0.3);
+    border: 1px solid rgba(255, 59, 48, 0.2);
 }
 
 .season-selector-wrapper {
@@ -851,12 +972,12 @@ img {
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    margin: 24px 0 14px;
+    margin: 26px 0 14px;
 }
 
 .season-selector {
     display: flex;
-    gap: 7px;
+    gap: 8px;
     overflow-x: auto;
     flex: 1;
     min-width: 0;
@@ -864,18 +985,23 @@ img {
 
 .season-button {
     flex: 0 0 auto;
-    height: 36px;
-    padding: 0 14px;
-    border-radius: 9px;
-    background: var(--surface-3);
+    height: 38px;
+    padding: 0 16px;
+    border-radius: 12px;
+    background: var(--surface);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
     color: var(--text-secondary);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
+    box-shadow: var(--glass-shadow-sm);
 }
 
 .season-button.active {
     background: var(--blue);
     color: white;
+    border-color: var(--blue);
+    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3);
 }
 
 .season-batch-actions {
@@ -887,31 +1013,33 @@ img {
 
 .season-batch-btn {
     width: 100%;
-    height: 38px;
-    border-radius: 10px;
-    background: var(--surface-3);
-    border: 1px solid var(--border);
+    height: 40px;
+    border-radius: 12px;
+    background: var(--surface);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
     color: var(--text-secondary);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
+    box-shadow: var(--glass-shadow-sm);
 }
 
 .season-batch-btn:hover {
-    border-color: var(--blue-light);
+    border-color: var(--blue);
     color: var(--text);
-    background: var(--surface-2);
+    background: rgba(255,255,255,0.9);
 }
 
 .episode {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    padding: 14px 0;
-    border-bottom: 1px solid var(--border);
+    padding: 16px 0;
+    border-bottom: 1px solid var(--glass-border-subtle);
 }
 
 .episode-main {
@@ -922,18 +1050,18 @@ img {
 }
 
 .episode-still {
-    width: 110px;
-    height: 62px;
-    border-radius: 8px;
+    width: 116px;
+    height: 65px;
+    border-radius: 10px;
     object-fit: cover;
-    background: var(--surface-3);
+    background: var(--surface-2);
     flex-shrink: 0;
 }
 
 .episode-left {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
     min-width: 0;
     flex: 1;
 }
@@ -944,8 +1072,8 @@ img {
 }
 
 .episode-title {
-    font-size: 12px;
-    font-weight: 650;
+    font-size: 13px;
+    font-weight: 700;
 }
 
 .episode-overview {
@@ -961,7 +1089,7 @@ img {
 
 .episode-meta {
     color: var(--text-muted);
-    font-size: 10px;
+    font-size: 11px;
     line-height: 1.5;
     margin-top: 4px;
 }
@@ -974,13 +1102,14 @@ img {
 
 .episode-action-btn {
     flex: 1;
-    height: 32px;
-    border-radius: 8px;
-    font-size: 11px;
+    height: 34px;
+    border-radius: 10px;
+    font-size: 12px;
     font-weight: 700;
-    background: var(--surface-3);
+    background: var(--surface);
+    backdrop-filter: blur(20px);
     color: var(--text-secondary);
-    border: 1px solid var(--border);
+    border: 1px solid var(--glass-border);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -993,7 +1122,7 @@ img {
 }
 
 .episode-action-btn.unwatched-active {
-    background: var(--surface-3);
+    background: var(--surface-2);
     color: var(--text-secondary);
 }
 
@@ -1001,55 +1130,61 @@ img {
    HOME & AUTH INPUTS
 ========================================================= */
 .home-card {
-    padding: 20px;
+    padding: 22px;
     background: var(--surface);
-    border: 1px solid var(--border);
+    backdrop-filter: blur(35px) saturate(180%);
+    -webkit-backdrop-filter: blur(35px) saturate(180%);
+    border: 1px solid var(--glass-border);
     border-radius: var(--radius);
+    box-shadow: var(--glass-shadow);
 }
 
 .home-row {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 16px;
 }
 
 .large-avatar {
-    width: 58px;
-    height: 58px;
+    width: 62px;
+    height: 62px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--blue), var(--blue-dark));
-    font-size: 20px;
+    background: linear-gradient(135deg, var(--blue-light), var(--blue));
+    color: white;
+    font-size: 22px;
     font-weight: 800;
+    box-shadow: 0 8px 20px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.4);
 }
 
 .home-name {
-    font-size: 17px;
+    font-size: 18px;
     font-weight: 750;
 }
 
 .home-subtitle {
     color: var(--text-secondary);
-    font-size: 11px;
+    font-size: 12px;
     margin-top: 4px;
 }
 
 .google-auth-btn {
     width: 100%;
-    height: 42px;
-    border-radius: 10px;
+    height: 46px;
+    border-radius: 12px;
     background: #ffffff;
     color: #1f1f1f;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    transition: opacity 0.15s ease, transform 0.15s ease;
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    transition: transform 0.15s ease;
 }
 
 .google-auth-btn:active {
@@ -1060,7 +1195,7 @@ img {
     display: flex;
     align-items: center;
     text-align: center;
-    margin: 14px 0 10px;
+    margin: 16px 0 12px;
     color: var(--text-muted);
     font-size: 11px;
     font-weight: 700;
@@ -1070,7 +1205,7 @@ img {
 .auth-divider::after {
     content: '';
     flex: 1;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--glass-border-subtle);
 }
 
 .auth-divider span {
@@ -1080,65 +1215,75 @@ img {
 .auth-form {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
     margin-top: 10px;
 }
 
 .auth-input {
     width: 100%;
-    height: 42px;
-    padding: 0 14px;
+    height: 44px;
+    padding: 0 16px;
     outline: none;
     background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    color: white;
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    color: var(--text);
     font-size: 13px;
 }
 
 .auth-input:focus {
-    border-color: rgba(22,119,255,0.6);
+    border-color: var(--blue);
+    background: var(--surface);
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
 }
 
 .auth-actions {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     margin-top: 6px;
 }
 
 .auth-btn {
     flex: 1;
-    height: 38px;
-    border-radius: 10px;
-    font-size: 12px;
+    height: 40px;
+    border-radius: 12px;
+    font-size: 13px;
     font-weight: 700;
     background: var(--blue);
     color: white;
+    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3);
 }
 
 .auth-btn.secondary {
-    background: var(--surface-3);
+    background: var(--surface);
+    backdrop-filter: blur(20px);
     color: var(--text-secondary);
-    border: 1px solid var(--border);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow-sm);
 }
 
+/* Glass Toast */
 .toast {
     position: fixed;
     left: 50%;
-    bottom: 88px;
+    bottom: 92px;
     z-index: 500;
     transform: translateX(-50%) translateY(20px);
     opacity: 0;
     pointer-events: none;
-    padding: 11px 16px;
-    border-radius: 10px;
-    background: #161d29;
-    border: 1px solid var(--border);
-    color: white;
-    font-size: 12px;
-    font-weight: 600;
-    transition: 0.25s ease;
+    padding: 12px 20px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(40px) saturate(200%);
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
+    border: 1px solid var(--glass-border);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 700;
+    transition: 0.25s cubic-bezier(0.25, 1, 0.5, 1);
     white-space: nowrap;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .toast.show {
@@ -1157,9 +1302,7 @@ img {
 <header class="header">
     <div class="logo">
         <div class="logo-mark">
-            <svg class="icon" viewBox="0 0 24 24">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-            </svg>
+            <img src="https://www.novyra.co.za/Novyra%20Tab%20Icon%20(Light%20Theme).png" alt="NovaWatch Logo">
         </div>
         NovaWatch
     </div>
@@ -1186,15 +1329,15 @@ img {
             <circle cx="11" cy="11" r="7"/>
             <path d="M20 20l-4-4"/>
         </svg>
-        <input id="onlineSearchInput" type="search" placeholder="Search thousands of TV shows & movies..." autocomplete="off">
+        <input id="onlineSearchInput" type="search" placeholder="Search for TV Shows & Movies..." autocomplete="off">
         <button class="search-clear-btn" type="button" onclick="clearSearch('onlineSearchInput')" aria-label="Clear search">
             <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
         </button>
     </div>
 
-    <div style="margin-top: 18px;">
+    <div style="margin-top: 20px;">
         <div class="section-header">
-            <div id="searchResultsHeading" class="section-title" style="font-size: 15px; color: var(--text-secondary);">Trending Shows</div>
+            <div id="searchResultsHeading" class="section-title" style="font-size: 16px; color: var(--text-secondary);">Trending Shows</div>
         </div>
         <div id="searchResultsList" class="search-results-grid"></div>
     </div>
@@ -1213,7 +1356,7 @@ img {
         <button id="upcomingTypeMovie" class="search-type-btn" onclick="setUpcomingType('movie')">Movies</button>
     </div>
 
-    <div style="margin-top: 18px;">
+    <div style="margin-top: 20px;">
         <div id="upcomingResultsList" class="search-results-grid"></div>
     </div>
 </main>
@@ -1287,11 +1430,7 @@ img {
 ================================================     -->
 <main id="homePage" class="page active">
     <div class="tab-content-wrapper">
-        <div class="section-header">
-            <div class="section-title">Home</div>
-        </div>
-        
-        <div class="home-card" style="display: flex; flex-direction: column; gap: 16px;">
+        <div class="home-card" style="display: flex; flex-direction: column; gap: 18px;">
             <div class="home-row">
                 <div class="large-avatar" id="largeAvatar">G</div>
                 <div>
@@ -1300,7 +1439,7 @@ img {
                 </div>
             </div>
 
-            <div id="authSection" style="border-top: 1px solid var(--border); padding-top: 14px;">
+            <div id="authSection" style="border-top: 1px solid var(--glass-border-subtle); padding-top: 16px;">
                 <div id="loggedOutView">
                     <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Sign in to load and sync your library:</div>
                     
@@ -1336,15 +1475,22 @@ img {
         </div>
 
         <!-- Viewing Stats -->
-        <div>
+        <div class="analytics-section">
             <div class="section-header">
                 <div class="section-title">Viewing Analytics</div>
             </div>
-            <div class="stat" style="margin-bottom: 10px; text-align: center; padding: 16px;">
-                <div class="stat-label" style="font-size: 11px; margin-top: 0; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Total Watch Time</div>
-                <div id="totalWatchTime" class="stat-value" style="color: var(--blue-light);">0 days, 0 hours, 0 minutes</div>
+            <div class="analytics-card">
+                <div class="analytics-main">
+                    <div class="analytics-icon-badge">
+                        <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <div>
+                        <div class="stat-label" style="text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Total Watch Time</div>
+                        <div id="totalWatchTime" class="stat-value highlight">0 days, 0 hours, 0 minutes</div>
+                    </div>
+                </div>
+                <div id="dashboardStats" class="stats"></div>
             </div>
-            <div id="dashboardStats" class="stats"></div>
         </div>
 
         <!-- TV Shows Library Section -->
@@ -1394,7 +1540,7 @@ img {
 </main>
 
 <!-- =====================================================
-     BOTTOM NAVIGATION (TAB ORDER: TV Shows -> Movies -> Upcoming -> Discover -> Home)
+     BOTTOM NAVIGATION
 ================================================     -->
 <nav class="bottom-nav">
     <button id="navTvShows" class="nav-button" onclick="showPage('tvShows')">
@@ -1406,12 +1552,10 @@ img {
     </button>
     <button id="navMovies" class="nav-button" onclick="showPage('movies')">
         <svg class="icon" viewBox="0 0 24 24">
-            <rect x="3" y="3" width="18" height="18" rx="2"/>
-            <path d="M7 3v18"/>
-            <path d="M17 3v18"/>
-            <path d="M3 7h18"/>
-            <path d="M3 12h18"/>
-            <path d="M3 17h18"/>
+            <rect x="2" y="7" width="20" height="14" rx="2"/>
+            <path d="M2 7l4-4h3l-4 4H2z"/>
+            <path d="M11 7l4-4h3l-4 4h-3z"/>
+            <line x1="2" y1="12" x2="22" y2="12"/>
         </svg>
         Movies
     </button>
@@ -1611,6 +1755,7 @@ function mergeLibraries(localLib = [], cloudLib = []) {
 
             if (localItem.type === 'movie') {
                 cloudItem.watched = Boolean(cloudItem.watched || localItem.watched);
+                cloudItem.watchCount = Math.max(cloudItem.watchCount || 0, localItem.watchCount || 0);
                 if (localItem.lastWatchedAt && (!cloudItem.lastWatchedAt || new Date(localItem.lastWatchedAt) > new Date(cloudItem.lastWatchedAt))) {
                     cloudItem.lastWatchedAt = localItem.lastWatchedAt;
                 }
@@ -1625,6 +1770,7 @@ function mergeLibraries(localLib = [], cloudLib = []) {
                         if (epMap.has(locEp.id)) {
                             const cEp = epMap.get(locEp.id);
                             cEp.watched = Boolean(cEp.watched || locEp.watched);
+                            cEp.watchCount = Math.max(cEp.watchCount || 0, locEp.watchCount || 0);
                         } else {
                             cloudItem.episodes.push(JSON.parse(JSON.stringify(locEp)));
                         }
@@ -1725,6 +1871,83 @@ function refreshActivePage() {
     updateHomeUI();
 }
 
+/* =========================================================
+   AUTOMATIC TV SHOW UPDATES & STATUS DETECTION [source: 1]
+========================================================= */
+async function checkLibraryForUpdates() {
+    if (!state.library || state.library.length === 0) return;
+    let updated = false;
+
+    for (let item of state.library) {
+        if (item.type === 'tv' && item.tmdbId) {
+            try {
+                const res = await fetch(`https://api.themoviedb.org/3/tv/${item.tmdbId}?api_key=${TMDB_API_KEY}`);
+                const showData = await res.json();
+                if (!showData || !showData.seasons) continue;
+
+                let newEpisodes = [];
+                const validSeasons = showData.seasons.filter(s => s.season_number > 0);
+                const seasonPromises = validSeasons.map(season => 
+                    fetch(`https://api.themoviedb.org/3/tv/${item.tmdbId}/season/${season.season_number}?api_key=${TMDB_API_KEY}`)
+                    .then(r => r.json())
+                    .catch(e => null)
+                );
+
+                const seasonsData = await Promise.all(seasonPromises);
+                seasonsData.forEach(seasonData => {
+                    if (seasonData && seasonData.episodes) {
+                        seasonData.episodes.forEach(ep => {
+                            newEpisodes.push({
+                                id: `s${seasonData.season_number}e${ep.episode_number}`,
+                                season: seasonData.season_number,
+                                number: ep.episode_number,
+                                title: ep.name || `Episode ${ep.episode_number}`,
+                                overview: ep.overview || '',
+                                still: ep.still_path ? `https://image.tmdb.org/t/p/w300${ep.still_path}` : '',
+                                runtime: ep.runtime ? `${ep.runtime} min` : "45 min",
+                                watched: false,
+                                watchCount: 0,
+                                releaseDate: ep.air_date ? new Date(ep.air_date).toISOString() : new Date().toISOString()
+                            });
+                        });
+                    }
+                });
+
+                if (newEpisodes.length > 0 && item.episodes) {
+                    const epMap = new Map();
+                    item.episodes.forEach(ep => epMap.set(ep.id, ep));
+
+                    let hasNewContent = false;
+                    newEpisodes.forEach(newEp => {
+                        if (epMap.has(newEp.id)) {
+                            const existing = epMap.get(newEp.id);
+                            newEp.watched = existing.watched;
+                            newEp.watchCount = existing.watchCount;
+                        } else {
+                            hasNewContent = true;
+                        }
+                    });
+
+                    if (hasNewContent || newEpisodes.length !== item.episodes.length) {
+                        item.episodes = newEpisodes;
+                        updated = true;
+                    }
+                } else if (!item.episodes && newEpisodes.length > 0) {
+                    item.episodes = newEpisodes;
+                    updated = true;
+                }
+            } catch (err) {
+                console.error(`Failed to check updates for show ${item.title}:`, err);
+            }
+        }
+    }
+
+    if (updated) {
+        await saveState();
+        refreshActivePage();
+    }
+}
+
 if (auth) {
     auth.onAuthStateChanged(async (user) => {
         currentUser = user;
@@ -1761,6 +1984,9 @@ if (auth) {
                         
                         refreshActivePage();
                         showToast("Loaded library!");
+
+                        // Automatically check for new seasons or episodes from API [source: 1]
+                        await checkLibraryForUpdates();
 
                         db.collection("users")
                             .doc(user.uid)
@@ -1971,7 +2197,8 @@ async function openSearchResultDetails(tmdbId, type) {
                 runtime: movieData.runtime ? `${movieData.runtime} min` : "120 min",
                 releaseDate: movieData.release_date ? new Date(movieData.release_date).toISOString() : new Date().toISOString(),
                 isPreview: true,
-                watched: false
+                watched: false,
+                watchCount: 0
             };
         } else {
             const showRes = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${TMDB_API_KEY}`);
@@ -2001,6 +2228,7 @@ async function openSearchResultDetails(tmdbId, type) {
                                 still: ep.still_path ? `https://image.tmdb.org/t/p/w300${ep.still_path}` : '',
                                 runtime: ep.runtime ? `${ep.runtime} min` : "45 min",
                                 watched: false,
+                                watchCount: 0,
                                 releaseDate: ep.air_date ? new Date(ep.air_date).toISOString() : new Date().toISOString()
                             });
                         });
@@ -2017,6 +2245,7 @@ async function openSearchResultDetails(tmdbId, type) {
                 poster: showData.poster_path ? `https://image.tmdb.org/t/p/w500${showData.poster_path}` : "",
                 backdrop: showData.backdrop_path ? `https://image.tmdb.org/t/p/w780${showData.backdrop_path}` : "",
                 description: showData.overview || "No description available.",
+                releaseDate: showData.first_air_date ? new Date(showData.first_air_date).toISOString() : null,
                 isPreview: true,
                 episodes: episodes
             };
@@ -2134,6 +2363,7 @@ async function importMediaData(id, type, buttonElement) {
                 poster: showData.poster_path ? `https://image.tmdb.org/t/p/w500${showData.poster_path}` : "",
                 backdrop: showData.backdrop_path ? `https://image.tmdb.org/t/p/w780${showData.backdrop_path}` : "",
                 description: showData.overview || "No description available.",
+                releaseDate: showData.first_air_date ? new Date(showData.first_air_date).toISOString() : null,
                 isFinished: false,
                 episodes: episodes
             };
@@ -2342,6 +2572,9 @@ function renderTVShowsTab() {
     const tvShows = state.library.filter(item => item.type === 'tv' || !item.type);
 
     const continueShows = sortTVShowsByLatestAired(tvShows.filter(show => {
+        if (show.releaseDate && !isReleased(show.releaseDate)) return false;
+        if (!show.releaseDate && show.first_air_date && !isReleased(show.first_air_date)) return false;
+
         const watchedEps = show.episodes ? show.episodes.filter(ep => ep.watched) : [];
         if (watchedEps.length === 0) return false;
 
@@ -2352,6 +2585,9 @@ function renderTVShowsTab() {
     }));
 
     const startShows = sortTVShowsByLatestAired(tvShows.filter(show => {
+        if (show.releaseDate && !isReleased(show.releaseDate)) return false;
+        if (!show.releaseDate && show.first_air_date && !isReleased(show.first_air_date)) return false;
+
         const watchedEps = show.episodes ? show.episodes.filter(ep => ep.watched) : [];
         if (watchedEps.length > 0) return false;
 
@@ -2369,7 +2605,7 @@ function renderTVShowsTab() {
 function renderMoviesTab() {
     const movies = state.library.filter(item => item.type === 'movie');
 
-    const unwatchedMovies = movies.filter(item => !item.watched);
+    const unwatchedMovies = movies.filter(item => !item.watched && isReleased(item.releaseDate));
     const watchedMovies = sortMoviesByWatchedDate(movies.filter(item => item.watched));
 
     renderRow("moviesUnwatchedGrid", unwatchedMovies, "No unwatched movies in your library.");
@@ -2402,7 +2638,7 @@ function renderHomeTab() {
             if (item.watched) {
                 const match = (item.runtime || "").match(/(\d+)/);
                 const mins = match ? parseInt(match[1], 10) : 120;
-                totalMinutes += mins;
+                totalMinutes += mins * Math.max(1, item.watchCount || 1);
             }
         } else if (item.episodes) {
             let watchedEps = item.episodes.filter(ep => ep.watched);
@@ -2411,7 +2647,7 @@ function renderHomeTab() {
             watchedEps.forEach(ep => {
                 const match = (ep.runtime || "").match(/(\d+)/);
                 const mins = match ? parseInt(match[1], 10) : 45;
-                totalMinutes += mins;
+                totalMinutes += mins * Math.max(1, ep.watchCount || 1);
             });
         }
     });
@@ -2532,8 +2768,25 @@ function renderCategoryBlock(title, items) {
    CARDS & RENDER HELPERS
 ========================================================= */
 function createCard(item) {
-    const isMovie = item.type === 'movie';
     const hasPoster = item.poster && item.poster.trim() !== "";
+
+    let progressBarHTML = '';
+    if (item.type !== 'movie') {
+        const prog = getTVProgress(item);
+        if (prog.total > 0 && prog.watched > 0) {
+            let barColor = 'var(--blue)'; // Continue Watching: Blue
+            if (isTVFinished(item)) {
+                barColor = 'var(--danger)'; // Finished: Red
+            } else if (isTVUpToDate(item)) {
+                barColor = 'var(--success)'; // Up-to-Date: Green
+            }
+            progressBarHTML = `
+                <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: rgba(0,0,0,0.2); z-index: 2;">
+                    <div style="width: ${prog.percentage}%; height: 100%; background: ${barColor};"></div>
+                </div>
+            `;
+        }
+    }
 
     return `
         <div class="card" onclick="openDetails('${item.id}')">
@@ -2544,6 +2797,7 @@ function createCard(item) {
                 ` : `
                     <div class="poster-placeholder">${escapeHTML(item.title)}</div>
                 `}
+                ${progressBarHTML}
             </div>
         </div>
     `;
@@ -2688,13 +2942,16 @@ function closeModalOutside(event) {
 function updateModalContent() {
     if (!currentItem) return;
 
+    const existingSeasonSelector = document.querySelector('.season-selector');
+    const savedScrollLeft = existingSeasonSelector ? existingSeasonSelector.scrollLeft : 0;
+
     const backdropHeader = document.getElementById("modalBackdropHeader");
     const backdropUrl = currentItem.backdrop || currentItem.poster;
     if (backdropUrl) {
         backdropHeader.style.backgroundImage = `url('${backdropUrl}')`;
     } else {
         backdropHeader.style.backgroundImage = `none`;
-        backdropHeader.style.backgroundColor = `var(--surface-3)`;
+        backdropHeader.style.backgroundColor = `var(--surface-2)`;
     }
 
     document.getElementById("modalTitle").textContent = currentItem.title;
@@ -2713,6 +2970,7 @@ function updateModalContent() {
             <span>${released ? 'Released ' + formatDate(currentItem.releaseDate) : 'Releases ' + formatDate(currentItem.releaseDate)}</span>
             <span>•</span>
             <span style="color: ${currentItem.watched ? 'var(--success)' : 'var(--text-muted)'}; font-weight: 700;">${currentItem.watched ? 'Watched' : 'Unwatched'}</span>
+            ${currentItem.watchCount && currentItem.watchCount > 0 ? `<span>•</span><span>Rewatches: ${currentItem.watchCount}</span>` : ''}
         `;
 
         let actionBtns = '';
@@ -2765,7 +3023,7 @@ function updateModalContent() {
     if (currentItem.isPreview) {
         tvActions += `<button class="action-button primary" onclick="importMediaData(${currentItem.tmdbId}, 'tv', this)">Add to Library</button>`;
     } else {
-        tvActions += `<button class="action-button primary" onclick="markAllWatched()">Mark All Watched</button>`;
+        tvActions += `<button class="action-button primary" onclick="markAllWatched()">Mark Watched</button>`;
     }
 
     if (!currentItem.isPreview) {
@@ -2790,7 +3048,7 @@ function updateModalContent() {
         </div>
         ${!currentItem.isPreview ? `
         <div class="season-batch-actions">
-            <button class="season-batch-btn" onclick="markSeasonWatched(${selectedSeason})">Mark Season Watched</button>
+            <button class="season-batch-btn" onclick="markSeasonWatched(${selectedSeason})">Mark Season Watch</button>
         </div>` : ''}
         <div class="episodes-list">
     `;
@@ -2806,14 +3064,14 @@ function updateModalContent() {
                         <div class="episode-info">
                             <div class="episode-title">E${ep.number}: ${escapeHTML(ep.title)}</div>
                             ${ep.overview ? `<div class="episode-overview">${escapeHTML(ep.overview)}</div>` : ''}
-                            <div class="episode-meta">${ep.runtime || '45 min'} • ${released ? formatDate(ep.releaseDate) : 'Coming ' + formatDate(ep.releaseDate)}</div>
+                            <div class="episode-meta">${ep.runtime || '45 min'} • ${released ? formatDate(ep.releaseDate) : 'Coming ' + formatDate(ep.releaseDate)}${ep.watchCount && ep.watchCount > 0 ? ' • Rewatches: ' + ep.watchCount : ''}</div>
                         </div>
                     </div>
                 </div>
                 ${!currentItem.isPreview ? `
                 <div class="episode-buttons">
                     <button class="episode-action-btn ${ep.watched ? 'watched-active' : ''}" onclick="setEpisodeState('${ep.id}', true)">
-                        ${ep.watched ? 'Rewatch' : 'Watched'}
+                        ${ep.watched ? 'Rewatch' : 'Watch'}
                     </button>
                     <button class="episode-action-btn ${!ep.watched ? 'watched-active' : ''}" onclick="setEpisodeState('${ep.id}', false)">
                         Unwatched
@@ -2825,6 +3083,11 @@ function updateModalContent() {
 
     html += `</div>`;
     document.getElementById("modalEpisodes").innerHTML = html;
+
+    const newSeasonSelector = document.querySelector('.season-selector');
+    if (newSeasonSelector) {
+        newSeasonSelector.scrollLeft = savedScrollLeft;
+    }
 }
 
 /* =========================================================
@@ -2833,6 +3096,9 @@ function updateModalContent() {
 function setMovieWatchedState(watchedStatus) {
     if (!currentItem) return;
     currentItem.watched = watchedStatus;
+    if (watchedStatus) {
+        currentItem.watchCount = (currentItem.watchCount || 0) + 1;
+    }
     currentItem.lastWatchedAt = watchedStatus ? new Date().toISOString() : null;
     saveState();
     updateModalContent();
@@ -2853,6 +3119,9 @@ function setEpisodeState(episodeId, watchedStatus) {
     if (!ep) return;
 
     ep.watched = watchedStatus;
+    if (watchedStatus) {
+        ep.watchCount = (ep.watchCount || 0) + 1;
+    }
     saveState();
     updateModalContent();
 }
@@ -2861,6 +3130,9 @@ function markAllWatched() {
     if (!currentItem) return;
     currentItem.episodes.forEach(ep => {
         if (isReleased(ep.releaseDate)) {
+            if (!ep.watched) {
+                ep.watchCount = (ep.watchCount || 0) + 1;
+            }
             ep.watched = true;
         }
     });
@@ -2873,6 +3145,9 @@ function markSeasonWatched(seasonNum) {
     if (!currentItem) return;
     currentItem.episodes.forEach(ep => {
         if (ep.season === seasonNum && isReleased(ep.releaseDate)) {
+            if (!ep.watched) {
+                ep.watchCount = (ep.watchCount || 0) + 1;
+            }
             ep.watched = true;
         }
     });
@@ -2882,88 +3157,49 @@ function markSeasonWatched(seasonNum) {
 }
 
 function deleteItem(itemId) {
-    const isMovie = currentItem && currentItem.type === 'movie';
-    if (!confirm(`Are you sure you want to remove this ${isMovie ? 'movie' : 'show'} from your library?`)) return;
-    state.library = state.library.filter(s => s.id !== itemId);
+    state.library = state.library.filter(item => item.id !== itemId);
     saveState();
     closeModal();
-    showToast("Item removed from library");
+    showToast("Removed from library");
 }
 
-/* =========================================================
-   SEARCH CLEAR UTILITY
-========================================================= */
-function setupSearchClear(inputId) {
-    const input = document.getElementById(inputId);
+function clearSearch(elementId) {
+    const input = document.getElementById(elementId);
     if (!input) return;
-    const box = input.closest('.search-box');
-    
-    function updateState() {
-        if (input.value.trim().length > 0) {
-            box.classList.add('has-text');
-        } else {
-            box.classList.remove('has-text');
-        }
-    }
-
-    input.addEventListener('input', updateState);
-    updateState();
-}
-
-function clearSearch(inputId) {
-    const input = document.getElementById(inputId);
-    if (!input) return;
-    input.value = '';
-    const box = input.closest('.search-box');
-    box.classList.remove('has-text');
-    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.value = "";
+    input.dispatchEvent(new Event("input"));
     input.focus();
 }
 
-/* =========================================================
-   TOAST NOTIFICATION
-========================================================= */
+function escapeHTML(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 function showToast(message) {
     const toast = document.getElementById("toast");
+    if (!toast) return;
     toast.textContent = message;
     toast.classList.add("show");
-
-    if (toastTimer) clearTimeout(toastTimer);
+    clearTimeout(toastTimer);
     toastTimer = setTimeout(() => {
         toast.classList.remove("show");
     }, 2500);
 }
 
-/* =========================================================
-   UTILS
-========================================================= */
-function escapeHTML(str) {
-    return (str || "").replace(/[&<>'"]/g, 
-        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-    );
-}
-
-/* =========================================================
-   INITIALIZATION
-========================================================= */
+// Initialize app on load
 window.addEventListener("DOMContentLoaded", () => {
-    showPage('home');
     initSearchPage();
     updateHomeUI();
 
-    setupSearchClear("onlineSearchInput");
-    setupSearchClear("tvLibrarySearchInput");
-    setupSearchClear("movieLibrarySearchInput");
-
-    const tvSearch = document.getElementById("tvLibrarySearchInput");
-    if (tvSearch) {
-        tvSearch.addEventListener("input", renderTVLibrarySection);
-    }
-
-    const movieSearch = document.getElementById("movieLibrarySearchInput");
-    if (movieSearch) {
-        movieSearch.addEventListener("input", renderMovieLibrarySection);
-    }
+    setTimeout(() => {
+        checkLibraryForUpdates();
+    }, 1500);
 });
 </script>
 </body>
