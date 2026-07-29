@@ -1711,78 +1711,51 @@ function getCountdown(date) {
 /* =========================================================
    FIREBASE CLOUD SYNC & AUTHENTICATION
 ========================================================= */
-async function saveState() {
+async function saveItem(item) {
     try {
-        if (!auth || !auth.currentUser || !db) {
-            console.log("Not signed in - skipping cloud save");
+        if (!auth || !auth.currentUser || !db || !item || !item.id) {
+            console.log("Not signed in or invalid item - skipping cloud save");
             return;
         }
 
         await db.collection("users")
             .doc(auth.currentUser.uid)
-            .set(state, { merge: true });
+            .collection("library")
+            .doc(item.id)
+            .set(item, { merge: true });
 
-        console.log("Firestore save SUCCESS");
+        console.log(`Firestore save item ${item.id} SUCCESS`);
     } catch (err) {
-        console.error("Firestore FAILED", err);
+        console.error(`Firestore save item ${item.id} FAILED`, err);
     }
 }
 
-function mergeLibraries(localLib = [], cloudLib = []) {
-    const map = new Map();
+async function deleteItemFromFirestore(itemId) {
+    try {
+        if (!auth || !auth.currentUser || !db || !itemId) return;
+        await db.collection("users")
+            .doc(auth.currentUser.uid)
+            .collection("library")
+            .doc(itemId)
+            .delete();
+        console.log(`Firestore delete item ${itemId} SUCCESS`);
+    } catch (err) {
+        console.error(`Firestore delete item ${itemId} FAILED`, err);
+    }
+}
 
-    const getKey = (item) => {
-        if (!item) return '';
-        if (item.tmdbId) return `${item.type || 'tv'}-${item.tmdbId}`;
-        return item.id || '';
-    };
-
-    cloudLib.forEach(item => {
-        if (!item) return;
-        const key = getKey(item);
-        if (key) map.set(key, JSON.parse(JSON.stringify(item)));
-    });
-
-    localLib.forEach(localItem => {
-        if (!localItem) return;
-        const key = getKey(localItem);
-        if (!key) return;
-
-        if (!map.has(key)) {
-            map.set(key, JSON.parse(JSON.stringify(localItem)));
-        } else {
-            const cloudItem = map.get(key);
-
-            if (localItem.type === 'movie') {
-                cloudItem.watched = Boolean(cloudItem.watched || localItem.watched);
-                cloudItem.watchCount = Math.max(cloudItem.watchCount || 0, localItem.watchCount || 0);
-                if (localItem.lastWatchedAt && (!cloudItem.lastWatchedAt || new Date(localItem.lastWatchedAt) > new Date(cloudItem.lastWatchedAt))) {
-                    cloudItem.lastWatchedAt = localItem.lastWatchedAt;
-                }
-            } else {
-                cloudItem.isFinished = Boolean(cloudItem.isFinished || localItem.isFinished);
-                
-                if (localItem.episodes && cloudItem.episodes) {
-                    const epMap = new Map();
-                    cloudItem.episodes.forEach(ep => epMap.set(ep.id, ep));
-
-                    localItem.episodes.forEach(locEp => {
-                        if (epMap.has(locEp.id)) {
-                            const cEp = epMap.get(locEp.id);
-                            cEp.watched = Boolean(cEp.watched || locEp.watched);
-                            cEp.watchCount = Math.max(cEp.watchCount || 0, locEp.watchCount || 0);
-                        } else {
-                            cloudItem.episodes.push(JSON.parse(JSON.stringify(locEp)));
-                        }
-                    });
-                } else if (localItem.episodes && !cloudItem.episodes) {
-                    cloudItem.episodes = JSON.parse(JSON.stringify(localItem.episodes));
-                }
-            }
-        }
-    });
-
-    return Array.from(map.values());
+async function saveUserProfile() {
+    try {
+        if (!auth || !auth.currentUser || !db) return;
+        await db.collection("users")
+            .doc(auth.currentUser.uid)
+            .set({
+                profiles: state.profiles,
+                activeProfileId: state.activeProfileId
+            }, { merge: true });
+    } catch (err) {
+        console.error("Firestore user profile save FAILED", err);
+    }
 }
 
 async function handleGoogleSignIn() {
@@ -1827,7 +1800,7 @@ async function handleSignUp() {
             state.profiles[0].initials = username.charAt(0).toUpperCase();
         }
         
-        saveState();
+        await saveUserProfile();
         showToast("Account created & logged in!");
     } catch (err) {
         showToast(err.message);
@@ -1930,10 +1903,12 @@ async function checkLibraryForUpdates() {
 
                     if (hasNewContent || newEpisodes.length !== item.episodes.length) {
                         item.episodes = newEpisodes;
+                        await saveItem(item);
                         updated = true;
                     }
                 } else if (!item.episodes && newEpisodes.length > 0) {
                     item.episodes = newEpisodes;
+                    await saveItem(item);
                     updated = true;
                 }
             } catch (err) {
@@ -1943,7 +1918,6 @@ async function checkLibraryForUpdates() {
     }
 
     if (updated) {
-        await saveState();
         refreshActivePage();
     }
 }
@@ -1959,64 +1933,74 @@ if (auth) {
             inView.style.display = "block";
 
             try {
-                const doc = await db.collection("users").doc(user.uid).get();
-                if (doc.exists) {
-                    const cloudData = doc.data();
-                    if (cloudData) {
-                        const mergedLibrary = mergeLibraries(state.library, cloudData.library || []);
+                const userDoc = await db.collection("users").doc(user.uid).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    if (userData) {
                         state = {
                             ...state,
-                            ...cloudData,
-                            library: mergedLibrary
+                            ...userData
                         };
-
-                        await db.collection("users")
-                            .doc(user.uid)
-                            .set({
-                                ...state,
-                                library: mergedLibrary
-                            }, { merge: true });
-                       
-                        if (!state.profiles || state.profiles.length === 0) {
-                            const name = user.displayName || user.email.split('@')[0];
-                            state.profiles = [{ id: "profile-hanu", name: name, initials: name.charAt(0).toUpperCase() }];
-                        }
-                        
-                        refreshActivePage();
-                        showToast("Loaded library!");
-
-                        // Automatically check for new seasons or episodes from API
-                        await checkLibraryForUpdates();
-
-                        db.collection("users")
-                            .doc(user.uid)
-                            .onSnapshot((snapshot) => {
-                                if (!snapshot.exists) return;
-
-                                const cloudData = snapshot.data();
-                                const mergedLibrary = mergeLibraries(
-                                    state.library,
-                                    cloudData.library || []
-                                );
-
-                                state = {
-                                    ...state,
-                                    ...cloudData,
-                                    library: mergedLibrary
-                                };
-
-                                refreshActivePage();
-                            });
                     }
                 } else {
                     if (user.displayName && state.profiles && state.profiles[0]) {
                         state.profiles[0].name = user.displayName;
                         state.profiles[0].initials = user.displayName.charAt(0).toUpperCase();
                     }
-                    saveState();
-                    refreshActivePage();
-                    showToast("Initialized new library!");
+                    await saveUserProfile();
                 }
+
+                const librarySnapshot = await db.collection("users")
+                    .doc(user.uid)
+                    .collection("library")
+                    .get();
+
+                let cloudLibrary = [];
+                librarySnapshot.forEach(doc => {
+                    if (doc.exists) {
+                        cloudLibrary.push(doc.data());
+                    }
+                });
+
+                state.library = cloudLibrary;
+               
+                if (!state.profiles || state.profiles.length === 0) {
+                    const name = user.displayName || user.email.split('@')[0];
+                    state.profiles = [{ id: "profile-hanu", name: name, initials: name.charAt(0).toUpperCase() }];
+                }
+                
+                refreshActivePage();
+                showToast("Loaded library!");
+
+                // Automatically check for new seasons or episodes from API
+                await checkLibraryForUpdates();
+
+                db.collection("users")
+                    .doc(user.uid)
+                    .collection("library")
+                    .onSnapshot((snapshot) => {
+                        let updatedLibrary = [...state.library];
+
+                        snapshot.docChanges().forEach((change) => {
+                            const itemData = change.doc.data();
+                            const index = updatedLibrary.findIndex(i => i.id === itemData.id);
+
+                            if (change.type === "added" || change.type === "modified") {
+                                if (index !== -1) {
+                                    updatedLibrary[index] = itemData;
+                                } else {
+                                    updatedLibrary.push(itemData);
+                                }
+                            } else if (change.type === "removed") {
+                                if (index !== -1) {
+                                    updatedLibrary.splice(index, 1);
+                                }
+                            }
+                        });
+
+                        state.library = updatedLibrary;
+                        refreshActivePage();
+                    });
             } catch (err) {
                 console.error("Error fetching cloud data:", err);
                 showToast("Library sync failed.");
@@ -2303,7 +2287,7 @@ async function importMediaData(id, type, buttonElement) {
             };
 
             state.library.push(newMovie);
-            await saveState();
+            await saveItem(newMovie);
 
             if (buttonElement) {
                 buttonElement.className = "search-add-btn added";
@@ -2369,7 +2353,7 @@ async function importMediaData(id, type, buttonElement) {
             };
 
             state.library.push(newShow);
-            await saveState();
+            await saveItem(newShow);
 
             if (buttonElement) {
                 buttonElement.className = "search-add-btn added";
@@ -3100,7 +3084,7 @@ function setMovieWatchedState(watchedStatus) {
         currentItem.watchCount = (currentItem.watchCount || 0) + 1;
     }
     currentItem.lastWatchedAt = watchedStatus ? new Date().toISOString() : null;
-    saveState();
+    saveItem(currentItem);
     updateModalContent();
     showToast(watchedStatus ? "Marked movie as watched" : "Marked movie as unwatched");
 }
@@ -3122,7 +3106,7 @@ function setEpisodeState(episodeId, watchedStatus) {
     if (watchedStatus) {
         ep.watchCount = (ep.watchCount || 0) + 1;
     }
-    saveState();
+    saveItem(currentItem);
     updateModalContent();
 }
 
@@ -3136,7 +3120,7 @@ function markAllWatched() {
             ep.watched = true;
         }
     });
-    saveState();
+    saveItem(currentItem);
     updateModalContent();
     showToast("Marked all released episodes as watched");
 }
@@ -3151,14 +3135,14 @@ function markSeasonWatched(seasonNum) {
             ep.watched = true;
         }
     });
-    saveState();
+    saveItem(currentItem);
     updateModalContent();
     showToast(`Marked Season ${seasonNum} as watched`);
 }
 
 function deleteItem(itemId) {
     state.library = state.library.filter(item => item.id !== itemId);
-    saveState();
+    deleteItemFromFirestore(itemId);
     closeModal();
     showToast("Removed from library");
 }
@@ -3210,24 +3194,7 @@ window.addEventListener("DOMContentLoaded", () => {
             }
         });
     });
-
-    // Add live search functionality to Home Tab libraries
-    const tvSearchInput = document.getElementById("tvLibrarySearchInput");
-    if (tvSearchInput) {
-        tvSearchInput.addEventListener("input", renderTVLibrarySection);
-    }
-
-    const movieSearchInput = document.getElementById("movieLibrarySearchInput");
-    if (movieSearchInput) {
-        movieSearchInput.addEventListener("input", renderMovieLibrarySection);
-    }
-
     initSearchPage();
-    updateHomeUI();
-
-    setTimeout(() => {
-        checkLibraryForUpdates();
-    }, 1500);
 });
 </script>
 </body>
