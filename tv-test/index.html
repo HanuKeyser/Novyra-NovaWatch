@@ -1329,7 +1329,7 @@ img {
             <circle cx="11" cy="11" r="7"/>
             <path d="M20 20l-4-4"/>
         </svg>
-        <input id="onlineSearchInput" type="search" placeholder="Search thousands of TV shows & movies..." autocomplete="off">
+        <input id="onlineSearchInput" type="search" placeholder="Search for TV Shows & Movies..." autocomplete="off">
         <button class="search-clear-btn" type="button" onclick="clearSearch('onlineSearchInput')" aria-label="Clear search">
             <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
         </button>
@@ -1871,6 +1871,83 @@ function refreshActivePage() {
     updateHomeUI();
 }
 
+/* =========================================================
+   AUTOMATIC TV SHOW UPDATES & STATUS DETECTION [source: 1]
+========================================================= */
+async function checkLibraryForUpdates() {
+    if (!state.library || state.library.length === 0) return;
+    let updated = false;
+
+    for (let item of state.library) {
+        if (item.type === 'tv' && item.tmdbId) {
+            try {
+                const res = await fetch(`https://api.themoviedb.org/3/tv/${item.tmdbId}?api_key=${TMDB_API_KEY}`);
+                const showData = await res.json();
+                if (!showData || !showData.seasons) continue;
+
+                let newEpisodes = [];
+                const validSeasons = showData.seasons.filter(s => s.season_number > 0);
+                const seasonPromises = validSeasons.map(season => 
+                    fetch(`https://api.themoviedb.org/3/tv/${item.tmdbId}/season/${season.season_number}?api_key=${TMDB_API_KEY}`)
+                    .then(r => r.json())
+                    .catch(e => null)
+                );
+
+                const seasonsData = await Promise.all(seasonPromises);
+                seasonsData.forEach(seasonData => {
+                    if (seasonData && seasonData.episodes) {
+                        seasonData.episodes.forEach(ep => {
+                            newEpisodes.push({
+                                id: `s${seasonData.season_number}e${ep.episode_number}`,
+                                season: seasonData.season_number,
+                                number: ep.episode_number,
+                                title: ep.name || `Episode ${ep.episode_number}`,
+                                overview: ep.overview || '',
+                                still: ep.still_path ? `https://image.tmdb.org/t/p/w300${ep.still_path}` : '',
+                                runtime: ep.runtime ? `${ep.runtime} min` : "45 min",
+                                watched: false,
+                                watchCount: 0,
+                                releaseDate: ep.air_date ? new Date(ep.air_date).toISOString() : new Date().toISOString()
+                            });
+                        });
+                    }
+                });
+
+                if (newEpisodes.length > 0 && item.episodes) {
+                    const epMap = new Map();
+                    item.episodes.forEach(ep => epMap.set(ep.id, ep));
+
+                    let hasNewContent = false;
+                    newEpisodes.forEach(newEp => {
+                        if (epMap.has(newEp.id)) {
+                            const existing = epMap.get(newEp.id);
+                            newEp.watched = existing.watched;
+                            newEp.watchCount = existing.watchCount;
+                        } else {
+                            hasNewContent = true;
+                        }
+                    });
+
+                    if (hasNewContent || newEpisodes.length !== item.episodes.length) {
+                        item.episodes = newEpisodes;
+                        updated = true;
+                    }
+                } else if (!item.episodes && newEpisodes.length > 0) {
+                    item.episodes = newEpisodes;
+                    updated = true;
+                }
+            } catch (err) {
+                console.error(`Failed to check updates for show ${item.title}:`, err);
+            }
+        }
+    }
+
+    if (updated) {
+        await saveState();
+        refreshActivePage();
+    }
+}
+
 if (auth) {
     auth.onAuthStateChanged(async (user) => {
         currentUser = user;
@@ -1907,6 +1984,9 @@ if (auth) {
                         
                         refreshActivePage();
                         showToast("Loaded library!");
+
+                        // Automatically check for new seasons or episodes from API [source: 1]
+                        await checkLibraryForUpdates();
 
                         db.collection("users")
                             .doc(user.uid)
@@ -3077,88 +3157,49 @@ function markSeasonWatched(seasonNum) {
 }
 
 function deleteItem(itemId) {
-    const isMovie = currentItem && currentItem.type === 'movie';
-    if (!confirm(`Are you sure you want to remove this ${isMovie ? 'movie' : 'show'} from your library?`)) return;
-    state.library = state.library.filter(s => s.id !== itemId);
+    state.library = state.library.filter(item => item.id !== itemId);
     saveState();
     closeModal();
-    showToast("Item removed from library");
+    showToast("Removed from library");
 }
 
-/* =========================================================
-   SEARCH CLEAR UTILITY
-========================================================= */
-function setupSearchClear(inputId) {
-    const input = document.getElementById(inputId);
+function clearSearch(elementId) {
+    const input = document.getElementById(elementId);
     if (!input) return;
-    const box = input.closest('.search-box');
-    
-    function updateState() {
-        if (input.value.trim().length > 0) {
-            box.classList.add('has-text');
-        } else {
-            box.classList.remove('has-text');
-        }
-    }
-
-    input.addEventListener('input', updateState);
-    updateState();
-}
-
-function clearSearch(inputId) {
-    const input = document.getElementById(inputId);
-    if (!input) return;
-    input.value = '';
-    const box = input.closest('.search-box');
-    box.classList.remove('has-text');
-    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.value = "";
+    input.dispatchEvent(new Event("input"));
     input.focus();
 }
 
-/* =========================================================
-   TOAST NOTIFICATION
-========================================================= */
+function escapeHTML(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 function showToast(message) {
     const toast = document.getElementById("toast");
+    if (!toast) return;
     toast.textContent = message;
     toast.classList.add("show");
-
-    if (toastTimer) clearTimeout(toastTimer);
+    clearTimeout(toastTimer);
     toastTimer = setTimeout(() => {
         toast.classList.remove("show");
     }, 2500);
 }
 
-/* =========================================================
-   UTILS
-========================================================= */
-function escapeHTML(str) {
-    return (str || "").replace(/[&<>'"]/g, 
-        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-    );
-}
-
-/* =========================================================
-   INITIALIZATION
-========================================================= */
+// Initialize app on load
 window.addEventListener("DOMContentLoaded", () => {
-    showPage('home');
     initSearchPage();
     updateHomeUI();
 
-    setupSearchClear("onlineSearchInput");
-    setupSearchClear("tvLibrarySearchInput");
-    setupSearchClear("movieLibrarySearchInput");
-
-    const tvSearch = document.getElementById("tvLibrarySearchInput");
-    if (tvSearch) {
-        tvSearch.addEventListener("input", renderTVLibrarySection);
-    }
-
-    const movieSearch = document.getElementById("movieLibrarySearchInput");
-    if (movieSearch) {
-        movieSearch.addEventListener("input", renderMovieLibrarySection);
-    }
+    setTimeout(() => {
+        checkLibraryForUpdates();
+    }, 1500);
 });
 </script>
 </body>
