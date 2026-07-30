@@ -1723,6 +1723,27 @@ function clearSearch(inputId) {
     if (inputId === "movieLibrarySearchInput") renderMovieLibrarySection();
 }
 
+// Bind search input listeners to toggle clear button display state
+document.addEventListener("DOMContentLoaded", () => {
+    const searchInputs = ['onlineSearchInput', 'tvLibrarySearchInput', 'movieLibrarySearchInput'];
+    
+    searchInputs.forEach(id => {
+        const input = document.getElementById(id);
+        if (!input) return;
+
+        input.addEventListener("input", (e) => {
+            const val = e.target.value;
+            if (val.trim().length > 0) {
+                input.parentElement.classList.add("has-text");
+            } else {
+                input.parentElement.classList.remove("has-text");
+            }
+        });
+    });
+
+    initSearchPage();
+});
+
 /* =========================================================
    DATE HELPERS
 ========================================================= */
@@ -2104,6 +2125,20 @@ function initSearchPage() {
             performTMDBSearch(query);
         }, 200);
     });
+
+    const tvLibInput = document.getElementById("tvLibrarySearchInput");
+    if (tvLibInput) {
+        tvLibInput.addEventListener("input", () => {
+            renderTVLibrarySection();
+        });
+    }
+
+    const movieLibInput = document.getElementById("movieLibrarySearchInput");
+    if (movieLibInput) {
+        movieLibInput.addEventListener("input", () => {
+            renderMovieLibrarySection();
+        });
+    }
 
     fetchTrending();
 }
@@ -3126,42 +3161,49 @@ function updateModalContent() {
                 `).join("")}
             </div>
         </div>
-        ${!currentItem.isPreview ? `
-        <div class="season-batch-actions">
-            <button class="season-batch-btn" onclick="markSeasonWatched(${selectedSeason})">Mark Season Watch</button>
-        </div>` : ''}
-        <div class="episodes-list">
     `;
 
-    const seasonEpisodes = currentItem.episodes.filter(ep => ep.season === selectedSeason);
-    seasonEpisodes.forEach(ep => {
-        const released = isReleased(ep.releaseDate);
+    if (!currentItem.isPreview) {
         html += `
+            <div class="season-batch-actions">
+                <button class="season-batch-btn" onclick="markSeasonWatched(${selectedSeason})">
+                    <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+                    Mark Season ${selectedSeason} as Watched
+                </button>
+            </div>
+        `;
+    }
+
+    const filteredEpisodes = currentItem.episodes.filter(ep => ep.season === selectedSeason);
+
+    html += filteredEpisodes.map(ep => {
+        const isEpWatched = ep.watched;
+        return `
             <div class="episode">
                 <div class="episode-main">
                     <div class="episode-left">
-                        ${ep.still ? `<img src="${ep.still}" class="episode-still" alt="${escapeHTML(ep.title)}" loading="lazy" onerror="this.style.display='none'">` : ''}
+                        ${ep.still ? 
+                            `<img src="${ep.still}" class="episode-still" alt="" loading="lazy" onerror="this.style.display='none'">` :
+                            `<div class="episode-still" style="display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--text-muted);">S${ep.season}E${ep.number}</div>`
+                        }
                         <div class="episode-info">
-                            <div class="episode-title">E${ep.number}: ${escapeHTML(ep.title)}</div>
+                            <div class="episode-title">${ep.number}. ${escapeHTML(ep.title)}</div>
+                            <div class="episode-meta">${formatDate(ep.releaseDate)} • ${ep.runtime}</div>
                             ${ep.overview ? `<div class="episode-overview">${escapeHTML(ep.overview)}</div>` : ''}
-                            <div class="episode-meta">${ep.runtime || '45 min'} • ${released ? formatDate(ep.releaseDate) : 'Coming ' + formatDate(ep.releaseDate)}${ep.watchCount && ep.watchCount > 0 ? ' • Rewatches: ' + (ep.watchCount - 1) : ''}</div>
                         </div>
                     </div>
                 </div>
                 ${!currentItem.isPreview ? `
-                <div class="episode-buttons">
-                    <button class="episode-action-btn ${ep.watched ? 'watched-active' : ''}" onclick="setEpisodeState('${ep.id}', true)">
-                        ${ep.watched ? 'Rewatch' : 'Watch'}
-                    </button>
-                    <button class="episode-action-btn ${!ep.watched ? 'watched-active' : ''}" onclick="setEpisodeState('${ep.id}', false)">
-                        Unwatched
-                    </button>
-                </div>` : ''}
+                    <div class="episode-buttons">
+                        <button class="episode-action-btn ${isEpWatched ? 'watched-active' : 'unwatched-active'}" onclick="toggleEpisodeWatched('${ep.id}')">
+                            ${isEpWatched ? 'Watched' : 'Mark Watched'}
+                        </button>
+                    </div>
+                ` : ''}
             </div>
         `;
-    });
+    }).join("");
 
-    html += `</div>`;
     document.getElementById("modalEpisodes").innerHTML = html;
 
     const newSeasonSelector = document.querySelector('.season-selector');
@@ -3170,96 +3212,97 @@ function updateModalContent() {
     }
 }
 
-/* =========================================================
-   MOVIE ACTIONS
-========================================================= */
-function setMovieWatchedState(watchedStatus) {
-    if (!currentItem) return;
-    currentItem.watched = watchedStatus;
-    if (watchedStatus) {
-        currentItem.watchCount = (currentItem.watchCount || 0) + 1;
-    } else {
-        currentItem.watchCount = 0;
-    }
-    currentItem.lastWatchedAt = watchedStatus ? new Date().toISOString() : null;
-    saveItem(currentItem);
-    updateModalContent();
-    showToast(watchedStatus ? "Marked movie as watched" : "Marked movie as unwatched");
-}
-
-/* =========================================================
-   TV SHOW ACTIONS
-========================================================= */
-function selectSeason(season) {
-    selectedSeason = season;
+function selectSeason(seasonNumber) {
+    selectedSeason = seasonNumber;
     updateModalContent();
 }
 
-function toggleStopWatching() {
-    if (!currentItem || currentItem.type === 'movie') return;
-    currentItem.isStopped = !currentItem.isStopped;
-    saveItem(currentItem);
-    updateModalContent();
-    showToast(currentItem.isStopped ? `Stopped watching ${currentItem.title}` : `Resumed watching ${currentItem.title}`);
-}
+async function toggleEpisodeWatched(episodeId) {
+    if (!currentItem || currentItem.isPreview) return;
 
-function setEpisodeState(episodeId, watchedStatus) {
-    if (!currentItem) return;
     const ep = currentItem.episodes.find(e => e.id === episodeId);
     if (!ep) return;
 
-    ep.watched = watchedStatus;
-    if (watchedStatus) {
-        ep.watchCount = (ep.watchCount || 0) + 1;
-    } else {
-        ep.watchCount = 0;
-    }
+    ep.watched = !ep.watched;
+    ep.watchCount = ep.watched ? (ep.watchCount || 0) + 1 : 0;
 
-    saveItem(currentItem);
+    await saveItem(currentItem);
     updateModalContent();
-    showToast(watchedStatus ? "Marked episode as watched" : "Marked episode as unwatched");
+    refreshActivePage();
 }
 
-function markAllWatched() {
-    if (!currentItem || !currentItem.episodes) return;
+async function markSeasonWatched(seasonNumber) {
+    if (!currentItem || currentItem.isPreview) return;
+
+    let modified = false;
     currentItem.episodes.forEach(ep => {
-        if (isReleased(ep.releaseDate)) {
+        if (ep.season === seasonNumber && !ep.watched) {
             ep.watched = true;
-            ep.watchCount = Math.max(1, ep.watchCount || 1);
+            ep.watchCount = (ep.watchCount || 0) + 1;
+            modified = true;
         }
     });
-    saveItem(currentItem);
-    updateModalContent();
-    showToast("Marked all available episodes as watched");
+
+    if (modified) {
+        await saveItem(currentItem);
+        updateModalContent();
+        refreshActivePage();
+        showToast(`Season ${seasonNumber} marked as watched!`);
+    }
 }
 
-function markSeasonWatched(season) {
-    if (!currentItem || !currentItem.episodes) return;
-    currentItem.episodes
-        .filter(ep => ep.season === season && isReleased(ep.releaseDate))
-        .forEach(ep => {
+async function markAllWatched() {
+    if (!currentItem || currentItem.isPreview) return;
+
+    let modified = false;
+    currentItem.episodes.forEach(ep => {
+        if (!ep.watched) {
             ep.watched = true;
-            ep.watchCount = Math.max(1, ep.watchCount || 1);
-        });
-    saveItem(currentItem);
+            ep.watchCount = (ep.watchCount || 0) + 1;
+            modified = true;
+        }
+    });
+
+    if (modified) {
+        await saveItem(currentItem);
+        updateModalContent();
+        refreshActivePage();
+        showToast("All episodes marked as watched!");
+    }
+}
+
+async function toggleStopWatching() {
+    if (!currentItem || currentItem.isPreview) return;
+
+    currentItem.isStopped = !currentItem.isStopped;
+    await saveItem(currentItem);
     updateModalContent();
-    showToast(`Marked Season ${season} as watched`);
+    refreshActivePage();
+    showToast(currentItem.isStopped ? "Show moved to Stopped Watching." : "Show resumed!");
+}
+
+async function setMovieWatchedState(watched) {
+    if (!currentItem || currentItem.isPreview) return;
+
+    currentItem.watched = watched;
+    currentItem.watchCount = watched ? (currentItem.watchCount || 0) + 1 : 0;
+    currentItem.lastWatchedAt = watched ? new Date().toISOString() : null;
+
+    await saveItem(currentItem);
+    updateModalContent();
+    refreshActivePage();
+    showToast(watched ? "Movie marked as watched!" : "Movie marked as unwatched.");
 }
 
 async function deleteItem(itemId) {
     if (!confirm("Are you sure you want to remove this item from your library?")) return;
-    const index = state.library.findIndex(i => i.id === itemId);
-    if (index !== -1) {
-        state.library.splice(index, 1);
-        await deleteItemFromFirestore(itemId);
-        closeModal();
-        showToast("Item removed from library");
-    }
-}
 
-document.addEventListener("DOMContentLoaded", () => {
-    initSearchPage();
-});
+    state.library = state.library.filter(i => i.id !== itemId);
+    await deleteItemFromFirestore(itemId);
+    closeModal();
+    refreshActivePage();
+    showToast("Item removed from library.");
+}
 </script>
 </body>
 </html>
