@@ -985,47 +985,6 @@ img {
     border: 1px solid rgba(255, 59, 48, 0.2);
 }
 
-.watch-providers-section {
-    margin: 16px 0;
-    padding: 14px;
-    background: var(--surface);
-    border: 1px solid var(--glass-border);
-    border-radius: 14px;
-    box-shadow: var(--glass-shadow-sm);
-}
-
-.watch-providers-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text-secondary);
-    margin-bottom: 10px;
-}
-
-.watch-providers-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.provider-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 10px;
-    background: var(--surface-2);
-    border: 1px solid var(--glass-border-subtle);
-    border-radius: 10px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text);
-}
-
-.provider-badge img {
-    width: 18px;
-    height: 18px;
-    border-radius: 4px;
-}
-
 .season-selector-wrapper {
     display: flex;
     align-items: center;
@@ -1316,6 +1275,8 @@ img {
      1. DISCOVER TAB
 ================================================     -->
 <main id="discoverPage" class="page">
+    
+
     <div class="search-type-toggle">
         <button id="searchTypeTV" class="search-type-btn active" onclick="setSearchType('tv')">TV Shows</button>
         <button id="searchTypeMovie" class="search-type-btn" onclick="setSearchType('movie')">Movies</button>
@@ -1344,6 +1305,8 @@ img {
      2. UPCOMING TAB
 ================================================     -->
 <main id="upcomingPage" class="page">
+    
+
     <div class="search-type-toggle">
         <button id="upcomingTypeTV" class="search-type-btn active" onclick="setUpcomingType('tv')">TV Shows</button>
         <button id="upcomingTypeMovie" class="search-type-btn" onclick="setUpcomingType('movie')">Movies</button>
@@ -1610,10 +1573,6 @@ img {
         <div class="modal-content">
             <div id="modalMeta" class="modal-meta"></div>
             <p id="modalDescription" class="modal-description"></p>
-            <div id="modalWatchProviders" class="watch-providers-section" style="display: none;">
-                <div class="watch-providers-title">Where to Watch</div>
-                <div id="watchProvidersList" class="watch-providers-list"></div>
-            </div>
             <div id="modalActions" class="modal-actions"></div>
             <div id="modalEpisodes"></div>
         </div>
@@ -1984,7 +1943,7 @@ function refreshActivePage() {
 }
 
 /* =========================================================
-   AUTOMATIC TV SHOW SHOW UPDATES & RELEASE ALERTS
+   AUTOMATIC TV SHOW UPDATES & RELEASE ALERTS
 ========================================================= */
 async function checkLibraryForUpdates() {
     if (!state.library || state.library.length === 0) return;
@@ -3100,43 +3059,6 @@ async function playTrailer(tmdbId, type) {
     }
 }
 
-async function loadWatchProviders(tmdbId, type) {
-    const container = document.getElementById("modalWatchProviders");
-    const listEl = document.getElementById("watchProvidersList");
-    if (!container || !listEl) return;
-
-    container.style.display = "none";
-    listEl.innerHTML = "";
-
-    try {
-        const endpoint = type === 'movie'
-            ? `https://api.themoviedb.org/3/movie/${tmdbId}/watch/providers?api_key=${TMDB_API_KEY}`
-            : `https://api.themoviedb.org/3/tv/${tmdbId}/watch/providers?api_key=${TMDB_API_KEY}`;
-
-        const res = await fetch(endpoint);
-        const data = await res.json();
-        
-        // Defaulting to South Africa (ZA) region or fallback to US/flatrate
-        const results = data.results || {};
-        const regionData = results.ZA || results.US || Object.values(results)[0];
-
-        if (regionData && regionData.flatrate && regionData.flatrate.length > 0) {
-            container.style.display = "block";
-            listEl.innerHTML = regionData.flatrate.map(provider => {
-                const logoUrl = provider.logo_path ? `https://image.tmdb.org/t/p/original${provider.logo_path}` : '';
-                return `
-                    <div class="provider-badge">
-                        ${logoUrl ? `<img src="${logoUrl}" alt="${escapeHTML(provider.provider_name)}">` : ''}
-                        <span>${escapeHTML(provider.provider_name)}</span>
-                    </div>
-                `;
-            }).join("");
-        }
-    } catch (err) {
-        console.error("Error loading watch providers:", err);
-    }
-}
-
 function openDetails(itemId) {
     currentItem = getItem(itemId);
     if (!currentItem) return;
@@ -3151,10 +3073,6 @@ function openDetails(itemId) {
 
     updateModalContent();
     document.getElementById("detailsModal").classList.add("open");
-
-    if (currentItem.tmdbId) {
-        loadWatchProviders(currentItem.tmdbId, currentItem.type);
-    }
 }
 
 function closeModal() {
@@ -3250,15 +3168,15 @@ function updateModalContent() {
     if (currentItem.type === 'movie') {
         actionsHTML = `
             <div class="modal-actions-row movie-actions-grid">
+                <button class="action-button primary" onclick="toggleMovieWatched()">${currentItem.watched ? 'Mark Unwatched' : 'Mark Watched'}</button>
                 <button class="action-button trailer" onclick="playTrailer(${currentItem.tmdbId}, 'movie')">Trailer</button>
-                <button class="action-button danger" onclick="removeCurrentItem()">Remove</button>
             </div>
         `;
     } else {
         actionsHTML = `
             <div class="modal-actions-row">
                 <button class="action-button trailer" onclick="playTrailer(${currentItem.tmdbId}, 'tv')">Trailer</button>
-                <button class="action-button danger" onclick="removeCurrentItem()">Remove</button>
+                <button class="action-button ${currentItem.isStopped ? 'warning' : 'warning'}" onclick="toggleStopWatching()">${currentItem.isStopped ? 'Resume Show' : 'Stop Watching'}</button>
             </div>
         `;
     }
@@ -3271,62 +3189,12 @@ function updateModalContent() {
             <button class="season-button ${s === selectedSeason ? 'active' : ''}" onclick="selectSeason(${s})">Season ${s}</button>
         `).join("");
 
-        const filteredEps = currentItem.episodes.filter(ep => ep.season === selectedSeason);
-
-        let epsListHTML = filteredEps.map(ep => {
-            const isReleasedEp = isReleased(ep.releaseDate);
-            return `
-                <div class="episode" onclick="openEpisodeDetails('${ep.id}')">
-                    <div class="episode-main">
-                        <div class="episode-left">
-                            ${ep.still ? `<img src="${ep.still}" class="episode-still" loading="lazy">` : `<div class="episode-still" style="display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text-muted);">No Image</div>`}
-                            <div class="episode-info">
-                                <div class="episode-title">${ep.number}. ${escapeHTML(ep.title)}</div>
-                                <div class="episode-overview">${escapeHTML(ep.overview || 'No description.')}</div>
-                                <div class="episode-meta">
-                                    ${formatDate(ep.releaseDate)} • ${ep.runtime || '45 min'}
-                                    ${ep.watched ? '<span style="color:var(--success); font-weight:700; margin-left:6px;">✓ Watched</span>' : ''}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }).join("");
-
         episodesHTML = `
             <div class="season-selector-wrapper">
                 <div class="season-selector">${seasonsHTML}</div>
             </div>
-            <div style="margin-top: 10px;">${epsListHTML}</div>
         `;
     }
-
-    document.getElementById("modalEpisodes").innerHTML = episodesHTML;
-}
-
-async function removeCurrentItem() {
-    if (!currentItem) return;
-    if (!confirm(`Are you sure you want to remove "${currentItem.title}" from your library?`)) return;
-
-    const id = currentItem.id;
-    state.library = state.library.filter(i => i.id !== id);
-
-    try {
-        if (auth && auth.currentUser && db) {
-            await db.collection("users")
-                .doc(auth.currentUser.uid)
-                .collection("library")
-                .doc(id)
-                .delete();
-        }
-    } catch (err) {
-        console.error("Failed to delete item from cloud:", err);
-    }
-
-    closeModal();
-    showToast("Removed from library.");
-    refreshActivePage();
 }
 </script>
 </body>
