@@ -910,10 +910,17 @@ img {
 }
 
 .modal-actions {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     margin: 22px 0;
+}
+
+.modal-actions-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    width: 100%;
 }
 
 .modal-actions.movie-actions-grid {
@@ -3078,19 +3085,29 @@ function updateModalContent() {
 
     let tvActions = '';
 
-    if (currentItem.tmdbId) {
-        tvActions += `<button class="action-button trailer" onclick="playTrailer(${currentItem.tmdbId}, 'tv')">Trailer</button>`;
-    }
-
     if (currentItem.isPreview) {
-        tvActions += `<button class="action-button primary" onclick="importMediaData(${currentItem.tmdbId}, 'tv', this)">Add to Library</button>`;
+        let topBtns = '';
+        if (currentItem.tmdbId) {
+            topBtns += `<button class="action-button trailer" onclick="playTrailer(${currentItem.tmdbId}, 'tv')">Trailer</button>`;
+        }
+        topBtns += `<button class="action-button primary" onclick="importMediaData(${currentItem.tmdbId}, 'tv', this)">Add to Library</button>`;
+        tvActions = `<div class="modal-actions-row" style="grid-template-columns: repeat(${currentItem.tmdbId ? 2 : 1}, 1fr);">${topBtns}</div>`;
     } else {
-        tvActions += `<button class="action-button primary" onclick="markAllWatched()">Mark Watched</button>`;
-        tvActions += `<button class="action-button ${currentItem.isStopped ? 'primary' : 'warning'}" onclick="toggleStopWatching()">${currentItem.isStopped ? 'Resume Show' : 'Stop Watching'}</button>`;
-    }
+        let topBtns = '';
+        if (currentItem.tmdbId) {
+            topBtns += `<button class="action-button trailer" onclick="playTrailer(${currentItem.tmdbId}, 'tv')">Trailer</button>`;
+        }
+        topBtns += `<button class="action-button primary" onclick="markAllWatched()">Mark Watched</button>`;
+        topBtns += `<button class="action-button danger" onclick="deleteItem('${currentItem.id}')">Remove</button>`;
 
-    if (!currentItem.isPreview) {
-        tvActions += `<button class="action-button danger" onclick="deleteItem('${currentItem.id}')">Remove</button>`;
+        const stopBtn = `<button class="action-button ${currentItem.isStopped ? 'primary' : 'warning'}" onclick="toggleStopWatching()">${currentItem.isStopped ? 'Resume Show' : 'Stop Watching'}</button>`;
+
+        tvActions = `
+            <div class="modal-actions-row">
+                ${topBtns}
+            </div>
+            ${stopBtn}
+        `;
     }
 
     const tvActionsContainer = document.getElementById("modalActions");
@@ -3200,46 +3217,48 @@ function setEpisodeState(episodeId, watchedStatus) {
 
     saveItem(currentItem);
     updateModalContent();
-    showToast(watchedStatus ? `Watched ${ep.title}` : `Unwatched ${ep.title}`);
+    showToast(watchedStatus ? "Marked episode as watched" : "Marked episode as unwatched");
 }
 
 function markAllWatched() {
     if (!currentItem || !currentItem.episodes) return;
     currentItem.episodes.forEach(ep => {
-        ep.watched = true;
-        ep.watchCount = (ep.watchCount || 0) + 1;
+        if (isReleased(ep.releaseDate)) {
+            ep.watched = true;
+            ep.watchCount = Math.max(1, ep.watchCount || 1);
+        }
     });
     saveItem(currentItem);
     updateModalContent();
-    showToast(`Marked all episodes as watched`);
+    showToast("Marked all available episodes as watched");
 }
 
 function markSeasonWatched(season) {
     if (!currentItem || !currentItem.episodes) return;
-    currentItem.episodes.filter(ep => ep.season === season).forEach(ep => {
-        ep.watched = true;
-        ep.watchCount = (ep.watchCount || 0) + 1;
-    });
+    currentItem.episodes
+        .filter(ep => ep.season === season && isReleased(ep.releaseDate))
+        .forEach(ep => {
+            ep.watched = true;
+            ep.watchCount = Math.max(1, ep.watchCount || 1);
+        });
     saveItem(currentItem);
     updateModalContent();
     showToast(`Marked Season ${season} as watched`);
 }
 
 async function deleteItem(itemId) {
-    if (confirm("Are you sure you want to remove this item from your library?")) {
-        state.library = state.library.filter(item => item.id !== itemId);
+    if (!confirm("Are you sure you want to remove this item from your library?")) return;
+    const index = state.library.findIndex(i => i.id === itemId);
+    if (index !== -1) {
+        state.library.splice(index, 1);
         await deleteItemFromFirestore(itemId);
         closeModal();
-        showToast("Item removed from library.");
+        showToast("Item removed from library");
     }
 }
 
-/* =========================================================
-   INITIALIZATION
-========================================================= */
-window.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
     initSearchPage();
-    renderHomeTab();
 });
 </script>
 </body>
