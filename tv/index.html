@@ -158,8 +158,8 @@ img {
 }
 
 .logo-mark {
-    width: 34px;
-    height: 34px;
+    width: 50px;
+    height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -168,8 +168,8 @@ img {
 }
 
 .logo-mark img {
-    width: 34px;
-    height: 34px;
+    width: 50px;
+    height: 50px;
     object-fit: contain;
 }
 
@@ -1310,6 +1310,7 @@ img {
         <div class="logo-mark">
             <img src="https://www.novyra.co.za/NovaWatch_Logo.png" alt="NovaWatch Logo">
         </div>
+      NovaWatch
     </div>
     <button class="home-button" onclick="showPage('home')" aria-label="Open Home">
         <div class="home-avatar" id="headerAvatar">G</div>
@@ -3205,67 +3206,40 @@ function setEpisodeState(episodeId, watchedStatus) {
 function markAllWatched() {
     if (!currentItem || !currentItem.episodes) return;
     currentItem.episodes.forEach(ep => {
-        if (isReleased(ep.releaseDate)) {
-            ep.watched = true;
-            ep.watchCount = Math.max(1, ep.watchCount || 1);
-        }
+        ep.watched = true;
+        ep.watchCount = (ep.watchCount || 0) + 1;
     });
     saveItem(currentItem);
     updateModalContent();
-    showToast("Marked all available episodes as watched");
+    showToast(`Marked all episodes as watched`);
 }
 
-function markSeasonWatched(seasonNum) {
+function markSeasonWatched(season) {
     if (!currentItem || !currentItem.episodes) return;
-    currentItem.episodes
-        .filter(ep => ep.season === seasonNum && isReleased(ep.releaseDate))
-        .forEach(ep => {
-            ep.watched = true;
-            ep.watchCount = Math.max(1, ep.watchCount || 1);
-        });
+    currentItem.episodes.filter(ep => ep.season === season).forEach(ep => {
+        ep.watched = true;
+        ep.watchCount = (ep.watchCount || 0) + 1;
+    });
     saveItem(currentItem);
     updateModalContent();
-    showToast(`Marked Season ${seasonNum} as watched`);
+    showToast(`Marked Season ${season} as watched`);
 }
 
 async function deleteItem(itemId) {
-    const index = state.library.findIndex(i => i.id === itemId);
-    if (index !== -1) {
-        state.library.splice(index, 1);
+    if (confirm("Are you sure you want to remove this item from your library?")) {
+        state.library = state.library.filter(item => item.id !== itemId);
         await deleteItemFromFirestore(itemId);
         closeModal();
-        showToast("Removed from library.");
+        showToast("Item removed from library.");
     }
 }
 
 /* =========================================================
    INITIALIZATION
 ========================================================= */
-document.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", () => {
     initSearchPage();
-
-    const tvSearchInput = document.getElementById("tvLibrarySearchInput");
-    if (tvSearchInput) {
-        tvSearchInput.addEventListener("input", (e) => {
-            e.target.parentElement.classList.toggle("has-text", e.target.value.length > 0);
-            renderTVLibrarySection();
-        });
-    }
-
-    const movieSearchInput = document.getElementById("movieLibrarySearchInput");
-    if (movieSearchInput) {
-        movieSearchInput.addEventListener("input", (e) => {
-            e.target.parentElement.classList.toggle("has-text", e.target.value.length > 0);
-            renderMovieLibrarySection();
-        });
-    }
-
-    const onlineSearchInput = document.getElementById("onlineSearchInput");
-    if (onlineSearchInput) {
-        onlineSearchInput.addEventListener("input", (e) => {
-            e.target.parentElement.classList.toggle("has-text", e.target.value.length > 0);
-        });
-    }
+    renderHomeTab();
 });
 </script>
 </body>
