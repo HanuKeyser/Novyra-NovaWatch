@@ -201,15 +201,21 @@ img {
 }
 
 /* =========================================================
-   PAGES
+   PAGES CONTAINER & SWIPE ENGINE
 ========================================================= */
-.page {
-    display: none;
-    padding: 24px 18px 36px;
+.pages-container {
+    display: flex;
+    width: 500%; /* 5 pages */
+    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    will-change: transform;
 }
 
-.page.active {
-    display: block;
+.page {
+    flex: 0 0 20%;
+    width: 20%;
+    display: block; /* Always rendered side-by-side */
+    padding: 24px 18px 36px;
+    box-sizing: border-box;
 }
 
 .tab-content-wrapper {
@@ -1271,233 +1277,235 @@ img {
     </button>
 </header>
 
-<!-- =====================================================
-     1. DISCOVER TAB
-================================================     -->
-<main id="discoverPage" class="page">
-    <div class="search-type-toggle">
-        <button id="searchTypeTV" class="search-type-btn active" onclick="setSearchType('tv')">TV Shows</button>
-        <button id="searchTypeMovie" class="search-type-btn" onclick="setSearchType('movie')">Movies</button>
-    </div>
-
-    <div class="search-box">
-        <svg class="icon search-icon" viewBox="0 0 24 24">
-            <circle cx="11" cy="11" r="7"/>
-            <path d="M20 20l-4-4"/>
-        </svg>
-        <input id="onlineSearchInput" type="search" placeholder="Search for TV Shows & Movies..." autocomplete="off">
-        <button class="search-clear-btn" type="button" onclick="clearSearch('onlineSearchInput')" aria-label="Clear search">
-            <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
-        </button>
-    </div>
-
-    <div style="margin-top: 20px;">
-        <div class="section-header">
-            <div id="searchResultsHeading" class="section-title" style="font-size: 16px; color: var(--text-secondary);">Trending Shows</div>
-        </div>
-        <div id="searchResultsList" class="search-results-grid"></div>
-    </div>
-</main>
-
-<!-- =====================================================
-     2. UPCOMING TAB
-================================================     -->
-<main id="upcomingPage" class="page">
-    <div class="search-type-toggle">
-        <button id="upcomingTypeTV" class="search-type-btn active" onclick="setUpcomingType('tv')">TV Shows</button>
-        <button id="upcomingTypeMovie" class="search-type-btn" onclick="setUpcomingType('movie')">Movies</button>
-    </div>
-
-    <div style="margin-top: 20px;">
-        <div id="upcomingResultsList" class="search-results-grid"></div>
-    </div>
-</main>
-
-<!-- =====================================================
-     3. TV SHOWS TAB
-================================================     -->
-<main id="tvShowsPage" class="page">
-    <div class="tab-content-wrapper">
-        <div>
-            <div class="category-title">
-                <span>Continue Watching</span>
-            </div>
-            <div id="tvContinueGrid" class="library-grid"></div>
+<div id="swipeContainer" class="pages-container">
+    <!-- =====================================================
+         1. DISCOVER TAB (Index 3)
+    ================================================     -->
+    <main id="discoverPage" class="page">
+        <div class="search-type-toggle">
+            <button id="searchTypeTV" class="search-type-btn active" onclick="setSearchType('tv')">TV Shows</button>
+            <button id="searchTypeMovie" class="search-type-btn" onclick="setSearchType('movie')">Movies</button>
         </div>
 
-        <div>
-            <div class="category-title">
-                <span>Start Watching</span>
-            </div>
-            <div id="tvStartGrid" class="library-grid"></div>
-        </div>
-
-        <div id="stoppedShowsSection" style="display: none;">
-            <div class="category-title">
-                <span>Stopped Watching</span>
-            </div>
-            <div id="tvStoppedGrid" class="library-grid"></div>
-        </div>
-
-        <div class="tab-nav-footer">
-            <button class="footer-browse-button" onclick="showPage('discover', 'tv')">
-                <svg class="icon icon-small" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
-                Browse All Shows
+        <div class="search-box">
+            <svg class="icon search-icon" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="7"/>
+                <path d="M20 20l-4-4"/>
+            </svg>
+            <input id="onlineSearchInput" type="search" placeholder="Search for TV Shows & Movies..." autocomplete="off">
+            <button class="search-clear-btn" type="button" onclick="clearSearch('onlineSearchInput')" aria-label="Clear search">
+                <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
             </button>
         </div>
-    </div>
-</main>
 
-<!-- =====================================================
-     4. MOVIES TAB
-================================================     -->
-<main id="moviesPage" class="page">
-    <div class="tab-content-wrapper">
-        <div>
-            <div class="category-title">
-                <span>Unwatched Movies</span>
+        <div style="margin-top: 20px;">
+            <div class="section-header">
+                <div id="searchResultsHeading" class="section-title" style="font-size: 16px; color: var(--text-secondary);">Trending Shows</div>
             </div>
-            <div id="moviesUnwatchedGrid" class="library-grid"></div>
+            <div id="searchResultsList" class="search-results-grid"></div>
+        </div>
+    </main>
+
+    <!-- =====================================================
+         2. UPCOMING TAB (Index 2)
+    ================================================     -->
+    <main id="upcomingPage" class="page">
+        <div class="search-type-toggle">
+            <button id="upcomingTypeTV" class="search-type-btn active" onclick="setUpcomingType('tv')">TV Shows</button>
+            <button id="upcomingTypeMovie" class="search-type-btn" onclick="setUpcomingType('movie')">Movies</button>
         </div>
 
-        <div id="watchedMoviesSection" style="display: none;">
-            <div class="category-title">
-                <span>Watched Movies</span>
-            </div>
-            <div id="moviesWatchedGrid" class="library-grid"></div>
+        <div style="margin-top: 20px;">
+            <div id="upcomingResultsList" class="search-results-grid"></div>
         </div>
+    </main>
 
-        <div class="tab-nav-footer">
-            <button class="footer-browse-button" onclick="showPage('discover', 'movie')">
-                <svg class="icon icon-small" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
-                Browse All Movies
-            </button>
-        </div>
-    </div>
-</main>
-
-<!-- =====================================================
-     5. HOME TAB (DEFAULT LANDING)
-================================================     -->
-<main id="homePage" class="page active">
-    <div class="tab-content-wrapper">
-        <div class="home-card" style="display: flex; flex-direction: column; gap: 18px;">
-            <div class="home-row">
-                <div class="large-avatar" id="largeAvatar">G</div>
-                <div>
-                    <div class="home-name" id="homeName">Guest</div>
-                    <div class="home-subtitle" id="homeEmailSubtitle">Guest Account</div>
+    <!-- =====================================================
+         3. TV SHOWS TAB (Index 0)
+    ================================================     -->
+    <main id="tvShowsPage" class="page">
+        <div class="tab-content-wrapper">
+            <div>
+                <div class="category-title">
+                    <span>Continue Watching</span>
                 </div>
+                <div id="tvContinueGrid" class="library-grid"></div>
             </div>
 
-            <!-- Notifications Permission Control -->
-            <div style="border-top: 1px solid var(--glass-border-subtle); padding-top: 16px; display: flex; flex-direction: column; gap: 10px;">
-                <div>
-                    <div style="font-size: 14px; font-weight: 700;">Release Notifications</div>
-                    <div style="font-size: 12px; color: var(--text-secondary);">Stay ahead with alerts for new episodes and movie releases.</div>
+            <div>
+                <div class="category-title">
+                    <span>Start Watching</span>
                 </div>
-                <button class="action-button primary" id="notificationBtn" onclick="requestNotificationPermission()" style="width: 100%; height: 40px; font-size: 13px;">Enable</button>
+                <div id="tvStartGrid" class="library-grid"></div>
             </div>
 
-            <div id="authSection" style="border-top: 1px solid var(--glass-border-subtle); padding-top: 16px;">
-                <div id="loggedOutView">
-                    <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Sign in to load and sync your library:</div>
-                    
-                    <button class="google-auth-btn" onclick="handleGoogleSignIn()">
-                        <svg width="18" height="18" viewBox="0 0 24 24">
-                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                            <path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.62z"/>
-                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-                        </svg>
-                        Continue with Google
-                    </button>
+            <div id="stoppedShowsSection" style="display: none;">
+                <div class="category-title">
+                    <span>Stopped Watching</span>
+                </div>
+                <div id="tvStoppedGrid" class="library-grid"></div>
+            </div>
 
-                    <div class="auth-divider">
-                        <span>OR</span>
+            <div class="tab-nav-footer">
+                <button class="footer-browse-button" onclick="showPage('discover', 'tv')">
+                    <svg class="icon icon-small" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+                    Browse All Shows
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- =====================================================
+         4. MOVIES TAB (Index 1)
+    ================================================     -->
+    <main id="moviesPage" class="page">
+        <div class="tab-content-wrapper">
+            <div>
+                <div class="category-title">
+                    <span>Unwatched Movies</span>
+                </div>
+                <div id="moviesUnwatchedGrid" class="library-grid"></div>
+            </div>
+
+            <div id="watchedMoviesSection" style="display: none;">
+                <div class="category-title">
+                    <span>Watched Movies</span>
+                </div>
+                <div id="moviesWatchedGrid" class="library-grid"></div>
+            </div>
+
+            <div class="tab-nav-footer">
+                <button class="footer-browse-button" onclick="showPage('discover', 'movie')">
+                    <svg class="icon icon-small" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+                    Browse All Movies
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- =====================================================
+         5. HOME TAB (Index 4)
+    ================================================     -->
+    <main id="homePage" class="page">
+        <div class="tab-content-wrapper">
+            <div class="home-card" style="display: flex; flex-direction: column; gap: 18px;">
+                <div class="home-row">
+                    <div class="large-avatar" id="largeAvatar">G</div>
+                    <div>
+                        <div class="home-name" id="homeName">Guest</div>
+                        <div class="home-subtitle" id="homeEmailSubtitle">Guest Account</div>
                     </div>
+                </div>
 
-                    <div class="auth-form">
-                        <input type="text" id="authUsername" class="auth-input" placeholder="Username">
-                        <input type="email" id="authEmail" class="auth-input" placeholder="Email address">
-                        <input type="password" id="authPassword" class="auth-input" placeholder="Password">
-                        <div class="auth-actions">
-                            <button class="auth-btn" onclick="handleSignIn()">Sign In</button>
-                            <button class="auth-btn secondary" onclick="handleSignUp()">Register</button>
+                <!-- Notifications Permission Control -->
+                <div style="border-top: 1px solid var(--glass-border-subtle); padding-top: 16px; display: flex; flex-direction: column; gap: 10px;">
+                    <div>
+                        <div style="font-size: 14px; font-weight: 700;">Release Notifications</div>
+                        <div style="font-size: 12px; color: var(--text-secondary);">Stay ahead with alerts for new episodes and movie releases.</div>
+                    </div>
+                    <button class="action-button primary" id="notificationBtn" onclick="requestNotificationPermission()" style="width: 100%; height: 40px; font-size: 13px;">Enable</button>
+                </div>
+
+                <div id="authSection" style="border-top: 1px solid var(--glass-border-subtle); padding-top: 16px;">
+                    <div id="loggedOutView">
+                        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Sign in to load and sync your library:</div>
+                        
+                        <button class="google-auth-btn" onclick="handleGoogleSignIn()">
+                            <svg width="18" height="18" viewBox="0 0 24 24">
+                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                <path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.62z"/>
+                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                            </svg>
+                            Continue with Google
+                        </button>
+
+                        <div class="auth-divider">
+                            <span>OR</span>
+                        </div>
+
+                        <div class="auth-form">
+                            <input type="text" id="authUsername" class="auth-input" placeholder="Username">
+                            <input type="email" id="authEmail" class="auth-input" placeholder="Email address">
+                            <input type="password" id="authPassword" class="auth-input" placeholder="Password">
+                            <div class="auth-actions">
+                                <button class="auth-btn" onclick="handleSignIn()">Sign In</button>
+                                <button class="auth-btn secondary" onclick="handleSignUp()">Register</button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div id="loggedInView" style="display: none;">
-                    <button class="auth-btn secondary" style="width: 100%;" onclick="handleSignOut()">Sign Out</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Viewing Stats -->
-        <div class="analytics-section">
-            <div class="section-header">
-                <div class="section-title">Viewing Analytics</div>
-            </div>
-            <div class="analytics-card">
-                <div class="analytics-main">
-                    <div class="analytics-icon-badge">
-                        <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    </div>
-                    <div>
-                        <div class="stat-label" style="text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Total Watch Time</div>
-                        <div id="totalWatchTime" class="stat-value highlight">0 Days, 0 Hours, 0 Minutes</div>
+                    <div id="loggedInView" style="display: none;">
+                        <button class="auth-btn secondary" style="width: 100%;" onclick="handleSignOut()">Sign Out</button>
                     </div>
                 </div>
-                <div id="dashboardStats" class="stats"></div>
-            </div>
-        </div>
-
-        <!-- TV Shows Library Section -->
-        <div>
-            <div class="section-header">
-                <div class="section-title">TV Shows Library</div>
             </div>
 
-            <div class="library-toolbar">
-                <div class="search-box">
-                    <svg class="icon search-icon" viewBox="0 0 24 24">
-                        <circle cx="11" cy="11" r="7"/>
-                        <path d="M20 20l-4-4"/>
-                    </svg>
-                    <input id="tvLibrarySearchInput" type="search" placeholder="Search TV shows library..." autocomplete="off">
-                    <button class="search-clear-btn" type="button" onclick="clearSearch('tvLibrarySearchInput')" aria-label="Clear search">
-                        <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
-                    </button>
+            <!-- Viewing Stats -->
+            <div class="analytics-section">
+                <div class="section-header">
+                    <div class="section-title">Viewing Analytics</div>
+                </div>
+                <div class="analytics-card">
+                    <div class="analytics-main">
+                        <div class="analytics-icon-badge">
+                            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        </div>
+                        <div>
+                            <div class="stat-label" style="text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Total Watch Time</div>
+                            <div id="totalWatchTime" class="stat-value highlight">0 Days, 0 Hours, 0 Minutes</div>
+                        </div>
+                    </div>
+                    <div id="dashboardStats" class="stats"></div>
                 </div>
             </div>
 
-            <div id="tvLibraryCategories"></div>
-        </div>
-
-        <!-- Movies Library Section -->
-        <div>
-            <div class="section-header">
-                <div class="section-title">Movies Library</div>
-            </div>
-
-            <div class="library-toolbar">
-                <div class="search-box">
-                    <svg class="icon search-icon" viewBox="0 0 24 24">
-                        <circle cx="11" cy="11" r="7"/>
-                        <path d="M20 20l-4-4"/>
-                    </svg>
-                    <input id="movieLibrarySearchInput" type="search" placeholder="Search movies library..." autocomplete="off">
-                    <button class="search-clear-btn" type="button" onclick="clearSearch('movieLibrarySearchInput')" aria-label="Clear search">
-                        <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
-                    </button>
+            <!-- TV Shows Library Section -->
+            <div>
+                <div class="section-header">
+                    <div class="section-title">TV Shows Library</div>
                 </div>
+
+                <div class="library-toolbar">
+                    <div class="search-box">
+                        <svg class="icon search-icon" viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="7"/>
+                            <path d="M20 20l-4-4"/>
+                        </svg>
+                        <input id="tvLibrarySearchInput" type="search" placeholder="Search TV shows library..." autocomplete="off">
+                        <button class="search-clear-btn" type="button" onclick="clearSearch('tvLibrarySearchInput')" aria-label="Clear search">
+                            <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="tvLibraryCategories"></div>
             </div>
 
-            <div id="movieLibraryCategories"></div>
+            <!-- Movies Library Section -->
+            <div>
+                <div class="section-header">
+                    <div class="section-title">Movies Library</div>
+                </div>
+
+                <div class="library-toolbar">
+                    <div class="search-box">
+                        <svg class="icon search-icon" viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="7"/>
+                            <path d="M20 20l-4-4"/>
+                        </svg>
+                        <input id="movieLibrarySearchInput" type="search" placeholder="Search movies library..." autocomplete="off">
+                        <button class="search-clear-btn" type="button" onclick="clearSearch('movieLibrarySearchInput')" aria-label="Clear search">
+                            <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="movieLibraryCategories"></div>
+            </div>
         </div>
-    </div>
-</main>
+    </main>
+</div>
 
 <!-- =====================================================
      BOTTOM NAVIGATION
@@ -1778,7 +1786,145 @@ document.addEventListener("DOMContentLoaded", () => {
 
     initSearchPage();
     checkNotificationPermissionState();
+    initSwipeNavigation();
 });
+
+/* =========================================================
+   SWIPE GESTURE & NAVIGATION ENGINE
+========================================================= */
+const pageOrder = ['tvShows', 'movies', 'upcoming', 'discover', 'home'];
+
+function getPageIndex(pageName) {
+    return pageOrder.indexOf(pageName);
+}
+
+function showPage(page, subType = null) {
+    window.scrollTo(0, 0);
+
+    const index = getPageIndex(page);
+    if (index === -1) return;
+
+    const container = document.getElementById("swipeContainer");
+    if (container) {
+        container.style.transform = `translateX(-${index * 20}%)`;
+    }
+
+    document.querySelectorAll(".page").forEach(element => element.classList.remove("active"));
+    const target = document.getElementById(`${page}Page`);
+    if (target) {
+        target.classList.add("active");
+    }
+
+    document.querySelectorAll(".nav-button").forEach(button => button.classList.remove("active"));
+    const navId = `nav${page.charAt(0).toUpperCase()}${page.slice(1)}`;
+    const nav = document.getElementById(navId);
+    if (nav) {
+        nav.classList.add("active");
+    }
+
+    if (page === "tvShows") renderTVShowsTab();
+    if (page === "movies") renderMoviesTab();
+    if (page === "upcoming") renderUpcomingTab();
+    if (page === "discover") {
+        if (subType) {
+            setSearchType(subType);
+        } else {
+            const query = document.getElementById("onlineSearchInput").value.trim();
+            if (!query) fetchTrending();
+        }
+    }
+    if (page === "home") renderHomeTab();
+}
+
+function initSwipeNavigation() {
+    const container = document.getElementById("swipeContainer");
+    if (!container) return;
+
+    let startX = 0;
+    let startY = 0;
+    let currentX = 0;
+    let isTracking = false;
+    let isHorizontalSwipe = false;
+
+    container.addEventListener("touchstart", (e) => {
+        if (document.querySelector(".modal.open")) return; // Don't swipe if modal is open
+        const touch = e.touches[0];
+        startX = touch.clientX;
+        startY = touch.clientY;
+        isTracking = true;
+        isHorizontalSwipe = false;
+        container.style.transition = "none";
+    }, { passive: true });
+
+    container.addEventListener("touchmove", (e) => {
+        if (!isTracking) return;
+        const touch = e.touches[0];
+        currentX = touch.clientX;
+        
+        const diffX = currentX - startX;
+        const diffY = touch.clientY - startY;
+
+        if (!isHorizontalSwipe && Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 10) {
+            isHorizontalSwipe = true;
+        }
+
+        if (isHorizontalSwipe) {
+            // Prevent vertical scroll interference during horizontal swipe
+            e.preventDefault();
+            
+            const activePageEl = document.querySelector(".page.active");
+            let currentIndex = 4; // default home
+            pageOrder.forEach((p, idx) => {
+                if (document.getElementById(`${p}Page`) === activePageEl) {
+                    currentIndex = idx;
+                }
+            });
+
+            const baseOffset = -currentIndex * 20;
+            const containerWidth = container.offsetWidth;
+            const percentageOffset = (diffX / containerWidth) * 20;
+            
+            container.style.transform = `translateX(${baseOffset + percentageOffset}%)`;
+        }
+    }, { passive: false });
+
+    container.addEventListener("touchend", (e) => {
+        if (!isTracking) return;
+        isTracking = false;
+        container.style.transition = "transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)";
+
+        if (!isHorizontalSwipe) {
+            const activePageEl = document.querySelector(".page.active");
+            pageOrder.forEach(p => {
+                if (document.getElementById(`${p}Page`) === activePageEl) {
+                    showPage(p);
+                }
+            });
+            return;
+        }
+
+        const diffX = currentX - startX;
+        const activePageEl = document.querySelector(".page.active");
+        let currentIndex = 4;
+        pageOrder.forEach((p, idx) => {
+            if (document.getElementById(`${p}Page`) === activePageEl) {
+                currentIndex = idx;
+            }
+        });
+
+        if (Math.abs(diffX) > 60) {
+            if (diffX < 0 && currentIndex < pageOrder.length - 1) {
+                showPage(pageOrder[currentIndex + 1]);
+            } else if (diffX > 0 && currentIndex > 0) {
+                showPage(pageOrder[currentIndex - 1]);
+            } else {
+                showPage(pageOrder[currentIndex]);
+            }
+        } else {
+            showPage(pageOrder[currentIndex]);
+        }
+    });
+}
 
 /* =========================================================
    DATE HELPERS
@@ -2605,41 +2751,6 @@ function sortMoviesByWatchedDate(movies) {
 }
 
 /* =========================================================
-   TAB NAVIGATION
-========================================================= */
-function showPage(page, subType = null) {
-    window.scrollTo(0, 0);
-
-    document.querySelectorAll(".page").forEach(element => element.classList.remove("active"));
-
-    const target = document.getElementById(`${page}Page`);
-    if (target) {
-        target.classList.add("active");
-    }
-
-    document.querySelectorAll(".nav-button").forEach(button => button.classList.remove("active"));
-
-    const navId = `nav${page.charAt(0).toUpperCase()}${page.slice(1)}`;
-    const nav = document.getElementById(navId);
-    if (nav) {
-        nav.classList.add("active");
-    }
-
-    if (page === "tvShows") renderTVShowsTab();
-    if (page === "movies") renderMoviesTab();
-    if (page === "upcoming") renderUpcomingTab();
-    if (page === "discover") {
-        if (subType) {
-            setSearchType(subType);
-        } else {
-            const query = document.getElementById("onlineSearchInput").value.trim();
-            if (!query) fetchTrending();
-        }
-    }
-    if (page === "home") renderHomeTab();
-}
-
-/* =========================================================
    1. UPCOMING TAB RENDER
 ========================================================= */
 function setUpcomingType(type) {
@@ -2849,7 +2960,7 @@ function renderMovieLibrarySection() {
     }
 
     if (!items.length) {
-        container.innerHTML = emptyState("No Movies Found", "Your movie library is empty.");
+        container.innerHTML = emptyState("No Movies Found", "Your movies library is empty.");
         return;
     }
 
@@ -2872,7 +2983,7 @@ function renderCategoryBlock(title, items) {
     return `
         <div class="category-block">
             <div class="category-title">
-                <span>${escapeHTML(title)}</span>
+                <span>${title}</span>
                 <span class="category-count">${items.length}</span>
             </div>
             <div class="library-grid">
@@ -2882,59 +2993,43 @@ function renderCategoryBlock(title, items) {
     `;
 }
 
-/* =========================================================
-   CARDS
-========================================================= */
-function createCard(item) {
-    const hasPoster = item.poster && item.poster.trim() !== "";
+function renderGrid(containerId, items, emptyMessage) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
 
-    let progressBarHTML = '';
-    if (item.type !== 'movie') {
-        const prog = getTVProgress(item);
-        if (prog.total > 0 && prog.watched > 0) {
-            let barColor = 'var(--blue)';
-            if (item.isStopped) {
-                barColor = 'var(--text-muted)';
-            } else if (isTVFinished(item)) {
-                barColor = 'var(--danger)';
-            } else if (isTVUpToDate(item)) {
-                barColor = 'var(--success)';
-            }
-            progressBarHTML = `
-                <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: rgba(0,0,0,0.2); z-index: 2;">
-                    <div style="width: ${prog.percentage}%; height: 100%; background: ${barColor};"></div>
-                </div>
-            `;
-        }
+    if (!items || items.length === 0) {
+        container.innerHTML = emptyState("Empty", emptyMessage);
+        return;
     }
 
+    container.innerHTML = items.map(item => createCard(item)).join("");
+}
+
+function createCard(item) {
+    const posterUrl = item.poster ? escapeHTML(item.poster) : '';
+
     return `
-        <div class="card" onclick="openDetails('${item.id}')" data-id="${item.id}">
+        <div class="card" onclick="openDetails('${item.id}')">
             <div class="poster">
-                ${hasPoster ? `
-                    <img src="${item.poster}" alt="${escapeHTML(item.title)}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="poster-placeholder" style="display: none;">${escapeHTML(item.title)}</div>
-                ` : `
-                    <div class="poster-placeholder">${escapeHTML(item.title)}</div>
-                `}
-                ${progressBarHTML}
+                ${posterUrl ? 
+                    `<img src="${posterUrl}" alt="${escapeHTML(item.title)}" loading="lazy" onerror="this.style.display='none'">` :
+                    `<div class="poster-placeholder">${escapeHTML(item.title)}</div>`
+                }
             </div>
         </div>
     `;
 }
 
 function createUpcomingCard(data) {
-    const hasPoster = data.item.poster && data.item.poster.trim() !== "";
+    const posterUrl = data.item.poster ? escapeHTML(data.item.poster) : '';
 
     return `
         <div class="upcoming-card" onclick="openDetails('${data.item.id}')">
             <div class="upcoming-poster">
-                ${hasPoster ? `
-                    <img src="${data.item.poster}" alt="${escapeHTML(data.title)}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="upcoming-poster-placeholder" style="display: none;">${escapeHTML(data.title)}</div>
-                ` : `
-                    <div class="upcoming-poster-placeholder">${escapeHTML(data.title)}</div>
-                `}
+                ${posterUrl ? 
+                    `<img src="${posterUrl}" alt="${escapeHTML(data.title)}" loading="lazy" onerror="this.style.display='none'">` :
+                    `<div class="upcoming-poster-placeholder">${escapeHTML(data.title)}</div>`
+                }
             </div>
             <div class="upcoming-info">
                 <div class="upcoming-title">${escapeHTML(data.title)}</div>
@@ -2946,105 +3041,168 @@ function createUpcomingCard(data) {
     `;
 }
 
-function renderGrid(containerId, items, emptyText) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-
-    if (!items.length) {
-        container.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:10px 0; grid-column: 1 / -1;">${emptyText}</div>`;
-        return;
-    }
-
-    container.innerHTML = items.map(item => createCard(item)).join("");
-}
-
-function emptyState(title, message = "Check back later or search for new shows and movies to add.") {
+function emptyState(title, message) {
     return `
         <div class="empty-state">
-            <svg class="icon icon-large" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="9"/>
-                <path d="M12 8v4l3 3"/>
-            </svg>
-            <h3>${title}</h3>
-            <p>${message}</p>
+            <svg class="icon icon-large" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <h3>${escapeHTML(title)}</h3>
+            <p>${escapeHTML(message)}</p>
         </div>
     `;
 }
 
 /* =========================================================
-   HOME UI HANDLING
+   DETAILS MODAL SYSTEM
 ========================================================= */
-function updateHomeUI() {
-    let displayName = "";
-
-    if (auth && auth.currentUser) {
-        const user = auth.currentUser;
-        displayName = user.displayName || user.email.split('@')[0];
-    } else if (state.profiles && state.profiles[0] && state.profiles[0].name && auth && auth.currentUser) {
-        displayName = state.profiles[0].name;
-    } else {
-        displayName = "Guest";
-    }
-
-    const initial = displayName.charAt(0).toUpperCase() || "G";
-
-    const homeNameEl = document.getElementById("homeName");
-    if (homeNameEl) homeNameEl.textContent = displayName;
-
-    const homeEmailSub = document.getElementById("homeEmailSubtitle");
-    if (homeEmailSub) {
-        homeEmailSub.textContent = (auth && auth.currentUser) 
-            ? auth.currentUser.email 
-            : "Guest Account";
-    }
-
-    const largeAvatarEl = document.getElementById("largeAvatar");
-    if (largeAvatarEl) largeAvatarEl.textContent = initial;
-
-    const headerAvatarEl = document.getElementById("headerAvatar");
-    if (headerAvatarEl) headerAvatarEl.textContent = initial;
-}
-
-/* =========================================================
-   DETAILS MODAL, TRAILERS & EPISODE DETAILED VIEW
-========================================================= */
-async function playTrailer(tmdbId, type) {
-    showToast("Finding trailer...");
-    try {
-        const endpoint = type === 'movie' 
-            ? `https://api.themoviedb.org/3/movie/${tmdbId}/videos?api_key=${TMDB_API_KEY}`
-            : `https://api.themoviedb.org/3/tv/${tmdbId}/videos?api_key=${TMDB_API_KEY}`;
-
-        const res = await fetch(endpoint);
-        const data = await res.json();
-
-        const trailer = (data.results || []).find(v => v.site === "YouTube" && v.type === "Trailer");
-
-        if (trailer) {
-            window.open(`https://www.youtube.com/watch?v=${trailer.key}`, '_blank');
-        } else {
-            showToast("No official trailer found.");
-        }
-    } catch (err) {
-        console.error("Error playing trailer:", err);
-        showToast("Could not load trailer.");
-    }
-}
-
-function openDetails(itemId) {
-    currentItem = getItem(itemId);
+function openDetails(id) {
+    currentItem = getItem(id);
     if (!currentItem) return;
 
-    if (currentItem.type !== 'movie' && currentItem.episodes) {
-        selectedSeason = 1;
-        const availableSeasons = [...new Set(currentItem.episodes.map(ep => ep.season))].sort((a, b) => a - b);
-        if (availableSeasons.length > 0 && !availableSeasons.includes(selectedSeason)) {
-            selectedSeason = availableSeasons[0];
-        }
-    }
-
+    selectedSeason = 1;
     updateModalContent();
     document.getElementById("detailsModal").classList.add("open");
+}
+
+function updateModalContent() {
+    if (!currentItem) return;
+
+    const backdropHeader = document.getElementById("modalBackdropHeader");
+    const titleEl = document.getElementById("modalTitle");
+    const metaEl = document.getElementById("modalMeta");
+    const descEl = document.getElementById("modalDescription");
+    const actionsEl = document.getElementById("modalActions");
+    const episodesEl = document.getElementById("modalEpisodes");
+
+    if (currentItem.backdrop) {
+        backdropHeader.style.backgroundImage = `url('${currentItem.backdrop}')`;
+    } else if (currentItem.poster) {
+        backdropHeader.style.backgroundImage = `url('${currentItem.poster}')`;
+    } else {
+        backdropHeader.style.backgroundImage = 'none';
+    }
+
+    titleEl.textContent = currentItem.title;
+    descEl.textContent = currentItem.description || "No description available.";
+
+    if (currentItem.type === 'movie') {
+        metaEl.innerHTML = `
+            <span>${currentItem.year || 'N/A'}</span>
+            <span>•</span>
+            <span>${currentItem.runtime || '120 min'}</span>
+            <span>•</span>
+            <span style="text-transform:uppercase;">Movie</span>
+        `;
+
+        actionsEl.className = "modal-actions movie-actions-grid";
+        actionsEl.innerHTML = `
+            <button class="action-button primary" onclick="toggleMovieWatched()">
+                ${currentItem.watched ? 'Watched ✓' : 'Mark Watched'}
+            </button>
+            <button class="action-button warning" onclick="toggleMovieWatchCount()">
+                Watched (${currentItem.watchCount || (currentItem.watched ? 1 : 0)})
+            </button>
+            <button class="action-button danger" onclick="confirmDeleteItem()">
+                Delete
+            </button>
+        `;
+        episodesEl.innerHTML = "";
+
+    } else {
+        const progress = getTVProgress(currentItem);
+        metaEl.innerHTML = `
+            <span>${currentItem.year || 'N/A'}</span>
+            <span>•</span>
+            <span>${progress.watched}/${progress.total} Episodes Watched</span>
+            <span>•</span>
+            <span style="text-transform:uppercase;">TV Show</span>
+        `;
+
+        actionsEl.className = "modal-actions";
+        actionsEl.innerHTML = `
+            <div class="modal-actions-row">
+                <button class="action-button primary" onclick="markAllEpisodesWatched()">Mark All</button>
+                <button class="action-button warning" onclick="toggleStopWatching()">
+                    ${currentItem.isStopped ? 'Resume Show' : 'Stop Watching'}
+                </button>
+                <button class="action-button danger" onclick="confirmDeleteItem()">Delete</button>
+            </div>
+        `;
+
+        renderSeasonsAndEpisodes(episodesEl);
+    }
+}
+
+function renderSeasonsAndEpisodes(container) {
+    if (!currentItem.episodes || currentItem.episodes.length === 0) {
+        container.innerHTML = `<div style="margin-top:20px; text-align:center; color:var(--text-secondary); font-size:13px;">No episodes available.</div>`;
+        return;
+    }
+
+    const seasonsMap = new Map();
+    currentItem.episodes.forEach(ep => {
+        if (!seasonsMap.has(ep.season)) seasonsMap.set(ep.season, []);
+        seasonsMap.get(ep.season).push(ep);
+    });
+
+    const seasons = Array.from(seasonsMap.keys()).sort((a, b) => a - b);
+    if (!seasons.includes(selectedSeason) && seasons.length > 0) {
+        selectedSeason = seasons[0];
+    }
+
+    let seasonButtonsHTML = seasons.map(sNum => `
+        <button class="season-button ${sNum === selectedSeason ? 'active' : ''}" onclick="selectSeason(${sNum})">
+            Season ${sNum}
+        </button>
+    `).join("");
+
+    const currentSeasonEpisodes = (seasonsMap.get(selectedSeason) || []).sort((a, b) => a.number - b.number);
+
+    let episodesHTML = currentSeasonEpisodes.map(ep => {
+        const released = isReleased(ep.releaseDate);
+        const stillUrl = ep.still ? escapeHTML(ep.still) : '';
+
+        return `
+            <div class="episode" onclick="openEpisodeDetails('${ep.id}')">
+                <div class="episode-main">
+                    <div class="episode-left">
+                        ${stillUrl ?
+                            `<img src="${stillUrl}" class="episode-still" alt="S${ep.season}E${ep.number}" loading="lazy" onerror="this.style.display='none'">` :
+                            `<div class="episode-still" style="display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--text-muted);">S${ep.season}E${ep.number}</div>`
+                        }
+                        <div class="episode-info">
+                            <div class="episode-title">${ep.number}. ${escapeHTML(ep.title)}</div>
+                            <div class="episode-overview">${escapeHTML(ep.overview || 'No overview available.')}</div>
+                            <div class="episode-meta">
+                                ${released ? `${ep.runtime || '45 min'}` : `Releases ${formatDate(ep.releaseDate)}`}
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="action-button ${ep.watched ? 'primary' : ''}" style="width: 38px; height: 38px; border-radius: 50%; padding: 0;" onclick="event.stopPropagation(); toggleEpisodeWatched('${ep.id}')" aria-label="Toggle watched">
+                            ${ep.watched ? '✓' : ''}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join("");
+
+    container.innerHTML = `
+        <div class="season-selector-wrapper">
+            <div class="season-selector">
+                ${seasonButtonsHTML}
+            </div>
+        </div>
+        <div style="margin-top: 10px;">
+            ${episodesHTML || '<div style="text-align:center; color:var(--text-secondary); padding:20px;">No episodes in this season.</div>'}
+        </div>
+    `;
+}
+
+function selectSeason(sNum) {
+    selectedSeason = sNum;
+    const episodesEl = document.getElementById("modalEpisodes");
+    renderSeasonsAndEpisodes(episodesEl);
 }
 
 function closeModal() {
@@ -3053,145 +3211,57 @@ function closeModal() {
     refreshActivePage();
 }
 
-function closeModalOutside(event) {
-    if (event.target.id === "detailsModal") {
+function closeModalOutside(e) {
+    if (e.target.id === "detailsModal") {
         closeModal();
     }
 }
 
-function updateModalContent() {
-    if (!currentItem) return;
-
-    const backdropHeader = document.getElementById("modalBackdropHeader");
-    const backdropUrl = currentItem.backdrop || currentItem.poster;
-    if (backdropUrl) {
-        backdropHeader.style.backgroundImage = `url('${backdropUrl}')`;
-    } else {
-        backdropHeader.style.backgroundImage = `none`;
-        backdropHeader.style.backgroundColor = `var(--surface-2)`;
-    }
-
-    document.getElementById("modalTitle").textContent = currentItem.title;
-
-    let metaHTML = `
-        <span>${currentItem.year || 'N/A'}</span>
-        <span>•</span>
-        <span style="text-transform:uppercase;">${currentItem.type === 'movie' ? 'Movie' : 'TV Show'}</span>
-    `;
-
-    if (currentItem.type === 'movie') {
-        metaHTML += `<span>•</span><span>${currentItem.runtime || '120 min'}</span>`;
-    } else {
-        const prog = getTVProgress(currentItem);
-        metaHTML += `<span>•</span><span>${prog.watched}/${prog.total} Episodes Watched (${prog.percentage}%)</span>`;
-    }
-
-    document.getElementById("modalMeta").innerHTML = metaHTML;
-    document.getElementById("modalDescription").textContent = currentItem.description;
-
-    let actionsHTML = '';
-    if (currentItem.type === 'movie') {
-        actionsHTML = `
-            <div class="modal-actions movie-actions-grid">
-                <button class="action-button trailer" onclick="playTrailer(${currentItem.tmdbId}, 'movie')">Trailer</button>
-                <button class="action-button warning" onclick="toggleStopItem('${currentItem.id}')">${currentItem.isStopped ? 'Resume' : 'Stop'}</button>
-                <button class="action-button danger" onclick="deleteItem('${currentItem.id}')">Remove</button>
-            </div>
-        `;
-    } else {
-        actionsHTML = `
-            <div class="modal-actions-row">
-                <button class="action-button trailer" onclick="playTrailer(${currentItem.tmdbId}, 'tv')">Trailer</button>
-                <button class="action-button warning" onclick="toggleStopItem('${currentItem.id}')">${currentItem.isStopped ? 'Resume' : 'Stop'}</button>
-                <button class="action-button danger" onclick="deleteItem('${currentItem.id}')">Remove</button>
-            </div>
-        `;
-    }
-
-    document.getElementById("modalActions").innerHTML = actionsHTML;
-
-    const episodesContainer = document.getElementById("modalEpisodes");
-    if (currentItem.type === 'movie') {
-        episodesContainer.innerHTML = '';
-    } else {
-        const seasons = [...new Set(currentItem.episodes.map(ep => ep.season))].sort((a, b) => a - b);
-        
-        let seasonSelectorHTML = '';
-        if (seasons.length > 1) {
-            seasonSelectorHTML = `
-                <div class="season-selector-wrapper">
-                    <div class="season-selector">
-                        ${seasons.map(season => `
-                            <button class="season-button ${season === selectedSeason ? 'active' : ''}" onclick="selectSeason(${season})">Season ${season}</button>
-                        `).join("")}
-                    </div>
-                </div>
-            `;
-        }
-
-        const seasonEpisodes = currentItem.episodes.filter(ep => ep.season === selectedSeason);
-
-        let episodesHTML = seasonEpisodes.map(ep => {
-            const hasStill = ep.still && ep.still.trim() !== "";
-            return `
-                <div class="episode" onclick="openEpisodeDetails('${currentItem.id}', '${ep.id}')">
-                    <div class="episode-main">
-                        <div class="episode-left">
-                            ${hasStill ? 
-                                `<img src="${ep.still}" class="episode-still" alt="${escapeHTML(ep.title)}" loading="lazy">` : 
-                                `<div class="episode-still" style="display:flex; align-items:center; justify-content:center; font-size:9px; color:var(--text-muted); text-align:center;">S${ep.season} E${ep.number}</div>`
-                            }
-                            <div class="episode-info">
-                                <div class="episode-title">${ep.number}. ${escapeHTML(ep.title)}</div>
-                                <div class="episode-overview">${escapeHTML(ep.overview || 'No overview available.')}</div>
-                                <div class="episode-meta">${formatDate(ep.releaseDate)} • ${ep.runtime || '45 min'}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }).join("");
-
-        episodesContainer.innerHTML = seasonSelectorHTML + `<div>${episodesHTML || '<div style="color:var(--text-secondary); font-size:13px; padding:10px 0;">No episodes found for this season.</div>'}</div>`;
-    }
-}
-
-function selectSeason(seasonNum) {
-    selectedSeason = seasonNum;
-    updateModalContent();
-}
-
-function openEpisodeDetails(showId, episodeId) {
-    const show = getItem(showId);
-    if (!show || !show.episodes) return;
-
-    const episode = show.episodes.find(ep => ep.id === episodeId);
-    if (!episode) return;
-
-    currentEpisode = { showId, episodeId };
+/* =========================================================
+   EPISODE DETAILS MODAL SYSTEM
+========================================================= */
+function openEpisodeDetails(episodeId) {
+    if (!currentItem || !currentItem.episodes) return;
+    currentEpisode = currentItem.episodes.find(e => e.id === episodeId);
+    if (!currentEpisode) return;
 
     const backdropHeader = document.getElementById("episodeModalBackdropHeader");
-    const backdropUrl = episode.still || show.backdrop || show.poster;
-    if (backdropUrl) {
-        backdropHeader.style.backgroundImage = `url('${backdropUrl}')`;
+    const titleEl = document.getElementById("episodeModalTitle");
+    const metaEl = document.getElementById("episodeModalMeta");
+    const descEl = document.getElementById("episodeModalDescription");
+    const actionsEl = document.getElementById("episodeModalActions");
+
+    if (currentEpisode.still) {
+        backdropHeader.style.backgroundImage = `url('${currentEpisode.still}')`;
+    } else if (currentItem.backdrop) {
+        backdropHeader.style.backgroundImage = `url('${currentItem.backdrop}')`;
     } else {
-        backdropHeader.style.backgroundImage = `none`;
-        backdropHeader.style.backgroundColor = `var(--surface-2)`;
+        backdropHeader.style.backgroundImage = 'none';
     }
 
-    document.getElementById("episodeModalTitle").textContent = `S${episode.season} E${episode.number}: ${episode.title}`;
+    titleEl.textContent = `S${currentEpisode.season} E${currentEpisode.number}: ${currentEpisode.title}`;
+    descEl.textContent = currentEpisode.overview || "No description available.";
 
-    let metaHTML = `
-        <span>${show.title}</span>
+    metaEl.innerHTML = `
+        <span>Season ${currentEpisode.season}, Episode ${currentEpisode.number}</span>
         <span>•</span>
-        <span>Season ${episode.season}, Episode ${episode.number}</span>
+        <span>${currentEpisode.runtime || '45 min'}</span>
         <span>•</span>
-        <span>${episode.runtime || '45 min'}</span>
+        <span>${formatDate(currentEpisode.releaseDate)}</span>
     `;
 
-    document.getElementById("episodeModalMeta").innerHTML = metaHTML;
-    document.getElementById("episodeModalDescription").textContent = episode.overview || "No description available for this episode.";
-    document.getElementById("episodeModalActions").innerHTML = '';
+    actionsEl.className = "modal-actions movie-actions-grid";
+    actionsEl.innerHTML = `
+        <button class="action-button primary" onclick="toggleEpisodeWatchedFromModal()">
+            ${currentEpisode.watched ? 'Watched ✓' : 'Mark Watched'}
+        </button>
+        <button class="action-button warning" onclick="toggleEpisodeWatchCountFromModal()">
+            Watched (${currentEpisode.watchCount || (currentEpisode.watched ? 1 : 0)})
+        </button>
+        <button class="action-button danger" onclick="closeEpisodeModal()">
+            Close
+        </button>
+    `;
 
     document.getElementById("episodeDetailsModal").classList.add("open");
 }
@@ -3199,44 +3269,154 @@ function openEpisodeDetails(showId, episodeId) {
 function closeEpisodeModal() {
     document.getElementById("episodeDetailsModal").classList.remove("open");
     currentEpisode = null;
+    updateModalContent(); // Refresh main show modal
 }
 
-function closeEpisodeModalOutside(event) {
-    if (event.target.id === "episodeDetailsModal") {
+function closeEpisodeModalOutside(e) {
+    if (e.target.id === "episodeDetailsModal") {
         closeEpisodeModal();
     }
 }
 
-async function toggleStopItem(itemId) {
-    const item = getItem(itemId);
-    if (!item) return;
+async function toggleEpisodeWatchedFromModal() {
+    if (!currentEpisode || !currentItem) return;
+    currentEpisode.watched = !currentEpisode.watched;
+    if (currentEpisode.watched) {
+        currentEpisode.watchCount = Math.max(1, (currentEpisode.watchCount || 0) + 1);
+    } else {
+        currentEpisode.watchCount = 0;
+    }
 
-    item.isStopped = !item.isStopped;
-    await saveItem(item);
-    showToast(item.isStopped ? "Moved to Stopped Watching" : "Resumed tracking show");
-    closeModal();
-    refreshActivePage();
+    await saveItem(currentItem);
+    openEpisodeDetails(currentEpisode.id);
+    showToast(`Updated "${currentEpisode.title}"`);
 }
 
-async function deleteItem(itemId) {
-    if (!confirm("Are you sure you want to remove this item from your library?")) return;
+async function toggleEpisodeWatchCountFromModal() {
+    if (!currentEpisode || !currentItem) return;
+    if (!currentEpisode.watched) {
+        currentEpisode.watched = true;
+    }
+    currentEpisode.watchCount = (currentEpisode.watchCount || 1) + 1;
+
+    await saveItem(currentItem);
+    openEpisodeDetails(currentEpisode.id);
+    showToast(`Watch count increased for "${currentEpisode.title}"`);
+}
+
+/* =========================================================
+   MEDIA ACTIONS & UPDATERS
+========================================================= */
+async function toggleMovieWatched() {
+    if (!currentItem || currentItem.type !== 'movie') return;
+    currentItem.watched = !currentItem.watched;
+    currentItem.lastWatchedAt = currentItem.watched ? new Date().toISOString() : null;
+    
+    if (currentItem.watched) {
+        currentItem.watchCount = Math.max(1, (currentItem.watchCount || 0) + 1);
+    } else {
+        currentItem.watchCount = 0;
+    }
+
+    await saveItem(currentItem);
+    updateModalContent();
+    showToast(`Updated "${currentItem.title}"`);
+}
+
+async function toggleMovieWatchCount() {
+    if (!currentItem || currentItem.type !== 'movie') return;
+    if (!currentItem.watched) {
+        currentItem.watched = true;
+        currentItem.lastWatchedAt = new Date().toISOString();
+    }
+    currentItem.watchCount = (currentItem.watchCount || 1) + 1;
+
+    await saveItem(currentItem);
+    updateModalContent();
+    showToast(`Watch count increased for "${currentItem.title}"`);
+}
+
+async function toggleStopWatching() {
+    if (!currentItem || currentItem.type === 'movie') return;
+    currentItem.isStopped = !currentItem.isStopped;
+
+    await saveItem(currentItem);
+    updateModalContent();
+    showToast(currentItem.isStopped ? `Stopped watching "${currentItem.title}"` : `Resumed watching "${currentItem.title}"`);
+}
+
+async function toggleEpisodeWatched(episodeId) {
+    if (!currentItem || !currentItem.episodes) return;
+    const ep = currentItem.episodes.find(e => e.id === episodeId);
+    if (!ep) return;
+
+    ep.watched = !ep.watched;
+    if (ep.watched) {
+        ep.watchCount = Math.max(1, (ep.watchCount || 0) + 1);
+    } else {
+        ep.watchCount = 0;
+    }
+
+    await saveItem(currentItem);
+    updateModalContent();
+}
+
+async function markAllEpisodesWatched() {
+    if (!currentItem || !currentItem.episodes) return;
+    const available = getAvailableEpisodes(currentItem);
+    
+    available.forEach(ep => {
+        ep.watched = true;
+        ep.watchCount = Math.max(1, (ep.watchCount || 0) + 1);
+    });
+
+    await saveItem(currentItem);
+    updateModalContent();
+    showToast(`Marked all available episodes of "${currentItem.title}" as watched!`);
+}
+
+async function confirmDeleteItem() {
+    if (!currentItem) return;
+    if (!confirm(`Are you sure you want to remove "${currentItem.title}" from your library?`)) return;
 
     try {
-        if (auth && auth.currentUser && db) {
+        if (auth && auth.currentUser) {
             await db.collection("users")
                 .doc(auth.currentUser.uid)
                 .collection("library")
-                .doc(itemId)
+                .doc(currentItem.id)
                 .delete();
         }
 
-        state.library = state.library.filter(i => i.id !== itemId);
-        showToast("Removed from library.");
+        state.library = state.library.filter(i => i.id !== currentItem.id);
         closeModal();
-        refreshActivePage();
+        showToast("Item deleted from library.");
     } catch (err) {
         console.error("Error deleting item:", err);
-        showToast("Failed to remove item.");
+        showToast("Failed to delete item.");
+    }
+}
+
+/* =========================================================
+   USER UI UPDATES
+========================================================= */
+function updateHomeUI() {
+    const avatar = document.getElementById("headerAvatar");
+    const largeAvatar = document.getElementById("largeAvatar");
+    const nameEl = document.getElementById("homeName");
+    const subtitleEl = document.getElementById("homeEmailSubtitle");
+
+    const profile = state.profiles[0] || { name: "Guest", initials: "G" };
+    
+    avatar.textContent = profile.initials || "G";
+    largeAvatar.textContent = profile.initials || "G";
+
+    if (currentUser) {
+        nameEl.textContent = currentUser.displayName || profile.name;
+        subtitleEl.textContent = currentUser.email;
+    } else {
+        nameEl.textContent = "Guest";
+        subtitleEl.textContent = "Guest Account (Sign in to sync)";
     }
 }
 </script>
