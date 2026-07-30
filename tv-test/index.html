@@ -214,62 +214,6 @@ img {
 }
 
 /* =========================================================
-   TAB HERO HEADERS (Revamped Dashboard Layout)
-========================================================= */
-.watchlist-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 20px;
-    margin-bottom: -10px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.88) 0%, rgba(235,244,255,0.75) 100%);
-    backdrop-filter: blur(40px) saturate(200%);
-    -webkit-backdrop-filter: blur(40px) saturate(200%);
-    border: 1px solid rgba(0, 102, 204, 0.22);
-    border-radius: var(--radius);
-    box-shadow: 0 16px 40px rgba(0, 102, 204, 0.08), inset 0 1px 0 rgba(255,255,255,0.95);
-}
-
-.watchlist-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-    background: linear-gradient(135deg, var(--blue-light), var(--blue));
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.4);
-    flex-shrink: 0;
-}
-
-.watchlist-icon svg {
-    width: 24px;
-    height: 24px;
-}
-
-.watchlist-title-group {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.watchlist-title-group .section-title {
-    margin: 0;
-    font-size: 22px;
-    font-weight: 800;
-}
-
-.watchlist-subtitle {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--blue);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-
-/* =========================================================
    SECTIONS & FOOTERS
 ========================================================= */
 .section-header {
@@ -507,7 +451,6 @@ img {
     border: 1px solid var(--glass-border);
     border-radius: var(--radius);
     box-shadow: var(--glass-shadow-sm);
-    width: 100%;
 }
 
 .empty-state svg {
@@ -1117,6 +1060,12 @@ img {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.episode-main:active {
+    opacity: 0.7;
 }
 
 .episode-still {
@@ -1417,19 +1366,8 @@ img {
      2. UPCOMING TAB
 ================================================     -->
 <main id="upcomingPage" class="page">
-    <div class="watchlist-header">
-        <div class="watchlist-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                <line x1="16" y1="2" x2="16" y2="6"/>
-                <line x1="8" y1="2" x2="8" y2="6"/>
-                <line x1="3" y1="10" x2="21" y2="10"/>
-            </svg>
-        </div>
-        <div class="watchlist-title-group">
-            <div class="section-title">Upcoming</div>
-            <div class="watchlist-subtitle">New Releases</div>
-        </div>
+    <div class="section-header">
+        <div class="section-title">Upcoming Releases</div>
     </div>
 
     <div class="search-type-toggle">
@@ -1443,45 +1381,36 @@ img {
 </main>
 
 <!-- =====================================================
-     3. TV SHOWS TAB (Revamped Layout)
+     3. TV SHOWS TAB
 ================================================     -->
 <main id="tvShowsPage" class="page">
     <div class="tab-content-wrapper">
-        <div class="watchlist-header">
-            <div class="watchlist-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="2" y="7" width="20" height="13" rx="2"/>
-                    <path d="M17 2l-5 5-5-5"/>
-                </svg>
-            </div>
-            <div class="watchlist-title-group">
-                <div class="section-title">TV Shows</div>
-                <div class="watchlist-subtitle">Your Watchlist</div>
-            </div>
+        <div class="section-header">
+            <div class="section-title">TV Shows Watch List</div>
         </div>
 
-        <div class="category-block">
+        <div>
             <div class="category-title">
                 <span>Continue Watching</span>
-                <span id="tvContinueCount" class="category-count">0</span>
             </div>
-            <div id="tvContinueGrid" class="horizontal-row"></div>
+            <!-- Changed from horizontal-row to search-results-grid for list view -->
+            <div id="tvContinueGrid" class="search-results-grid"></div>
         </div>
 
-        <div class="category-block">
+        <div>
             <div class="category-title">
                 <span>Start Watching</span>
-                <span id="tvStartCount" class="category-count">0</span>
             </div>
-            <div id="tvStartGrid" class="horizontal-row"></div>
+            <!-- Changed from horizontal-row to library-grid for 3 items per row -->
+            <div id="tvStartGrid" class="library-grid"></div>
         </div>
 
-        <div id="stoppedShowsSection" class="category-block" style="display: none;">
+        <div id="stoppedShowsSection" style="display: none;">
             <div class="category-title">
                 <span>Stopped Watching</span>
-                <span id="tvStoppedCount" class="category-count">0</span>
             </div>
-            <div id="tvStoppedGrid" class="horizontal-row"></div>
+            <!-- Changed to library-grid -->
+            <div id="tvStoppedGrid" class="library-grid"></div>
         </div>
 
         <div class="tab-nav-footer">
@@ -1494,39 +1423,28 @@ img {
 </main>
 
 <!-- =====================================================
-     4. MOVIES TAB (Revamped Layout)
+     4. MOVIES TAB
 ================================================     -->
 <main id="moviesPage" class="page">
     <div class="tab-content-wrapper">
-        <div class="watchlist-header">
-            <div class="watchlist-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="2" y="7" width="20" height="14" rx="2"/>
-                    <path d="M2 7l4-4h3l-4 4H2z"/>
-                    <path d="M11 7l4-4h3l-4 4h-3z"/>
-                    <line x1="2" y1="12" x2="22" y2="12"/>
-                </svg>
-            </div>
-            <div class="watchlist-title-group">
-                <div class="section-title">Movies</div>
-                <div class="watchlist-subtitle">Your Watchlist</div>
-            </div>
+        <div class="section-header">
+            <div class="section-title">Movies Watch List</div>
         </div>
 
-        <div class="category-block">
+        <div>
             <div class="category-title">
                 <span>Unwatched Movies</span>
-                <span id="moviesUnwatchedCount" class="category-count">0</span>
             </div>
-            <div id="moviesUnwatchedGrid" class="horizontal-row"></div>
+            <!-- Changed from horizontal-row to library-grid for 3 items per row -->
+            <div id="moviesUnwatchedGrid" class="library-grid"></div>
         </div>
 
-        <div id="watchedMoviesSection" class="category-block" style="display: none;">
+        <div id="watchedMoviesSection" style="display: none;">
             <div class="category-title">
                 <span>Watched Movies</span>
-                <span id="moviesWatchedCount" class="category-count">0</span>
             </div>
-            <div id="moviesWatchedGrid" class="horizontal-row"></div>
+            <!-- Changed from horizontal-row to library-grid for 3 items per row -->
+            <div id="moviesWatchedGrid" class="library-grid"></div>
         </div>
 
         <div class="tab-nav-footer">
@@ -1728,6 +1646,35 @@ img {
     </div>
 </div>
 
+<!-- =====================================================
+     EPISODE DETAILS MODAL
+================================================     -->
+<div id="episodeModal" class="modal" style="z-index: 300;" onclick="closeEpisodeModalOutside(event)">
+    <div class="modal-sheet">
+        <div class="modal-header-nav">
+            <button class="close-button" onclick="closeEpisodeModal()" aria-label="Close">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M6 6l12 12"/>
+                    <path d="M18 6L6 18"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div id="episodeModalBackdropHeader" class="modal-backdrop-header">
+            <div class="modal-backdrop-overlay"></div>
+            <div class="modal-hero-title-container">
+                <h2 id="episodeModalTitle" class="modal-title"></h2>
+            </div>
+        </div>
+
+        <div class="modal-content">
+            <div id="episodeModalMeta" class="modal-meta"></div>
+            <p id="episodeModalDescription" class="modal-description"></p>
+            <div id="episodeModalActions" class="modal-actions"></div>
+        </div>
+    </div>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <script>
@@ -1776,6 +1723,7 @@ let state = {
 };
 
 let currentItem = null;
+let currentEpisode = null;
 let selectedSeason = 1;
 let currentSearchType = 'tv';
 let currentUpcomingType = 'tv';
@@ -2769,18 +2717,14 @@ function renderTVShowsTab() {
 
     const stoppedShows = sortTVShowsByLatestAired(tvShows.filter(show => show.isStopped));
 
-    document.getElementById("tvContinueCount").textContent = continueShows.length;
-    document.getElementById("tvStartCount").textContent = startShows.length;
-
-    renderRow("tvContinueGrid", continueShows, "No TV shows currently in progress with available episodes.");
+    renderContinueWatchingList("tvContinueGrid", continueShows, "No TV shows currently in progress with available episodes.");
     renderRow("tvStartGrid", startShows, "No unwatched TV shows ready to start.");
 
     const stoppedSection = document.getElementById("stoppedShowsSection");
     if (stoppedSection) {
         if (stoppedShows.length > 0) {
             stoppedSection.style.display = "block";
-            document.getElementById("tvStoppedCount").textContent = stoppedShows.length;
-            renderRow("tvStoppedGrid", stoppedShows, "No stopped shows.");
+            renderRow("tvStoppedGrid", stoppedShows, "");
         } else {
             stoppedSection.style.display = "none";
         }
@@ -2796,16 +2740,13 @@ function renderMoviesTab() {
     const unwatchedMovies = movies.filter(item => !item.watched && isReleased(item.releaseDate));
     const watchedMovies = sortMoviesByWatchedDate(movies.filter(item => item.watched));
 
-    document.getElementById("moviesUnwatchedCount").textContent = unwatchedMovies.length;
-
     renderRow("moviesUnwatchedGrid", unwatchedMovies, "No unwatched movies in your library.");
 
     const watchedSection = document.getElementById("watchedMoviesSection");
     if (watchedSection) {
         if (watchedMovies.length > 0) {
             watchedSection.style.display = "block";
-            document.getElementById("moviesWatchedCount").textContent = watchedMovies.length;
-            renderRow("moviesWatchedGrid", watchedMovies, "No watched movies.");
+            renderRow("moviesWatchedGrid", watchedMovies, "");
         } else {
             watchedSection.style.display = "none";
         }
@@ -3028,13 +2969,44 @@ function renderRow(containerId, items, emptyText) {
     if (!container) return;
 
     if (!items.length) {
-        container.style.display = "block"; // override flex temporarily to fit the full-width empty block
-        container.innerHTML = emptyState("Nothing Here", emptyText);
+        container.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:10px 0;">${emptyText}</div>`;
         return;
     }
 
-    container.style.display = "flex"; // restore flex
     container.innerHTML = items.map(item => createCard(item)).join("");
+}
+
+function renderContinueWatchingList(containerId, items, emptyText) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (!items.length) {
+        container.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:10px 0;">${emptyText}</div>`;
+        return;
+    }
+
+    container.innerHTML = items.map(show => {
+        const nextEp = getNextUnwatchedEpisode(show);
+        if (!nextEp) return '';
+        const posterUrl = show.poster || '';
+        return `
+            <div class="search-card" onclick="openDetails('${show.id}')">
+                ${posterUrl ? 
+                    `<img src="${posterUrl}" class="search-card-poster" alt="${escapeHTML(show.title)}" loading="lazy" onerror="this.style.display='none'">` :
+                    `<div class="search-card-poster" style="display:flex; align-items:center; justify-content:center; text-align:center; font-size:10px; color:var(--text-muted); padding:5px;">${escapeHTML(show.title)}</div>`
+                }
+                <div class="search-card-info">
+                    <div class="search-card-title">${escapeHTML(show.title)}</div>
+                    <div class="search-card-meta">
+                        <span style="font-weight:750; color:var(--blue);">S${nextEp.season} E${nextEp.number}</span>
+                        <span>•</span>
+                        <span>${escapeHTML(nextEp.title)}</span>
+                    </div>
+                    <div class="search-card-overview">${escapeHTML(nextEp.overview || 'No description available.')}</div>
+                </div>
+            </div>
+        `;
+    }).join("");
 }
 
 function emptyState(title, message = "Check back later or search for new shows and movies to add.") {
@@ -3136,6 +3108,67 @@ function closeModalOutside(event) {
     if (event.target.id === "detailsModal") {
         closeModal();
     }
+}
+
+/* =========================================================
+   EPISODE MODAL
+========================================================= */
+function openEpisodeDetails(episodeId) {
+    if (!currentItem || !currentItem.episodes) return;
+    currentEpisode = currentItem.episodes.find(e => e.id === episodeId);
+    if (!currentEpisode) return;
+
+    const backdropHeader = document.getElementById("episodeModalBackdropHeader");
+    const backdropUrl = currentEpisode.still || currentItem.backdrop || currentItem.poster;
+    
+    if (backdropUrl) {
+        backdropHeader.style.backgroundImage = `url('${backdropUrl}')`;
+    } else {
+        backdropHeader.style.backgroundImage = `none`;
+        backdropHeader.style.backgroundColor = `var(--surface-2)`;
+    }
+
+    document.getElementById("episodeModalTitle").textContent = `${currentEpisode.number}. ${currentEpisode.title}`;
+    document.getElementById("episodeModalDescription").textContent = currentEpisode.overview || "No description available.";
+
+    document.getElementById("episodeModalMeta").innerHTML = `
+        <span>Season ${currentEpisode.season}</span>
+        <span>•</span>
+        <span>Episode ${currentEpisode.number}</span>
+        <span>•</span>
+        <span>${currentEpisode.runtime}</span>
+        <span>•</span>
+        <span>${formatDate(currentEpisode.releaseDate)}</span>
+    `;
+
+    let actionsHtml = '';
+    if (!currentItem.isPreview) {
+        const isEpWatched = currentEpisode.watched;
+        actionsHtml = `
+            <button class="action-button ${isEpWatched ? 'primary' : 'trailer'}" style="background: ${isEpWatched ? 'var(--blue)' : 'var(--surface)'}; color: ${isEpWatched ? 'white' : 'var(--text)'}; border: 1px solid var(--glass-border);" onclick="toggleEpisodeWatchedFromDetails('${currentEpisode.id}')">
+                ${isEpWatched ? 'Mark as Unwatched' : 'Mark as Watched'}
+            </button>
+        `;
+    }
+    
+    document.getElementById("episodeModalActions").innerHTML = actionsHtml;
+    document.getElementById("episodeModal").classList.add("open");
+}
+
+function closeEpisodeModal() {
+    document.getElementById("episodeModal").classList.remove("open");
+    currentEpisode = null;
+}
+
+function closeEpisodeModalOutside(event) {
+    if (event.target.id === "episodeModal") {
+        closeEpisodeModal();
+    }
+}
+
+async function toggleEpisodeWatchedFromDetails(episodeId) {
+    await toggleEpisodeWatched(episodeId);
+    openEpisodeDetails(episodeId); 
 }
 
 function updateModalContent() {
@@ -3282,7 +3315,7 @@ function updateModalContent() {
         const isEpWatched = ep.watched;
         return `
             <div class="episode">
-                <div class="episode-main">
+                <div class="episode-main" onclick="openEpisodeDetails('${ep.id}')">
                     <div class="episode-left">
                         ${ep.still ? 
                             `<img src="${ep.still}" class="episode-still" alt="" loading="lazy" onerror="this.style.display='none'">` :
@@ -3314,107 +3347,101 @@ function updateModalContent() {
     }
 }
 
-function selectSeason(season) {
-    selectedSeason = season;
+function selectSeason(seasonNumber) {
+    selectedSeason = seasonNumber;
     updateModalContent();
-}
-
-async function setMovieWatchedState(watched) {
-    if (!currentItem || currentItem.type !== 'movie') return;
-
-    if (watched && currentItem.watched) {
-        currentItem.watchCount = (currentItem.watchCount || 1) + 1;
-    } else if (watched) {
-        currentItem.watched = true;
-        currentItem.watchCount = 1;
-    } else {
-        currentItem.watched = false;
-        currentItem.watchCount = 0;
-    }
-    
-    if (watched) {
-        currentItem.lastWatchedAt = new Date().toISOString();
-    }
-
-    await saveItem(currentItem);
-    updateModalContent();
-    refreshActivePage();
-}
-
-async function markAllWatched() {
-    if (!currentItem || currentItem.type === 'movie' || !currentItem.episodes) return;
-    
-    let changed = false;
-    currentItem.episodes.forEach(ep => {
-        if (isReleased(ep.releaseDate) && !ep.watched) {
-            ep.watched = true;
-            ep.watchCount = 1;
-            changed = true;
-        }
-    });
-
-    if (changed) {
-        await saveItem(currentItem);
-        updateModalContent();
-        refreshActivePage();
-    }
-}
-
-async function markSeasonWatched(season) {
-    if (!currentItem || currentItem.type === 'movie' || !currentItem.episodes) return;
-
-    let changed = false;
-    currentItem.episodes.forEach(ep => {
-        if (ep.season === season && isReleased(ep.releaseDate) && !ep.watched) {
-            ep.watched = true;
-            ep.watchCount = 1;
-            changed = true;
-        }
-    });
-
-    if (changed) {
-        await saveItem(currentItem);
-        updateModalContent();
-        refreshActivePage();
-    }
 }
 
 async function toggleEpisodeWatched(episodeId) {
-    if (!currentItem || currentItem.type === 'movie' || !currentItem.episodes) return;
+    if (!currentItem || currentItem.isPreview) return;
 
     const ep = currentItem.episodes.find(e => e.id === episodeId);
     if (!ep) return;
 
-    if (ep.watched) {
-        ep.watched = false;
-        ep.watchCount = 0;
-    } else {
-        ep.watched = true;
-        ep.watchCount = (ep.watchCount || 0) + 1;
-    }
+    ep.watched = !ep.watched;
+    ep.watchCount = ep.watched ? (ep.watchCount || 0) + 1 : 0;
 
     await saveItem(currentItem);
     updateModalContent();
     refreshActivePage();
 }
 
+async function markSeasonWatched(seasonNumber) {
+    if (!currentItem || currentItem.isPreview) return;
+
+    let modified = false;
+    currentItem.episodes.forEach(ep => {
+        if (ep.season === seasonNumber && !ep.watched) {
+            ep.watched = true;
+            ep.watchCount = (ep.watchCount || 0) + 1;
+            modified = true;
+        }
+    });
+
+    if (modified) {
+        await saveItem(currentItem);
+        updateModalContent();
+        refreshActivePage();
+        showToast(`Season ${seasonNumber} marked as watched.`);
+    }
+}
+
+async function markAllWatched() {
+    if (!currentItem || currentItem.isPreview) return;
+
+    let modified = false;
+    currentItem.episodes.forEach(ep => {
+        if (!ep.watched) {
+            ep.watched = true;
+            ep.watchCount = (ep.watchCount || 0) + 1;
+            modified = true;
+        }
+    });
+
+    if (modified) {
+        await saveItem(currentItem);
+        updateModalContent();
+        refreshActivePage();
+        showToast("All episodes marked as watched.");
+    }
+}
+
 async function toggleStopWatching() {
-    if (!currentItem || currentItem.type === 'movie') return;
+    if (!currentItem || currentItem.isPreview) return;
+
     currentItem.isStopped = !currentItem.isStopped;
     await saveItem(currentItem);
     updateModalContent();
     refreshActivePage();
+    
+    if (currentItem.isStopped) {
+        showToast("Show moved to Stopped Watching.");
+    } else {
+        showToast("Show resumed.");
+    }
 }
 
-async function deleteItem(itemId) {
+async function deleteItem(id) {
     if (confirm("Are you sure you want to remove this from your library?")) {
-        const index = state.library.findIndex(item => item.id === itemId);
-        if (index > -1) {
-            state.library.splice(index, 1);
-            await deleteItemFromFirestore(itemId);
-            closeModal();
-        }
+        await deleteItemFromFirestore(id);
+        closeModal();
+        showToast("Item removed.");
     }
+}
+
+async function setMovieWatchedState(isWatched) {
+    if (!currentItem || currentItem.isPreview || currentItem.type !== 'movie') return;
+
+    currentItem.watched = isWatched;
+    if (isWatched) {
+        currentItem.watchCount = (currentItem.watchCount || 0) + 1;
+        currentItem.lastWatchedAt = new Date().toISOString();
+    }
+    
+    await saveItem(currentItem);
+    updateModalContent();
+    refreshActivePage();
+    showToast(isWatched ? "Marked as watched." : "Marked as unwatched.");
 }
 </script>
 </body>
