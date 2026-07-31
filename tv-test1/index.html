@@ -1949,15 +1949,51 @@ function refreshActivePage() {
 }
 
 /* =========================================================
-   AUTOMATIC TV SHOW UPDATES & RELEASE ALERTS
+   AUTOMATIC TV SHOW, MOVIE & EPISODE UPDATES & RELEASE ALERTS
 ========================================================= */
 async function checkLibraryForUpdates() {
     if (!state.library || state.library.length === 0) return;
     let updated = false;
 
     for (let item of state.library) {
-        if (item.type === 'tv' && item.tmdbId) {
-            try {
+        if (!item.tmdbId) continue;
+
+        try {
+            if (item.type === 'movie') {
+                const res = await fetch(`https://api.themoviedb.org/3/movie/${item.tmdbId}?api_key=${TMDB_API_KEY}`);
+                const movieData = await res.json();
+                if (!movieData || !movieData.id) continue;
+
+                const newTitle = movieData.title || item.title;
+                const newYear = movieData.release_date ? movieData.release_date.substring(0, 4) : item.year;
+                const newPoster = movieData.poster_path ? `https://image.tmdb.org/t/p/w500${movieData.poster_path}` : item.poster;
+                const newBackdrop = movieData.backdrop_path ? `https://image.tmdb.org/t/p/w780${movieData.backdrop_path}` : item.backdrop;
+                const newDescription = movieData.overview || item.description;
+                const newRuntime = movieData.runtime ? `${movieData.runtime} min` : item.runtime;
+                const newReleaseDate = movieData.release_date ? new Date(movieData.release_date).toISOString() : item.releaseDate;
+
+                if (
+                    item.title !== newTitle ||
+                    item.year !== newYear ||
+                    item.poster !== newPoster ||
+                    item.backdrop !== newBackdrop ||
+                    item.description !== newDescription ||
+                    item.runtime !== newRuntime ||
+                    item.releaseDate !== newReleaseDate
+                ) {
+                    item.title = newTitle;
+                    item.year = newYear;
+                    item.poster = newPoster;
+                    item.backdrop = newBackdrop;
+                    item.description = newDescription;
+                    item.runtime = newRuntime;
+                    item.releaseDate = newReleaseDate;
+                    
+                    await saveItem(item);
+                    updated = true;
+                }
+            } else {
+                // TV Shows & Individual Episodes
                 const res = await fetch(`https://api.themoviedb.org/3/tv/${item.tmdbId}?api_key=${TMDB_API_KEY}`);
                 const showData = await res.json();
                 if (!showData || !showData.seasons) continue;
@@ -1997,6 +2033,7 @@ async function checkLibraryForUpdates() {
                     newEpisodes.forEach(newEp => {
                         if (epMap.has(newEp.id)) {
                             const existing = epMap.get(newEp.id);
+                            // Preserve existing watch status and specific metadata changes if any
                             newEp.watched = existing.watched;
                         } else {
                             hasNewContent = true;
@@ -2016,9 +2053,9 @@ async function checkLibraryForUpdates() {
                     await saveItem(item);
                     updated = true;
                 }
-            } catch (err) {
-                console.error(`Failed to check updates for show ${item.title}:`, err);
             }
+        } catch (err) {
+            console.error(`Failed to check updates for item ${item.title}:`, err);
         }
     }
 
