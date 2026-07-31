@@ -1157,12 +1157,6 @@ img {
     color: var(--text-secondary);
 }
 
-.episode-action-btn.rewatch-btn {
-    background: rgba(52, 199, 89, 0.12);
-    color: var(--success);
-    border: 1px solid rgba(52, 199, 89, 0.3);
-}
-
 /* =========================================================
    HOME & AUTH INPUTS
 ========================================================= */
@@ -1300,7 +1294,7 @@ img {
     box-shadow: var(--glass-shadow-sm);
 }
 
-/* Glass Toast (Updated for wrapping/screen size safety) */
+/* Glass Toast */
 .toast {
     position: fixed;
     left: 50%;
@@ -1355,10 +1349,6 @@ img {
      1. DISCOVER TAB
 ================================================     -->
 <main id="discoverPage" class="page">
-    <div class="section-header">
-        <div class="section-title">Discover</div>
-    </div>
-
     <div class="search-type-toggle">
         <button id="searchTypeTV" class="search-type-btn active" onclick="setSearchType('tv')">TV Shows</button>
         <button id="searchTypeMovie" class="search-type-btn" onclick="setSearchType('movie')">Movies</button>
@@ -1387,10 +1377,6 @@ img {
      2. UPCOMING TAB
 ================================================     -->
 <main id="upcomingPage" class="page">
-    <div class="section-header">
-        <div class="section-title">Upcoming Releases</div>
-    </div>
-
     <div class="search-type-toggle">
         <button id="upcomingTypeTV" class="search-type-btn active" onclick="setUpcomingType('tv')">TV Shows</button>
         <button id="upcomingTypeMovie" class="search-type-btn" onclick="setUpcomingType('movie')">Movies</button>
@@ -1478,7 +1464,7 @@ img {
                 </div>
             </div>
 
-            <!-- Notifications Permission Control (Stacked layout with button underneath matching website theme) -->
+            <!-- Notifications Permission Control -->
             <div style="border-top: 1px solid var(--glass-border-subtle); padding-top: 16px; display: flex; flex-direction: column; gap: 10px;">
                 <div>
                     <div style="font-size: 14px; font-weight: 700;">Release Notifications</div>
@@ -1663,35 +1649,6 @@ img {
     </div>
 </div>
 
-<!-- =====================================================
-     EPISODE DETAILS MODAL
-================================================     -->
-<div id="episodeDetailsModal" class="modal" onclick="closeEpisodeModalOutside(event)">
-    <div class="modal-sheet">
-        <div class="modal-header-nav">
-            <button class="close-button" onclick="closeEpisodeModal()" aria-label="Close">
-                <svg class="icon" viewBox="0 0 24 24">
-                    <path d="M6 6l12 12"/>
-                    <path d="M18 6L6 18"/>
-                </svg>
-            </button>
-        </div>
-        
-        <div id="episodeModalBackdropHeader" class="modal-backdrop-header">
-            <div class="modal-backdrop-overlay"></div>
-            <div class="modal-hero-title-container">
-                <h2 id="episodeModalTitle" class="modal-title"></h2>
-            </div>
-        </div>
-
-        <div class="modal-content">
-            <div id="episodeModalMeta" class="modal-meta"></div>
-            <p id="episodeModalDescription" class="modal-description"></p>
-            <div id="episodeModalActions" class="modal-actions"></div>
-        </div>
-    </div>
-</div>
-
 <div id="toast" class="toast"></div>
 
 <script>
@@ -1740,7 +1697,6 @@ let state = {
 };
 
 let currentItem = null;
-let currentEpisode = null;
 let selectedSeason = 1;
 let currentSearchType = 'tv';
 let currentUpcomingType = 'tv';
@@ -1748,7 +1704,7 @@ let toastTimer = null;
 let searchDebounceTimer = null;
 
 /* =========================================================
-   NOTIFICATIONS SYSTEM (Web & Mobile PWA ready)
+   NOTIFICATIONS SYSTEM
 ========================================================= */
 function checkNotificationPermissionState() {
     const btn = document.getElementById("notificationBtn");
@@ -2061,7 +2017,6 @@ async function checkLibraryForUpdates() {
                                 still: ep.still_path ? `https://image.tmdb.org/t/p/w300${ep.still_path}` : '',
                                 runtime: ep.runtime ? `${ep.runtime} min` : "45 min",
                                 watched: false,
-                                watchCount: 0,
                                 releaseDate: ep.air_date ? new Date(ep.air_date).toISOString() : new Date().toISOString()
                             });
                         });
@@ -2077,7 +2032,6 @@ async function checkLibraryForUpdates() {
                         if (epMap.has(newEp.id)) {
                             const existing = epMap.get(newEp.id);
                             newEp.watched = existing.watched;
-                            newEp.watchCount = existing.watchCount;
                         } else {
                             hasNewContent = true;
                             sendAppNotification(`New Episode Available!`, {
@@ -2379,8 +2333,7 @@ async function openSearchResultDetails(tmdbId, type) {
                 runtime: movieData.runtime ? `${movieData.runtime} min` : "120 min",
                 releaseDate: movieData.release_date ? new Date(movieData.release_date).toISOString() : new Date().toISOString(),
                 isPreview: true,
-                watched: false,
-                watchCount: 0
+                watched: false
             };
         } else {
             const showRes = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${TMDB_API_KEY}`);
@@ -2410,7 +2363,6 @@ async function openSearchResultDetails(tmdbId, type) {
                                 still: ep.still_path ? `https://image.tmdb.org/t/p/w300${ep.still_path}` : '',
                                 runtime: ep.runtime ? `${ep.runtime} min` : "45 min",
                                 watched: false,
-                                watchCount: 0,
                                 releaseDate: ep.air_date ? new Date(ep.air_date).toISOString() : new Date().toISOString()
                             });
                         });
@@ -2482,7 +2434,6 @@ async function importMediaData(id, type, buttonElement) {
                 runtime: movieData.runtime ? `${movieData.runtime} min` : "120 min",
                 releaseDate: movieData.release_date ? new Date(movieData.release_date).toISOString() : new Date().toISOString(),
                 watched: false,
-                watchCount: 0,
                 lastWatchedAt: null
             };
 
@@ -2530,7 +2481,6 @@ async function importMediaData(id, type, buttonElement) {
                                 still: ep.still_path ? `https://image.tmdb.org/t/p/w300${ep.still_path}` : '',
                                 runtime: ep.runtime ? `${ep.runtime} min` : "45 min",
                                 watched: false,
-                                watchCount: 0,
                                 releaseDate: ep.air_date ? new Date(ep.air_date).toISOString() : new Date().toISOString()
                             });
                         });
@@ -2754,7 +2704,7 @@ function renderUpcomingTab() {
 }
 
 /* =========================================================
-   2 & 3. TV SHOWS TAB RENDER (3 columns per row)
+   2 & 3. TV SHOWS TAB RENDER
 ========================================================= */
 function renderTVShowsTab() {
     const tvShows = state.library.filter(item => item.type === 'tv' || !item.type);
@@ -2802,7 +2752,7 @@ function renderTVShowsTab() {
 }
 
 /* =========================================================
-   4. MOVIES TAB RENDER (3 columns per row)
+   4. MOVIES TAB RENDER
 ========================================================= */
 function renderMoviesTab() {
     const movies = state.library.filter(item => item.type === 'movie');
@@ -2840,7 +2790,7 @@ function renderHomeTab() {
             if (item.watched) {
                 const match = (item.runtime || "").match(/(\d+)/);
                 const mins = match ? parseInt(match[1], 10) : 120;
-                totalMinutes += mins * Math.max(1, item.watchCount || 1);
+                totalMinutes += mins;
             }
         } else if (item.episodes) {
             let watchedEps = item.episodes.filter(ep => ep.watched);
@@ -2849,7 +2799,7 @@ function renderHomeTab() {
             watchedEps.forEach(ep => {
                 const match = (ep.runtime || "").match(/(\d+)/);
                 const mins = match ? parseInt(match[1], 10) : 45;
-                totalMinutes += mins * Math.max(1, ep.watchCount || 1);
+                totalMinutes += mins;
             });
         }
     });
@@ -2971,7 +2921,7 @@ function renderCategoryBlock(title, items) {
 }
 
 /* =========================================================
-   CARDS & SWIPEABLE GESTURES
+   CARDS
 ========================================================= */
 function createCard(item) {
     const hasPoster = item.poster && item.poster.trim() !== "";
@@ -2997,9 +2947,7 @@ function createCard(item) {
     }
 
     return `
-        <div class="card" onclick="openDetails('${item.id}')" data-id="${item.id}" 
-             ontouchstart="handleCardTouchStart(event, '${item.id}')" 
-             ontouchend="handleCardTouchEnd(event, '${item.id}')">
+        <div class="card" onclick="openDetails('${item.id}')" data-id="${item.id}">
             <div class="poster">
                 ${hasPoster ? `
                     <img src="${item.poster}" alt="${escapeHTML(item.title)}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -3011,39 +2959,6 @@ function createCard(item) {
             </div>
         </div>
     `;
-}
-
-let touchStartX = 0;
-function handleCardTouchStart(e, itemId) {
-    touchStartX = e.changedTouches[0].screenX;
-}
-
-function handleCardTouchEnd(e, itemId) {
-    const touchEndX = e.changedTouches[0].screenX;
-    const diff = touchEndX - touchStartX;
-    if (Math.abs(diff) > 50) {
-        e.stopPropagation();
-        const item = getItem(itemId);
-        if (item && item.type !== 'movie' && item.episodes) {
-            const nextEp = getNextUnwatchedEpisode(item);
-            if (nextEp) {
-                nextEp.watched = true;
-                nextEp.watchCount = (nextEp.watchCount || 0) + 1;
-                saveItem(item);
-                showToast(`Swiped & marked S${nextEp.season}E${nextEp.number} watched!`);
-                refreshActivePage();
-            } else {
-                showToast("All episodes already watched!");
-            }
-        } else if (item && item.type === 'movie') {
-            item.watched = !item.watched;
-            item.watchCount = item.watched ? (item.watchCount || 0) + 1 : item.watchCount;
-            item.lastWatchedAt = item.watched ? new Date().toISOString() : null;
-            saveItem(item);
-            showToast(item.watched ? `Swiped & marked movie watched!` : `Swiped & marked movie unwatched!`);
-            refreshActivePage();
-        }
-    }
 }
 
 function createUpcomingCard(data) {
@@ -3129,7 +3044,7 @@ function updateHomeUI() {
 }
 
 /* =========================================================
-   DETAILS MODAL, TRAILERS & EPISODE DETAILED VIEW
+   DETAILS MODAL & TRAILERS
 ========================================================= */
 async function playTrailer(tmdbId, type) {
     showToast("Finding trailer...");
@@ -3220,7 +3135,7 @@ function updateModalContent() {
         actionsHTML = `
             <div class="modal-actions-row movie-actions-grid">
                 <button class="action-button primary" onclick="toggleMovieWatched('${currentItem.id}')">
-                    ${currentItem.watched ? 'Mark Unwatched' : 'Mark Watched'}
+                    ${currentItem.watched ? 'Unwatch' : 'Watch'}
                 </button>
                 <button class="action-button trailer" onclick="playTrailer(${currentItem.tmdbId}, 'movie')">
                     Trailer
@@ -3235,20 +3150,20 @@ function updateModalContent() {
         const nextLabel = nextEp ? `S${nextEp.season} E${nextEp.number}` : 'Up to Date';
 
         actionsHTML = `
-            <div class="modal-actions-row">
-                <button class="action-button primary" onclick="markNextEpisodeWatched()" ${!nextEp ? 'disabled' : ''}>
-                    ${nextLabel}
+            <div class="modal-actions-row" style="grid-template-columns: repeat(2, 1fr);">
+                <button class="action-button primary" onclick="markNextEpisodeWatched('${currentItem.id}')">
+                    Next: ${nextLabel}
                 </button>
                 <button class="action-button trailer" onclick="playTrailer(${currentItem.tmdbId}, 'tv')">
                     Trailer
                 </button>
-                <button class="action-button ${currentItem.isStopped ? 'warning' : 'danger'}" onclick="toggleStopWatching()">
-                    ${currentItem.isStopped ? 'Resume' : 'Stop'}
-                </button>
             </div>
-            <div style="display: flex; gap: 10px; width: 100%;">
-                <button class="action-button danger" style="width: 100%;" onclick="removeCurrentItem()">
-                    Remove from Library
+            <div class="modal-actions-row" style="grid-template-columns: repeat(2, 1fr);">
+                <button class="action-button ${currentItem.isStopped ? 'primary' : 'warning'}" onclick="toggleStopWatching('${currentItem.id}')">
+                    ${currentItem.isStopped ? 'Resume Show' : 'Stop Watching'}
+                </button>
+                <button class="action-button danger" onclick="removeCurrentItem()">
+                    Remove
                 </button>
             </div>
         `;
@@ -3265,85 +3180,75 @@ function updateModalContent() {
 }
 
 function renderEpisodesList(container) {
-    if (!currentItem || !currentItem.episodes) {
-        container.innerHTML = '';
+    if (!currentItem.episodes || currentItem.episodes.length === 0) {
+        container.innerHTML = `<div style="font-size:13px; color:var(--text-muted); margin-top:20px;">No episode info available.</div>`;
         return;
     }
 
     const seasons = [...new Set(currentItem.episodes.map(ep => ep.season))].sort((a, b) => a - b);
+    
     if (!seasons.includes(selectedSeason) && seasons.length > 0) {
         selectedSeason = seasons[0];
     }
 
     const seasonEpisodes = currentItem.episodes.filter(ep => ep.season === selectedSeason);
 
-    let seasonTabsHTML = '';
-    if (seasons.length > 1) {
-        seasonTabsHTML = `
-            <div class="season-selector-wrapper">
-                <div class="season-selector">
-                    ${seasons.map(s => `
-                        <button class="season-button ${s === selectedSeason ? 'active' : ''}" onclick="selectSeason(${s})">
-                            Season ${s}
-                        </button>
-                    `).join("")}
-                </div>
-            </div>
-        `;
-    }
-
     const seasonWatchedCount = seasonEpisodes.filter(ep => ep.watched).length;
-    const allSeasonWatched = seasonEpisodes.length > 0 && seasonWatchedCount === seasonEpisodes.length;
+    const isSeasonFullyWatched = seasonEpisodes.length > 0 && seasonWatchedCount === seasonEpisodes.length;
 
-    let seasonBatchActionsHTML = `
-        <div style="display: flex; gap: 10px; margin: 16px 0 8px 0;">
-            <button class="season-watched-btn" onclick="markSeasonWatched(${selectedSeason})">
-                Mark Season Watched
-            </button>
-            <button class="season-unwatched-btn" onclick="markSeasonUnwatched(${selectedSeason})">
-                Mark Season Unwatched
-            </button>
+    let html = `
+        <div class="season-selector-wrapper">
+            <div class="season-selector">
+                ${seasons.map(s => `
+                    <button class="season-button ${s === selectedSeason ? 'active' : ''}" onclick="selectSeason(${s})">
+                        Season ${s}
+                    </button>
+                `).join("")}
+            </div>
+            ${isSeasonFullyWatched ? `
+                <button class="season-unwatched-btn" onclick="toggleSeasonWatched(${selectedSeason}, false)">
+                    Unwatch Season
+                </button>
+            ` : `
+                <button class="season-watched-btn" onclick="toggleSeasonWatched(${selectedSeason}, true)">
+                    Watch Season
+                </button>
+            `}
         </div>
+        <div style="display: flex; flex-direction: column;">
     `;
 
-    let episodesHTML = seasonEpisodes.map(ep => {
-        const released = isReleased(ep.releaseDate);
-        const hasStill = ep.still && ep.still.trim() !== "";
-        const countdownStr = !released ? getCountdown(ep.releaseDate) : (ep.runtime || "45 min");
-
-        return `
-            <div class="episode" onclick="openEpisodeDetails('${ep.id}')">
-                <div class="episode-main">
+    seasonEpisodes.forEach(ep => {
+        const stillUrl = ep.still ? ep.still : '';
+        const airDateFormatted = ep.releaseDate ? formatDate(ep.releaseDate) : 'TBA';
+        
+        html += `
+            <div class="episode">
+                <div class="episode-main" onclick="toggleEpisodeWatched('${currentItem.id}', '${ep.id}')">
                     <div class="episode-left">
-                        ${hasStill ? `
-                            <img src="${ep.still}" class="episode-still" alt="S${ep.season}E${ep.number}" loading="lazy">
+                        ${stillUrl ? `
+                            <img src="${stillUrl}" class="episode-still" alt="Still" loading="lazy" onerror="this.style.display='none'">
                         ` : `
-                            <div class="episode-still" style="display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--text-muted); text-align:center;">S${ep.season}E${ep.number}</div>
+                            <div class="episode-still" style="display:flex; align-items:center; justify-content:center; font-size:9px; color:var(--text-muted);">S${ep.season}E${ep.number}</div>
                         `}
                         <div class="episode-info">
                             <div class="episode-title">${ep.number}. ${escapeHTML(ep.title)}</div>
                             <div class="episode-overview">${escapeHTML(ep.overview || 'No overview available.')}</div>
-                            <div class="episode-meta">
-                                ${formatDate(ep.releaseDate)} • ${countdownStr}
-                            </div>
+                            <div class="episode-meta">${airDateFormatted} • ${ep.runtime || '45 min'}</div>
                         </div>
                     </div>
                 </div>
-                <div class="episode-buttons" onclick="event.stopPropagation();">
-                    <button class="episode-action-btn ${ep.watched ? 'watched-active' : 'unwatched-active'}" onclick="toggleEpisodeWatched('${ep.id}')">
+                <div class="episode-buttons">
+                    <button class="episode-action-btn ${ep.watched ? 'watched-active' : 'unwatched-active'}" onclick="toggleEpisodeWatched('${currentItem.id}', '${ep.id}')">
                         ${ep.watched ? 'Watched' : 'Unwatched'}
                     </button>
-                    ${ep.watched ? `
-                        <button class="episode-action-btn rewatch-btn" onclick="rewatchEpisode('${ep.id}')">
-                            Rewatch (${ep.watchCount || 1})
-                        </button>
-                    ` : ''}
                 </div>
             </div>
         `;
-    }).join("");
+    });
 
-    container.innerHTML = seasonTabsHTML + seasonBatchActionsHTML + (episodesHTML || `<div style="font-size:12px; color:var(--text-muted); padding:20px 0; text-align:center;">No episodes available for this season.</div>`);
+    html += `</div>`;
+    container.innerHTML = html;
 }
 
 function selectSeason(seasonNum) {
@@ -3356,34 +3261,99 @@ async function toggleMovieWatched(itemId) {
     if (!item) return;
 
     item.watched = !item.watched;
-    item.watchCount = item.watched ? (item.watchCount || 0) + 1 : item.watchCount;
     item.lastWatchedAt = item.watched ? new Date().toISOString() : null;
-
     await saveItem(item);
     updateModalContent();
     refreshActivePage();
     showToast(item.watched ? "Marked movie as watched!" : "Marked movie as unwatched!");
 }
 
-async function toggleStopWatching() {
-    if (!currentItem) return;
-    currentItem.isStopped = !currentItem.isStopped;
-    await saveItem(currentItem);
+async function markNextEpisodeWatched(itemId) {
+    const item = getItem(itemId);
+    if (!item || !item.episodes) return;
+
+    const nextEp = getNextUnwatchedEpisode(item);
+    if (!nextEp) {
+        showToast("All available episodes already watched!");
+        return;
+    }
+
+    if (!isReleased(nextEp.releaseDate)) {
+        showToast("Next episode has not released yet!");
+        return;
+    }
+
+    nextEp.watched = true;
+    await saveItem(item);
     updateModalContent();
     refreshActivePage();
-    showToast(currentItem.isStopped ? "Show moved to Stopped Watching." : "Show resumed!");
+    showToast(`Marked S${nextEp.season}E${nextEp.number} watched!`);
+}
+
+async function toggleEpisodeWatched(itemId, episodeId) {
+    const item = getItem(itemId);
+    if (!item || !item.episodes) return;
+
+    const ep = item.episodes.find(e => e.id === episodeId);
+    if (!ep) return;
+
+    if (!ep.watched && !isReleased(ep.releaseDate)) {
+        showToast("Cannot mark unreleased episode as watched!");
+        return;
+    }
+
+    ep.watched = !ep.watched;
+    await saveItem(item);
+    updateModalContent();
+    refreshActivePage();
+}
+
+async function toggleSeasonWatched(seasonNum, status) {
+    if (!currentItem || !currentItem.episodes) return;
+
+    let updated = false;
+    currentItem.episodes.forEach(ep => {
+        if (ep.season === seasonNum) {
+            if (status && !isReleased(ep.releaseDate)) return;
+            ep.watched = status;
+            updated = true;
+        }
+    });
+
+    if (updated) {
+        await saveItem(currentItem);
+        updateModalContent();
+        refreshActivePage();
+        showToast(status ? `Season ${seasonNum} watched!` : `Season ${seasonNum} unwatched!`);
+    }
+}
+
+async function toggleStopWatching(itemId) {
+    const item = getItem(itemId);
+    if (!item) return;
+
+    item.isStopped = !item.isStopped;
+    await saveItem(item);
+    updateModalContent();
+    refreshActivePage();
+    showToast(item.isStopped ? "Moved to Stopped Watching." : "Resumed show tracking.");
 }
 
 async function removeCurrentItem() {
-    if (!currentItem || !auth || !auth.currentUser) return;
-    if (!confirm(`Remove "${currentItem.title}" from your library?`)) return;
+    if (!currentItem) return;
+
+    if (!confirm(`Are you sure you want to remove "${currentItem.title}" from your library?`)) {
+        return;
+    }
 
     try {
-        await db.collection("users")
-            .doc(auth.currentUser.uid)
-            .collection("library")
-            .doc(currentItem.id)
-            .delete();
+        if (auth && auth.currentUser && db) {
+            await db.collection("users")
+                .doc(auth.currentUser.uid)
+                .collection("library")
+                .doc(currentItem.id)
+                .delete();
+        }
 
         state.library = state.library.filter(i => i.id !== currentItem.id);
         closeModal();
@@ -3392,168 +3362,6 @@ async function removeCurrentItem() {
     } catch (err) {
         console.error("Error removing item:", err);
         showToast("Failed to remove item.");
-    }
-}
-
-async function markNextEpisodeWatched() {
-    if (!currentItem || !currentItem.episodes) return;
-    const nextEp = getNextUnwatchedEpisode(currentItem);
-    if (!nextEp) {
-        showToast("All episodes already watched!");
-        return;
-    }
-
-    if (!isReleased(nextEp.releaseDate)) {
-        showToast("Episode has not released yet!");
-        return;
-    }
-
-    nextEp.watched = true;
-    nextEp.watchCount = (nextEp.watchCount || 0) + 1;
-
-    await saveItem(currentItem);
-    updateModalContent();
-    refreshActivePage();
-    showToast(`Marked S${nextEp.season}E${nextEp.number} watched!`);
-}
-
-async function toggleEpisodeWatched(epId) {
-    if (!currentItem || !currentItem.episodes) return;
-    const ep = currentItem.episodes.find(e => e.id === epId);
-    if (!ep) return;
-
-    if (!ep.watched && !isReleased(ep.releaseDate)) {
-        showToast("Cannot mark unreleased episode as watched.");
-        return;
-    }
-
-    ep.watched = !ep.watched;
-    ep.watchCount = ep.watched ? (ep.watchCount || 0) + 1 : ep.watchCount;
-
-    await saveItem(currentItem);
-    updateModalContent();
-    refreshActivePage();
-    showToast(ep.watched ? `Marked S${ep.season}E${ep.number} watched!` : `Marked S${ep.season}E${ep.number} unwatched!`);
-}
-
-async function rewatchEpisode(epId) {
-    if (!currentItem || !currentItem.episodes) return;
-    const ep = currentItem.episodes.find(e => e.id === epId);
-    if (!ep) return;
-
-    ep.watchCount = (ep.watchCount || 1) + 1;
-    await saveItem(currentItem);
-    updateModalContent();
-    showToast(`Added rewatch count for S${ep.season}E${ep.number}!`);
-}
-
-async function markSeasonWatched(seasonNum) {
-    if (!currentItem || !currentItem.episodes) return;
-    let changed = false;
-
-    currentItem.episodes.forEach(ep => {
-        if (ep.season === seasonNum && isReleased(ep.releaseDate) && !ep.watched) {
-            ep.watched = true;
-            ep.watchCount = (ep.watchCount || 0) + 1;
-            changed = true;
-        }
-    });
-
-    if (changed) {
-        await saveItem(currentItem);
-        updateModalContent();
-        refreshActivePage();
-        showToast(`Season ${seasonNum} marked watched!`);
-    } else {
-        showToast("All released episodes in season already watched.");
-    }
-}
-
-async function markSeasonUnwatched(seasonNum) {
-    if (!currentItem || !currentItem.episodes) return;
-    let changed = false;
-
-    currentItem.episodes.forEach(ep => {
-        if (ep.season === seasonNum && ep.watched) {
-            ep.watched = false;
-            changed = true;
-        }
-    });
-
-    if (changed) {
-        await saveItem(currentItem);
-        updateModalContent();
-        refreshActivePage();
-        showToast(`Season ${seasonNum} marked unwatched.`);
-    } else {
-        showToast("No watched episodes in this season.");
-    }
-}
-
-function openEpisodeDetails(epId) {
-    if (!currentItem || !currentItem.episodes) return;
-    const ep = currentItem.episodes.find(e => e.id === epId);
-    if (!ep) return;
-
-    currentEpisode = ep;
-
-    const backdropHeader = document.getElementById("episodeModalBackdropHeader");
-    const backdropUrl = ep.still || currentItem.backdrop || currentItem.poster;
-    if (backdropUrl) {
-        backdropHeader.style.backgroundImage = `url('${backdropUrl}')`;
-    } else {
-        backdropHeader.style.backgroundImage = `none`;
-        backdropHeader.style.backgroundColor = `var(--surface-2)`;
-    }
-
-    document.getElementById("episodeModalTitle").textContent = `S${ep.season} E${ep.number}: ${ep.title}`;
-    document.getElementById("episodeModalMeta").innerHTML = `
-        <span>${currentItem.title}</span>
-        <span>•</span>
-        <span>${formatDate(ep.releaseDate)}</span>
-        <span>•</span>
-        <span>${ep.runtime || '45 min'}</span>
-    `;
-    document.getElementById("episodeModalDescription").textContent = ep.overview || 'No description available for this episode.';
-
-    document.getElementById("episodeModalActions").innerHTML = `
-        <div style="display: flex; gap: 10px; width: 100%;">
-            <button class="action-button ${ep.watched ? 'primary' : ''}" onclick="toggleEpisodeWatchedFromModal('${ep.id}')">
-                ${ep.watched ? 'Mark Unwatched' : 'Mark Watched'}
-            </button>
-            ${ep.watched ? `
-                <button class="action-button warning" onclick="rewatchEpisodeFromModal('${ep.id}')">
-                    Rewatch (${ep.watchCount || 1})
-                </button>
-            ` : ''}
-        </div>
-    `;
-
-    document.getElementById("episodeDetailsModal").classList.add("open");
-}
-
-function closeEpisodeModal() {
-    document.getElementById("episodeDetailsModal").classList.remove("open");
-    currentEpisode = null;
-}
-
-function closeEpisodeModalOutside(event) {
-    if (event.target.id === "episodeDetailsModal") {
-        closeEpisodeModal();
-    }
-}
-
-async function toggleEpisodeWatchedFromModal(epId) {
-    await toggleEpisodeWatched(epId);
-    if (currentEpisode) {
-        openEpisodeDetails(currentEpisode.id);
-    }
-}
-
-async function rewatchEpisodeFromModal(epId) {
-    await rewatchEpisode(epId);
-    if (currentEpisode) {
-        openEpisodeDetails(currentEpisode.id);
     }
 }
 </script>
