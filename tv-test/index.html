@@ -1022,55 +1022,12 @@ img {
     box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3);
 }
 
-/* =========================================================
-   MARK SEASON AS WATCHED & UNWATCHED BUTTONS CSS
-========================================================= */
-.season-watched-btn,
-.season-unwatched-btn {
-    flex: 1;
-    height: 38px;
-    padding: 0 12px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 700;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: var(--glass-shadow-sm);
-    transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
-    cursor: pointer;
-}
-
-.season-watched-btn {
-    background: var(--blue);
-    color: white;
-    border: 1px solid var(--blue);
-    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3);
-}
-
-.season-watched-btn:active {
-    transform: scale(0.98);
-}
-
-.season-unwatched-btn {
-    background: var(--surface);
-    color: var(--text-secondary);
-    border: 1px solid var(--glass-border);
-}
-
-.season-unwatched-btn:active {
-    transform: scale(0.98);
-}
-
 .episode {
     display: flex;
     flex-direction: column;
     gap: 10px;
     padding: 16px 0;
     border-bottom: 1px solid var(--glass-border-subtle);
-    cursor: pointer;
 }
 
 .episode-main {
@@ -1123,38 +1080,6 @@ img {
     font-size: 11px;
     line-height: 1.5;
     margin-top: 4px;
-}
-
-.episode-buttons {
-    display: flex;
-    gap: 8px;
-    width: 100%;
-}
-
-.episode-action-btn {
-    flex: 1;
-    height: 34px;
-    border-radius: 10px;
-    font-size: 12px;
-    font-weight: 700;
-    background: var(--surface);
-    backdrop-filter: blur(20px);
-    color: var(--text-secondary);
-    border: 1px solid var(--glass-border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.episode-action-btn.watched-active {
-    background: var(--blue);
-    color: white;
-    border-color: var(--blue);
-}
-
-.episode-action-btn.unwatched-active {
-    background: var(--surface-2);
-    color: var(--text-secondary);
 }
 
 /* =========================================================
@@ -3193,9 +3118,7 @@ function renderEpisodesList(container) {
 
     const seasonEpisodes = currentItem.episodes.filter(ep => ep.season === selectedSeason);
 
-    const seasonWatchedCount = seasonEpisodes.filter(ep => ep.watched).length;
-    const isSeasonFullyWatched = seasonEpisodes.length > 0 && seasonWatchedCount === seasonEpisodes.length;
-
+    // Removed the watch/unwatch season buttons (Change 1)
     let html = `
         <div class="season-selector-wrapper">
             <div class="season-selector">
@@ -3205,81 +3128,72 @@ function renderEpisodesList(container) {
                     </button>
                 `).join("")}
             </div>
-            ${isSeasonFullyWatched ? `
-                <button class="season-unwatched-btn" onclick="toggleSeasonWatched(${selectedSeason}, false)">
-                    Unwatch Season
-                </button>
-            ` : `
-                <button class="season-watched-btn" onclick="toggleSeasonWatched(${selectedSeason}, true)">
-                    Watch Season
-                </button>
-            `}
         </div>
-        <div style="display: flex; flex-direction: column;">
     `;
 
-    seasonEpisodes.forEach(ep => {
-        const stillUrl = ep.still ? ep.still : '';
-        const airDateFormatted = ep.releaseDate ? formatDate(ep.releaseDate) : 'TBA';
-        
-        html += `
+    html += `<div style="display: flex; flex-direction: column; gap: 10px;">`;
+    
+    // Removed episode level watch/unwatch toggle buttons (Change 2)
+    html += seasonEpisodes.map(ep => {
+        const watchedBadge = ep.watched ? `<span style="color: var(--success); font-weight:700; font-size: 11px;">Watched</span>` : '';
+        return `
             <div class="episode">
-                <div class="episode-main" onclick="toggleEpisodeWatched('${currentItem.id}', '${ep.id}')">
+                <div class="episode-main">
+                    ${ep.still ? 
+                        `<img src="${ep.still}" class="episode-still" loading="lazy" onerror="this.style.display='none'">` : 
+                        `<div class="episode-still" style="display:flex;align-items:center;justify-content:center;font-size:10px;">No Image</div>`
+                    }
                     <div class="episode-left">
-                        ${stillUrl ? `
-                            <img src="${stillUrl}" class="episode-still" alt="Still" loading="lazy" onerror="this.style.display='none'">
-                        ` : `
-                            <div class="episode-still" style="display:flex; align-items:center; justify-content:center; font-size:9px; color:var(--text-muted);">S${ep.season}E${ep.number}</div>
-                        `}
                         <div class="episode-info">
-                            <div class="episode-title">${ep.number}. ${escapeHTML(ep.title)}</div>
-                            <div class="episode-overview">${escapeHTML(ep.overview || 'No overview available.')}</div>
-                            <div class="episode-meta">${airDateFormatted} • ${ep.runtime || '45 min'}</div>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div class="episode-title">${ep.number}. ${escapeHTML(ep.title)}</div>
+                                ${watchedBadge}
+                            </div>
+                            <div class="episode-overview">${escapeHTML(ep.overview)}</div>
+                            <div class="episode-meta">${ep.runtime} • ${formatDate(ep.releaseDate)}</div>
                         </div>
                     </div>
                 </div>
-                <div class="episode-buttons">
-                    <button class="episode-action-btn ${ep.watched ? 'watched-active' : 'unwatched-active'}" onclick="toggleEpisodeWatched('${currentItem.id}', '${ep.id}')">
-                        ${ep.watched ? 'Watched' : 'Unwatched'}
-                    </button>
-                </div>
             </div>
         `;
-    });
+    }).join("");
 
     html += `</div>`;
     container.innerHTML = html;
 }
 
-function selectSeason(seasonNum) {
-    selectedSeason = seasonNum;
-    renderEpisodesList(document.getElementById("modalEpisodes"));
+// Added the missing functionality functions that were cut off
+function selectSeason(season) {
+    selectedSeason = season;
+    updateModalContent();
 }
 
-async function toggleMovieWatched(itemId) {
-    const item = getItem(itemId);
+async function toggleMovieWatched(id) {
+    const item = getItem(id);
     if (!item) return;
+
+    // Change 3: Prevent marking unreleased movies as watched
+    if (!item.watched && !isReleased(item.releaseDate)) {
+        showToast("You can not mark an unreleased movie or tv show as watched.");
+        return;
+    }
 
     item.watched = !item.watched;
     item.lastWatchedAt = item.watched ? new Date().toISOString() : null;
     await saveItem(item);
     updateModalContent();
     refreshActivePage();
-    showToast(item.watched ? "Marked movie as watched!" : "Marked movie as unwatched!");
 }
 
-async function markNextEpisodeWatched(itemId) {
-    const item = getItem(itemId);
-    if (!item || !item.episodes) return;
-
+async function markNextEpisodeWatched(id) {
+    const item = getItem(id);
+    if (!item) return;
     const nextEp = getNextUnwatchedEpisode(item);
-    if (!nextEp) {
-        showToast("All available episodes already watched!");
-        return;
-    }
+    if (!nextEp) return;
 
+    // Change 3: Prevent marking unreleased tv episodes as watched
     if (!isReleased(nextEp.releaseDate)) {
-        showToast("Next episode has not released yet!");
+        showToast("You can not mark an unreleased movie or tv show as watched.");
         return;
     }
 
@@ -3287,82 +3201,35 @@ async function markNextEpisodeWatched(itemId) {
     await saveItem(item);
     updateModalContent();
     refreshActivePage();
-    showToast(`Marked S${nextEp.season}E${nextEp.number} watched!`);
 }
 
-async function toggleEpisodeWatched(itemId, episodeId) {
-    const item = getItem(itemId);
-    if (!item || !item.episodes) return;
-
-    const ep = item.episodes.find(e => e.id === episodeId);
-    if (!ep) return;
-
-    if (!ep.watched && !isReleased(ep.releaseDate)) {
-        showToast("Cannot mark unreleased episode as watched!");
-        return;
-    }
-
-    ep.watched = !ep.watched;
-    await saveItem(item);
-    updateModalContent();
-    refreshActivePage();
-}
-
-async function toggleSeasonWatched(seasonNum, status) {
-    if (!currentItem || !currentItem.episodes) return;
-
-    let updated = false;
-    currentItem.episodes.forEach(ep => {
-        if (ep.season === seasonNum) {
-            if (status && !isReleased(ep.releaseDate)) return;
-            ep.watched = status;
-            updated = true;
-        }
-    });
-
-    if (updated) {
-        await saveItem(currentItem);
-        updateModalContent();
-        refreshActivePage();
-        showToast(status ? `Season ${seasonNum} watched!` : `Season ${seasonNum} unwatched!`);
-    }
-}
-
-async function toggleStopWatching(itemId) {
-    const item = getItem(itemId);
+async function toggleStopWatching(id) {
+    const item = getItem(id);
     if (!item) return;
-
     item.isStopped = !item.isStopped;
     await saveItem(item);
     updateModalContent();
     refreshActivePage();
-    showToast(item.isStopped ? "Moved to Stopped Watching." : "Resumed show tracking.");
 }
 
 async function removeCurrentItem() {
     if (!currentItem) return;
-
-    if (!confirm(`Are you sure you want to remove "${currentItem.title}" from your library?`)) {
-        return;
-    }
-
-    try {
-        if (auth && auth.currentUser && db) {
-            await db.collection("users")
-                .doc(auth.currentUser.uid)
-                .collection("library")
-                .doc(currentItem.id)
-                .delete();
+    
+    // Remove from local state
+    state.library = state.library.filter(i => i.id !== currentItem.id);
+    
+    // Remove from Firebase if authenticated
+    if (auth && auth.currentUser && db) {
+        try {
+            await db.collection("users").doc(auth.currentUser.uid).collection("library").doc(currentItem.id).delete();
+        } catch(e) {
+            console.error("Error deleting item:", e);
         }
-
-        state.library = state.library.filter(i => i.id !== currentItem.id);
-        closeModal();
-        refreshActivePage();
-        showToast("Item removed from library.");
-    } catch (err) {
-        console.error("Error removing item:", err);
-        showToast("Failed to remove item.");
     }
+    
+    showToast("Removed from library.");
+    closeModal();
+    refreshActivePage();
 }
 </script>
 </body>
