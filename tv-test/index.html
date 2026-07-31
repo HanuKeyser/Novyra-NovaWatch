@@ -3212,6 +3212,25 @@ function renderEpisodesList(container) {
 function selectSeason(seasonNumber) {
     selectedSeason = seasonNumber;
     renderEpisodesList(document.getElementById("modalEpisodes"));
+
+    requestAnimationFrame(() => {
+        const seasonSelector = document.querySelector("#modalEpisodes .season-selector");
+        const activeSeasonButton = seasonSelector?.querySelector(".season-button.active");
+
+        if (seasonSelector && activeSeasonButton) {
+            const targetScrollLeft =
+                activeSeasonButton.offsetLeft -
+                (seasonSelector.clientWidth - activeSeasonButton.offsetWidth) / 2;
+
+            seasonSelector.scrollLeft = Math.max(
+                0,
+                Math.min(
+                    targetScrollLeft,
+                    seasonSelector.scrollWidth - seasonSelector.clientWidth
+                )
+            );
+        }
+    });
 }
 
 function openEpisodeDetails(episodeId) {
