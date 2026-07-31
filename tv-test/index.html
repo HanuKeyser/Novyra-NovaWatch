@@ -3036,20 +3036,31 @@ function updateModalContent() {
 
     document.getElementById("modalTitle").textContent = currentItem.title;
 
-    let metaHTML = `
-        <span>${currentItem.year || 'N/A'}</span>
-        <span>•</span>
-        <span style="text-transform:uppercase;">${currentItem.type === 'movie' ? 'Movie' : 'TV Show'}</span>
-    `;
+    let metaHTML = "";
 
     if (currentItem.type === 'movie') {
-        metaHTML += `<span>•</span><span>${currentItem.runtime || '120 min'}</span>`;
+        const releaseDateStr = currentItem.releaseDate ? formatDate(currentItem.releaseDate) : 'TBA';
+        metaHTML = `
+            <span>${currentItem.year || 'N/A'}</span>
+            <span>•</span>
+            <span style="text-transform:uppercase;">Movie</span>
+            <span>•</span>
+            <span>${currentItem.runtime || '120 min'}</span>
+            <span>•</span>
+            <span>${releaseDateStr}</span>
+        `;
         if (currentItem.watched) {
             metaHTML += `<span>•</span><span style="color: var(--success); font-weight:700;">Watched</span>`;
         }
     } else {
         const prog = getTVProgress(currentItem);
-        metaHTML += `<span>•</span><span>${prog.watched}/${prog.total} Episodes Watched (${prog.percentage}%)</span>`;
+        metaHTML = `
+            <span>${currentItem.year || 'N/A'}</span>
+            <span>•</span>
+            <span style="text-transform:uppercase;">TV Show</span>
+            <span>•</span>
+            <span>${prog.watched}/${prog.total} Episodes Watched (${prog.percentage}%)</span>
+        `;
     }
 
     document.getElementById("modalMeta").innerHTML = metaHTML;
@@ -3118,7 +3129,6 @@ function renderEpisodesList(container) {
 
     const seasonEpisodes = currentItem.episodes.filter(ep => ep.season === selectedSeason);
 
-    // Removed the watch/unwatch season buttons (Change 1)
     let html = `
         <div class="season-selector-wrapper">
             <div class="season-selector">
@@ -3133,9 +3143,7 @@ function renderEpisodesList(container) {
 
     html += `<div style="display: flex; flex-direction: column; gap: 10px;">`;
     
-    // Removed episode level watch/unwatch toggle buttons (Change 2)
     html += seasonEpisodes.map(ep => {
-        const watchedBadge = ep.watched ? `<span style="color: var(--success); font-weight:700; font-size: 11px;">Watched</span>` : '';
         return `
             <div class="episode">
                 <div class="episode-main">
@@ -3147,7 +3155,6 @@ function renderEpisodesList(container) {
                         <div class="episode-info">
                             <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <div class="episode-title">${ep.number}. ${escapeHTML(ep.title)}</div>
-                                ${watchedBadge}
                             </div>
                             <div class="episode-overview">${escapeHTML(ep.overview)}</div>
                             <div class="episode-meta">${ep.runtime} • ${formatDate(ep.releaseDate)}</div>
@@ -3162,38 +3169,41 @@ function renderEpisodesList(container) {
     container.innerHTML = html;
 }
 
-// Added the missing functionality functions that were cut off
-function selectSeason(season) {
-    selectedSeason = season;
+function selectSeason(seasonNum) {
+    selectedSeason = seasonNum;
     updateModalContent();
 }
 
-async function toggleMovieWatched(id) {
-    const item = getItem(id);
-    if (!item) return;
+async function toggleMovieWatched(itemId) {
+    const item = getItem(itemId);
+    if (!item || item.type !== 'movie') return;
 
-    // Change 3: Prevent marking unreleased movies as watched
-    if (!item.watched && !isReleased(item.releaseDate)) {
-        showToast("You can not mark an unreleased movie or tv show as watched.");
+    if (!item.watched && item.releaseDate && !isReleased(item.releaseDate)) {
+        showToast("Cannot mark unreleased movie as watched.");
         return;
     }
 
     item.watched = !item.watched;
     item.lastWatchedAt = item.watched ? new Date().toISOString() : null;
+
     await saveItem(item);
     updateModalContent();
     refreshActivePage();
+    showToast(item.watched ? "Marked as watched" : "Marked as unwatched");
 }
 
-async function markNextEpisodeWatched(id) {
-    const item = getItem(id);
-    if (!item) return;
-    const nextEp = getNextUnwatchedEpisode(item);
-    if (!nextEp) return;
+async function markNextEpisodeWatched(itemId) {
+    const item = getItem(itemId);
+    if (!item || item.type === 'movie' || !item.episodes) return;
 
-    // Change 3: Prevent marking unreleased tv episodes as watched
-    if (!isReleased(nextEp.releaseDate)) {
-        showToast("You can not mark an unreleased movie or tv show as watched.");
+    const nextEp = getNextUnwatchedEpisode(item);
+    if (!nextEp) {
+        showToast("All available episodes are watched!");
+        return;
+    }
+
+    if (nextEp.releaseDate && !isReleased(nextEp.releaseDate)) {
+        showToast("Cannot watch unreleased episodes.");
         return;
     }
 
@@ -3201,35 +3211,42 @@ async function markNextEpisodeWatched(id) {
     await saveItem(item);
     updateModalContent();
     refreshActivePage();
+    showToast(`Marked S${nextEp.season}E${nextEp.number} as watched`);
 }
 
-async function toggleStopWatching(id) {
-    const item = getItem(id);
-    if (!item) return;
+async function toggleStopWatching(itemId) {
+    const item = getItem(itemId);
+    if (!item || item.type === 'movie') return;
+
     item.isStopped = !item.isStopped;
     await saveItem(item);
     updateModalContent();
     refreshActivePage();
+    showToast(item.isStopped ? "Show moved to stopped watching" : "Show resumed");
 }
 
 async function removeCurrentItem() {
     if (!currentItem) return;
-    
-    // Remove from local state
-    state.library = state.library.filter(i => i.id !== currentItem.id);
-    
-    // Remove from Firebase if authenticated
-    if (auth && auth.currentUser && db) {
-        try {
-            await db.collection("users").doc(auth.currentUser.uid).collection("library").doc(currentItem.id).delete();
-        } catch(e) {
-            console.error("Error deleting item:", e);
+    if (!confirm(`Are you sure you want to remove "${currentItem.title}" from your library?`)) return;
+
+    const itemId = currentItem.id;
+    try {
+        if (auth && auth.currentUser && db) {
+            await db.collection("users")
+                .doc(auth.currentUser.uid)
+                .collection("library")
+                .doc(itemId)
+                .delete();
         }
+
+        state.library = state.library.filter(i => i.id !== itemId);
+        closeModal();
+        refreshActivePage();
+        showToast("Removed from library");
+    } catch (err) {
+        console.error("Failed to remove item:", err);
+        showToast("Could not remove item.");
     }
-    
-    showToast("Removed from library.");
-    closeModal();
-    refreshActivePage();
 }
 </script>
 </body>
