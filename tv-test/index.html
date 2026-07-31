@@ -1028,6 +1028,11 @@ img {
     gap: 10px;
     padding: 16px 0;
     border-bottom: 1px solid var(--glass-border-subtle);
+    cursor: pointer;
+}
+
+.episode:active {
+    opacity: 0.7;
 }
 
 .episode-main {
@@ -1574,6 +1579,39 @@ img {
     </div>
 </div>
 
+<!-- =====================================================
+     EPISODE DETAILS MODAL
+================================================     -->
+<div id="episodeDetailsModal" class="modal" onclick="closeEpisodeModalOutside(event)">
+    <div class="modal-sheet" style="max-height: 80vh;">
+        <div class="modal-header-nav">
+            <button class="close-button" onclick="closeEpisodeModal()" aria-label="Close">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M6 6l12 12"/>
+                    <path d="M18 6L6 18"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div id="episodeModalBackdrop" class="modal-backdrop-header" style="height: 200px;">
+            <div class="modal-backdrop-overlay"></div>
+            <div class="modal-hero-title-container">
+                <h2 id="episodeModalTitle" class="modal-title" style="font-size: 20px;"></h2>
+            </div>
+        </div>
+
+        <div class="modal-content">
+            <div id="episodeModalMeta" class="modal-meta"></div>
+            <p id="episodeModalDescription" class="modal-description"></p>
+            <div style="margin-top: 24px;">
+                <button id="episodeWatchedToggleBtn" class="action-button primary" onclick="toggleCurrentEpisodeWatched()">
+                    Mark as Watched
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <script>
@@ -1622,6 +1660,7 @@ let state = {
 };
 
 let currentItem = null;
+let currentEpisode = null;
 let selectedSeason = 1;
 let currentSearchType = 'tv';
 let currentUpcomingType = 'tv';
@@ -2999,9 +3038,8 @@ function openDetails(itemId) {
     if (!currentItem) return;
 
     if (currentItem.type !== 'movie' && currentItem.episodes) {
-        selectedSeason = 1;
         const availableSeasons = [...new Set(currentItem.episodes.map(ep => ep.season))].sort((a, b) => a - b);
-        if (availableSeasons.length > 0 && !availableSeasons.includes(selectedSeason)) {
+        if (!availableSeasons.includes(selectedSeason) && availableSeasons.length > 0) {
             selectedSeason = availableSeasons[0];
         }
     }
@@ -3145,7 +3183,7 @@ function renderEpisodesList(container) {
     
     html += seasonEpisodes.map(ep => {
         return `
-            <div class="episode">
+            <div class="episode" onclick="openEpisodeDetails('${ep.id}')">
                 <div class="episode-main">
                     ${ep.still ? 
                         `<img src="${ep.still}" class="episode-still" loading="lazy" onerror="this.style.display='none'">` : 
@@ -3155,6 +3193,7 @@ function renderEpisodesList(container) {
                         <div class="episode-info">
                             <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <div class="episode-title">${ep.number}. ${escapeHTML(ep.title)}</div>
+                                ${ep.watched ? '<span style="font-size:11px; color:var(--success); font-weight:700;">Watched</span>' : ''}
                             </div>
                             <div class="episode-overview">${escapeHTML(ep.overview)}</div>
                             <div class="episode-meta">${ep.runtime} • ${formatDate(ep.releaseDate)}</div>
@@ -3174,6 +3213,78 @@ function selectSeason(seasonNum) {
     updateModalContent();
 }
 
+function openEpisodeDetails(episodeId) {
+    if (!currentItem || !currentItem.episodes) return;
+    const ep = currentItem.episodes.find(e => e.id === episodeId);
+    if (!ep) return;
+
+    currentEpisode = ep;
+
+    const backdropHeader = document.getElementById("episodeModalBackdrop");
+    if (ep.still) {
+        backdropHeader.style.backgroundImage = `url('${ep.still}')`;
+    } else if (currentItem.backdrop) {
+        backdropHeader.style.backgroundImage = `url('${currentItem.backdrop}')`;
+    } else {
+        backdropHeader.style.backgroundImage = `none`;
+        backdropHeader.style.backgroundColor = `var(--surface-2)`;
+    }
+
+    document.getElementById("episodeModalTitle").textContent = `S${ep.season} E${ep.number}: ${ep.title}`;
+    document.getElementById("episodeModalMeta").innerHTML = `
+        <span>Season ${ep.season}</span>
+        <span>•</span>
+        <span>Episode ${ep.number}</span>
+        <span>•</span>
+        <span>${ep.runtime}</span>
+        <span>•</span>
+        <span>${formatDate(ep.releaseDate)}</span>
+    `;
+    document.getElementById("episodeModalDescription").textContent = ep.overview || "No episode overview available.";
+
+    const toggleBtn = document.getElementById("episodeWatchedToggleBtn");
+    if (ep.watched) {
+        toggleBtn.textContent = "Mark as Unwatched";
+        toggleBtn.className = "action-button warning";
+    } else {
+        toggleBtn.textContent = "Mark as Watched";
+        toggleBtn.className = "action-button primary";
+    }
+
+    document.getElementById("episodeDetailsModal").classList.add("open");
+}
+
+function closeEpisodeModal() {
+    document.getElementById("episodeDetailsModal").classList.remove("open");
+    currentEpisode = null;
+}
+
+function closeEpisodeModalOutside(event) {
+    if (event.target.id === "episodeDetailsModal") {
+        closeEpisodeModal();
+    }
+}
+
+async function toggleCurrentEpisodeWatched() {
+    if (!currentItem || !currentEpisode) return;
+
+    const ep = currentItem.episodes.find(e => e.id === currentEpisode.id);
+    if (!ep) return;
+
+    if (!ep.watched && ep.releaseDate && !isReleased(ep.releaseDate)) {
+        showToast("Cannot mark unreleased episode as watched.");
+        return;
+    }
+
+    ep.watched = !ep.watched;
+    currentEpisode.watched = ep.watched;
+
+    await saveItem(currentItem);
+    updateModalContent();
+    openEpisodeDetails(ep.id);
+    showToast(ep.watched ? `Marked S${ep.season}E${ep.number} as watched` : `Marked S${ep.season}E${ep.number} as unwatched`);
+}
+
 async function toggleMovieWatched(itemId) {
     const item = getItem(itemId);
     if (!item || item.type !== 'movie') return;
@@ -3189,7 +3300,7 @@ async function toggleMovieWatched(itemId) {
     await saveItem(item);
     updateModalContent();
     refreshActivePage();
-    showToast(item.watched ? "Marked as watched" : "Marked as unwatched");
+    showToast(item.watched ? "Marked as watched!" : "Marked as unwatched.");
 }
 
 async function markNextEpisodeWatched(itemId) {
@@ -3203,15 +3314,16 @@ async function markNextEpisodeWatched(itemId) {
     }
 
     if (nextEp.releaseDate && !isReleased(nextEp.releaseDate)) {
-        showToast("Cannot watch unreleased episodes.");
+        showToast("Next episode has not released yet.");
         return;
     }
 
     nextEp.watched = true;
     await saveItem(item);
+
     updateModalContent();
     refreshActivePage();
-    showToast(`Marked S${nextEp.season}E${nextEp.number} as watched`);
+    showToast(`Watched S${nextEp.season}E${nextEp.number}!`);
 }
 
 async function toggleStopWatching(itemId) {
@@ -3220,32 +3332,35 @@ async function toggleStopWatching(itemId) {
 
     item.isStopped = !item.isStopped;
     await saveItem(item);
+
     updateModalContent();
     refreshActivePage();
-    showToast(item.isStopped ? "Show moved to stopped watching" : "Show resumed");
+    showToast(item.isStopped ? "Show moved to Stopped Watching." : "Show resumed.");
 }
 
 async function removeCurrentItem() {
     if (!currentItem) return;
-    if (!confirm(`Are you sure you want to remove "${currentItem.title}" from your library?`)) return;
 
-    const itemId = currentItem.id;
+    if (!confirm(`Are you sure you want to remove "${currentItem.title}" from your library?`)) {
+        return;
+    }
+
     try {
         if (auth && auth.currentUser && db) {
             await db.collection("users")
                 .doc(auth.currentUser.uid)
                 .collection("library")
-                .doc(itemId)
+                .doc(currentItem.id)
                 .delete();
         }
 
-        state.library = state.library.filter(i => i.id !== itemId);
+        state.library = state.library.filter(i => i.id !== currentItem.id);
         closeModal();
         refreshActivePage();
-        showToast("Removed from library");
+        showToast("Removed from library.");
     } catch (err) {
-        console.error("Failed to remove item:", err);
-        showToast("Could not remove item.");
+        console.error("Error removing item:", err);
+        showToast("Failed to remove item.");
     }
 }
 </script>
