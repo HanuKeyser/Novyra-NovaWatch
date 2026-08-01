@@ -3148,13 +3148,8 @@ function updateModalContent() {
         if (currentItem.watched) {
             const watchedDateStr = currentItem.lastWatchedAt
                 ? formatDate(currentItem.lastWatchedAt)
-                : null;
-
-            metaHTML += `<span>•</span>`;
-            if (watchedDateStr) {
-                metaHTML += `<span>${watchedDateStr}</span><span>•</span>`;
-            }
-            metaHTML += `<span style="color: var(--success); font-weight:700;">Watched</span>`;
+                : 'Date unavailable';
+            metaHTML += `<span>•</span><span style="color: var(--success); font-weight:700;">Watched ${escapeHTML(watchedDateStr)}</span>`;
         }
     } else {
         const prog = getTVProgress(currentItem);
@@ -3288,6 +3283,22 @@ function renderEpisodesList(container) {
         </div>
     `;
     container.innerHTML = html;
+
+    // Keep the currently selected season visible after the episode list re-renders.
+    // This runs after the DOM has been updated so the active season button can
+    // be scrolled into view without affecting the press-and-hold functionality.
+    requestAnimationFrame(() => {
+        const seasonSelector = container.querySelector('.season-selector');
+        const activeSeasonButton = container.querySelector('.season-button.active');
+
+        if (seasonSelector && activeSeasonButton) {
+            activeSeasonButton.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'center'
+            });
+        }
+    });
 }
 
 /* =========================================================
