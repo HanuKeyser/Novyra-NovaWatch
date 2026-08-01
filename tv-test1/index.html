@@ -3146,7 +3146,15 @@ function updateModalContent() {
             <span>${releaseDateStr}</span>
         `;
         if (currentItem.watched) {
-            metaHTML += `<span>•</span><span style="color: var(--success); font-weight:700;">Watched</span>`;
+            const watchedDateStr = currentItem.lastWatchedAt
+                ? formatDate(currentItem.lastWatchedAt)
+                : null;
+
+            metaHTML += `<span>•</span>`;
+            if (watchedDateStr) {
+                metaHTML += `<span>${watchedDateStr}</span><span>•</span>`;
+            }
+            metaHTML += `<span style="color: var(--success); font-weight:700;">Watched</span>`;
         }
     } else {
         const prog = getTVProgress(currentItem);
