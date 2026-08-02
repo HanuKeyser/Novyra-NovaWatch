@@ -1350,7 +1350,7 @@ img {
         </div>
 
         <div class="auth-form">
-            <input type="text" id="authUsername" class="auth-input" placeholder="Username (for registration)">
+            <input type="text" id="authUsername" class="auth-input" placeholder="Username">
             <input type="email" id="authEmail" class="auth-input" placeholder="Email address">
             <input type="password" id="authPassword" class="auth-input" placeholder="Password">
             <div class="auth-actions">
@@ -1502,8 +1502,8 @@ img {
             <!-- Notifications Permission Control -->
             <div style="border-top: 1px solid var(--glass-border-subtle); margin-top: 18px; padding-top: 16px; display: flex; flex-direction: column; gap: 10px;">
                 <div>
-                    <div style="font-size: 14px; font-weight: 700;">Release Notifications</div>
-                    <div style="font-size: 12px; color: var(--text-secondary);">Stay Ahead With Alerts!</div>
+                    <div style="font-size: 14px; font-weight: 700;">Your Watchlist, Always Up to Date</div>
+                    <div style="font-size: 12px; color: var(--text-secondary);">Get alerts when new episodes and movies are released.</div>
                 </div>
                 <button class="action-button primary" id="notificationBtn" onclick="requestNotificationPermission()" style="width: 100%; height: 40px; font-size: 13px;">Enable</button>
             </div>
@@ -1690,7 +1690,7 @@ img {
 
 <div id="toast" class="toast"></div>
 
-<script>
+<script>  
 /* =========================================================
    FIREBASE CONFIG & INITIALIZATION
 ========================================================= */
@@ -1713,6 +1713,15 @@ try {
         firebase.initializeApp(firebaseConfig);
         auth = firebase.auth();
         db = firebase.firestore();
+
+        // Safely set persistence with fallback for restricted browsers/incognito mode
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch((err) => {
+            console.warn("Local persistence failed, attempting session persistence:", err);
+            return auth.setPersistence(firebase.auth.Auth.Persistence.SESSION).catch(() => {
+                console.warn("Session storage inaccessible. Falling back to in-memory persistence.");
+                return auth.setPersistence(firebase.auth.Auth.Persistence.NONE);
+            });
+        });
     }
 } catch (e) {
     console.warn("Firebase initialization failed.", e);
@@ -2177,16 +2186,32 @@ if (auth) {
                     await saveUserProfile();
                 }
 
-                // Fetch Personal Library
-                const librarySnapshot = await db.collection("users")
-                    .doc(user.uid)
-                    .collection("library")
-                    .get();
-
+                // Fetch Personal Library with error handling
                 let cloudLibrary = [];
-                librarySnapshot.forEach(doc => {
-                    if (doc.exists) cloudLibrary.push(doc.data());
-                });
+                try {
+                    const librarySnapshot = await db.collection("users")
+                        .doc(user.uid)
+                        .collection("library")
+                        .get();
+
+                    librarySnapshot.forEach(doc => {
+                        if (doc.exists) cloudLibrary.push(doc.data());
+                    });
+                } catch (fetchErr) {
+                    console.warn("Could not fetch library from server, trying cache:", fetchErr);
+                    // Attempt to fetch from local firestore cache if offline
+                    try {
+                        const cachedSnapshot = await db.collection("users")
+                            .doc(user.uid)
+                            .collection("library")
+                            .get({ source: 'cache' });
+                        cachedSnapshot.forEach(doc => {
+                            if (doc.exists) cloudLibrary.push(doc.data());
+                        });
+                    } catch (cacheErr) {
+                        console.error("Cache fetch also failed:", cacheErr);
+                    }
+                }
                 state.library = cloudLibrary;
                
                 if (!state.profiles || state.profiles.length === 0) {
