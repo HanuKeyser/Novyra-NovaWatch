@@ -2239,8 +2239,9 @@ if (auth) {
                 showToast("Library sync failed.");
                 refreshActivePage();
             finally {
-    // Hide loading screen immediately once initialization is complete
-    if (loadingScreen) loadingScreen.style.display = "none";
+    setTimeout(() => {
+        if (loadingScreen) loadingScreen.style.display = "none";
+    }, 600);
 }
         } else {
             // User is logged out: Show Auth Screen, Hide Main App & Loading Screen
