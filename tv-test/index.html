@@ -1496,7 +1496,9 @@ img {
 ================================================     -->
 <main id="homePage" class="page active">
     <div class="tab-content-wrapper">
-        <div class="home-card" style="display: flex; flex-direction: column; gap: 18px;">
+        
+        <!-- Profile Card -->
+        <div class="home-card">
             <div class="home-row">
                 <div class="large-avatar" id="largeAvatar">G</div>
                 <div>
@@ -1506,7 +1508,7 @@ img {
             </div>
 
             <!-- Notifications Permission Control -->
-            <div style="border-top: 1px solid var(--glass-border-subtle); padding-top: 16px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="border-top: 1px solid var(--glass-border-subtle); margin-top: 18px; padding-top: 16px; display: flex; flex-direction: column; gap: 10px;">
                 <div>
                     <div style="font-size: 14px; font-weight: 700;">Release Notifications</div>
                     <div style="font-size: 12px; color: var(--text-secondary);">Stay Ahead With Alerts!</div>
@@ -1514,9 +1516,11 @@ img {
                 <button class="action-button primary" id="notificationBtn" onclick="requestNotificationPermission()" style="width: 100%; height: 40px; font-size: 13px;">Enable</button>
             </div>
 
-<div style="border-top: 1px solid var(--glass-border-subtle); padding-top: 16px; display: flex; flex-direction: column; gap: 10px;">
-    <button class="auth-btn secondary" style="width: 100%;" onclick="handleSignOut()">Sign Out</button>
-</div>
+            <!-- Sign Out Section -->
+            <div style="border-top: 1px solid var(--glass-border-subtle); margin-top: 16px; padding-top: 16px;">
+                <button class="auth-btn secondary" style="width: 100%;" onclick="handleSignOut()">Sign Out</button>
+            </div>
+        </div>
 
         <!-- Viewing Stats -->
         <div class="analytics-section">
@@ -2234,12 +2238,10 @@ if (auth) {
                 console.error("Error fetching cloud data:", err);
                 showToast("Library sync failed.");
                 refreshActivePage();
-            } finally {
-                // Dismiss mini loading screen smoothly after everything is initialized
-                setTimeout(() => {
-                    if (loadingScreen) loadingScreen.style.display = "none";
-                }, 600);
-            }
+            finally {
+    // Hide loading screen immediately once initialization is complete
+    if (loadingScreen) loadingScreen.style.display = "none";
+}
         } else {
             // User is logged out: Show Auth Screen, Hide Main App & Loading Screen
             if (authScreen) authScreen.style.display = "flex";
