@@ -1820,14 +1820,61 @@ let auth = null;
 let currentUser = null;
 
 try {
+
     if (firebaseConfig.apiKey !== "YOUR_FIREBASE_API_KEY") {
+
         firebase.initializeApp(firebaseConfig);
+
         auth = firebase.auth();
         db = firebase.firestore();
-        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err => console.warn("Firebase persistence setup failed:", err));
+
+        // Enable the best available persistence
+        (async () => {
+
+            try {
+
+                // Preferred: Stay signed in after browser closes
+                await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+                console.log("Firebase LOCAL persistence enabled.");
+
+            } catch (localError) {
+
+                console.warn("LOCAL persistence unavailable.", localError);
+
+                try {
+
+                    // Fallback: Stay signed in until browser/tab closes
+                    await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+                    console.log("Firebase SESSION persistence enabled.");
+
+                } catch (sessionError) {
+
+                    console.warn("SESSION persistence unavailable.", sessionError);
+
+                    try {
+
+                        // Final fallback: Memory only
+                        await auth.setPersistence(firebase.auth.Auth.Persistence.NONE);
+                        console.log("Firebase using in-memory authentication.");
+
+                    } catch (memoryError) {
+
+                        console.error("Unable to configure Firebase persistence.", memoryError);
+
+                    }
+
+                }
+
+            }
+
+        })();
+
     }
+
 } catch (e) {
-    console.warn("Firebase initialization failed.", e);
+
+    console.error("Firebase initialization failed.", e);
+
 }
 
 /* =========================================================
@@ -2139,7 +2186,7 @@ async function handleGoogleSignIn() {
 
     try {
         const provider = new firebase.auth.GoogleAuthProvider();
-        await auth.signInWithPopup(provider);
+        await signInWithRedirect();
         showToast("Signed in with Google!");
     } catch (err) {
         console.error("Google Sign-In Error:", err);
