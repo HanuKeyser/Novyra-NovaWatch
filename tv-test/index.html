@@ -2176,6 +2176,17 @@ if (auth) {
             if (largeAvatar) largeAvatar.textContent = initial;
 
             try {
+// Load local cache first for instant UI rendering
+                const cachedLibrary = localStorage.getItem(`novawatch_lib_${user.uid}`);
+                if (cachedLibrary) {
+                    try {
+                        state.library = JSON.parse(cachedLibrary);
+                        refreshActivePage(); // Render instantly using cache
+                    } catch (e) {
+                        console.error("Cache parse error", e);
+                    }
+                }
+
                 // Fetch User Cloud Profile & Settings
                 const userDoc = await db.collection("users").doc(user.uid).get();
                 if (userDoc.exists) {
@@ -2191,7 +2202,7 @@ if (auth) {
                     await saveUserProfile();
                 }
 
-                // Fetch Personal Library
+                // Fetch Personal Library from Firestore & Update Cache
                 const librarySnapshot = await db.collection("users")
                     .doc(user.uid)
                     .collection("library")
@@ -2202,7 +2213,8 @@ if (auth) {
                     if (doc.exists) cloudLibrary.push(doc.data());
                 });
                 state.library = cloudLibrary;
-               
+                localStorage.setItem(`novawatch_lib_${user.uid}`, JSON.stringify(cloudLibrary));
+              
                 if (!state.profiles || state.profiles.length === 0) {
                     state.profiles = [{ id: "profile-main", name: displayName, initials: initial }];
                 }
@@ -2234,15 +2246,13 @@ if (auth) {
                         state.library = updatedLibrary;
                         refreshActivePage();
                     });
-            } catch (err) {
+} catch (err) {
                 console.error("Error fetching cloud data:", err);
                 showToast("Library sync failed.");
+            } finally {
                 refreshActivePage();
-            finally {
-    setTimeout(() => {
-        if (loadingScreen) loadingScreen.style.display = "none";
-    }, 100);
-}
+                if (loadingScreen) loadingScreen.style.display = "none";
+            }
         } else {
             // User is logged out: Show Auth Screen, Hide Main App & Loading Screen
             if (authScreen) authScreen.style.display = "flex";
