@@ -1360,14 +1360,6 @@ img {
         </div>
     </div>
 </div>
-
-<!-- INITIAL LOADING SCREEN -->
-<div id="loadingScreen" style="position: fixed; inset: 0; z-index: 1500; background: var(--bg-mesh); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px;">
-    <div style="backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); position: absolute; inset: 0; z-index: -1;"></div>
-    <img src="https://www.novyra.co.za/NovaWatch_Logo.png" alt="NovaWatch Logo" style="width: 72px; height: 72px; object-fit: contain;">
-    <div style="font-size: 18px; font-weight: 800; color: var(--text); letter-spacing: -0.5px;">Loading NovaWatch...</div>
-    <div class="spinner"></div>
-</div>
   
 <div class="app">
 
@@ -2150,18 +2142,12 @@ if (auth) {
     auth.onAuthStateChanged(async (user) => {
         currentUser = user;
         const authScreen = document.getElementById("authScreen");
-        const loadingScreen = document.getElementById("loadingScreen");
         const mainApp = document.querySelector(".app");
 
-        // Ensure the loading screen is visible while processing authentication state
-        if (loadingScreen) loadingScreen.style.display = "flex";
-
         if (user) {
-            // Hide Auth Screen, Keep Loading Screen active temporarily for sync
             if (authScreen) authScreen.style.display = "none";
             if (mainApp) mainApp.style.display = "block";
 
-            // Set UI Profile Details
             const displayName = user.displayName || user.email.split('@')[0];
             const initial = displayName.charAt(0).toUpperCase();
             
@@ -2176,18 +2162,16 @@ if (auth) {
             if (largeAvatar) largeAvatar.textContent = initial;
 
             try {
-// Load local cache first for instant UI rendering
                 const cachedLibrary = localStorage.getItem(`novawatch_lib_${user.uid}`);
                 if (cachedLibrary) {
                     try {
                         state.library = JSON.parse(cachedLibrary);
-                        refreshActivePage(); // Render instantly using cache
+                        refreshActivePage();
                     } catch (e) {
                         console.error("Cache parse error", e);
                     }
                 }
 
-                // Fetch User Cloud Profile & Settings
                 const userDoc = await db.collection("users").doc(user.uid).get();
                 if (userDoc.exists) {
                     const userData = userDoc.data();
@@ -2202,7 +2186,6 @@ if (auth) {
                     await saveUserProfile();
                 }
 
-                // Fetch Personal Library from Firestore & Update Cache
                 const librarySnapshot = await db.collection("users")
                     .doc(user.uid)
                     .collection("library")
@@ -2220,11 +2203,8 @@ if (auth) {
                 }
                 
                 refreshActivePage();
-                
-                // Trigger Background Updates & Notifications
                 await checkLibraryForUpdates();
 
-                // Listen for real-time changes
                 db.collection("users")
                     .doc(user.uid)
                     .collection("library")
@@ -2246,20 +2226,16 @@ if (auth) {
                         state.library = updatedLibrary;
                         refreshActivePage();
                     });
-} catch (err) {
+            } catch (err) {
                 console.error("Error fetching cloud data:", err);
                 showToast("Library sync failed.");
             } finally {
                 refreshActivePage();
-                if (loadingScreen) loadingScreen.style.display = "none";
             }
         } else {
-            // User is logged out: Show Auth Screen, Hide Main App & Loading Screen
             if (authScreen) authScreen.style.display = "flex";
             if (mainApp) mainApp.style.display = "none";
-            if (loadingScreen) loadingScreen.style.display = "none";
             
-            // Clear local state
             state.library = [];
             const homeNameEl = document.getElementById("homeName");
             const homeEmailEl = document.getElementById("homeEmailSubtitle");
