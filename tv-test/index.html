@@ -1013,6 +1013,9 @@ img {
     font-size: 12px;
     font-weight: 700;
     box-shadow: var(--glass-shadow-sm);
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: pan-x;
 }
 
 .season-button.active {
@@ -1254,10 +1257,174 @@ img {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
 }
+
+/* =========================================================
+   STARTUP LOADING & AUTHENTICATION EXPERIENCE
+========================================================= */
+.startup-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: var(--bg-mesh);
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+.startup-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+.startup-card {
+    width: 100%;
+    max-width: 380px;
+    padding: 34px 26px;
+    text-align: center;
+    background: var(--surface);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    border-radius: 28px;
+    box-shadow: var(--glass-shadow);
+}
+.startup-logo {
+    width: 76px;
+    height: 76px;
+    object-fit: contain;
+    margin: 0 auto 16px;
+}
+.startup-title {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+.startup-status {
+    margin-top: 8px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.5;
+}
+.startup-spinner {
+    width: 30px;
+    height: 30px;
+    margin: 20px auto 0;
+    border: 3px solid rgba(0,0,0,0.08);
+    border-top-color: var(--blue);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+#loginPage {
+    min-height: calc(100vh - 68px);
+    align-items: center;
+    justify-content: center;
+}
+#loginPage.active {
+    display: flex;
+}
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 26px;
+    background: var(--surface);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    box-shadow: var(--glass-shadow);
+}
+.login-brand {
+    text-align: center;
+    margin-bottom: 24px;
+}
+.login-brand img {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    margin: 0 auto 12px;
+}
+.login-brand h1 {
+    font-size: 24px;
+    font-weight: 800;
+}
+.login-brand p {
+    margin-top: 6px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.5;
+}
+.login-error {
+    display: none;
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(255,59,48,0.08);
+    border: 1px solid rgba(255,59,48,0.18);
+    color: var(--danger);
+    font-size: 12px;
+    line-height: 1.4;
+}
+.login-error.show {
+    display: block;
+}
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.login-submit {
+    width: 100%;
+    height: 46px;
+    border-radius: 12px;
+    background: var(--blue);
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    box-shadow: 0 6px 16px rgba(0,102,204,0.3);
+}
+.login-submit:active {
+    transform: scale(0.98);
+}
+.login-register {
+    margin-top: 14px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+.login-register button {
+    background: transparent;
+    color: var(--blue);
+    font-weight: 700;
+}
+.authenticated-only {
+    display: none !important;
+}
+body.app-ready .authenticated-only {
+    display: initial;
+}
+body.app-ready .bottom-nav.authenticated-only {
+    display: grid !important;
+}
+body.app-ready .page.authenticated-only.active {
+    display: block;
+}
+
 </style>
 </head>
 
 <body>
+
+<div id="startupScreen" class="startup-screen">
+    <div class="startup-card">
+        <img class="startup-logo" src="https://www.novyra.co.za/NovaWatch_App_Icon.png" alt="NovaWatch">
+        <div class="startup-title">NovaWatch</div>
+        <div id="startupStatus" class="startup-status">Restoring your session...</div>
+        <div class="startup-spinner"></div>
+    </div>
+</div>
+
 <div class="app">
 
 <!-- =====================================================
@@ -1275,10 +1442,49 @@ img {
     </button>
 </header>
 
+
+<!-- =====================================================
+     AUTHENTICATION / LOGIN SCREEN
+===================================================== -->
+<main id="loginPage" class="page">
+    <div class="login-card">
+        <div class="login-brand">
+            <img src="https://www.novyra.co.za/NovaWatch_App_Icon.png" alt="NovaWatch">
+            <h1>Welcome to NovaWatch</h1>
+            <p>Sign in to access your library, sync your watch progress, and continue where you left off.</p>
+        </div>
+
+        <div id="loginError" class="login-error"></div>
+
+        <button class="google-auth-btn" onclick="handleGoogleSignIn()">
+            <svg width="18" height="18" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            Continue with Google
+        </button>
+
+        <div class="auth-divider"><span>OR</span></div>
+
+        <div class="login-form">
+            <input type="email" id="loginEmail" class="auth-input" placeholder="Email address" autocomplete="email">
+            <input type="password" id="loginPassword" class="auth-input" placeholder="Password" autocomplete="current-password">
+            <button class="login-submit" onclick="handleLoginPageSignIn()">Sign In</button>
+        </div>
+
+        <div class="login-register">
+            Don't have an account?
+            <button onclick="handleLoginPageRegister()">Create one</button>
+        </div>
+    </div>
+</main>
+
 <!-- =====================================================
      1. DISCOVER TAB
 ================================================     -->
-<main id="discoverPage" class="page">
+<main id="discoverPage" class="page authenticated-only">
     <div class="search-type-toggle">
         <button id="searchTypeTV" class="search-type-btn active" onclick="setSearchType('tv')">TV Shows</button>
         <button id="searchTypeMovie" class="search-type-btn" onclick="setSearchType('movie')">Movies</button>
@@ -1306,7 +1512,7 @@ img {
 <!-- =====================================================
      2. UPCOMING TAB
 ================================================     -->
-<main id="upcomingPage" class="page">
+<main id="upcomingPage" class="page authenticated-only">
     <div class="search-type-toggle">
         <button id="upcomingTypeTV" class="search-type-btn active" onclick="setUpcomingType('tv')">TV Shows</button>
         <button id="upcomingTypeMovie" class="search-type-btn" onclick="setUpcomingType('movie')">Movies</button>
@@ -1320,7 +1526,7 @@ img {
 <!-- =====================================================
      3. TV SHOWS TAB
 ================================================     -->
-<main id="tvShowsPage" class="page">
+<main id="tvShowsPage" class="page authenticated-only">
     <div class="tab-content-wrapper">
         <div>
             <div class="category-title">
@@ -1355,7 +1561,7 @@ img {
 <!-- =====================================================
      4. MOVIES TAB
 ================================================     -->
-<main id="moviesPage" class="page">
+<main id="moviesPage" class="page authenticated-only">
     <div class="tab-content-wrapper">
         <div>
             <div class="category-title">
@@ -1404,38 +1610,19 @@ img {
             </div>
 
             <div id="authSection" style="border-top: 1px solid var(--glass-border-subtle); padding-top: 16px;">
-                <div id="loggedOutView">
-                    <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Sign in to load and sync your library:</div>
-                    
-                    <button class="google-auth-btn" onclick="handleGoogleSignIn()">
-                        <svg width="18" height="18" viewBox="0 0 24 24">
-                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                            <path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.62z"/>
-                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-                        </svg>
-                        Continue with Google
-                    </button>
-
-                    <div class="auth-divider">
-                        <span>OR</span>
-                    </div>
-
-                    <div class="auth-form">
-                        <input type="text" id="authUsername" class="auth-input" placeholder="Username">
-                        <input type="email" id="authEmail" class="auth-input" placeholder="Email address">
-                        <input type="password" id="authPassword" class="auth-input" placeholder="Password">
-                        <div class="auth-actions">
-                            <button class="auth-btn" onclick="handleSignIn()">Sign In</button>
-                            <button class="auth-btn secondary" onclick="handleSignUp()">Register</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="loggedInView" style="display: none;">
-                    <button class="auth-btn secondary" style="width: 100%;" onclick="handleSignOut()">Sign Out</button>
-                </div>
+    <div id="accountDashboard">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+            <div>
+                <div style="font-size:14px; font-weight:700;">Cloud Sync</div>
+                <div id="cloudSyncStatus" style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Checking connection...</div>
             </div>
+            <div id="cloudSyncIndicator" style="width:10px; height:10px; border-radius:50%; background:var(--text-muted); flex-shrink:0;"></div>
+        </div>
+        <div style="margin-top:16px;">
+            <button class="auth-btn secondary" style="width:100%;" onclick="handleSignOut()">Sign Out</button>
+        </div>
+    </div>
+</div>
         </div>
 
         <!-- Viewing Stats -->
@@ -1506,7 +1693,7 @@ img {
 <!-- =====================================================
      BOTTOM NAVIGATION
 ================================================     -->
-<nav class="bottom-nav">
+<nav class="bottom-nav authenticated-only">
     <button id="navTvShows" class="nav-button" onclick="showPage('tvShows')">
         <svg class="icon" viewBox="0 0 24 24">
             <rect x="2" y="7" width="20" height="13" rx="2"/>
@@ -1637,6 +1824,7 @@ try {
         firebase.initializeApp(firebaseConfig);
         auth = firebase.auth();
         db = firebase.firestore();
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err => console.warn("Firebase persistence setup failed:", err));
     }
 } catch (e) {
     console.warn("Firebase initialization failed.", e);
@@ -1646,6 +1834,82 @@ try {
    APP STATE & CONFIG
 ========================================================= */
 const TMDB_API_KEY = "c8dc4239290060d91afd45c40d8182b7";
+const FETCH_TIMEOUT_MS = 15000;
+
+async function fetchWithTimeout(url, options = {}, timeout = FETCH_TIMEOUT_MS) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeout);
+    try {
+        return await window.fetch(url, { ...options, signal: controller.signal });
+    } finally {
+        clearTimeout(timer);
+    }
+}
+
+function setStartupStatus(message) {
+    const el = document.getElementById("startupStatus");
+    if (el) el.textContent = message;
+}
+
+function hideStartupScreen() {
+    const screen = document.getElementById("startupScreen");
+    if (!screen) return;
+    screen.classList.add("hidden");
+    setTimeout(() => screen.remove(), 350);
+}
+
+function showLoginScreen() {
+    document.body.classList.remove("app-ready");
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    const login = document.getElementById("loginPage");
+    if (login) login.classList.add("active");
+    window.scrollTo(0, 0);
+}
+
+function showAppPage(page, subType = null) {
+    document.body.classList.add("app-ready");
+    showPage(page, subType, true);
+}
+
+function showLoginError(message) {
+    const el = document.getElementById("loginError");
+    if (!el) return;
+    el.textContent = message;
+    el.classList.toggle("show", !!message);
+}
+
+async function handleLoginPageSignIn() {
+    const email = document.getElementById("loginEmail")?.value.trim();
+    const password = document.getElementById("loginPassword")?.value;
+    if (!email || !password) {
+        showLoginError("Please enter your email address and password.");
+        return;
+    }
+    try {
+        showLoginError("");
+        await auth.signInWithEmailAndPassword(email, password);
+    } catch (err) {
+        showLoginError(err.message || "Unable to sign in.");
+    }
+}
+
+async function handleLoginPageRegister() {
+    const email = document.getElementById("loginEmail")?.value.trim();
+    const password = document.getElementById("loginPassword")?.value;
+    if (!email || !password) {
+        showLoginError("Enter an email and password first, then tap Create one.");
+        return;
+    }
+    try {
+        showLoginError("");
+        const credential = await auth.createUserWithEmailAndPassword(email, password);
+        const name = email.split("@")[0] || "NovaWatch User";
+        await credential.user.updateProfile({ displayName: name });
+    } catch (err) {
+        showLoginError(err.message || "Unable to create your account.");
+    }
+}
+
 
 let state = {
     library: [],
@@ -1786,6 +2050,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     initSearchPage();
     checkNotificationPermissionState();
+
+    ["loginEmail", "loginPassword"].forEach(id => {
+        const input = document.getElementById(id);
+        if (input) input.addEventListener("keydown", e => {
+            if (e.key === "Enter") handleLoginPageSignIn();
+        });
+    });
 });
 
 /* =========================================================
@@ -1929,9 +2200,13 @@ async function handleSignIn() {
 async function handleSignOut() {
     if (!auth) return;
     try {
+        if (unsubscribeLibrary) {
+            unsubscribeLibrary();
+            unsubscribeLibrary = null;
+        }
         await auth.signOut();
         state.library = [];
-        refreshActivePage();
+        showLoginScreen();
         showToast("Signed out successfully.");
     } catch (err) {
         showToast(err.message);
@@ -1947,23 +2222,59 @@ function refreshActivePage() {
 }
 
 /* =========================================================
-   AUTOMATIC TV SHOW UPDATES & RELEASE ALERTS
+   AUTOMATIC TV SHOW, MOVIE & EPISODE UPDATES & RELEASE ALERTS
 ========================================================= */
 async function checkLibraryForUpdates() {
     if (!state.library || state.library.length === 0) return;
     let updated = false;
 
     for (let item of state.library) {
-        if (item.type === 'tv' && item.tmdbId) {
-            try {
-                const res = await fetch(`https://api.themoviedb.org/3/tv/${item.tmdbId}?api_key=${TMDB_API_KEY}`);
+        if (!item.tmdbId) continue;
+
+        try {
+            if (item.type === 'movie') {
+                const res = await fetchWithTimeout(`https://api.themoviedb.org/3/movie/${item.tmdbId}?api_key=${TMDB_API_KEY}`);
+                const movieData = await res.json();
+                if (!movieData || !movieData.id) continue;
+
+                const newTitle = movieData.title || item.title;
+                const newYear = movieData.release_date ? movieData.release_date.substring(0, 4) : item.year;
+                const newPoster = movieData.poster_path ? `https://image.tmdb.org/t/p/w500${movieData.poster_path}` : item.poster;
+                const newBackdrop = movieData.backdrop_path ? `https://image.tmdb.org/t/p/w780${movieData.backdrop_path}` : item.backdrop;
+                const newDescription = movieData.overview || item.description;
+                const newRuntime = movieData.runtime ? `${movieData.runtime} min` : item.runtime;
+                const newReleaseDate = movieData.release_date ? new Date(movieData.release_date).toISOString() : item.releaseDate;
+
+                if (
+                    item.title !== newTitle ||
+                    item.year !== newYear ||
+                    item.poster !== newPoster ||
+                    item.backdrop !== newBackdrop ||
+                    item.description !== newDescription ||
+                    item.runtime !== newRuntime ||
+                    item.releaseDate !== newReleaseDate
+                ) {
+                    item.title = newTitle;
+                    item.year = newYear;
+                    item.poster = newPoster;
+                    item.backdrop = newBackdrop;
+                    item.description = newDescription;
+                    item.runtime = newRuntime;
+                    item.releaseDate = newReleaseDate;
+                    
+                    await saveItem(item);
+                    updated = true;
+                }
+            } else {
+                // TV Shows & Individual Episodes
+                const res = await fetchWithTimeout(`https://api.themoviedb.org/3/tv/${item.tmdbId}?api_key=${TMDB_API_KEY}`);
                 const showData = await res.json();
                 if (!showData || !showData.seasons) continue;
 
                 let newEpisodes = [];
                 const validSeasons = showData.seasons.filter(s => s.season_number > 0);
                 const seasonPromises = validSeasons.map(season => 
-                    fetch(`https://api.themoviedb.org/3/tv/${item.tmdbId}/season/${season.season_number}?api_key=${TMDB_API_KEY}`)
+                    fetchWithTimeout(`https://api.themoviedb.org/3/tv/${item.tmdbId}/season/${season.season_number}?api_key=${TMDB_API_KEY}`)
                     .then(r => r.json())
                     .catch(e => null)
                 );
@@ -1995,6 +2306,7 @@ async function checkLibraryForUpdates() {
                     newEpisodes.forEach(newEp => {
                         if (epMap.has(newEp.id)) {
                             const existing = epMap.get(newEp.id);
+                            // Preserve existing watch status and specific metadata changes if any
                             newEp.watched = existing.watched;
                         } else {
                             hasNewContent = true;
@@ -2014,9 +2326,9 @@ async function checkLibraryForUpdates() {
                     await saveItem(item);
                     updated = true;
                 }
-            } catch (err) {
-                console.error(`Failed to check updates for show ${item.title}:`, err);
             }
+        } catch (err) {
+            console.error(`Failed to check updates for item ${item.title}:`, err);
         }
     }
 
@@ -2025,96 +2337,126 @@ async function checkLibraryForUpdates() {
     }
 }
 
-if (auth) {
-    auth.onAuthStateChanged(async (user) => {
-        currentUser = user;
-        const outView = document.getElementById("loggedOutView");
-        const inView = document.getElementById("loggedInView");
+let unsubscribeLibrary = null;
 
-        if (user) {
-            outView.style.display = "none";
-            inView.style.display = "block";
+async function loadAuthenticatedApp(user) {
+    currentUser = user;
+    document.body.classList.add("app-ready");
+    setStartupStatus("Syncing your library...");
 
-            try {
-                const userDoc = await db.collection("users").doc(user.uid).get();
-                if (userDoc.exists) {
-                    const userData = userDoc.data();
-                    if (userData) {
-                        state = {
-                            ...state,
-                            ...userData
-                        };
-                    }
-                } else {
-                    if (user.displayName && state.profiles && state.profiles[0]) {
-                        state.profiles[0].name = user.displayName;
-                        state.profiles[0].initials = user.displayName.charAt(0).toUpperCase();
-                    }
-                    await saveUserProfile();
-                }
+    const syncStatus = document.getElementById("cloudSyncStatus");
+    const syncIndicator = document.getElementById("cloudSyncIndicator");
+    if (syncStatus) syncStatus.textContent = "Synchronising with Cloud Firestore...";
+    if (syncIndicator) syncIndicator.style.background = "var(--blue)";
 
-                const librarySnapshot = await db.collection("users")
-                    .doc(user.uid)
-                    .collection("library")
-                    .get();
+    try {
+        const userRef = db.collection("users").doc(user.uid);
+        const userDoc = await userRef.get();
 
-                let cloudLibrary = [];
-                librarySnapshot.forEach(doc => {
-                    if (doc.exists) {
-                        cloudLibrary.push(doc.data());
-                    }
-                });
-
-                state.library = cloudLibrary;
-               
-                if (!state.profiles || state.profiles.length === 0) {
-                    const name = user.displayName || user.email.split('@')[0];
-                    state.profiles = [{ id: "profile-hanu", name: name, initials: name.charAt(0).toUpperCase() }];
-                }
-                
-                refreshActivePage();
-                showToast("Loaded library!");
-
-                await checkLibraryForUpdates();
-
-                db.collection("users")
-                    .doc(user.uid)
-                    .collection("library")
-                    .onSnapshot((snapshot) => {
-                        let updatedLibrary = [...state.library];
-
-                        snapshot.docChanges().forEach((change) => {
-                            const itemData = change.doc.data();
-                            const index = updatedLibrary.findIndex(i => i.id === itemData.id);
-
-                            if (change.type === "added" || change.type === "modified") {
-                                if (index !== -1) {
-                                    updatedLibrary[index] = itemData;
-                                } else {
-                                    updatedLibrary.push(itemData);
-                                }
-                            } else if (change.type === "removed") {
-                                if (index !== -1) {
-                                    updatedLibrary.splice(index, 1);
-                                }
-                            }
-                        });
-
-                        state.library = updatedLibrary;
-                        refreshActivePage();
-                    });
-            } catch (err) {
-                console.error("Error fetching cloud data:", err);
-                showToast("Library sync failed.");
-                refreshActivePage();
-            }
+        if (userDoc.exists) {
+            const userData = userDoc.data();
+            if (userData) state = { ...state, ...userData };
         } else {
-            outView.style.display = "block";
-            inView.style.display = "none";
-            state.library = [];
-            refreshActivePage();
+            const name = user.displayName || user.email?.split("@")[0] || "NovaWatch User";
+            state.profiles = [{
+                id: "profile-hanu",
+                name,
+                initials: name.charAt(0).toUpperCase()
+            }];
+            await saveUserProfile();
         }
-    });
+
+        const librarySnapshot = await userRef.collection("library").get();
+        state.library = librarySnapshot.docs.map(doc => doc.data()).filter(Boolean);
+
+        if (!state.profiles || state.profiles.length === 0) {
+            const name = user.displayName || user.email?.split("@")[0] || "NovaWatch User";
+            state.profiles = [{ id: "profile-hanu", name, initials: name.charAt(0).toUpperCase() }];
+        }
+
+        updateHomeUI();
+        renderHomeTab();
+
+        if (syncStatus) syncStatus.textContent = "Synced with Cloud Firestore";
+        if (syncIndicator) syncIndicator.style.background = "var(--success)";
+
+        const lastPage = localStorage.getItem("novawatchLastPage") || "home";
+        const lastSubType = localStorage.getItem("novawatchLastSubType") || null;
+        showAppPage(lastPage, lastSubType);
+        hideStartupScreen();
+
+        // Live updates stay active without blocking the initial app launch.
+        if (unsubscribeLibrary) unsubscribeLibrary();
+        unsubscribeLibrary = userRef.collection("library").onSnapshot(snapshot => {
+            let updatedLibrary = [...state.library];
+
+            snapshot.docChanges().forEach(change => {
+                const itemData = change.doc.data();
+                const index = updatedLibrary.findIndex(i => i.id === itemData.id);
+
+                if (change.type === "added" || change.type === "modified") {
+                    if (index !== -1) updatedLibrary[index] = itemData;
+                    else updatedLibrary.push(itemData);
+                } else if (change.type === "removed" && index !== -1) {
+                    updatedLibrary.splice(index, 1);
+                }
+            });
+
+            state.library = updatedLibrary;
+            refreshActivePage();
+        }, err => {
+            console.error("Firestore realtime sync failed:", err);
+            if (syncStatus) syncStatus.textContent = "Offline — changes will retry";
+            if (syncIndicator) syncIndicator.style.background = "var(--danger)";
+        });
+
+        // Do not hold the UI hostage while TMDB checks for updates.
+        setTimeout(() => {
+            checkLibraryForUpdates().catch(err => console.warn("Background update check failed:", err));
+        }, 250);
+    } catch (err) {
+        console.error("Error fetching cloud data:", err);
+        if (syncStatus) syncStatus.textContent = "Sync unavailable";
+        if (syncIndicator) syncIndicator.style.background = "var(--danger)";
+        state.library = [];
+        showAppPage("home");
+        hideStartupScreen();
+        showToast("Library sync failed. Please try again.");
+    }
+}
+
+function initFirebaseSession() {
+    if (!auth || !db) {
+        currentUser = null;
+        hideStartupScreen();
+        showLoginScreen();
+        return;
+    }
+
+    setStartupStatus("Restoring your session...");
+
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+        .catch(err => console.warn("Could not enable persistent authentication:", err))
+        .finally(() => {
+            auth.onAuthStateChanged(async user => {
+                if (user) {
+                    await loadAuthenticatedApp(user);
+                } else {
+                    if (unsubscribeLibrary) {
+                        unsubscribeLibrary();
+                        unsubscribeLibrary = null;
+                    }
+                    currentUser = null;
+                    state.library = [];
+                    hideStartupScreen();
+                    showLoginScreen();
+                }
+            });
+        });
+}
+
+if (auth) {
+    initFirebaseSession();
 }
 
 /* =========================================================
@@ -2183,7 +2525,7 @@ async function fetchTrending() {
         : `https://api.themoviedb.org/3/trending/tv/week?api_key=${TMDB_API_KEY}`;
 
     try {
-        const response = await fetch(endpoint);
+        const response = await fetchWithTimeout(endpoint);
         const data = await response.json();
         renderSearchResults(data.results || []);
     } catch (error) {
@@ -2204,7 +2546,7 @@ async function performTMDBSearch(query) {
         : `https://api.themoviedb.org/3/search/tv?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}`;
 
     try {
-        const response = await fetch(endpoint);
+        const response = await fetchWithTimeout(endpoint);
         const data = await response.json();
         
         if (!data.results || data.results.length === 0) {
@@ -2282,7 +2624,7 @@ async function openSearchResultDetails(tmdbId, type) {
 
     try {
         if (type === 'movie') {
-            const movieRes = await fetch(`https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${TMDB_API_KEY}`);
+            const movieRes = await fetchWithTimeout(`https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${TMDB_API_KEY}`);
             const movieData = await movieRes.json();
 
             currentItem = {
@@ -2300,7 +2642,7 @@ async function openSearchResultDetails(tmdbId, type) {
                 watched: false
             };
         } else {
-            const showRes = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${TMDB_API_KEY}`);
+            const showRes = await fetchWithTimeout(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${TMDB_API_KEY}`);
             const showData = await showRes.json();
 
             let episodes = [];
@@ -2308,7 +2650,7 @@ async function openSearchResultDetails(tmdbId, type) {
             if (showData.seasons && showData.seasons.length > 0) {
                 const validSeasons = showData.seasons.filter(s => s.season_number > 0);
                 const seasonPromises = validSeasons.map(season => 
-                    fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${season.season_number}?api_key=${TMDB_API_KEY}`)
+                    fetchWithTimeout(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${season.season_number}?api_key=${TMDB_API_KEY}`)
                     .then(res => res.json())
                     .catch(e => { console.error(e); return null; })
                 );
@@ -2376,7 +2718,7 @@ async function importMediaData(id, type, buttonElement) {
 
     try {
         if (type === 'movie') {
-            const movieRes = await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_API_KEY}`);
+            const movieRes = await fetchWithTimeout(`https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_API_KEY}`);
             const movieData = await movieRes.json();
 
             const slug = `movie-${movieData.id}`;
@@ -2412,7 +2754,7 @@ async function importMediaData(id, type, buttonElement) {
             sendAppNotification("Added to Library", { body: `You will be notified when ${movieData.title} releases.` });
 
         } else {
-            const showRes = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${TMDB_API_KEY}`);
+            const showRes = await fetchWithTimeout(`https://api.themoviedb.org/3/tv/${id}?api_key=${TMDB_API_KEY}`);
             const showData = await showRes.json();
 
             const slug = "tv-" + showData.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
@@ -2426,7 +2768,7 @@ async function importMediaData(id, type, buttonElement) {
             if (showData.seasons && showData.seasons.length > 0) {
                 const validSeasons = showData.seasons.filter(s => s.season_number > 0);
                 const seasonPromises = validSeasons.map(season => 
-                    fetch(`https://api.themoviedb.org/3/tv/${id}/season/${season.season_number}?api_key=${TMDB_API_KEY}`)
+                    fetchWithTimeout(`https://api.themoviedb.org/3/tv/${id}/season/${season.season_number}?api_key=${TMDB_API_KEY}`)
                     .then(res => res.json())
                     .catch(e => { console.error(e); return null; })
                 );
@@ -2609,23 +2951,26 @@ function sortMoviesByWatchedDate(movies) {
 /* =========================================================
    TAB NAVIGATION
 ========================================================= */
-function showPage(page, subType = null) {
+function showPage(page, subType = null, skipAuthGuard = false) {
+    if (!skipAuthGuard && !currentUser) {
+        showLoginScreen();
+        return;
+    }
+
     window.scrollTo(0, 0);
+    localStorage.setItem("novawatchLastPage", page);
+    if (subType) localStorage.setItem("novawatchLastSubType", subType);
 
     document.querySelectorAll(".page").forEach(element => element.classList.remove("active"));
 
     const target = document.getElementById(`${page}Page`);
-    if (target) {
-        target.classList.add("active");
-    }
+    if (target) target.classList.add("active");
 
     document.querySelectorAll(".nav-button").forEach(button => button.classList.remove("active"));
 
     const navId = `nav${page.charAt(0).toUpperCase()}${page.slice(1)}`;
     const nav = document.getElementById(navId);
-    if (nav) {
-        nav.classList.add("active");
-    }
+    if (nav) nav.classList.add("active");
 
     if (page === "tvShows") renderTVShowsTab();
     if (page === "movies") renderMoviesTab();
@@ -2634,7 +2979,7 @@ function showPage(page, subType = null) {
         if (subType) {
             setSearchType(subType);
         } else {
-            const query = document.getElementById("onlineSearchInput").value.trim();
+            const query = document.getElementById("onlineSearchInput")?.value.trim();
             if (!query) fetchTrending();
         }
     }
@@ -3017,7 +3362,7 @@ async function playTrailer(tmdbId, type) {
             ? `https://api.themoviedb.org/3/movie/${tmdbId}/videos?api_key=${TMDB_API_KEY}`
             : `https://api.themoviedb.org/3/tv/${tmdbId}/videos?api_key=${TMDB_API_KEY}`;
 
-        const res = await fetch(endpoint);
+        const res = await fetchWithTimeout(endpoint);
         const data = await res.json();
 
         const trailer = (data.results || []).find(v => v.site === "YouTube" && v.type === "Trailer");
@@ -3031,6 +3376,25 @@ async function playTrailer(tmdbId, type) {
         console.error("Error playing trailer:", err);
         showToast("Could not load trailer.");
     }
+}
+
+async function addModalItemToLibrary() {
+    if (!currentItem) return;
+    if (state.library.some(s => s.tmdbId === currentItem.tmdbId)) return;
+    
+    const btn = document.getElementById('modalAddLibBtn');
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = "Adding...";
+    }
+    
+    await importMediaData(currentItem.tmdbId, currentItem.type);
+    
+    const newItem = state.library.find(s => s.tmdbId === currentItem.tmdbId);
+    if (newItem) {
+        currentItem = newItem;
+    }
+    updateModalContent();
 }
 
 function openDetails(itemId) {
@@ -3088,7 +3452,10 @@ function updateModalContent() {
             <span>${releaseDateStr}</span>
         `;
         if (currentItem.watched) {
-            metaHTML += `<span>•</span><span style="color: var(--success); font-weight:700;">Watched</span>`;
+            const watchedDate = currentItem.lastWatchedAt
+                ? formatDate(currentItem.lastWatchedAt)
+                : "Date unavailable";
+            metaHTML += `<span>•</span><span style="color: var(--success); font-weight:700;">Watched ${watchedDate}</span>`;
         }
     } else {
         const prog = getTVProgress(currentItem);
@@ -3105,6 +3472,8 @@ function updateModalContent() {
     document.getElementById("modalDescription").textContent = currentItem.description;
 
     let actionsHTML = '';
+    const isAdded = state.library.some(s => s.tmdbId === currentItem.tmdbId);
+
     if (currentItem.type === 'movie') {
         actionsHTML = `
             <div class="modal-actions-row movie-actions-grid">
@@ -3116,6 +3485,11 @@ function updateModalContent() {
                 </button>
                 <button class="action-button danger" onclick="removeCurrentItem()">
                     Remove
+                </button>
+            </div>
+            <div style="margin-top: 10px;">
+                <button id="modalAddLibBtn" class="action-button ${isAdded ? '' : 'primary'}" style="width: 100%; ${isAdded ? 'background: var(--surface-2); color: var(--success); border: 1px solid rgba(52, 199, 89, 0.3);' : ''}" onclick="addModalItemToLibrary()" ${isAdded ? 'disabled' : ''}>
+                    ${isAdded ? 'In Library' : 'Add to Library'}
                 </button>
             </div>
         `;
@@ -3171,7 +3545,14 @@ function renderEpisodesList(container) {
         <div class="season-selector-wrapper">
             <div class="season-selector">
                 ${seasons.map(s => `
-                    <button class="season-button ${s === selectedSeason ? 'active' : ''}" onclick="selectSeason(${s})">Season ${s}</button>
+                    <button data-season="${s}" class="season-button ${s === selectedSeason ? 'active' : ''}" 
+                            onpointerdown="startSeasonPress(event, ${s})"
+                            onpointerup="endSeasonPress(event)"
+                            onpointercancel="endSeasonPress(event)"
+                            onpointerleave="endSeasonPress(event)"
+                            onclick="handleSeasonClick(event, ${s})">
+                        Season ${s}
+                    </button>
                 `).join("")}
             </div>
         </div>
@@ -3193,10 +3574,10 @@ function renderEpisodesList(container) {
                                 `}
                                 <div class="episode-info">
                                     <div class="episode-title">E${ep.number} • ${escapeHTML(ep.title)}</div>
+                                    <div class="episode-overview">${escapeHTML(ep.overview)}</div>
                                     <div class="episode-meta">
-                                        ${ep.runtime || '45 min'} &bull; ${dateStr} &bull; <span style="color: ${watchedColor}; font-weight:700; cursor:pointer;" onclick="event.stopPropagation(); toggleEpisodeWatchedDirectly('${ep.id}')">${watchedText}</span>
+                                        ${ep.runtime || '45 min'} &bull; ${dateStr} &bull; <span style="color: ${watchedColor}; font-weight:700;">${watchedText}</span>
                                     </div>
-                                    <div class="episode-overview">${escapeHTML(ep.overview || 'No overview available.')}</div>
                                 </div>
                             </div>
                         </div>
@@ -3205,70 +3586,131 @@ function renderEpisodesList(container) {
             }).join("")}
         </div>
     `;
-
     container.innerHTML = html;
-}
 
-function selectSeason(seasonNumber) {
-    selectedSeason = seasonNumber;
-    renderEpisodesList(document.getElementById("modalEpisodes"));
-
+    // Restore the selected season's position after every re-render.
+    // This is deliberately done after layout so it works consistently
+    // across Safari, Chrome, Edge and Firefox.
     requestAnimationFrame(() => {
-        const seasonSelector = document.querySelector("#modalEpisodes .season-selector");
-        const activeSeasonButton = seasonSelector?.querySelector(".season-button.active");
+        const selector = container.querySelector(".season-selector");
+        const selectedButton = selector
+            ? selector.querySelector(`.season-button[data-season="${selectedSeason}"]`)
+            : null;
 
-        if (seasonSelector && activeSeasonButton) {
-            const targetScrollLeft =
-                activeSeasonButton.offsetLeft -
-                (seasonSelector.clientWidth - activeSeasonButton.offsetWidth) / 2;
+        if (selector && selectedButton) {
+            const targetLeft = selectedButton.offsetLeft
+                - (selector.clientWidth / 2)
+                + (selectedButton.offsetWidth / 2);
 
-            seasonSelector.scrollLeft = Math.max(
+            selector.scrollLeft = Math.max(
                 0,
-                Math.min(
-                    targetScrollLeft,
-                    seasonSelector.scrollWidth - seasonSelector.clientWidth
-                )
+                Math.min(targetLeft, selector.scrollWidth - selector.clientWidth)
             );
         }
     });
 }
 
-function openEpisodeDetails(episodeId) {
+/* =========================================================
+   SEASON PRESS-AND-HOLD FUNCTIONALITY
+========================================================= */
+let seasonPressTimer = null;
+let isLongPress = false;
+let seasonPressPointerId = null;
+
+function startSeasonPress(event, seasonNumber) {
+    isLongPress = false;
+    clearTimeout(seasonPressTimer);
+
+    seasonPressPointerId = event?.pointerId ?? null;
+
+    if (event?.currentTarget && event.pointerId != null) {
+        try {
+            event.currentTarget.setPointerCapture(event.pointerId);
+        } catch (e) {}
+    }
+
+    seasonPressTimer = setTimeout(() => {
+        isLongPress = true;
+        toggleEntireSeasonWatched(seasonNumber);
+        if (navigator.vibrate) navigator.vibrate(50);
+    }, 600);
+}
+
+function endSeasonPress(event) {
+    clearTimeout(seasonPressTimer);
+    seasonPressTimer = null;
+
+    if (event?.currentTarget && seasonPressPointerId != null) {
+        try {
+            if (event.currentTarget.hasPointerCapture?.(seasonPressPointerId)) {
+                event.currentTarget.releasePointerCapture(seasonPressPointerId);
+            }
+        } catch (e) {}
+    }
+
+    seasonPressPointerId = null;
+}
+
+function handleSeasonClick(event, seasonNumber) {
+    if (isLongPress) {
+        event.preventDefault();
+        event.stopPropagation();
+        isLongPress = false;
+        return;
+    }
+
+    selectedSeason = seasonNumber;
+    updateModalContent();
+}
+
+async function toggleEntireSeasonWatched(seasonNumber) {
     if (!currentItem || !currentItem.episodes) return;
-    const ep = currentItem.episodes.find(e => e.id === episodeId);
-    if (!ep) return;
+    
+    const seasonEps = currentItem.episodes.filter(ep => ep.season === seasonNumber);
+    if (seasonEps.length === 0) return;
+    
+    const anyUnwatched = seasonEps.some(ep => !ep.watched);
+    seasonEps.forEach(ep => {
+        ep.watched = anyUnwatched;
+    });
+    
+    showToast(`Season ${seasonNumber} marked as ${anyUnwatched ? 'Watched' : 'Unwatched'}`);
+    await saveItem(currentItem);
+    updateModalContent();
+    refreshActivePage();
+}
 
-    currentEpisode = ep;
-
+/* =========================================================
+   MODAL CONTROLS & ACTIONS
+========================================================= */
+function openEpisodeDetails(epId) {
+    if (!currentItem || !currentItem.episodes) return;
+    currentEpisode = currentItem.episodes.find(e => e.id === epId);
+    if (!currentEpisode) return;
+    
+    document.getElementById("episodeModalTitle").textContent = `E${currentEpisode.number}: ${currentEpisode.title}`;
+    
     const backdrop = document.getElementById("episodeModalBackdrop");
-    if (ep.still) {
-        backdrop.style.backgroundImage = `url('${ep.still}')`;
-    } else if (currentItem.backdrop) {
-        backdrop.style.backgroundImage = `url('${currentItem.backdrop}')`;
+    if (currentEpisode.still) {
+        backdrop.style.backgroundImage = `url('${currentEpisode.still}')`;
     } else {
         backdrop.style.backgroundImage = 'none';
         backdrop.style.backgroundColor = 'var(--surface-2)';
     }
-
-    document.getElementById("episodeModalTitle").textContent = `S${ep.season} E${ep.number}: ${ep.title}`;
+    
     document.getElementById("episodeModalMeta").innerHTML = `
-        <span>${ep.runtime || '45 min'}</span>
+        <span>Season ${currentEpisode.season}</span>
         <span>•</span>
-        <span>${formatDate(ep.releaseDate)}</span>
+        <span>${currentEpisode.runtime || '45 min'}</span>
         <span>•</span>
-        <span style="color: ${ep.watched ? 'var(--success)' : 'var(--danger)'}; font-weight:700;">${ep.watched ? 'Watched' : 'Unwatched'}</span>
+        <span>${formatDate(currentEpisode.releaseDate)}</span>
     `;
-    document.getElementById("episodeModalDescription").textContent = ep.overview || 'No description available.';
-
+    
+    document.getElementById("episodeModalDescription").textContent = currentEpisode.overview || "No description available.";
+    
     const btn = document.getElementById("episodeWatchedToggleBtn");
-    if (ep.watched) {
-        btn.textContent = "Mark as Unwatched";
-        btn.className = "action-button warning";
-    } else {
-        btn.textContent = "Mark as Watched";
-        btn.className = "action-button primary";
-    }
-
+    btn.textContent = currentEpisode.watched ? "Mark as Unwatched" : "Mark as Watched";
+    
     document.getElementById("episodeDetailsModal").classList.add("open");
 }
 
@@ -3278,107 +3720,62 @@ function closeEpisodeModal() {
 }
 
 function closeEpisodeModalOutside(event) {
-    if (event.target.id === "episodeDetailsModal") {
-        closeEpisodeModal();
-    }
+    if (event.target.id === "episodeDetailsModal") closeEpisodeModal();
 }
 
 async function toggleCurrentEpisodeWatched() {
     if (!currentItem || !currentEpisode) return;
-
     currentEpisode.watched = !currentEpisode.watched;
-    
     await saveItem(currentItem);
-    showToast(`Marked S${currentEpisode.season}E${currentEpisode.number} as ${currentEpisode.watched ? 'Watched' : 'Unwatched'}`);
-
     closeEpisodeModal();
     updateModalContent();
     refreshActivePage();
 }
 
-async function toggleEpisodeWatchedDirectly(episodeId) {
-    if (!currentItem || !currentItem.episodes) return;
-    const ep = currentItem.episodes.find(e => e.id === episodeId);
-    if (!ep) return;
-
-    ep.watched = !ep.watched;
-
+async function toggleMovieWatched(id) {
+    if (!currentItem || currentItem.type !== 'movie') return;
+    currentItem.watched = !currentItem.watched;
+    currentItem.lastWatchedAt = currentItem.watched ? new Date().toISOString() : null;
     await saveItem(currentItem);
-    showToast(`Marked S${ep.season}E${ep.number} as ${ep.watched ? 'Watched' : 'Unwatched'}`);
-
     updateModalContent();
     refreshActivePage();
 }
 
-async function markNextEpisodeWatched(itemId) {
-    const item = getItem(itemId);
-    if (!item || !item.episodes) return;
-
-    const nextEp = getNextUnwatchedEpisode(item);
-    if (!nextEp) {
-        showToast("No more unwatched episodes available!");
-        return;
+async function markNextEpisodeWatched(id) {
+    if (!currentItem || currentItem.type === 'movie') return;
+    const nextEp = getNextUnwatchedEpisode(currentItem);
+    if (nextEp) {
+        nextEp.watched = true;
+        await saveItem(currentItem);
+        updateModalContent();
+        refreshActivePage();
     }
-
-    nextEp.watched = true;
-    await saveItem(item);
-
-    showToast(`Marked S${nextEp.season}E${nextEp.number} as Watched!`);
-    updateModalContent();
-    refreshActivePage();
 }
 
-async function toggleMovieWatched(itemId) {
-    const item = getItem(itemId);
-    if (!item) return;
-
-    item.watched = !item.watched;
-    item.lastWatchedAt = item.watched ? new Date().toISOString() : null;
-
-    await saveItem(item);
-    showToast(`Marked ${item.title} as ${item.watched ? 'Watched' : 'Unwatched'}`);
-
-    updateModalContent();
-    refreshActivePage();
-}
-
-async function toggleStopWatching(itemId) {
-    const item = getItem(itemId);
-    if (!item) return;
-
-    item.isStopped = !item.isStopped;
-    await saveItem(item);
-
-    showToast(item.isStopped ? "Moved to Stopped Watching" : "Resumed show");
+async function toggleStopWatching(id) {
+    if (!currentItem) return;
+    currentItem.isStopped = !currentItem.isStopped;
+    await saveItem(currentItem);
     updateModalContent();
     refreshActivePage();
 }
 
 async function removeCurrentItem() {
     if (!currentItem) return;
-
-    if (!confirm(`Are you sure you want to remove "${currentItem.title}" from your library?`)) {
+    const isAdded = state.library.some(s => s.tmdbId === currentItem.tmdbId);
+    if (!isAdded) {
+        closeModal();
         return;
     }
-
-    const itemId = currentItem.id;
-    state.library = state.library.filter(i => i.id !== itemId);
-
-    try {
-        if (auth && auth.currentUser && db) {
-            await db.collection("users")
-                .doc(auth.currentUser.uid)
-                .collection("library")
-                .doc(itemId)
-                .delete();
+    
+    if (confirm(`Are you sure you want to remove ${currentItem.title} from your library?`)) {
+        state.library = state.library.filter(i => i.id !== currentItem.id);
+        if (auth && auth.currentUser) {
+            await db.collection("users").doc(auth.currentUser.uid).collection("library").doc(currentItem.id).delete();
         }
-    } catch (err) {
-        console.error("Failed to delete from Firestore:", err);
+        closeModal();
+        showToast("Item removed.");
     }
-
-    closeModal();
-    showToast("Removed from library.");
-    refreshActivePage();
 }
 </script>
 </body>
