@@ -11,6 +11,13 @@
 <link rel="apple-touch-icon" href="https://www.novyra.co.za/NovaWatch_App_Icon.png">
 <link rel="shortcut icon" href="https://www.novyra.co.za/NovaWatch_Logo.png">
 
+<!-- PWA manifest: makes the app installable to a home screen / app drawer -->
+<link rel="manifest" href="/manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="NovaWatch">
+
 <!-- Preconnect for faster API calls -->
 <link rel="preconnect" href="https://api.themoviedb.org">
 <link rel="preconnect" href="https://image.tmdb.org">
@@ -696,6 +703,7 @@ img {
    UPCOMING CARDS
 ========================================================= */
 .upcoming-card {
+    position: relative;
     display: flex;
     gap: 14px;
     padding: 14px;
@@ -746,6 +754,7 @@ img {
 .upcoming-info {
     flex: 1;
     min-width: 0;
+    padding-right: 34px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -771,6 +780,64 @@ img {
     font-weight: 750;
     font-size: 11px;
     margin-top: 4px;
+}
+
+.upcoming-group-title {
+    font-size: 12px;
+    font-weight: 750;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin: 0 0 10px;
+}
+
+.upcoming-group + .upcoming-group .upcoming-group-title {
+    margin-top: 22px;
+}
+
+.upcoming-refresh-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 14px;
+}
+
+.upcoming-last-checked {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.upcoming-refresh-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface-2);
+    border: 1px solid var(--glass-border-subtle);
+    color: var(--blue);
+    flex: 0 0 auto;
+}
+
+.upcoming-refresh-btn.spinning .icon {
+    animation: spin 0.9s linear infinite;
+}
+
+.upcoming-calendar-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface-2);
+    border: 1px solid var(--glass-border-subtle);
+    color: var(--blue);
+    flex: 0 0 auto;
 }
 
 /* =========================================================
@@ -912,6 +979,110 @@ img {
     color: var(--text-secondary);
     font-size: 14px;
     line-height: 1.6;
+}
+
+/* =========================================================
+   WATCH ON (STREAMING AVAILABILITY)
+========================================================= */
+.modal-watch-on {
+    margin: 4px 0 18px;
+    animation: watchOnFadeIn 0.25s ease;
+}
+
+@keyframes watchOnFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.watch-on-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.watch-on-title {
+    font-size: 12px;
+    font-weight: 750;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.watch-on-providers {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+}
+
+.watch-provider-chip {
+    flex: 0 0 auto;
+    width: 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+}
+
+.watch-provider-logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    object-fit: cover;
+    background: var(--surface);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow-sm);
+}
+
+.watch-provider-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text-secondary);
+    backdrop-filter: blur(20px);
+}
+
+.watch-provider-name {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 64px;
+}
+
+.cinema-chip .watch-provider-logo.cinema-icon {
+    background: linear-gradient(135deg, var(--blue-light), var(--blue));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3);
+}
+
+.cinema-chip .watch-provider-name {
+    color: var(--blue);
+    font-weight: 750;
+    white-space: normal;
+}
+
+.watch-on-attribution {
+    margin-top: 10px;
+    font-size: 10px;
+    color: var(--text-muted);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.watch-on-attribution:hover {
+    text-decoration: underline;
 }
 
 .modal-actions {
@@ -1226,6 +1397,19 @@ img {
     box-shadow: var(--glass-shadow-sm);
 }
 
+.auth-forgot-link {
+    align-self: center;
+    margin-top: 4px;
+    background: transparent;
+    color: var(--blue);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.auth-forgot-link:hover {
+    text-decoration: underline;
+}
+
 /* =========================================================
    DEDICATED AUTHENTICATION OVERLAY
 ========================================================= */
@@ -1385,9 +1569,10 @@ img {
 <div id="authPasswordError" class="auth-error"></div>
 </div>
             <div class="auth-actions">
-                <button class="auth-btn" onclick="handleSignIn()">Sign In</button>
+                <button id="authSignInBtn" class="auth-btn" onclick="handleSignIn()">Sign In</button>
                 <button class="auth-btn secondary" onclick="handleSignUp()">Register</button>
             </div>
+            <button class="auth-forgot-link" onclick="handleForgotPassword()">Forgot password?</button>
         </div>
     </div>
 </div>
@@ -1444,6 +1629,17 @@ img {
     <div class="search-type-toggle">
         <button id="upcomingTypeTV" class="search-type-btn active" onclick="setUpcomingType('tv')">TV Shows</button>
         <button id="upcomingTypeMovie" class="search-type-btn" onclick="setUpcomingType('movie')">Movies</button>
+    </div>
+
+    <div class="upcoming-refresh-row">
+        <span id="upcomingLastChecked" class="upcoming-last-checked">Not checked yet</span>
+        <button id="upcomingRefreshBtn" class="upcoming-refresh-btn" onclick="manualRefreshUpcoming()" aria-label="Refresh upcoming releases" title="Refresh">
+            <svg class="icon icon-small" viewBox="0 0 24 24">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+        </button>
     </div>
 
     <div style="margin-top: 20px;">
@@ -1679,6 +1875,13 @@ img {
 
         <div class="modal-content">
             <div id="modalMeta" class="modal-meta"></div>
+            <div id="modalWatchOn" class="modal-watch-on" style="display:none;">
+                <div class="watch-on-header">
+                    <span class="watch-on-title">Watch On</span>
+                </div>
+                <div id="modalWatchProviders" class="watch-on-providers"></div>
+                <a id="modalWatchAttribution" class="watch-on-attribution" href="#" target="_blank" rel="noopener" style="display:none;">Streaming data provided by JustWatch</a>
+            </div>
             <p id="modalDescription" class="modal-description"></p>
             <div id="modalActions" class="modal-actions"></div>
             <div id="modalEpisodes"></div>
@@ -1767,12 +1970,12 @@ let state = {
     library: [],
     profiles: [
         {
-            id: "profile-hanu",
-            name: "Hanu",
-            initials: "H"
+            id: "profile-guest",
+            name: "Guest",
+            initials: "G"
         }
     ],
-    activeProfileId: "profile-hanu"
+    activeProfileId: "profile-guest"
 };
 
 let currentItem = null;
@@ -1902,6 +2105,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     initSearchPage();
     checkNotificationPermissionState();
+    updateLastCheckedLabel();
+    checkTodaysReleases();
+
+    // Keeps the "Updated Xm ago" label honest and catches the moment
+    // something crosses into "released today" for anyone who leaves the
+    // app open across midnight, without needing a network call.
+    setInterval(() => {
+        updateLastCheckedLabel();
+        checkTodaysReleases();
+    }, 5 * 60 * 1000);
 });
 
 /* =========================================================
@@ -1911,9 +2124,36 @@ function now() {
     return new Date();
 }
 
+// TMDB only ever gives us a calendar date (e.g. "2026-08-15"), never a real
+// release time. We parse/store that as UTC midnight, so all date logic below
+// reads it back out by its UTC calendar components rather than letting the
+// browser reinterpret it in the viewer's local timezone (which used to shift
+// the displayed day earlier/later depending on where the user is).
+function getDateOnlyParts(value) {
+    const d = new Date(value);
+    return { y: d.getUTCFullYear(), m: d.getUTCMonth(), d: d.getUTCDate() };
+}
+
+function getLocalTodayParts() {
+    const n = now();
+    return { y: n.getFullYear(), m: n.getMonth(), d: n.getDate() };
+}
+
+// Whole calendar days between a stored release date and the viewer's local
+// "today" — this is what drives both isReleased() and the countdown, so a
+// user in any timezone sees the same day TMDB reported, just measured
+// against their own local calendar.
+function daysUntil(date) {
+    const r = getDateOnlyParts(date);
+    const releaseLocalMidnight = new Date(r.y, r.m, r.d);
+    const t = getLocalTodayParts();
+    const todayLocalMidnight = new Date(t.y, t.m, t.d);
+    return Math.round((releaseLocalMidnight.getTime() - todayLocalMidnight.getTime()) / 86400000);
+}
+
 function isReleased(date) {
     if (!date) return true;
-    return new Date(date).getTime() <= now().getTime();
+    return daysUntil(date) <= 0;
 }
 
 function formatDate(date) {
@@ -1922,25 +2162,135 @@ function formatDate(date) {
         weekday: "short",
         day: "numeric",
         month: "short",
-        year: "numeric"
+        year: "numeric",
+        timeZone: "UTC" // dates are calendar-only; keep the day TMDB reported, don't let it drift with local tz
     }).format(new Date(date));
 }
 
 function getCountdown(date) {
     if (!date) return "TBA";
-    const difference = new Date(date).getTime() - now().getTime();
+    const days = daysUntil(date);
 
-    if (difference <= 0) {
-        return "Available now";
+    if (days <= 0) return "Available now";
+    if (days === 1) return "Tomorrow";
+    if (days <= 7) return `In ${days} days`;
+    if (days <= 13) return "Next week";
+    const weeks = Math.round(days / 7);
+    return `In ${weeks} weeks`;
+}
+
+/* =========================================================
+   RELEASE-DAY NOTIFICATIONS
+========================================================= */
+// Scans the whole library directly (not the Upcoming tab's own filtered
+// list) for movies/episodes whose release date is exactly `daysOffset` days
+// from today. Used to reliably catch "this is out today" the moment it's
+// true, independent of how the Upcoming tab itself displays things.
+function getReleasesForDay(daysOffset = 0) {
+    const results = [];
+
+    state.library.forEach(item => {
+        if (item.type === 'movie') {
+            if (item.releaseDate && daysUntil(item.releaseDate) === daysOffset) {
+                results.push({ item, type: 'movie', title: item.title, subtitle: 'Movie Release', date: new Date(item.releaseDate) });
+            }
+        } else if (item.episodes) {
+            item.episodes.forEach(episode => {
+                if (episode.releaseDate && daysUntil(episode.releaseDate) === daysOffset) {
+                    results.push({ item, type: 'tv', title: item.title, subtitle: `S${episode.season} E${episode.number} - ${episode.title}`, date: new Date(episode.releaseDate) });
+                }
+            });
+        }
+    });
+
+    return results;
+}
+
+// Fires a notification for anything releasing today, exactly once per item
+// per day (tracked in localStorage so re-opening the app or re-running the
+// background check doesn't spam the same notification repeatedly).
+const TODAYS_RELEASE_NOTIFIED_KEY = "novawatch_notifiedReleaseDay";
+
+function checkTodaysReleases() {
+    const releases = getReleasesForDay(0);
+    if (releases.length === 0) return;
+
+    const t = getLocalTodayParts();
+    const todayStamp = `${t.y}-${t.m}-${t.d}`;
+
+    let record = { day: todayStamp, ids: [] };
+    try {
+        const raw = localStorage.getItem(TODAYS_RELEASE_NOTIFIED_KEY);
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && parsed.day === todayStamp) record = parsed;
+        }
+    } catch (e) {
+        // If the stored record is corrupt, just fall back to a fresh one for today.
     }
 
-    const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+    let changed = false;
+    releases.forEach(release => {
+        const releaseId = release.type === 'movie'
+            ? `movie:${release.item.id}`
+            : `tv:${release.item.id}:${release.subtitle}`;
 
-    if (days > 0) return `${days}d ${hours}h until release`;
-    if (hours > 0) return `${hours}h ${minutes}m until release`;
-    return `${minutes}m until release`;
+        if (record.ids.includes(releaseId)) return;
+
+        sendAppNotification(
+            release.type === 'movie' ? "Out Today!" : "New Episode Today!",
+            { body: `${release.title} - ${release.subtitle}` }
+        );
+        record.ids.push(releaseId);
+        changed = true;
+    });
+
+    if (changed) {
+        try {
+            localStorage.setItem(TODAYS_RELEASE_NOTIFIED_KEY, JSON.stringify(record));
+        } catch (e) {
+            // Non-fatal — worst case the notification could repeat next check.
+        }
+    }
+}
+
+/* =========================================================
+   LAST-CHECKED TRACKING (for the Upcoming tab's refresh control)
+========================================================= */
+const LAST_LIBRARY_CHECK_KEY = "novawatch_lastLibraryCheck";
+
+function getLastLibraryCheck() {
+    try {
+        const raw = localStorage.getItem(LAST_LIBRARY_CHECK_KEY);
+        return raw ? new Date(raw) : null;
+    } catch (e) {
+        return null;
+    }
+}
+
+function setLastLibraryCheck(date) {
+    try {
+        localStorage.setItem(LAST_LIBRARY_CHECK_KEY, date.toISOString());
+    } catch (e) {
+        // Non-fatal — the label just won't persist across reloads.
+    }
+}
+
+function formatLastChecked(date) {
+    if (!date) return "Not checked yet";
+    const minutes = Math.floor((now().getTime() - date.getTime()) / 60000);
+    if (minutes < 1) return "Updated just now";
+    if (minutes < 60) return `Updated ${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `Updated ${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    return `Updated ${days}d ago`;
+}
+
+function updateLastCheckedLabel() {
+    const label = document.getElementById("upcomingLastChecked");
+    if (!label) return;
+    label.textContent = formatLastChecked(getLastLibraryCheck());
 }
 
 /* =========================================================
@@ -1992,6 +2342,106 @@ async function handleGoogleSignIn() {
     }
 }
 
+async function handleSignIn() {
+    const email = document.getElementById("authEmail").value.trim();
+    const password = document.getElementById("authPassword").value;
+
+    if (!auth) {
+        showToast("Cloud sync not configured yet.");
+        return;
+    }
+
+    clearPasswordError();
+
+    if (!email) {
+        showToast("Please enter your email address.");
+        return;
+    }
+
+    if (!password) {
+        showToast("Please enter your password.");
+        return;
+    }
+
+    const signInBtn = document.getElementById("authSignInBtn");
+    if (signInBtn) {
+        signInBtn.disabled = true;
+        signInBtn.textContent = "Signing In...";
+    }
+
+    try {
+        await auth.signInWithEmailAndPassword(email, password);
+        showToast("Welcome back!");
+    } catch (err) {
+        console.error("Sign-In Error:", err);
+
+        if (err.code === "auth/wrong-password" || err.code === "auth/invalid-credential") {
+            showPasswordError("Incorrect password. Please try again.");
+        } else if (err.code === "auth/user-not-found") {
+            showToast("No account found with that email address.");
+        } else if (err.code === "auth/invalid-email") {
+            showToast("Please enter a valid email address.");
+        } else if (err.code === "auth/too-many-requests") {
+            showToast("Too many attempts. Please try again later.");
+        } else if (err.code === "auth/user-disabled") {
+            showToast("This account has been disabled.");
+        } else {
+            showToast(err.message || "Unable to sign in.");
+        }
+    } finally {
+        if (signInBtn) {
+            signInBtn.disabled = false;
+            signInBtn.textContent = "Sign In";
+        }
+    }
+}
+
+function showPasswordError(message) {
+    const passwordInput = document.getElementById("authPassword");
+    const passwordError = document.getElementById("authPasswordError");
+
+    if (!passwordInput || !passwordError) return;
+
+    passwordError.textContent = message;
+    passwordError.classList.add("show");
+    passwordInput.classList.add("input-error");
+}
+
+async function handleForgotPassword() {
+    if (!auth) {
+        showToast("Cloud sync not configured yet.");
+        return;
+    }
+
+    const emailInput = document.getElementById("authEmail");
+    let email = emailInput ? emailInput.value.trim() : "";
+
+    // If they haven't typed an email into the form yet, ask for one rather
+    // than silently failing — this is the only path to recover an account.
+    if (!email) {
+        email = (prompt("Enter the email address for your account:") || "").trim();
+        if (!email) return;
+    }
+
+    try {
+        await auth.sendPasswordResetEmail(email);
+        showToast(`Password reset email sent to ${email}.`);
+    } catch (err) {
+        console.error("Password Reset Error:", err);
+
+        if (err.code === "auth/user-not-found") {
+            // Deliberately vague to avoid confirming which emails have accounts.
+            showToast("If that email has an account, a reset link has been sent.");
+        } else if (err.code === "auth/invalid-email") {
+            showToast("Please enter a valid email address.");
+        } else if (err.code === "auth/too-many-requests") {
+            showToast("Too many attempts. Please try again later.");
+        } else {
+            showToast(err.message || "Couldn't send reset email right now.");
+        }
+    }
+}
+
 async function handleSignUp() {
     const username = document.getElementById("authUsername").value.trim();
     const email = document.getElementById("authEmail").value.trim();
@@ -2032,7 +2482,7 @@ async function handleSignUp() {
 
         if (!state.profiles || state.profiles.length === 0) {
             state.profiles = [{
-                id: "profile-hanu",
+                id: "profile-main",
                 name: username,
                 initials: username.charAt(0).toUpperCase()
             }];
@@ -2189,10 +2639,209 @@ async function checkLibraryForUpdates() {
         } catch (err) {
             console.error(`Failed to check updates for item ${item.title}:`, err);
         }
+
+        try {
+            const availability = await fetchWatchAvailability(item.tmdbId, item.type);
+            const providersChanged = JSON.stringify(item.watchProviders || []) !== JSON.stringify(availability.providers);
+            const cinemaChanged = !!item.inCinemas !== !!availability.inCinemas;
+            const linkChanged = (item.watchLink || '') !== (availability.link || '');
+
+            if (providersChanged || cinemaChanged || linkChanged) {
+                item.watchProviders = availability.providers;
+                item.inCinemas = availability.inCinemas;
+                item.watchLink = availability.link;
+                await saveItem(item);
+                updated = true;
+            }
+        } catch (availErr) {
+            console.error(`Failed to refresh availability for ${item.title}:`, availErr);
+        }
     }
 
     if (updated) {
         refreshActivePage();
+    }
+
+    // Run regardless of whether anything changed above — the point is to
+    // catch the calendar day rolling over onto a release, not just new data.
+    checkTodaysReleases();
+    setLastLibraryCheck(now());
+    updateLastCheckedLabel();
+}
+
+/* =========================================================
+   WATCH ON (STREAMING AVAILABILITY & CINEMA STATUS)
+========================================================= */
+const WATCH_REGION_PRIORITY = ['ZA', 'US', 'GB'];
+
+async function fetchWatchAvailability(tmdbId, type) {
+    const availability = { providers: [], inCinemas: false, link: '' };
+    if (!tmdbId) return availability;
+
+    const mediaType = type === 'movie' ? 'movie' : 'tv';
+
+    try {
+        const res = await fetch(`https://api.themoviedb.org/3/${mediaType}/${tmdbId}/watch/providers?api_key=${TMDB_API_KEY}`);
+        const data = await res.json();
+        const byRegion = data.results || {};
+
+        let regionData = null;
+        for (const region of WATCH_REGION_PRIORITY) {
+            if (byRegion[region]) {
+                regionData = byRegion[region];
+                break;
+            }
+        }
+
+        let hasDigitalAvailability = false;
+
+        if (regionData) {
+            availability.link = regionData.link || '';
+
+            const streaming = [
+                ...(regionData.flatrate || []),
+                ...(regionData.free || []),
+                ...(regionData.ads || [])
+            ];
+            const rentBuy = [...(regionData.rent || []), ...(regionData.buy || [])];
+            hasDigitalAvailability = streaming.length > 0 || rentBuy.length > 0;
+
+            // Prefer subscription/free sources for the main chips; fall back to rent/buy
+            const source = streaming.length > 0 ? streaming : rentBuy;
+            const seen = new Set();
+
+            availability.providers = source
+                .filter(p => {
+                    if (seen.has(p.provider_id)) return false;
+                    seen.add(p.provider_id);
+                    return true;
+                })
+                .sort((a, b) => (a.display_priority ?? 99) - (b.display_priority ?? 99))
+                .map(p => ({
+                    id: p.provider_id,
+                    name: p.provider_name,
+                    logo: p.logo_path ? `https://image.tmdb.org/t/p/w92${p.logo_path}` : ''
+                }));
+        }
+
+        if (mediaType === 'movie') {
+            availability.inCinemas = await checkNowInCinemas(tmdbId, hasDigitalAvailability);
+        }
+    } catch (err) {
+        console.error('Error fetching watch availability:', err);
+    }
+
+    return availability;
+}
+
+async function checkNowInCinemas(tmdbId, hasDigitalAvailability) {
+    // If it's already available digitally (streaming/rent/buy), don't call it "in cinemas" anymore.
+    if (hasDigitalAvailability) return false;
+
+    try {
+        const res = await fetch(`https://api.themoviedb.org/3/movie/${tmdbId}/release_dates?api_key=${TMDB_API_KEY}`);
+        const data = await res.json();
+        const entries = data.results || [];
+
+        let regionEntry = null;
+        for (const region of WATCH_REGION_PRIORITY) {
+            regionEntry = entries.find(e => e.iso_3166_1 === region);
+            if (regionEntry) break;
+        }
+
+        const dates = regionEntry ? regionEntry.release_dates : (entries[0] ? entries[0].release_dates : []);
+        const nowTime = now().getTime();
+
+        // TMDB release_dates "type": 1 Premiere, 2 Theatrical (limited), 3 Theatrical, 4 Digital, 5 Physical, 6 TV
+        const hasTheatrical = dates.some(d => (d.type === 2 || d.type === 3) && new Date(d.release_date).getTime() <= nowTime);
+        const hasDigitalRelease = dates.some(d => d.type === 4 && new Date(d.release_date).getTime() <= nowTime);
+
+        return hasTheatrical && !hasDigitalRelease;
+    } catch (err) {
+        console.error('Error checking cinema release status:', err);
+        return false;
+    }
+}
+
+function renderWatchOnSection(item) {
+    const section = document.getElementById("modalWatchOn");
+    const providersContainer = document.getElementById("modalWatchProviders");
+    const attribution = document.getElementById("modalWatchAttribution");
+    if (!section || !providersContainer || !attribution) return;
+
+    if (!item) {
+        section.style.display = "none";
+        return;
+    }
+
+    const providers = item.watchProviders || [];
+    const inCinemas = !!item.inCinemas;
+
+    if (providers.length === 0 && !inCinemas) {
+        section.style.display = "none";
+        providersContainer.innerHTML = "";
+        attribution.style.display = "none";
+        return;
+    }
+
+    let chipsHTML = "";
+
+    if (inCinemas) {
+        chipsHTML += `
+            <div class="watch-provider-chip cinema-chip" title="Now in Cinemas">
+                <div class="watch-provider-logo cinema-icon">
+                    <svg class="icon icon-small" viewBox="0 0 24 24">
+                        <path d="M3 8.5V19a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8.5H3z"/>
+                        <path d="M3 8.5l1.5-4.5h3l-1 4.5"/>
+                        <path d="M9.5 8.5l1-4.5h3l-1 4.5"/>
+                        <path d="M16 8.5l1-4.5h3l1 4.5"/>
+                    </svg>
+                </div>
+                <span class="watch-provider-name">Now in Cinemas</span>
+            </div>
+        `;
+    }
+
+    providers.forEach(p => {
+        chipsHTML += `
+            <div class="watch-provider-chip" title="${escapeHTML(p.name)}">
+                ${p.logo
+                    ? `<img class="watch-provider-logo" src="${p.logo}" alt="${escapeHTML(p.name)}" loading="lazy">`
+                    : `<div class="watch-provider-logo watch-provider-fallback">${escapeHTML((p.name || '?').charAt(0))}</div>`
+                }
+                <span class="watch-provider-name">${escapeHTML(p.name)}</span>
+            </div>
+        `;
+    });
+
+    providersContainer.innerHTML = chipsHTML;
+    section.style.display = "block";
+
+    if (providers.length > 0) {
+        attribution.style.display = "inline-block";
+        if (item.watchLink) {
+            attribution.href = item.watchLink;
+            attribution.style.pointerEvents = "auto";
+        } else {
+            attribution.removeAttribute("href");
+            attribution.style.pointerEvents = "none";
+        }
+    } else {
+        attribution.style.display = "none";
+    }
+}
+
+async function loadWatchAvailability(item) {
+    if (!item || !item.tmdbId) return;
+
+    const availability = await fetchWatchAvailability(item.tmdbId, item.type);
+    item.watchProviders = availability.providers;
+    item.inCinemas = availability.inCinemas;
+    item.watchLink = availability.link;
+
+    // Only re-render if the modal is still showing this same item
+    if (currentItem === item) {
+        renderWatchOnSection(item);
     }
 }
 
@@ -2549,6 +3198,7 @@ async function openSearchResultDetails(tmdbId, type) {
         selectedSeason = 1;
         updateModalContent();
         document.getElementById("detailsModal").classList.add("open");
+        loadWatchAvailability(currentItem);
 
     } catch (err) {
         console.error("Error opening preview details:", err);
@@ -2571,6 +3221,7 @@ async function importMediaData(id, type, buttonElement) {
 
     try {
         if (type === 'movie') {
+            const availabilityPromise = fetchWatchAvailability(id, 'movie');
             const movieRes = await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_API_KEY}`);
             const movieData = await movieRes.json();
 
@@ -2579,6 +3230,8 @@ async function importMediaData(id, type, buttonElement) {
                 showToast("Movie is already in your library!");
                 return;
             }
+
+            const availability = await availabilityPromise;
 
             const newMovie = {
                 id: slug,
@@ -2593,7 +3246,10 @@ async function importMediaData(id, type, buttonElement) {
                 runtime: movieData.runtime ? `${movieData.runtime} min` : "120 min",
                 releaseDate: movieData.release_date ? new Date(movieData.release_date).toISOString() : new Date().toISOString(),
                 watched: false,
-                lastWatchedAt: null
+                lastWatchedAt: null,
+                watchProviders: availability.providers,
+                inCinemas: availability.inCinemas,
+                watchLink: availability.link
             };
 
             state.library.push(newMovie);
@@ -2607,6 +3263,7 @@ async function importMediaData(id, type, buttonElement) {
             sendAppNotification("Added to Library", { body: `You will be notified when ${movieData.title} releases.` });
 
         } else {
+            const availabilityPromise = fetchWatchAvailability(id, 'tv');
             const showRes = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${TMDB_API_KEY}`);
             const showData = await showRes.json();
 
@@ -2647,6 +3304,8 @@ async function importMediaData(id, type, buttonElement) {
                 });
             }
 
+            const availability = await availabilityPromise;
+
             const newShow = {
                 id: slug,
                 tmdbId: showData.id,
@@ -2660,7 +3319,10 @@ async function importMediaData(id, type, buttonElement) {
                 releaseDate: showData.first_air_date ? new Date(showData.first_air_date).toISOString() : null,
                 isFinished: false,
                 isStopped: false,
-                episodes: episodes
+                episodes: episodes,
+                watchProviders: availability.providers,
+                inCinemas: availability.inCinemas,
+                watchLink: availability.link
             };
 
             state.library.push(newShow);
@@ -2847,11 +3509,53 @@ function setUpcomingType(type) {
     renderUpcomingTab();
 }
 
+// Buckets items into Today / Tomorrow / This Week / Later so the list reads
+// like a schedule instead of one long undifferentiated feed.
+function groupUpcomingByTimeframe(items) {
+    const buckets = [
+        { label: "Today", items: [] },
+        { label: "Tomorrow", items: [] },
+        { label: "This Week", items: [] },
+        { label: "Later", items: [] }
+    ];
+
+    items.forEach(data => {
+        const days = daysUntil(data.date);
+        if (days <= 0) buckets[0].items.push(data);
+        else if (days === 1) buckets[1].items.push(data);
+        else if (days <= 7) buckets[2].items.push(data);
+        else buckets[3].items.push(data);
+    });
+
+    return buckets.filter(bucket => bucket.items.length > 0);
+}
+
+// Flat (ungrouped) list backing the currently-rendered cards, so each
+// card's "Add to Calendar" button can reference its data by a simple index
+// instead of re-embedding title/date strings into onclick attributes.
+let upcomingCalendarItems = [];
+
 function renderUpcomingTab() {
     const listContainer = document.getElementById("upcomingResultsList");
     if (!listContainer) return;
 
+    updateLastCheckedLabel();
+
+    // Keep the toggle buttons labeled with live counts so users can see at a
+    // glance whether there's anything upcoming before they even tap in.
+    const tvBtn = document.getElementById("upcomingTypeTV");
+    const movieBtn = document.getElementById("upcomingTypeMovie");
+    if (tvBtn) {
+        const tvCount = getUpcomingItems('tv').length;
+        tvBtn.textContent = tvCount ? `TV Shows (${tvCount})` : "TV Shows";
+    }
+    if (movieBtn) {
+        const movieCount = getUpcomingItems('movie').length;
+        movieBtn.textContent = movieCount ? `Movies (${movieCount})` : "Movies";
+    }
+
     const items = getUpcomingItems(currentUpcomingType);
+    upcomingCalendarItems = items;
 
     if (!items || items.length === 0) {
         const mediaLabel = currentUpcomingType === 'movie' ? 'movie releases' : 'TV episodes';
@@ -2859,7 +3563,40 @@ function renderUpcomingTab() {
         return;
     }
 
-    listContainer.innerHTML = items.map(data => createUpcomingCard(data)).join("");
+    const groups = groupUpcomingByTimeframe(items);
+
+    listContainer.innerHTML = groups.map(group => `
+        <div class="upcoming-group">
+            <div class="upcoming-group-title">${group.label}</div>
+            ${group.items.map(data => createUpcomingCard(data, items.indexOf(data))).join("")}
+        </div>
+    `).join("");
+}
+
+let upcomingRefreshInFlight = false;
+
+async function manualRefreshUpcoming() {
+    if (upcomingRefreshInFlight) return;
+    upcomingRefreshInFlight = true;
+
+    const btn = document.getElementById("upcomingRefreshBtn");
+    const label = document.getElementById("upcomingLastChecked");
+    if (btn) btn.disabled = true;
+    if (btn) btn.classList.add("spinning");
+    if (label) label.textContent = "Checking...";
+
+    try {
+        await checkLibraryForUpdates();
+        showToast("Upcoming releases refreshed.");
+    } catch (err) {
+        console.error("Manual refresh failed:", err);
+        showToast("Couldn't refresh right now.");
+    } finally {
+        upcomingRefreshInFlight = false;
+        if (btn) btn.disabled = false;
+        if (btn) btn.classList.remove("spinning");
+        updateLastCheckedLabel();
+    }
 }
 
 /* =========================================================
@@ -3120,7 +3857,7 @@ function createCard(item) {
     `;
 }
 
-function createUpcomingCard(data) {
+function createUpcomingCard(data, index) {
     const hasPoster = data.item.poster && data.item.poster.trim() !== "";
 
     return `
@@ -3139,8 +3876,74 @@ function createUpcomingCard(data) {
                 <div class="upcoming-date">${formatDate(data.date)}</div>
                 <div class="upcoming-countdown">${getCountdown(data.date)}</div>
             </div>
+            <button class="upcoming-calendar-btn" onclick="event.stopPropagation(); downloadCalendarEvent(${index})" aria-label="Add ${escapeHTML(data.title)} to calendar" title="Add to calendar">
+                <svg class="icon icon-small" viewBox="0 0 24 24">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+            </button>
         </div>
     `;
+}
+
+// Builds and downloads a minimal .ics file for a single upcoming release, so
+// there's a reliable reminder even if the browser/OS never fires (or the
+// user never grants) a push notification for it.
+function downloadCalendarEvent(index) {
+    const data = upcomingCalendarItems[index];
+    if (!data) return;
+
+    const parts = getDateOnlyParts(data.date);
+    const pad = n => String(n).padStart(2, '0');
+    const dateStamp = (y, m, d) => `${y}${pad(m + 1)}${pad(d)}`;
+
+    const startStr = dateStamp(parts.y, parts.m, parts.d);
+    // ICS all-day events use an exclusive DTEND, so it's the following day.
+    const endDate = new Date(Date.UTC(parts.y, parts.m, parts.d + 1));
+    const endStr = dateStamp(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate());
+
+    const summary = data.type === 'movie' ? `${data.title} (Movie Release)` : `${data.title}: ${data.subtitle}`;
+    const nowStamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    const uid = `novawatch-${data.item.id || data.item.tmdbId}-${startStr}@novyra.co.za`;
+
+    const icsContent = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//NovaWatch//Release Reminder//EN',
+        'CALSCALE:GREGORIAN',
+        'BEGIN:VEVENT',
+        `UID:${uid}`,
+        `DTSTAMP:${nowStamp}`,
+        `DTSTART;VALUE=DATE:${startStr}`,
+        `DTEND;VALUE=DATE:${endStr}`,
+        `SUMMARY:${escapeICS(summary)}`,
+        `DESCRIPTION:${escapeICS('Tracked in NovaWatch')}`,
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ].join('\r\n');
+
+    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${sanitizeFilename(data.title)}-release.ics`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    showToast("Calendar reminder downloaded.");
+}
+
+function escapeICS(str) {
+    return String(str).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+}
+
+function sanitizeFilename(str) {
+    return String(str).replace(/[^a-z0-9]+/gi, '-').toLowerCase();
 }
 
 function renderGrid(containerId, items, emptyText) {
@@ -3260,6 +4063,7 @@ function openDetails(itemId) {
 
     updateModalContent();
     document.getElementById("detailsModal").classList.add("open");
+    loadWatchAvailability(currentItem);
 }
 
 function closeModal() {
@@ -3319,6 +4123,7 @@ function updateModalContent() {
     }
 
     document.getElementById("modalMeta").innerHTML = metaHTML;
+    renderWatchOnSection(currentItem);
     document.getElementById("modalDescription").textContent = currentItem.description;
 
     let actionsHTML = '';
@@ -3615,6 +4420,18 @@ function clearPasswordError() {
     passwordError.classList.remove("show");
     passwordInput.classList.remove("input-error");
 }
+
+/* =========================================================
+   SERVICE WORKER REGISTRATION (PWA installability + notifications)
+========================================================= */
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/service-worker.js").catch(err => {
+            console.warn("Service worker registration failed:", err);
+        });
+    });
+}
+
 </script>
 </body>
 </html>
