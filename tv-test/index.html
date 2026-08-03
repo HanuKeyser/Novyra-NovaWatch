@@ -1765,7 +1765,7 @@ function checkNotificationPermissionState() {
     }
     if (Notification.permission === "granted") {
         btn.textContent = "Enabled";
-        btn.style.color = "var(--success)";
+        btn.style.color = "white";
         btn.disabled = true;
     } else if (Notification.permission === "denied") {
         btn.textContent = "Blocked";
@@ -1971,10 +1971,15 @@ async function handleSignUp() {
         return;
     }
 
-    if (!username) {
-        showToast("Please enter a username to register.");
-        return;
-    }
+if (!username) {
+    showToast("Please enter a username to register.");
+    return;
+}
+
+if (password.length < 6) {
+    showToast("Password must be at least 6 characters.");
+    return;
+}
 
     try {
         const userCredential = await auth.createUserWithEmailAndPassword(email, password);
