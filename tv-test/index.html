@@ -1993,19 +1993,9 @@ async function handleGoogleSignIn() {
 }
 
 async function handleSignUp() {
-    const usernameInput = document.getElementById("authUsername");
-    const emailInput = document.getElementById("authEmail");
-    const passwordInput = document.getElementById("authPassword");
-    const passwordError = document.getElementById("authPasswordError");
-
-    const username = usernameInput.value.trim();
-    const email = emailInput.value.trim();
-    const password = passwordInput.value;
-
-    // Clear old password error
-    passwordError.textContent = "";
-    passwordError.classList.remove("show");
-    passwordInput.classList.remove("input-error");
+    const username = document.getElementById("authUsername").value.trim();
+    const email = document.getElementById("authEmail").value.trim();
+    const password = document.getElementById("authPassword").value;
 
     if (!auth) {
         showToast("Cloud sync not configured yet.");
@@ -2015,26 +2005,18 @@ async function handleSignUp() {
     // Username validation
     if (!username) {
         showToast("Please enter a username to register.");
-        usernameInput.focus();
         return;
     }
 
     // Password validation
     if (!password) {
-        passwordError.textContent = "Please enter a password.";
-        passwordError.classList.add("show");
-        passwordInput.classList.add("input-error");
-        passwordInput.focus();
+        showToast("Please enter a password.");
         return;
     }
 
     // Password must be at least 6 characters
     if (password.length < 6) {
-        passwordError.textContent =
-            "Password is too short. Password must be at least 6 characters.";
-        passwordError.classList.add("show");
-        passwordInput.classList.add("input-error");
-        passwordInput.focus();
+        showToast("Password is too short. Password must be at least 6 characters.");
         return;
     }
 
@@ -2066,17 +2048,15 @@ async function handleSignUp() {
     } catch (err) {
         console.error("Registration Error:", err);
 
-        // Firebase weak password error
         if (err.code === "auth/weak-password") {
-            passwordError.textContent =
-                "Password is too short. Password must be at least 6 characters.";
-            passwordError.classList.add("show");
-            passwordInput.classList.add("input-error");
-            passwordInput.focus();
-            return;
+            showToast("Password is too short. Password must be at least 6 characters.");
+        } else if (err.code === "auth/email-already-in-use") {
+            showToast("This email address is already registered.");
+        } else if (err.code === "auth/invalid-email") {
+            showToast("Please enter a valid email address.");
+        } else {
+            showToast(err.message || "Unable to create your account.");
         }
-
-        showToast(err.message || "Unable to create your account.");
     }
 }
 
