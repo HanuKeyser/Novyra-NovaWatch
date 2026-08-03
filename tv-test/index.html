@@ -914,6 +914,110 @@ img {
     line-height: 1.6;
 }
 
+/* =========================================================
+   WATCH ON (STREAMING AVAILABILITY)
+========================================================= */
+.modal-watch-on {
+    margin: 4px 0 18px;
+    animation: watchOnFadeIn 0.25s ease;
+}
+
+@keyframes watchOnFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.watch-on-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.watch-on-title {
+    font-size: 12px;
+    font-weight: 750;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.watch-on-providers {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+}
+
+.watch-provider-chip {
+    flex: 0 0 auto;
+    width: 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+}
+
+.watch-provider-logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    object-fit: cover;
+    background: var(--surface);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow-sm);
+}
+
+.watch-provider-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text-secondary);
+    backdrop-filter: blur(20px);
+}
+
+.watch-provider-name {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 64px;
+}
+
+.cinema-chip .watch-provider-logo.cinema-icon {
+    background: linear-gradient(135deg, var(--blue-light), var(--blue));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3);
+}
+
+.cinema-chip .watch-provider-name {
+    color: var(--blue);
+    font-weight: 750;
+    white-space: normal;
+}
+
+.watch-on-attribution {
+    margin-top: 10px;
+    font-size: 10px;
+    color: var(--text-muted);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.watch-on-attribution:hover {
+    text-decoration: underline;
+}
+
 .modal-actions {
     display: flex;
     flex-direction: column;
@@ -1385,7 +1489,7 @@ img {
 <div id="authPasswordError" class="auth-error"></div>
 </div>
             <div class="auth-actions">
-                <button class="auth-btn" onclick="handleSignIn()">Sign In</button>
+                <button id="authSignInBtn" class="auth-btn" onclick="handleSignIn()">Sign In</button>
                 <button class="auth-btn secondary" onclick="handleSignUp()">Register</button>
             </div>
         </div>
@@ -1679,6 +1783,13 @@ img {
 
         <div class="modal-content">
             <div id="modalMeta" class="modal-meta"></div>
+            <div id="modalWatchOn" class="modal-watch-on" style="display:none;">
+                <div class="watch-on-header">
+                    <span class="watch-on-title">Watch On</span>
+                </div>
+                <div id="modalWatchProviders" class="watch-on-providers"></div>
+                <a id="modalWatchAttribution" class="watch-on-attribution" href="#" target="_blank" rel="noopener" style="display:none;">Streaming data provided by JustWatch</a>
+            </div>
             <p id="modalDescription" class="modal-description"></p>
             <div id="modalActions" class="modal-actions"></div>
             <div id="modalEpisodes"></div>
@@ -1992,6 +2103,71 @@ async function handleGoogleSignIn() {
     }
 }
 
+async function handleSignIn() {
+    const email = document.getElementById("authEmail").value.trim();
+    const password = document.getElementById("authPassword").value;
+
+    if (!auth) {
+        showToast("Cloud sync not configured yet.");
+        return;
+    }
+
+    clearPasswordError();
+
+    if (!email) {
+        showToast("Please enter your email address.");
+        return;
+    }
+
+    if (!password) {
+        showToast("Please enter your password.");
+        return;
+    }
+
+    const signInBtn = document.getElementById("authSignInBtn");
+    if (signInBtn) {
+        signInBtn.disabled = true;
+        signInBtn.textContent = "Signing In...";
+    }
+
+    try {
+        await auth.signInWithEmailAndPassword(email, password);
+        showToast("Welcome back!");
+    } catch (err) {
+        console.error("Sign-In Error:", err);
+
+        if (err.code === "auth/wrong-password" || err.code === "auth/invalid-credential") {
+            showPasswordError("Incorrect password. Please try again.");
+        } else if (err.code === "auth/user-not-found") {
+            showToast("No account found with that email address.");
+        } else if (err.code === "auth/invalid-email") {
+            showToast("Please enter a valid email address.");
+        } else if (err.code === "auth/too-many-requests") {
+            showToast("Too many attempts. Please try again later.");
+        } else if (err.code === "auth/user-disabled") {
+            showToast("This account has been disabled.");
+        } else {
+            showToast(err.message || "Unable to sign in.");
+        }
+    } finally {
+        if (signInBtn) {
+            signInBtn.disabled = false;
+            signInBtn.textContent = "Sign In";
+        }
+    }
+}
+
+function showPasswordError(message) {
+    const passwordInput = document.getElementById("authPassword");
+    const passwordError = document.getElementById("authPasswordError");
+
+    if (!passwordInput || !passwordError) return;
+
+    passwordError.textContent = message;
+    passwordError.classList.add("show");
+    passwordInput.classList.add("input-error");
+}
+
 async function handleSignUp() {
     const username = document.getElementById("authUsername").value.trim();
     const email = document.getElementById("authEmail").value.trim();
@@ -2189,10 +2365,203 @@ async function checkLibraryForUpdates() {
         } catch (err) {
             console.error(`Failed to check updates for item ${item.title}:`, err);
         }
+
+        try {
+            const availability = await fetchWatchAvailability(item.tmdbId, item.type);
+            const providersChanged = JSON.stringify(item.watchProviders || []) !== JSON.stringify(availability.providers);
+            const cinemaChanged = !!item.inCinemas !== !!availability.inCinemas;
+            const linkChanged = (item.watchLink || '') !== (availability.link || '');
+
+            if (providersChanged || cinemaChanged || linkChanged) {
+                item.watchProviders = availability.providers;
+                item.inCinemas = availability.inCinemas;
+                item.watchLink = availability.link;
+                await saveItem(item);
+                updated = true;
+            }
+        } catch (availErr) {
+            console.error(`Failed to refresh availability for ${item.title}:`, availErr);
+        }
     }
 
     if (updated) {
         refreshActivePage();
+    }
+}
+
+/* =========================================================
+   WATCH ON (STREAMING AVAILABILITY & CINEMA STATUS)
+========================================================= */
+const WATCH_REGION_PRIORITY = ['ZA', 'US', 'GB'];
+
+async function fetchWatchAvailability(tmdbId, type) {
+    const availability = { providers: [], inCinemas: false, link: '' };
+    if (!tmdbId) return availability;
+
+    const mediaType = type === 'movie' ? 'movie' : 'tv';
+
+    try {
+        const res = await fetch(`https://api.themoviedb.org/3/${mediaType}/${tmdbId}/watch/providers?api_key=${TMDB_API_KEY}`);
+        const data = await res.json();
+        const byRegion = data.results || {};
+
+        let regionData = null;
+        for (const region of WATCH_REGION_PRIORITY) {
+            if (byRegion[region]) {
+                regionData = byRegion[region];
+                break;
+            }
+        }
+
+        let hasDigitalAvailability = false;
+
+        if (regionData) {
+            availability.link = regionData.link || '';
+
+            const streaming = [
+                ...(regionData.flatrate || []),
+                ...(regionData.free || []),
+                ...(regionData.ads || [])
+            ];
+            const rentBuy = [...(regionData.rent || []), ...(regionData.buy || [])];
+            hasDigitalAvailability = streaming.length > 0 || rentBuy.length > 0;
+
+            // Prefer subscription/free sources for the main chips; fall back to rent/buy
+            const source = streaming.length > 0 ? streaming : rentBuy;
+            const seen = new Set();
+
+            availability.providers = source
+                .filter(p => {
+                    if (seen.has(p.provider_id)) return false;
+                    seen.add(p.provider_id);
+                    return true;
+                })
+                .sort((a, b) => (a.display_priority ?? 99) - (b.display_priority ?? 99))
+                .map(p => ({
+                    id: p.provider_id,
+                    name: p.provider_name,
+                    logo: p.logo_path ? `https://image.tmdb.org/t/p/w92${p.logo_path}` : ''
+                }));
+        }
+
+        if (mediaType === 'movie') {
+            availability.inCinemas = await checkNowInCinemas(tmdbId, hasDigitalAvailability);
+        }
+    } catch (err) {
+        console.error('Error fetching watch availability:', err);
+    }
+
+    return availability;
+}
+
+async function checkNowInCinemas(tmdbId, hasDigitalAvailability) {
+    // If it's already available digitally (streaming/rent/buy), don't call it "in cinemas" anymore.
+    if (hasDigitalAvailability) return false;
+
+    try {
+        const res = await fetch(`https://api.themoviedb.org/3/movie/${tmdbId}/release_dates?api_key=${TMDB_API_KEY}`);
+        const data = await res.json();
+        const entries = data.results || [];
+
+        let regionEntry = null;
+        for (const region of WATCH_REGION_PRIORITY) {
+            regionEntry = entries.find(e => e.iso_3166_1 === region);
+            if (regionEntry) break;
+        }
+
+        const dates = regionEntry ? regionEntry.release_dates : (entries[0] ? entries[0].release_dates : []);
+        const nowTime = now().getTime();
+
+        // TMDB release_dates "type": 1 Premiere, 2 Theatrical (limited), 3 Theatrical, 4 Digital, 5 Physical, 6 TV
+        const hasTheatrical = dates.some(d => (d.type === 2 || d.type === 3) && new Date(d.release_date).getTime() <= nowTime);
+        const hasDigitalRelease = dates.some(d => d.type === 4 && new Date(d.release_date).getTime() <= nowTime);
+
+        return hasTheatrical && !hasDigitalRelease;
+    } catch (err) {
+        console.error('Error checking cinema release status:', err);
+        return false;
+    }
+}
+
+function renderWatchOnSection(item) {
+    const section = document.getElementById("modalWatchOn");
+    const providersContainer = document.getElementById("modalWatchProviders");
+    const attribution = document.getElementById("modalWatchAttribution");
+    if (!section || !providersContainer || !attribution) return;
+
+    if (!item) {
+        section.style.display = "none";
+        return;
+    }
+
+    const providers = item.watchProviders || [];
+    const inCinemas = !!item.inCinemas;
+
+    if (providers.length === 0 && !inCinemas) {
+        section.style.display = "none";
+        providersContainer.innerHTML = "";
+        attribution.style.display = "none";
+        return;
+    }
+
+    let chipsHTML = "";
+
+    if (inCinemas) {
+        chipsHTML += `
+            <div class="watch-provider-chip cinema-chip" title="Now in Cinemas">
+                <div class="watch-provider-logo cinema-icon">
+                    <svg class="icon icon-small" viewBox="0 0 24 24">
+                        <path d="M3 8.5V19a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8.5H3z"/>
+                        <path d="M3 8.5l1.5-4.5h3l-1 4.5"/>
+                        <path d="M9.5 8.5l1-4.5h3l-1 4.5"/>
+                        <path d="M16 8.5l1-4.5h3l1 4.5"/>
+                    </svg>
+                </div>
+                <span class="watch-provider-name">Now in Cinemas</span>
+            </div>
+        `;
+    }
+
+    providers.forEach(p => {
+        chipsHTML += `
+            <div class="watch-provider-chip" title="${escapeHTML(p.name)}">
+                ${p.logo
+                    ? `<img class="watch-provider-logo" src="${p.logo}" alt="${escapeHTML(p.name)}" loading="lazy">`
+                    : `<div class="watch-provider-logo watch-provider-fallback">${escapeHTML((p.name || '?').charAt(0))}</div>`
+                }
+                <span class="watch-provider-name">${escapeHTML(p.name)}</span>
+            </div>
+        `;
+    });
+
+    providersContainer.innerHTML = chipsHTML;
+    section.style.display = "block";
+
+    if (providers.length > 0) {
+        attribution.style.display = "inline-block";
+        if (item.watchLink) {
+            attribution.href = item.watchLink;
+            attribution.style.pointerEvents = "auto";
+        } else {
+            attribution.removeAttribute("href");
+            attribution.style.pointerEvents = "none";
+        }
+    } else {
+        attribution.style.display = "none";
+    }
+}
+
+async function loadWatchAvailability(item) {
+    if (!item || !item.tmdbId) return;
+
+    const availability = await fetchWatchAvailability(item.tmdbId, item.type);
+    item.watchProviders = availability.providers;
+    item.inCinemas = availability.inCinemas;
+    item.watchLink = availability.link;
+
+    // Only re-render if the modal is still showing this same item
+    if (currentItem === item) {
+        renderWatchOnSection(item);
     }
 }
 
@@ -2549,6 +2918,7 @@ async function openSearchResultDetails(tmdbId, type) {
         selectedSeason = 1;
         updateModalContent();
         document.getElementById("detailsModal").classList.add("open");
+        loadWatchAvailability(currentItem);
 
     } catch (err) {
         console.error("Error opening preview details:", err);
@@ -2571,6 +2941,7 @@ async function importMediaData(id, type, buttonElement) {
 
     try {
         if (type === 'movie') {
+            const availabilityPromise = fetchWatchAvailability(id, 'movie');
             const movieRes = await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_API_KEY}`);
             const movieData = await movieRes.json();
 
@@ -2579,6 +2950,8 @@ async function importMediaData(id, type, buttonElement) {
                 showToast("Movie is already in your library!");
                 return;
             }
+
+            const availability = await availabilityPromise;
 
             const newMovie = {
                 id: slug,
@@ -2593,7 +2966,10 @@ async function importMediaData(id, type, buttonElement) {
                 runtime: movieData.runtime ? `${movieData.runtime} min` : "120 min",
                 releaseDate: movieData.release_date ? new Date(movieData.release_date).toISOString() : new Date().toISOString(),
                 watched: false,
-                lastWatchedAt: null
+                lastWatchedAt: null,
+                watchProviders: availability.providers,
+                inCinemas: availability.inCinemas,
+                watchLink: availability.link
             };
 
             state.library.push(newMovie);
@@ -2607,6 +2983,7 @@ async function importMediaData(id, type, buttonElement) {
             sendAppNotification("Added to Library", { body: `You will be notified when ${movieData.title} releases.` });
 
         } else {
+            const availabilityPromise = fetchWatchAvailability(id, 'tv');
             const showRes = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${TMDB_API_KEY}`);
             const showData = await showRes.json();
 
@@ -2647,6 +3024,8 @@ async function importMediaData(id, type, buttonElement) {
                 });
             }
 
+            const availability = await availabilityPromise;
+
             const newShow = {
                 id: slug,
                 tmdbId: showData.id,
@@ -2660,7 +3039,10 @@ async function importMediaData(id, type, buttonElement) {
                 releaseDate: showData.first_air_date ? new Date(showData.first_air_date).toISOString() : null,
                 isFinished: false,
                 isStopped: false,
-                episodes: episodes
+                episodes: episodes,
+                watchProviders: availability.providers,
+                inCinemas: availability.inCinemas,
+                watchLink: availability.link
             };
 
             state.library.push(newShow);
@@ -3260,6 +3642,7 @@ function openDetails(itemId) {
 
     updateModalContent();
     document.getElementById("detailsModal").classList.add("open");
+    loadWatchAvailability(currentItem);
 }
 
 function closeModal() {
@@ -3319,6 +3702,7 @@ function updateModalContent() {
     }
 
     document.getElementById("modalMeta").innerHTML = metaHTML;
+    renderWatchOnSection(currentItem);
     document.getElementById("modalDescription").textContent = currentItem.description;
 
     let actionsHTML = '';
