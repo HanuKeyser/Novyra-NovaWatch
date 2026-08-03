@@ -1323,6 +1323,28 @@ img {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
 }
+
+.auth-field {
+    width: 100%;
+}
+
+.auth-error {
+    display: none;
+    color: #ff3b30;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 6px;
+    padding-left: 4px;
+}
+
+.auth-error.show {
+    display: block;
+}
+
+.auth-input.input-error {
+    border: 1px solid #ff3b30 !important;
+    box-shadow: 0 0 0 2px rgba(255, 59, 48, 0.12);
+}
 </style>
 </head>
 
@@ -1352,7 +1374,16 @@ img {
         <div class="auth-form">
             <input type="text" id="authUsername" class="auth-input" placeholder="Username">
             <input type="email" id="authEmail" class="auth-input" placeholder="Email address">
-            <input type="password" id="authPassword" class="auth-input" placeholder="Password">
+            <div class="auth-field">
+    <input 
+        type="password" 
+        id="authPassword" 
+        class="auth-input" 
+        placeholder="Password"
+        oninput="clearPasswordError()"
+    >
+    <div id="authPasswordError" class="auth-error"></div>
+</div>
             <div class="auth-actions">
                 <button class="auth-btn" onclick="handleSignIn()">Sign In</button>
                 <button class="auth-btn secondary" onclick="handleSignUp()">Register</button>
@@ -1966,53 +1997,80 @@ async function handleSignUp() {
     const email = document.getElementById("authEmail").value.trim();
     const password = document.getElementById("authPassword").value;
 
+    const passwordInput = document.getElementById("authPassword");
+    const passwordError = document.getElementById("authPasswordError");
+
+    // Clear previous password error
+    passwordError.textContent = "";
+    passwordError.classList.remove("show");
+    passwordInput.classList.remove("input-error");
+
     if (!auth) {
         showToast("Cloud sync not configured yet.");
         return;
     }
 
-if (!username) {
-    showToast("Please enter a username to register.");
-    return;
-}
+    // Username validation
+    if (!username) {
+        showToast("Please enter a username to register.");
+        document.getElementById("authUsername").focus();
+        return;
+    }
 
-if (password.length < 6) {
-    showToast("Password must be at least 6 characters.");
-    return;
-}
+    // Password validation
+    if (!password) {
+        passwordError.textContent = "Please enter a password.";
+        passwordError.classList.add("show");
+        passwordInput.classList.add("input-error");
+        passwordInput.focus();
+        return;
+    }
+
+    if (password.length < 6) {
+        passwordError.textContent = "Password is too short. Password must be at least 6 characters.";
+        passwordError.classList.add("show");
+        passwordInput.classList.add("input-error");
+        passwordInput.focus();
+        return;
+    }
 
     try {
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        await userCredential.user.updateProfile({ displayName: username });
-        
+        const userCredential = await auth.createUserWithEmailAndPassword(
+            email,
+            password
+        );
+
+        await userCredential.user.updateProfile({
+            displayName: username
+        });
+
         if (!state.profiles || state.profiles.length === 0) {
-            state.profiles = [{ id: "profile-hanu", name: username, initials: username.charAt(0).toUpperCase() }];
+            state.profiles = [{
+                id: "profile-hanu",
+                name: username,
+                initials: username.charAt(0).toUpperCase()
+            }];
         } else {
             state.profiles[0].name = username;
             state.profiles[0].initials = username.charAt(0).toUpperCase();
         }
-        
+
         await saveUserProfile();
+
         showToast("Account created & logged in!");
+
     } catch (err) {
-        showToast(err.message);
-    }
-}
+        console.error("Registration Error:", err);
 
-async function handleSignIn() {
-    const email = document.getElementById("authEmail").value.trim();
-    const password = document.getElementById("authPassword").value;
-
-    if (!auth) {
-        showToast("Cloud sync not configured yet.");
-        return;
-    }
-
-    try {
-        await auth.signInWithEmailAndPassword(email, password);
-        showToast("Signed in successfully!");
-    } catch (err) {
-        showToast(err.message);
+        if (err.code === "auth/weak-password") {
+            passwordError.textContent =
+                "Password is too short. Password must be at least 6 characters.";
+            passwordError.classList.add("show");
+            passwordInput.classList.add("input-error");
+            passwordInput.focus();
+        } else {
+            showToast(err.message || "Unable to create your account.");
+        }
     }
 }
 
@@ -3558,6 +3616,19 @@ async function removeCurrentItem() {
         }
         closeModal();
         showToast("Item removed.");
+    }
+}
+
+  function clearPasswordError() {
+    const passwordInput = document.getElementById("authPassword");
+    const passwordError = document.getElementById("authPasswordError");
+
+    if (!passwordInput || !passwordError) return;
+
+    if (passwordInput.value.length >= 6) {
+        passwordError.textContent = "";
+        passwordError.classList.remove("show");
+        passwordInput.classList.remove("input-error");
     }
 }
 </script>
