@@ -1375,14 +1375,14 @@ img {
             <input type="text" id="authUsername" class="auth-input" placeholder="Username">
             <input type="email" id="authEmail" class="auth-input" placeholder="Email address">
             <div class="auth-field">
-    <input 
-        type="password" 
-        id="authPassword" 
-        class="auth-input" 
-        placeholder="Password"
-        oninput="clearPasswordError()"
-    >
-    <div id="authPasswordError" class="auth-error"></div>
+<input
+    type="password"
+    id="authPassword"
+    class="auth-input"
+    placeholder="Password"
+    oninput="clearPasswordError()"
+>
+<div id="authPasswordError" class="auth-error"></div>
 </div>
             <div class="auth-actions">
                 <button class="auth-btn" onclick="handleSignIn()">Sign In</button>
@@ -1993,14 +1993,16 @@ async function handleGoogleSignIn() {
 }
 
 async function handleSignUp() {
-    const username = document.getElementById("authUsername").value.trim();
-    const email = document.getElementById("authEmail").value.trim();
-    const password = document.getElementById("authPassword").value;
-
+    const usernameInput = document.getElementById("authUsername");
+    const emailInput = document.getElementById("authEmail");
     const passwordInput = document.getElementById("authPassword");
     const passwordError = document.getElementById("authPasswordError");
 
-    // Clear previous password error
+    const username = usernameInput.value.trim();
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+
+    // Clear old password error
     passwordError.textContent = "";
     passwordError.classList.remove("show");
     passwordInput.classList.remove("input-error");
@@ -2013,7 +2015,7 @@ async function handleSignUp() {
     // Username validation
     if (!username) {
         showToast("Please enter a username to register.");
-        document.getElementById("authUsername").focus();
+        usernameInput.focus();
         return;
     }
 
@@ -2026,8 +2028,10 @@ async function handleSignUp() {
         return;
     }
 
+    // Password must be at least 6 characters
     if (password.length < 6) {
-        passwordError.textContent = "Password is too short. Password must be at least 6 characters.";
+        passwordError.textContent =
+            "Password is too short. Password must be at least 6 characters.";
         passwordError.classList.add("show");
         passwordInput.classList.add("input-error");
         passwordInput.focus();
@@ -2062,15 +2066,17 @@ async function handleSignUp() {
     } catch (err) {
         console.error("Registration Error:", err);
 
+        // Firebase weak password error
         if (err.code === "auth/weak-password") {
             passwordError.textContent =
                 "Password is too short. Password must be at least 6 characters.";
             passwordError.classList.add("show");
             passwordInput.classList.add("input-error");
             passwordInput.focus();
-        } else {
-            showToast(err.message || "Unable to create your account.");
+            return;
         }
+
+        showToast(err.message || "Unable to create your account.");
     }
 }
 
@@ -3619,17 +3625,15 @@ async function removeCurrentItem() {
     }
 }
 
-  function clearPasswordError() {
+function clearPasswordError() {
     const passwordInput = document.getElementById("authPassword");
     const passwordError = document.getElementById("authPasswordError");
 
     if (!passwordInput || !passwordError) return;
 
-    if (passwordInput.value.length >= 6) {
-        passwordError.textContent = "";
-        passwordError.classList.remove("show");
-        passwordInput.classList.remove("input-error");
-    }
+    passwordError.textContent = "";
+    passwordError.classList.remove("show");
+    passwordInput.classList.remove("input-error");
 }
 </script>
 </body>
