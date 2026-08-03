@@ -773,6 +773,19 @@ img {
     margin-top: 4px;
 }
 
+.upcoming-group-title {
+    font-size: 12px;
+    font-weight: 750;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin: 0 0 10px;
+}
+
+.upcoming-group + .upcoming-group .upcoming-group-title {
+    margin-top: 22px;
+}
+
 /* =========================================================
    BOTTOM NAV (Floating Liquid Glass)
 ========================================================= */
@@ -2022,9 +2035,36 @@ function now() {
     return new Date();
 }
 
+// TMDB only ever gives us a calendar date (e.g. "2026-08-15"), never a real
+// release time. We parse/store that as UTC midnight, so all date logic below
+// reads it back out by its UTC calendar components rather than letting the
+// browser reinterpret it in the viewer's local timezone (which used to shift
+// the displayed day earlier/later depending on where the user is).
+function getDateOnlyParts(value) {
+    const d = new Date(value);
+    return { y: d.getUTCFullYear(), m: d.getUTCMonth(), d: d.getUTCDate() };
+}
+
+function getLocalTodayParts() {
+    const n = now();
+    return { y: n.getFullYear(), m: n.getMonth(), d: n.getDate() };
+}
+
+// Whole calendar days between a stored release date and the viewer's local
+// "today" — this is what drives both isReleased() and the countdown, so a
+// user in any timezone sees the same day TMDB reported, just measured
+// against their own local calendar.
+function daysUntil(date) {
+    const r = getDateOnlyParts(date);
+    const releaseLocalMidnight = new Date(r.y, r.m, r.d);
+    const t = getLocalTodayParts();
+    const todayLocalMidnight = new Date(t.y, t.m, t.d);
+    return Math.round((releaseLocalMidnight.getTime() - todayLocalMidnight.getTime()) / 86400000);
+}
+
 function isReleased(date) {
     if (!date) return true;
-    return new Date(date).getTime() <= now().getTime();
+    return daysUntil(date) <= 0;
 }
 
 function formatDate(date) {
@@ -2033,25 +2073,21 @@ function formatDate(date) {
         weekday: "short",
         day: "numeric",
         month: "short",
-        year: "numeric"
+        year: "numeric",
+        timeZone: "UTC" // dates are calendar-only; keep the day TMDB reported, don't let it drift with local tz
     }).format(new Date(date));
 }
 
 function getCountdown(date) {
     if (!date) return "TBA";
-    const difference = new Date(date).getTime() - now().getTime();
+    const days = daysUntil(date);
 
-    if (difference <= 0) {
-        return "Available now";
-    }
-
-    const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-
-    if (days > 0) return `${days}d ${hours}h until release`;
-    if (hours > 0) return `${hours}h ${minutes}m until release`;
-    return `${minutes}m until release`;
+    if (days <= 0) return "Available now";
+    if (days === 1) return "Tomorrow";
+    if (days <= 7) return `In ${days} days`;
+    if (days <= 13) return "Next week";
+    const weeks = Math.round(days / 7);
+    return `In ${weeks} weeks`;
 }
 
 /* =========================================================
@@ -3229,9 +3265,43 @@ function setUpcomingType(type) {
     renderUpcomingTab();
 }
 
+// Buckets items into Today / Tomorrow / This Week / Later so the list reads
+// like a schedule instead of one long undifferentiated feed.
+function groupUpcomingByTimeframe(items) {
+    const buckets = [
+        { label: "Today", items: [] },
+        { label: "Tomorrow", items: [] },
+        { label: "This Week", items: [] },
+        { label: "Later", items: [] }
+    ];
+
+    items.forEach(data => {
+        const days = daysUntil(data.date);
+        if (days <= 0) buckets[0].items.push(data);
+        else if (days === 1) buckets[1].items.push(data);
+        else if (days <= 7) buckets[2].items.push(data);
+        else buckets[3].items.push(data);
+    });
+
+    return buckets.filter(bucket => bucket.items.length > 0);
+}
+
 function renderUpcomingTab() {
     const listContainer = document.getElementById("upcomingResultsList");
     if (!listContainer) return;
+
+    // Keep the toggle buttons labeled with live counts so users can see at a
+    // glance whether there's anything upcoming before they even tap in.
+    const tvBtn = document.getElementById("upcomingTypeTV");
+    const movieBtn = document.getElementById("upcomingTypeMovie");
+    if (tvBtn) {
+        const tvCount = getUpcomingItems('tv').length;
+        tvBtn.textContent = tvCount ? `TV Shows (${tvCount})` : "TV Shows";
+    }
+    if (movieBtn) {
+        const movieCount = getUpcomingItems('movie').length;
+        movieBtn.textContent = movieCount ? `Movies (${movieCount})` : "Movies";
+    }
 
     const items = getUpcomingItems(currentUpcomingType);
 
@@ -3241,7 +3311,14 @@ function renderUpcomingTab() {
         return;
     }
 
-    listContainer.innerHTML = items.map(data => createUpcomingCard(data)).join("");
+    const groups = groupUpcomingByTimeframe(items);
+
+    listContainer.innerHTML = groups.map(group => `
+        <div class="upcoming-group">
+            <div class="upcoming-group-title">${group.label}</div>
+            ${group.items.map(data => createUpcomingCard(data)).join("")}
+        </div>
+    `).join("");
 }
 
 /* =========================================================
