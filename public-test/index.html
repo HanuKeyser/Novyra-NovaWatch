@@ -795,18 +795,6 @@ img {
     margin-top: 22px;
 }
 
-.upcoming-refresh-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 14px;
-}
-
-.upcoming-last-checked {
-    font-size: 12px;
-    color: var(--text-muted);
-}
-
 .upcoming-calendar-btn {
     position: absolute;
     top: 10px;
@@ -1616,10 +1604,6 @@ img {
         <button id="upcomingTypeMovie" class="search-type-btn" onclick="setUpcomingType('movie')">Movies</button>
     </div>
 
-    <div class="upcoming-refresh-row">
-        <span id="upcomingLastChecked" class="upcoming-last-checked">Not checked yet</span>
-    </div>
-
     <div style="margin-top: 20px;">
         <div id="upcomingResultsList" class="search-results-grid"></div>
     </div>
@@ -1716,7 +1700,6 @@ img {
             <!-- Sign Out Section -->
             <div style="border-top: 1px solid var(--glass-border-subtle); margin-top: 16px; padding-top: 16px;">
                 <button class="auth-btn secondary" style="width: 100%;" onclick="handleSignOut()">Sign Out</button>
-                <a href="https://www.novyra.co.za/public-test/privacy.html" target="_blank" rel="noopener" style="display:block; text-align:center; margin-top:12px; font-size:12px; color: var(--text-muted); text-decoration: underline;">Privacy Notice</a>
             </div>
         </div>
 
@@ -2084,14 +2067,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     initSearchPage();
     checkNotificationPermissionState();
-    updateLastCheckedLabel();
     checkTodaysReleases();
 
-    // Keeps the "Updated Xm ago" label honest and catches the moment
-    // something crosses into "released today" for anyone who leaves the
-    // app open across midnight, without needing a network call.
+    // Catches the moment something crosses into "released today" for
+    // anyone who leaves the app open across midnight, without needing a
+    // network call.
     setInterval(() => {
-        updateLastCheckedLabel();
         checkTodaysReleases();
     }, 5 * 60 * 1000);
 
@@ -2275,25 +2256,8 @@ function setLastLibraryCheck(date) {
     try {
         localStorage.setItem(LAST_LIBRARY_CHECK_KEY, date.toISOString());
     } catch (e) {
-        // Non-fatal — the label just won't persist across reloads.
+        // Non-fatal.
     }
-}
-
-function formatLastChecked(date) {
-    if (!date) return "Not checked yet";
-    const minutes = Math.floor((now().getTime() - date.getTime()) / 60000);
-    if (minutes < 1) return "Updated just now";
-    if (minutes < 60) return `Updated ${minutes}m ago`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `Updated ${hours}h ago`;
-    const days = Math.floor(hours / 24);
-    return `Updated ${days}d ago`;
-}
-
-function updateLastCheckedLabel() {
-    const label = document.getElementById("upcomingLastChecked");
-    if (!label) return;
-    label.textContent = formatLastChecked(getLastLibraryCheck());
 }
 
 /* =========================================================
@@ -2749,7 +2713,6 @@ async function checkLibraryForUpdates() {
         // catch the calendar day rolling over onto a release, not just new data.
         checkTodaysReleases();
         setLastLibraryCheck(now());
-        updateLastCheckedLabel();
     } finally {
         isSyncingLibrary = false;
     }
@@ -3638,8 +3601,6 @@ let upcomingCalendarItems = [];
 function renderUpcomingTab() {
     const listContainer = document.getElementById("upcomingResultsList");
     if (!listContainer) return;
-
-    updateLastCheckedLabel();
 
     // Keep the toggle buttons labeled with live counts so users can see at a
     // glance whether there's anything upcoming before they even tap in.
