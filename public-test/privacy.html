@@ -1,1 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f1f5f9">
+<title>Privacy Notice | NovaWatch</title>
+<link rel="icon" type="image/png" href="https://www.novyra.co.za/NovaWatch_Logo.png">
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
+:root {
+    --bg-mesh: linear-gradient(135deg, #e2e8f0 0%, #f8fafc 50%, #eff6ff 100%);
+    --surface: rgba(255, 255, 255, 0.72);
+    --glass-border: rgba(255, 255, 255, 0.85);
+    --glass-shadow: 0 20px 40px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    --blue: #0066cc;
+    --text: #1d1d1f;
+    --text-secondary: #424245;
+    --text-muted: #86868b;
+    --border: rgba(0, 0, 0, 0.08);
+    --radius: 20px;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg-mesh);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 48px 20px 80px;
+}
+
+.wrap {
+    width: 100%;
+    max-width: 640px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 28px;
+}
+
+.brand img {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+}
+
+.brand span {
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: var(--radius);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 36px 32px;
+}
+
+h1 {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+}
+
+.updated {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 28px;
+}
+
+h2 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-top: 26px;
+    margin-bottom: 8px;
+}
+
+p, li {
+    font-size: 14.5px;
+    line-height: 1.65;
+    color: var(--text-secondary);
+}
+
+ul {
+    padding-left: 20px;
+    margin-top: 6px;
+}
+
+li {
+    margin-bottom: 6px;
+}
+
+a {
+    color: var(--blue);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.divider {
+    height: 1px;
+    background: var(--border);
+    margin: 26px 0;
+}
+
+.contact-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 6px;
+}
+
+.back-link {
+    display: inline-block;
+    margin-top: 24px;
+    font-size: 14px;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+    <div class="brand">
+        <img src="https://www.novyra.co.za/NovaWatch_Logo.png" alt="NovaWatch Logo">
+        <span>NovaWatch</span>
+    </div>
+
+    <div class="card">
+        <h1>Privacy Notice</h1>
+        <div class="updated">Last updated: 4 August 2026</div>
+
+        <p>This notice explains, in plain terms, how NovaWatch handles your information.</p>
+
+        <h2>What we collect</h2>
+        <p>When you create a NovaWatch account, we collect the information needed to set up and run that account, such as your email address and the sign-in details provided by your chosen sign-in method (for example, Google Sign-In). We also store the watchlist data you build inside the app — the movies and TV shows you add, your watch progress, and your preferences — so it's there the next time you sign in.</p>
+
+        <h2>What we use it for</h2>
+        <p>We use your information for one purpose only: to create and operate your NovaWatch account and to provide the app's features to you (such as syncing your library across devices and sending release alerts you've opted into). We do not use your information for anything else — no advertising, no selling or sharing it with third parties for marketing, and no profiling beyond what's needed to run the app itself.</p>
+
+        <h2>Third-party services</h2>
+        <p>NovaWatch retrieves publicly available movie and TV metadata from The Movie Database (TMDB) to display titles, posters, and related information. This is a one-way lookup of show/movie data — it is not linked to your personal account information.</p>
+
+        <h2>Deleting your account</h2>
+        <p>If you'd like your account and associated data deleted, email us at <a href="mailto:delete@novawatch.site">delete@novawatch.site</a> and we'll take care of it.</p>
+
+        <h2>Questions</h2>
+        <p>If you have any questions about this notice or how your information is handled, email <a href="mailto:info@novawatch.site">info@novawatch.site</a>.</p>
+
+        <div class="divider"></div>
+
+        <div class="contact-row">
+            <p><strong>Account deletion:</strong> <a href="mailto:delete@novawatch.site">delete@novawatch.site</a></p>
+            <p><strong>General questions:</strong> <a href="mailto:info@novawatch.site">info@novawatch.site</a></p>
+        </div>
+
+        <a class="back-link" href="/">&larr; Back to NovaWatch</a>
+    </div>
+</div>
+</body>
+</html>
