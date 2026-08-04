@@ -807,23 +807,6 @@ img {
     color: var(--text-muted);
 }
 
-.upcoming-refresh-btn {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--surface-2);
-    border: 1px solid var(--glass-border-subtle);
-    color: var(--blue);
-    flex: 0 0 auto;
-}
-
-.upcoming-refresh-btn.spinning .icon {
-    animation: spin 0.9s linear infinite;
-}
-
 .upcoming-calendar-btn {
     position: absolute;
     top: 10px;
@@ -1635,13 +1618,6 @@ img {
 
     <div class="upcoming-refresh-row">
         <span id="upcomingLastChecked" class="upcoming-last-checked">Not checked yet</span>
-        <button id="upcomingRefreshBtn" class="upcoming-refresh-btn" onclick="manualRefreshUpcoming()" aria-label="Refresh upcoming releases" title="Refresh">
-            <svg class="icon icon-small" viewBox="0 0 24 24">
-                <polyline points="23 4 23 10 17 10"></polyline>
-                <polyline points="1 20 1 14 7 14"></polyline>
-                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-            </svg>
-        </button>
     </div>
 
     <div style="margin-top: 20px;">
@@ -3695,32 +3671,6 @@ function renderUpcomingTab() {
             ${group.items.map(data => createUpcomingCard(data, items.indexOf(data))).join("")}
         </div>
     `).join("");
-}
-
-let upcomingRefreshInFlight = false;
-
-async function manualRefreshUpcoming() {
-    if (upcomingRefreshInFlight) return;
-    upcomingRefreshInFlight = true;
-
-    const btn = document.getElementById("upcomingRefreshBtn");
-    const label = document.getElementById("upcomingLastChecked");
-    if (btn) btn.disabled = true;
-    if (btn) btn.classList.add("spinning");
-    if (label) label.textContent = "Checking...";
-
-    try {
-        await checkLibraryForUpdates();
-        showToast("Upcoming releases refreshed.");
-    } catch (err) {
-        console.error("Manual refresh failed:", err);
-        showToast("Couldn't refresh right now.");
-    } finally {
-        upcomingRefreshInFlight = false;
-        if (btn) btn.disabled = false;
-        if (btn) btn.classList.remove("spinning");
-        updateLastCheckedLabel();
-    }
 }
 
 /* =========================================================
