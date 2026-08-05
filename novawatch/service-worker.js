@@ -16,11 +16,15 @@
 // service worker is active (e.g. app open in a background tab).
 
 const CACHE_NAME = "novawatch-shell-v1";
-const APP_SHELL = ["/"];
 
 self.addEventListener("install", (event) => {
+    // self.registration.scope is the actual folder this worker controls
+    // (e.g. https://novyra.co.za/novawatch/) rather than a hardcoded "/",
+    // so this keeps working whether the app lives at the domain root or
+    // in a subfolder.
+    const appShellUrl = self.registration.scope;
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL))
+        caches.open(CACHE_NAME).then((cache) => cache.addAll([appShellUrl]))
     );
     self.skipWaiting();
 });
@@ -44,7 +48,7 @@ self.addEventListener("fetch", (event) => {
     if (event.request.mode !== "navigate") return;
 
     event.respondWith(
-        fetch(event.request).catch(() => caches.match("/"))
+        fetch(event.request).catch(() => caches.match(self.registration.scope))
     );
 });
 
@@ -55,7 +59,7 @@ self.addEventListener("notificationclick", (event) => {
             for (const client of clients) {
                 if ("focus" in client) return client.focus();
             }
-            if (self.clients.openWindow) return self.clients.openWindow("/");
+            if (self.clients.openWindow) return self.clients.openWindow(self.registration.scope);
         })
     );
 });
