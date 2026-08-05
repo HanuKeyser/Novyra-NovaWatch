@@ -1526,27 +1526,31 @@ img {
             <span>OR EMAIL</span>
         </div>
 
+        <div class="search-type-toggle" style="margin: 18px 0 4px;">
+            <button id="authTabSignIn" class="search-type-btn active" onclick="setAuthMode('signin')">Sign In</button>
+            <button id="authTabSignUp" class="search-type-btn" onclick="setAuthMode('signup')">Create Account</button>
+        </div>
+
         <div class="auth-form">
-            <input type="text" id="authUsername" class="auth-input" placeholder="Username">
+            <input type="text" id="authUsername" class="auth-input" placeholder="Username" style="display:none;">
             <input type="email" id="authEmail" class="auth-input" placeholder="Email address">
             <div class="auth-field">
 <input
     type="password"
     id="authPassword"
     class="auth-input"
-    placeholder="Password (Atleast 6 Characters)"
+    placeholder="Password"
     oninput="clearPasswordError()"
 >
 <div id="authPasswordError" class="auth-error"></div>
 </div>
             <div class="auth-actions">
                 <button id="authSignInBtn" class="auth-btn" onclick="handleSignIn()">Sign In</button>
-                <button class="auth-btn secondary" onclick="handleSignUp()">Register</button>
             </div>
             <button class="auth-forgot-link" onclick="handleForgotPassword()">Forgot password?</button>
         </div>
 
-        <a href="https://www.novyra.co.za/public-test/privacy.html" target="_blank" rel="noopener" style="display:block; text-align:center; margin-top:14px; font-size:12px; color: var(--text-muted); text-decoration: underline;">Privacy Notice</a>
+        <a href="https://www.novyra.co.za/novawatch/privacy.html" target="_blank" rel="noopener" style="display:block; text-align:center; margin-top:14px; font-size:12px; color: var(--text-muted); text-decoration: underline;">Privacy Notice</a>
     </div>
 </div>
   
@@ -1944,6 +1948,7 @@ let currentItem = null;
 let currentEpisode = null;
 let selectedSeason = 1;
 let currentSearchType = 'tv';
+let currentAuthMode = 'signin';
 let currentUpcomingType = 'tv';
 let toastTimer = null;
 let searchDebounceTimer = null;
@@ -2066,6 +2071,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     initSearchPage();
+    setAuthMode('signin');
     checkNotificationPermissionState();
     checkTodaysReleases();
 
@@ -2309,6 +2315,32 @@ async function handleGoogleSignIn() {
     }
 }
 
+/* =========================================================
+   AUTH MODE (SIGN IN vs CREATE ACCOUNT)
+========================================================= */
+function setAuthMode(mode) {
+    currentAuthMode = mode;
+
+    const tabSignIn = document.getElementById("authTabSignIn");
+    const tabSignUp = document.getElementById("authTabSignUp");
+    if (tabSignIn) tabSignIn.classList.toggle("active", mode === 'signin');
+    if (tabSignUp) tabSignUp.classList.toggle("active", mode === 'signup');
+
+    // Username is only needed when creating a new account.
+    const usernameInput = document.getElementById("authUsername");
+    if (usernameInput) {
+        usernameInput.style.display = mode === 'signup' ? '' : 'none';
+    }
+
+    const actionBtn = document.getElementById("authSignInBtn");
+    if (actionBtn) {
+        actionBtn.textContent = mode === 'signup' ? 'Create Account' : 'Sign In';
+        actionBtn.onclick = mode === 'signup' ? handleSignUp : handleSignIn;
+    }
+
+    clearPasswordError();
+}
+
 async function handleSignIn() {
     const email = document.getElementById("authEmail").value.trim();
     const password = document.getElementById("authPassword").value;
@@ -2419,9 +2451,16 @@ async function handleSignUp() {
         return;
     }
 
+    clearPasswordError();
+
     // Username validation
     if (!username) {
         showToast("Please enter a username to register.");
+        return;
+    }
+
+    if (!email) {
+        showToast("Please enter your email address.");
         return;
     }
 
@@ -2433,8 +2472,14 @@ async function handleSignUp() {
 
     // Password must be at least 6 characters
     if (password.length < 6) {
-        showToast("Password is too short. Password must be at least 6 characters.");
+        showPasswordError("Password is too short. It must be at least 6 characters.");
         return;
+    }
+
+    const signUpBtn = document.getElementById("authSignInBtn");
+    if (signUpBtn) {
+        signUpBtn.disabled = true;
+        signUpBtn.textContent = "Creating Account...";
     }
 
     try {
@@ -2466,13 +2511,18 @@ async function handleSignUp() {
         console.error("Registration Error:", err);
 
         if (err.code === "auth/weak-password") {
-            showToast("Password is too short. Password must be at least 6 characters.");
+            showPasswordError("Password is too short. It must be at least 6 characters.");
         } else if (err.code === "auth/email-already-in-use") {
             showToast("This email address is already registered.");
         } else if (err.code === "auth/invalid-email") {
             showToast("Please enter a valid email address.");
         } else {
             showToast(err.message || "Unable to create your account.");
+        }
+    } finally {
+        if (signUpBtn) {
+            signUpBtn.disabled = false;
+            signUpBtn.textContent = "Create Account";
         }
     }
 }
