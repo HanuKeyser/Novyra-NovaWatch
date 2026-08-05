@@ -6,7 +6,7 @@
 <title>NovaWatch — Track Movies & TV</title>
 <meta name="description" content="NovaWatch: track what you watch, discover what's next." />
 <link rel="manifest" href="manifest.json" />
-<meta name="theme-color" content="#050508" />
+<meta name="theme-color" content="#f2f3f6" />
 
 <link rel="icon" type="image/png" href="https://www.novyra.co.za/NovaWatch_Logo.png" />
 <link rel="apple-touch-icon" href="https://www.novyra.co.za/NovaWatch_App_Icon.png" />
@@ -35,8 +35,15 @@
   <span class="grain"></span>
 </div>
 
+<!-- ============ LOADING ============ -->
+<div id="loading-screen" class="loading-screen">
+  <img src="https://www.novyra.co.za/NovaWatch_App_Icon.png" alt="NovaWatch" class="loading-logo" />
+  <div class="loading-spinner" aria-hidden="true"></div>
+  <p class="loading-text">Loading NovaWatch…</p>
+</div>
+
 <!-- ============ LOGIN ============ -->
-<section id="login-screen" class="screen">
+<section id="login-screen" class="screen" hidden>
   <div class="login-wrap">
     <div class="brand">
       <img src="https://www.novyra.co.za/NovaWatch_App_Icon.png" alt="NovaWatch" class="brand-logo" />
