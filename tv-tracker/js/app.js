@@ -1,7 +1,8 @@
 /* =====================================================================
-   REEL — app.js
+   NOVAWATCH — app.js
    Handles: auth, tab routing, Firestore-backed library, TMDB rendering,
-   search, discover, upcoming, profile, detail modal.
+   search, discover, upcoming, profile, detail modal, and background
+   metadata refresh so library items stay current with TMDB.
    ===================================================================== */
 
 (() => {
@@ -17,6 +18,14 @@
   let searchDebounce = null;
   let modalContext = null;      // { id, mediaType, details }
   let isGuest = false;
+  let metaSyncInFlight = false;
+
+  // How long a library item's cached TMDB metadata (poster, title,
+  // episode counts, air dates) is trusted before it's refetched in the
+  // background. Kept short enough that a new season shows up promptly,
+  // long enough to stay well clear of TMDB rate limits.
+  const META_REFRESH_MS = 6 * 60 * 60 * 1000; // 6 hours
+  const META_SYNC_GAP_MS = 200; // spacing between background TMDB calls
 
   const STATUS_LABELS = {
     watching: "Watching",
@@ -52,6 +61,10 @@
     if (parts.length === 0) return "?";
     if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
     return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   /* ---------------- Auth screen wiring ---------------- */
@@ -187,6 +200,15 @@
     }
   });
 
+  // Whenever the tab becomes visible again (e.g. the user switched back
+  // after a while), give the library a chance to pick up anything new
+  // from TMDB without requiring the person to reopen every title.
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && currentUser) {
+      syncStaleLibraryItems();
+    }
+  });
+
   function hydrateProfile(user) {
     const displayName = user.isAnonymous ? "Guest" : (user.displayName || user.email || "Watcher");
     const email = user.isAnonymous ? "Browsing locally on this device" : (user.email || "");
@@ -205,6 +227,7 @@
         snap.forEach(doc => library.set(doc.id, doc.data()));
         renderCurrentView();
         renderProfileStats();
+        syncStaleLibraryItems(); // fire-and-forget: refresh anything past due
       }, err => {
         console.error("library listener error", err);
       });
@@ -225,6 +248,7 @@
       rating: item.rating !== undefined ? item.rating : (existing.rating ?? 0),
       watchedEpisodes: item.watchedEpisodes !== undefined ? item.watchedEpisodes : (existing.watchedEpisodes ?? 0),
       totalEpisodes: item.totalEpisodes !== undefined ? item.totalEpisodes : (existing.totalEpisodes ?? null),
+      metaSyncedAt: item.metaSyncedAt !== undefined ? item.metaSyncedAt : (existing.metaSyncedAt ?? null),
       addedAt: existing.addedAt || firebase.firestore.FieldValue.serverTimestamp(),
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
@@ -237,6 +261,88 @@
     const key = libKey(mediaType, id);
     await db.collection("users").doc(currentUser.uid).collection("library").doc(key).delete();
     library.delete(key);
+  }
+
+  /* ---------------- TMDB metadata auto-refresh ----------------
+     Library items store a snapshot of TMDB data (title, poster, air
+     dates, episode counts) at the time they were added or last opened.
+     These helpers keep that snapshot current automatically, even for
+     items nobody has revisited, so a new season, a changed poster, or
+     an updated air date shows up without the user re-adding anything. */
+
+  function metaFromDetails(mediaType, details) {
+    return {
+      title: mediaType === "tv" ? details.name : details.title,
+      posterPath: details.poster_path || null,
+      releaseDate: mediaType === "tv" ? details.first_air_date : details.release_date,
+      totalEpisodes: mediaType === "tv" ? (details.number_of_episodes || null) : null
+    };
+  }
+
+  // Writes fresh TMDB metadata onto an existing library entry, preserving
+  // the user's own status/rating/progress — except that a show marked
+  // Completed is reopened to Watching if TMDB now shows more episodes
+  // than the user has logged (i.e. a new season just landed).
+  // Returns the title if it was reopened this way, otherwise null.
+  async function refreshLibraryItemMetadata(key, mediaType, id, details) {
+    const entry = library.get(key);
+    if (!entry) return null;
+    const meta = metaFromDetails(mediaType, details);
+    let status = entry.status;
+    let reopened = false;
+    if (mediaType === "tv" && entry.status === "completed" && meta.totalEpisodes
+        && (entry.watchedEpisodes || 0) < meta.totalEpisodes) {
+      status = "watching";
+      reopened = true;
+    }
+    await upsertLibraryItem({
+      id, mediaType,
+      title: meta.title, posterPath: meta.posterPath, releaseDate: meta.releaseDate,
+      totalEpisodes: meta.totalEpisodes, status, metaSyncedAt: Date.now()
+    });
+    return reopened ? meta.title : null;
+  }
+
+  // Sweeps the library for entries whose cached metadata has aged past
+  // META_REFRESH_MS and refetches them from TMDB, one at a time with a
+  // small gap between calls. Safe to call often — it's a no-op unless
+  // something is actually stale, and re-entrant calls are ignored while
+  // a sweep is already running.
+  async function syncStaleLibraryItems() {
+    if (!currentUser || metaSyncInFlight) return;
+    const now = Date.now();
+    const stale = Array.from(library.entries())
+      .filter(([, item]) => !item.metaSyncedAt || (now - item.metaSyncedAt) > META_REFRESH_MS);
+    if (!stale.length) return;
+
+    metaSyncInFlight = true;
+    const reopenedTitles = [];
+    try {
+      for (const [key, item] of stale) {
+        // Library may have changed (item removed) mid-sweep — re-check.
+        if (!library.has(key)) continue;
+        try {
+          const details = item.mediaType === "tv"
+            ? await TMDB.tvDetails(item.id)
+            : await TMDB.movieDetails(item.id);
+          const reopenedTitle = await refreshLibraryItemMetadata(key, item.mediaType, item.id, details);
+          if (reopenedTitle) reopenedTitles.push(reopenedTitle);
+        } catch (err) {
+          // A single title failing (removed from TMDB, network hiccup)
+          // shouldn't stop the rest of the sweep.
+          console.warn("Metadata sync failed for", item.mediaType, item.id, err);
+        }
+        await sleep(META_SYNC_GAP_MS);
+      }
+    } finally {
+      metaSyncInFlight = false;
+    }
+
+    if (reopenedTitles.length === 1) {
+      toast(`New episodes available for ${reopenedTitles[0]}`);
+    } else if (reopenedTitles.length > 1) {
+      toast(`New episodes available for ${reopenedTitles.length} shows`);
+    }
   }
 
   /* ---------------- Tab navigation ---------------- */
@@ -253,6 +359,7 @@
     indicator.style.transform = `translateX(${idx * 100}%)`;
 
     renderCurrentView();
+    syncStaleLibraryItems(); // no-op unless something's actually stale
   }
 
   $$(".tab-btn").forEach(btn => {
@@ -543,6 +650,16 @@
       const details = mediaType === "tv" ? await TMDB.tvDetails(id) : await TMDB.movieDetails(id);
       modalContext = { id, mediaType, details };
       renderModal();
+
+      // The user is looking at this title right now — sync its library
+      // entry (if any) to these freshly-fetched details immediately,
+      // rather than waiting for the next background sweep.
+      const key = libKey(mediaType, id);
+      if (library.has(key)) {
+        refreshLibraryItemMetadata(key, mediaType, id, details).then(reopenedTitle => {
+          if (reopenedTitle) toast(`New episodes available for ${reopenedTitle}`);
+        }).catch(err => console.warn("Metadata refresh failed", err));
+      }
     } catch (err) {
       modalBody.innerHTML = `<p class="view-sub" style="padding:30px;">Couldn't load details right now.</p>`;
       console.error(err);
@@ -632,7 +749,7 @@
       btn.addEventListener("click", async () => {
         await upsertLibraryItem({
           id, mediaType, title, posterPath: details.poster_path, releaseDate: date,
-          status, totalEpisodes
+          status, totalEpisodes, metaSyncedAt: Date.now()
         });
         toast(`Added to ${STATUS_LABELS[status]}`);
         renderModal();
@@ -651,7 +768,7 @@
         const newRating = currentRating === i ? 0 : i; // tap same star again to clear
         await upsertLibraryItem({
           id, mediaType, title, posterPath: details.poster_path, releaseDate: date,
-          rating: newRating, status: (entry && entry.status) || "planned", totalEpisodes
+          rating: newRating, status: (entry && entry.status) || "planned", totalEpisodes, metaSyncedAt: Date.now()
         });
         renderModal();
       });
@@ -672,7 +789,7 @@
         updateEpUI();
         await upsertLibraryItem({
           id, mediaType, title, posterPath: details.poster_path, releaseDate: date,
-          watchedEpisodes: watched, status: (entry && entry.status) || "watching", totalEpisodes
+          watchedEpisodes: watched, status: (entry && entry.status) || "watching", totalEpisodes, metaSyncedAt: Date.now()
         });
       });
       $("#ep-plus").addEventListener("click", async () => {
@@ -681,7 +798,7 @@
         const autoStatus = totalEpisodes && watched >= totalEpisodes ? "completed" : ((entry && entry.status) || "watching");
         await upsertLibraryItem({
           id, mediaType, title, posterPath: details.poster_path, releaseDate: date,
-          watchedEpisodes: watched, status: autoStatus, totalEpisodes
+          watchedEpisodes: watched, status: autoStatus, totalEpisodes, metaSyncedAt: Date.now()
         });
         if (autoStatus === "completed") toast("Marked as completed 🎬");
       });
