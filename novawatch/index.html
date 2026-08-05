@@ -12,7 +12,7 @@
 <link rel="shortcut icon" href="https://www.novyra.co.za/NovaWatch_Logo.png">
 
 <!-- PWA manifest: makes the app installable to a home screen / app drawer -->
-<link rel="manifest" href="/manifest.json">
+<link rel="manifest" href="manifest.json">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -3295,7 +3295,7 @@ async function importMediaData(id, type, buttonElement) {
                 type: 'movie',
                 ownerId: state.activeProfileId,
                 title: movieData.title,
-                year: movieData.release_date ? movieData.release_date.substring(0, 4) : "2026",
+                year: movieData.release_date ? movieData.release_date.substring(0, 4) : "N/A",
                 poster: movieData.poster_path ? `https://image.tmdb.org/t/p/w500${movieData.poster_path}` : "",
                 backdrop: movieData.backdrop_path ? `https://image.tmdb.org/t/p/w780${movieData.backdrop_path}` : "",
                 description: movieData.overview || "No description available.",
@@ -3370,7 +3370,7 @@ async function importMediaData(id, type, buttonElement) {
                 type: 'tv',
                 ownerId: state.activeProfileId,
                 title: showData.name,
-                year: showData.first_air_date ? showData.first_air_date.substring(0, 4) : "2026",
+                year: showData.first_air_date ? showData.first_air_date.substring(0, 4) : "N/A",
                 poster: showData.poster_path ? `https://image.tmdb.org/t/p/w500${showData.poster_path}` : "",
                 backdrop: showData.backdrop_path ? `https://image.tmdb.org/t/p/w780${showData.backdrop_path}` : "",
                 description: showData.overview || "No description available.",
@@ -4015,7 +4015,7 @@ function updateHomeUI() {
     if (auth && auth.currentUser) {
         const user = auth.currentUser;
         displayName = user.displayName || user.email.split('@')[0];
-    } else if (state.profiles && state.profiles[0] && state.profiles[0].name && auth && auth.currentUser) {
+    } else if (state.profiles && state.profiles[0] && state.profiles[0].name) {
         displayName = state.profiles[0].name;
     } else {
         displayName = "Guest";
@@ -4338,7 +4338,11 @@ function handleSeasonClick(event, seasonNumber) {
 
 async function toggleEntireSeasonWatched(seasonNumber) {
     if (!currentItem || !currentItem.episodes) return;
-    
+    if (!isCurrentItemInLibrary()) {
+        showToast("Add this to your library first.");
+        return;
+    }
+
     const seasonEps = currentItem.episodes.filter(ep => ep.season === seasonNumber);
     if (seasonEps.length === 0) return;
     
@@ -4398,6 +4402,10 @@ function closeEpisodeModalOutside(event) {
 
 async function toggleCurrentEpisodeWatched() {
     if (!currentItem || !currentEpisode) return;
+    if (!isCurrentItemInLibrary()) {
+        showToast("Add this to your library first.");
+        return;
+    }
     currentEpisode.watched = !currentEpisode.watched;
     await saveItem(currentItem);
     closeEpisodeModal();
@@ -4405,8 +4413,22 @@ async function toggleCurrentEpisodeWatched() {
     refreshActivePage();
 }
 
+// Search-result "preview" items (opened before the user taps "Add to Library")
+// carry a real tmdbId and full data, but aren't in state.library yet. Without
+// this check, tapping Watch/Next/Stop on a preview would still call saveItem()
+// (which only checks item.id) and silently write a partial, incomplete doc
+// into the user's Firestore library — which then syncs back down as a
+// "phantom" entry the user never meant to add.
+function isCurrentItemInLibrary() {
+    return !!currentItem && !currentItem.isPreview && state.library.some(s => s.tmdbId === currentItem.tmdbId);
+}
+
 async function toggleMovieWatched(id) {
     if (!currentItem || currentItem.type !== 'movie') return;
+    if (!isCurrentItemInLibrary()) {
+        showToast("Add this to your library first.");
+        return;
+    }
     currentItem.watched = !currentItem.watched;
     currentItem.lastWatchedAt = currentItem.watched ? new Date().toISOString() : null;
     await saveItem(currentItem);
@@ -4416,6 +4438,10 @@ async function toggleMovieWatched(id) {
 
 async function markNextEpisodeWatched(id) {
     if (!currentItem || currentItem.type === 'movie') return;
+    if (!isCurrentItemInLibrary()) {
+        showToast("Add this to your library first.");
+        return;
+    }
     const nextEp = getNextUnwatchedEpisode(currentItem);
     if (nextEp) {
         nextEp.watched = true;
@@ -4427,6 +4453,10 @@ async function markNextEpisodeWatched(id) {
 
 async function toggleStopWatching(id) {
     if (!currentItem) return;
+    if (!isCurrentItemInLibrary()) {
+        showToast("Add this to your library first.");
+        return;
+    }
     currentItem.isStopped = !currentItem.isStopped;
     await saveItem(currentItem);
     updateModalContent();
@@ -4467,7 +4497,7 @@ function clearPasswordError() {
 ========================================================= */
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
-        navigator.serviceWorker.register("/service-worker.js").catch(err => {
+        navigator.serviceWorker.register("service-worker.js").catch(err => {
             console.warn("Service worker registration failed:", err);
         });
     });
