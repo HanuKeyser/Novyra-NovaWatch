@@ -1,0 +1,11 @@
+{
+  "name": "Reel — Track Movies & TV",
+  "short_name": "Reel",
+  "description": "Track what you're watching, discover what's next.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#050508",
+  "theme_color": "#050508",
+  "orientation": "portrait-primary",
+  "icons": []
+}
