@@ -85,6 +85,17 @@ img{ max-width:100%; }
 
 .screen{ position:relative; z-index:1; min-height:100vh; min-height:100dvh; }
 
+/* Several elements below (login screen, loading screen, detail modal)
+   are shown/hidden with the plain HTML `hidden` attribute, but also set
+   their own `display` for when they're visible. Because an attribute
+   selector and a plain class/id selector can tie in specificity, the
+   `display` rule can end up winning over `[hidden]`, leaving the
+   element stuck on screen even after JS sets `.hidden = true`. These
+   overrides guarantee `[hidden]` always wins. */
+#login-screen[hidden],
+.loading-screen[hidden],
+.modal-backdrop[hidden]{ display:none !important; }
+
 /* ---------- Loading screen ---------- */
 .loading-screen{
   position:fixed; inset:0; z-index:500;
