@@ -1,11 +1,24 @@
 {
-  "name": "Reel — Track Movies & TV",
-  "short_name": "Reel",
+  "name": "NovaWatch — Track Movies & TV",
+  "short_name": "NovaWatch",
   "description": "Track what you're watching, discover what's next.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#050508",
   "theme_color": "#050508",
   "orientation": "portrait-primary",
-  "icons": []
+  "icons": [
+    {
+      "src": "https://www.novyra.co.za/NovaWatch_App_Icon.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://www.novyra.co.za/NovaWatch_App_Icon.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
 }
