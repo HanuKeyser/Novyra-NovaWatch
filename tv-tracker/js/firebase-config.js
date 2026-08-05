@@ -1,10 +1,6 @@
 /* =====================================================================
-   FIREBASE CONFIG
-   Replace the values below with your own project's config, which you
-   can find in the Firebase Console:
-   Project Settings → General → Your apps → SDK setup and configuration
+   FIREBASE CONFIG — NovaWatch
    ===================================================================== */
-const firebaseConfig = {
 const firebaseConfig = {
   apiKey: "AIzaSyCzUprsMVHt_-YHvLImvanTlTXsyQ9sqOU",
   authDomain: "novawatch-b3ccd.firebaseapp.com",
@@ -19,6 +15,20 @@ firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
 const db = firebase.firestore();
+
+// Analytics is optional and can fail silently (ad blockers, unsupported
+// environments, or being served from a non-authorized domain) — never let
+// it block the rest of the app from working.
+let analytics;
+try {
+  if (firebase.analytics && firebase.analytics.isSupported) {
+    firebase.analytics.isSupported().then(supported => {
+      if (supported) analytics = firebase.analytics();
+    }).catch(() => {});
+  } else if (firebase.analytics) {
+    analytics = firebase.analytics();
+  }
+} catch (e) { /* analytics unavailable — app continues normally */ }
 
 // Keep users signed in across sessions (this is Firebase's own persistence
 // layer, not browser localStorage used directly by app code).
