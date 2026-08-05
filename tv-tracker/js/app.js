@@ -145,6 +145,25 @@
   $("#sign-out-btn").addEventListener("click", () => auth.signOut());
 
   /* ---------------- Auth state -> shell ---------------- */
+  let authResolved = false;
+
+  function hideLoadingScreen() {
+    const el = $("#loading-screen");
+    if (!el || el.hidden) return;
+    el.classList.add("fade-out");
+    setTimeout(() => { el.hidden = true; }, 550);
+  }
+
+  // Safety net: if auth genuinely can't resolve (misconfigured project,
+  // offline, etc.) don't leave people staring at a spinner forever.
+  setTimeout(() => {
+    if (!authResolved) {
+      authResolved = true;
+      $("#login-screen").hidden = false;
+      hideLoadingScreen();
+    }
+  }, 8000);
+
   auth.onAuthStateChanged(user => {
     currentUser = user;
     if (unsubscribeLibrary) { unsubscribeLibrary(); unsubscribeLibrary = null; }
@@ -160,6 +179,11 @@
       library = new Map();
       $("#app").hidden = true;
       $("#login-screen").hidden = false;
+    }
+
+    if (!authResolved) {
+      authResolved = true;
+      hideLoadingScreen();
     }
   });
 
