@@ -83,7 +83,7 @@ body {
     color: var(--text);
     min-height: 100vh;
     overflow-x: hidden;
-    padding-bottom: 96px;
+    padding-bottom: 128px;
     -webkit-font-smoothing: antialiased;
 }
 
@@ -142,77 +142,11 @@ img {
 }
 
 /* =========================================================
-   HEADER (Ultra-Glass Apple Style)
-========================================================= */
-.header {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    height: 68px;
-    padding: 0 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: rgba(255, 255, 255, 0.65);
-    backdrop-filter: blur(50px) saturate(210%);
-    -webkit-backdrop-filter: blur(50px) saturate(210%);
-    border-bottom: 1px solid var(--glass-border);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03), inset 0 -1px 0 rgba(255, 255, 255, 0.8);
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 20px;
-    font-weight: 750;
-    letter-spacing: -0.5px;
-}
-
-.logo-mark {
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px;
-    background: transparent;
-}
-
-.logo-mark img {
-    width: 50px;
-    height: 50px;
-    object-fit: contain;
-}
-
-.home-button {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    overflow: hidden;
-    background: var(--surface-2);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow-sm);
-}
-
-.home-avatar {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, var(--blue-light), var(--blue));
-    color: white;
-    font-size: 15px;
-    font-weight: 700;
-}
-
-/* =========================================================
    PAGES
 ========================================================= */
 .page {
     display: none;
-    padding: 24px 18px 36px;
+    padding: 36px 18px 36px;
 }
 
 .page.active {
@@ -236,9 +170,9 @@ img {
 }
 
 .section-title {
-    font-size: 20px;
-    font-weight: 750;
-    letter-spacing: -0.5px;
+    font-size: 21px;
+    font-weight: 800;
+    letter-spacing: -0.6px;
 }
 
 .tab-nav-footer {
@@ -273,17 +207,26 @@ img {
 }
 
 .category-block {
-    margin-bottom: 26px;
+    margin-bottom: 28px;
 }
 
 .category-title {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--text-secondary);
+    font-size: 14.5px;
+    font-weight: 750;
+    color: var(--text);
     margin-bottom: 12px;
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.category-title::before {
+    content: '';
+    width: 4px;
+    height: 14px;
+    border-radius: 3px;
+    background: linear-gradient(180deg, var(--blue-light), var(--blue));
+    flex-shrink: 0;
 }
 
 .category-count {
@@ -301,31 +244,38 @@ img {
 .stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+    gap: 10px;
 }
 
 .stat {
-    padding: 16px 12px;
+    padding: 16px 10px;
     text-align: center;
-    background: var(--surface);
-    backdrop-filter: blur(30px) saturate(180%);
-    -webkit-backdrop-filter: blur(30px) saturate(180%);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius);
-    box-shadow: var(--glass-shadow-sm);
+    background: var(--surface-2);
+    border: 1px solid var(--glass-border-subtle);
+    border-radius: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.stat-icon {
+    width: 18px;
+    height: 18px;
+    color: var(--blue);
+    margin-bottom: 2px;
 }
 
 .stat-value {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 800;
     letter-spacing: -0.5px;
 }
 
 .stat-label {
     color: var(--text-secondary);
-    font-size: 11px;
-    font-weight: 600;
-    margin-top: 4px;
+    font-size: 10.5px;
+    font-weight: 650;
 }
 
 /* =========================================================
@@ -337,12 +287,12 @@ img {
 
 .analytics-card {
     padding: 20px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.88) 0%, rgba(235,244,255,0.75) 100%);
+    background: var(--surface);
     backdrop-filter: blur(40px) saturate(200%);
     -webkit-backdrop-filter: blur(40px) saturate(200%);
-    border: 1px solid rgba(0, 102, 204, 0.22);
-    border-radius: var(--radius);
-    box-shadow: 0 16px 40px rgba(0, 102, 204, 0.08), inset 0 1px 0 rgba(255,255,255,0.95);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    box-shadow: var(--glass-shadow);
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -403,10 +353,15 @@ img {
     width: 126px;
     height: 184px;
     overflow: hidden;
-    border-radius: 16px;
+    border-radius: 20px;
     background: var(--surface-2);
     border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow-sm);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+    transition: box-shadow 0.25s ease;
+}
+
+.card:active .poster {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .poster img {
@@ -424,10 +379,27 @@ img {
     align-items: center;
     justify-content: center;
     text-align: center;
-    color: var(--text-secondary);
+    background: linear-gradient(135deg, rgba(0,102,204,0.14), rgba(0,102,204,0.05));
+    color: var(--blue);
+}
+
+.poster-placeholder .icon {
+    width: 30px;
+    height: 30px;
+    opacity: 0.8;
+}
+
+.card-title {
+    margin-top: 8px;
     font-size: 12px;
     font-weight: 700;
+    color: var(--text);
     line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-align: left;
 }
 
 /* =========================================================
@@ -436,7 +408,7 @@ img {
 .library-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px 12px;
+    gap: 20px 12px;
 }
 
 .library-grid .card {
@@ -500,13 +472,13 @@ img {
 .search-box input {
     width: 100%;
     height: 50px;
-    padding: 0 44px 0 46px;
+    padding: 0 46px 0 48px;
     outline: none;
     background: var(--surface);
     backdrop-filter: blur(30px) saturate(180%);
     -webkit-backdrop-filter: blur(30px) saturate(180%);
     border: 1px solid var(--glass-border);
-    border-radius: 16px;
+    border-radius: 999px;
     color: var(--text);
     font-size: 14px;
     box-shadow: var(--glass-shadow-sm);
@@ -583,41 +555,82 @@ img {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255,255,255,0.9);
 }
 
+.search-type-toggle.three-way {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* Modern filled-pill segmented control, used on Discover/Library/Upcoming.
+   Deliberately separate from .search-type-toggle/.search-type-btn so the
+   Sign In / Create Account tabs on the auth screen stay pixel-identical. */
+.segmented-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--surface-2);
+    padding: 5px;
+    border-radius: 999px;
+    border: 1px solid var(--glass-border-subtle);
+    margin-bottom: 18px;
+}
+
+.segmented-toggle.three-way {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.segmented-btn {
+    height: 40px;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 700;
+    transition: background 0.3s cubic-bezier(0.25, 1, 0.5, 1), color 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.segmented-btn.active {
+    background: linear-gradient(135deg, var(--blue-light), var(--blue));
+    color: white;
+    box-shadow: 0 8px 18px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+.library-subview {
+    margin-top: 4px;
+}
+
 .search-results-grid {
     display: flex;
     flex-direction: column;
-    gap: 14px;
     margin-top: 16px;
 }
 
 .search-card {
     display: flex;
     gap: 14px;
-    padding: 14px;
-    background: var(--surface);
-    backdrop-filter: blur(35px) saturate(180%);
-    -webkit-backdrop-filter: blur(35px) saturate(180%);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius);
-    align-items: center;
-    transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+    padding: 14px 6px;
+    align-items: flex-start;
+    border-radius: 18px;
+    border-bottom: 1px solid var(--glass-border-subtle);
+    transition: background 0.2s ease, transform 0.15s ease;
     cursor: pointer;
-    box-shadow: var(--glass-shadow-sm);
+    position: relative;
 }
 
-.search-card:hover {
-    border-color: rgba(0, 102, 204, 0.4);
-    background: rgba(255, 255, 255, 0.85);
-    box-shadow: 0 12px 30px rgba(0, 102, 204, 0.1);
+.search-card:last-child {
+    border-bottom: none;
+}
+
+.search-card:active {
+    transform: scale(0.98);
+    background: var(--surface-2);
 }
 
 .search-card-poster {
-    flex: 0 0 74px;
-    width: 74px;
-    height: 108px;
-    border-radius: 12px;
+    flex: 0 0 80px;
+    width: 80px;
+    height: 116px;
+    border-radius: 16px;
     object-fit: cover;
     background: var(--surface-2);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
 .search-card-info {
@@ -626,29 +639,35 @@ img {
     display: flex;
     flex-direction: column;
     gap: 4px;
+    padding-top: 2px;
 }
 
 .search-card-title {
-    font-size: 16px;
-    font-weight: 750;
+    font-size: 15.5px;
+    font-weight: 800;
     color: var(--text);
+    letter-spacing: -0.2px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    padding-right: 40px;
 }
 
 .search-card-meta {
-    font-size: 12px;
-    color: var(--text-secondary);
+    font-size: 11.5px;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 .search-card-overview {
-    font-size: 12px;
-    color: var(--text-muted);
-    line-height: 1.4;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    line-height: 1.45;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -657,19 +676,23 @@ img {
 }
 
 .search-add-btn {
-    height: 38px;
-    padding: 0 16px;
-    border-radius: 12px;
+    position: absolute;
+    top: 14px;
+    right: 6px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
     background: var(--blue);
     color: white;
-    font-size: 12px;
-    font-weight: 700;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    margin-top: 8px;
-    align-self: flex-start;
-    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3), inset 0 1px 0 rgba(255,255,255,0.4);
+    justify-content: center;
+    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.4);
+    flex-shrink: 0;
+}
+
+.search-add-btn:active {
+    transform: scale(0.9);
 }
 
 .search-add-btn.added {
@@ -706,20 +729,21 @@ img {
     position: relative;
     display: flex;
     gap: 14px;
-    padding: 14px;
-    margin-bottom: 12px;
-    background: var(--surface);
-    backdrop-filter: blur(35px) saturate(180%);
-    -webkit-backdrop-filter: blur(35px) saturate(180%);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius);
+    padding: 14px 6px;
+    align-items: flex-start;
+    border-radius: 18px;
+    border-bottom: 1px solid var(--glass-border-subtle);
     cursor: pointer;
-    box-shadow: var(--glass-shadow-sm);
-    transition: transform 0.2s ease;
+    transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.upcoming-group:last-child .upcoming-card:last-child {
+    border-bottom: none;
 }
 
 .upcoming-card:active {
     transform: scale(0.98);
+    background: var(--surface-2);
 }
 
 .upcoming-poster {
@@ -727,8 +751,9 @@ img {
     width: 66px;
     height: 94px;
     overflow: hidden;
-    border-radius: 12px;
+    border-radius: 14px;
     background: var(--surface-2);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
 }
 
 .upcoming-poster img {
@@ -755,14 +780,16 @@ img {
     flex: 1;
     min-width: 0;
     padding-right: 34px;
+    padding-top: 2px;
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 
 .upcoming-title {
-    font-size: 14px;
-    font-weight: 750;
+    font-size: 14.5px;
+    font-weight: 800;
+    letter-spacing: -0.2px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -770,7 +797,7 @@ img {
 
 .upcoming-date {
     color: var(--text-secondary);
-    font-size: 11px;
+    font-size: 11.5px;
     line-height: 1.5;
     margin-top: 2px;
 }
@@ -784,23 +811,23 @@ img {
 
 .upcoming-group-title {
     font-size: 12px;
-    font-weight: 750;
-    color: var(--text-muted);
+    font-weight: 800;
+    color: var(--blue);
     text-transform: uppercase;
-    letter-spacing: 0.6px;
-    margin: 0 0 10px;
+    letter-spacing: 0.8px;
+    margin: 0 0 12px;
 }
 
 .upcoming-group + .upcoming-group .upcoming-group-title {
-    margin-top: 22px;
+    margin-top: 24px;
 }
 
 .upcoming-calendar-btn {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 30px;
-    height: 30px;
+    top: 14px;
+    right: 6px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -811,26 +838,32 @@ img {
     flex: 0 0 auto;
 }
 
+.upcoming-calendar-btn:active {
+    transform: scale(0.9);
+}
+
 /* =========================================================
-   BOTTOM NAV (Floating Liquid Glass)
+   BOTTOM NAV (Floating Pill)
 ========================================================= */
 .bottom-nav {
     position: fixed;
     left: 50%;
-    bottom: 0;
+    bottom: 22px;
     transform: translateX(-50%);
     z-index: 100;
-    width: 100%;
-    max-width: 600px;
-    height: 76px;
-    padding: 8px 6px;
+    width: calc(100% - 36px);
+    max-width: 420px;
+    height: 70px;
+    padding: 7px;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    background: rgba(255, 255, 255, 0.65);
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(50px) saturate(210%);
     -webkit-backdrop-filter: blur(50px) saturate(210%);
-    border-top: 1px solid var(--glass-border);
-    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    border: 1px solid var(--glass-border);
+    border-radius: 999px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 
 .nav-button {
@@ -838,15 +871,33 @@ img {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: 2px;
     background: transparent;
     color: var(--text-muted);
-    font-size: 11px;
-    font-weight: 650;
+    font-size: 10.5px;
+    font-weight: 700;
+    border-radius: 999px;
+    transition: background 0.3s cubic-bezier(0.25, 1, 0.5, 1), color 0.3s cubic-bezier(0.25, 1, 0.5, 1), transform 0.2s ease;
+}
+
+.nav-button:active {
+    transform: scale(0.94);
+}
+
+.nav-button .icon {
+    width: 21px;
+    height: 21px;
+    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .nav-button.active {
-    color: var(--blue);
+    color: white;
+    background: linear-gradient(135deg, var(--blue-light), var(--blue));
+    box-shadow: 0 8px 20px rgba(0, 102, 204, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.nav-button.active .icon {
+    transform: translateY(-1px) scale(1.05);
 }
 
 /* =========================================================
@@ -905,6 +956,8 @@ img {
     top: 14px;
     right: 16px;
     z-index: 10;
+    display: flex;
+    gap: 10px;
 }
 
 .close-button {
@@ -1232,8 +1285,87 @@ img {
 }
 
 /* =========================================================
-   HOME & AUTH INPUTS
+   HOME HERO
 ========================================================= */
+.hero-card {
+    padding: 26px 24px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(224,238,255,0.78) 100%);
+    backdrop-filter: blur(40px) saturate(200%);
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
+    border: 1px solid rgba(0, 102, 204, 0.2);
+    border-radius: 28px;
+    box-shadow: 0 20px 48px rgba(0, 102, 204, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.hero-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.hero-profile {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.hero-signout-btn {
+    flex-shrink: 0;
+    height: 34px;
+    padding: 0 16px;
+    border-radius: 999px;
+    background: var(--surface);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 700;
+    box-shadow: var(--glass-shadow-sm);
+}
+
+.hero-signout-btn:active {
+    transform: scale(0.96);
+}
+
+.hero-notify-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(0, 102, 204, 0.14);
+}
+
+.hero-notify-title {
+    font-size: 13.5px;
+    font-weight: 750;
+}
+
+.hero-notify-sub {
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+    line-height: 1.4;
+}
+
+.hero-pill-btn {
+    flex-shrink: 0;
+    height: 38px;
+    padding: 0 18px;
+    border-radius: 999px;
+    background: var(--blue);
+    color: white;
+    font-size: 12.5px;
+    font-weight: 750;
+    box-shadow: 0 8px 20px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.35);
+}
+
+.hero-pill-btn:active {
+    transform: scale(0.96);
+}
+
 .home-card {
     padding: 22px;
     background: var(--surface);
@@ -1251,22 +1383,25 @@ img {
 }
 
 .large-avatar {
-    width: 62px;
-    height: 62px;
+    width: 60px;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    border-radius: 20px;
     background: linear-gradient(135deg, var(--blue-light), var(--blue));
     color: white;
     font-size: 22px;
     font-weight: 800;
     box-shadow: 0 8px 20px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.4);
+    flex-shrink: 0;
 }
 
 .home-name {
-    font-size: 18px;
-    font-weight: 750;
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    margin-top: 1px;
 }
 
 .home-subtitle {
@@ -1387,6 +1522,7 @@ img {
     color: var(--blue);
     font-size: 12px;
     font-weight: 600;
+    text-decoration: none;
 }
 
 .auth-forgot-link:hover {
@@ -1479,7 +1615,7 @@ img {
 .toast {
     position: fixed;
     left: 50%;
-    bottom: 92px;
+    bottom: 118px;
     z-index: 500;
     transform: translateX(-50%) translateY(20px);
     opacity: 0;
@@ -1581,7 +1717,7 @@ img {
         <div class="auth-footer-row">
             <button class="auth-forgot-link" onclick="handleForgotPassword()">Forgot password?</button>
             <span class="auth-footer-sep">|</span>
-            <a href="https://www.novyra.co.za/novawatch/privacy.html" target="_blank" rel="noopener" class="auth-forgot-link">Privacy Notice</a>
+            <a href="https://www.novyra.co.za/novawatch-test/privacy" target="_blank" rel="noopener" class="auth-forgot-link">Privacy Notice</a>
         </div>
     </div>
 </div>
@@ -1589,27 +1725,12 @@ img {
 <div class="app">
 
 <!-- =====================================================
-     HEADER
-================================================     -->
-<header class="header">
-    <div class="logo">
-        <div class="logo-mark">
-            <img src="https://www.novyra.co.za/NovaWatch_Logo.png" alt="NovaWatch Logo">
-        </div>
-      NovaWatch
-    </div>
-    <button class="home-button" onclick="showPage('home')" aria-label="Open Home">
-        <div class="home-avatar" id="headerAvatar">G</div>
-    </button>
-</header>
-
-<!-- =====================================================
      1. DISCOVER TAB
 ================================================     -->
 <main id="discoverPage" class="page">
-    <div class="search-type-toggle">
-        <button id="searchTypeTV" class="search-type-btn active" onclick="setSearchType('tv')">TV Shows</button>
-        <button id="searchTypeMovie" class="search-type-btn" onclick="setSearchType('movie')">Movies</button>
+    <div class="segmented-toggle">
+        <button id="searchTypeTV" class="segmented-btn active" onclick="setSearchType('tv')">TV Shows</button>
+        <button id="searchTypeMovie" class="segmented-btn" onclick="setSearchType('movie')">Movies</button>
     </div>
 
     <div class="search-box">
@@ -1632,110 +1753,82 @@ img {
 </main>
 
 <!-- =====================================================
-     2. UPCOMING TAB
+     2. LIBRARY TAB (TV Shows + Movies + Upcoming, combined)
 ================================================     -->
-<main id="upcomingPage" class="page">
-    <div class="search-type-toggle">
-        <button id="upcomingTypeTV" class="search-type-btn active" onclick="setUpcomingType('tv')">TV Shows</button>
-        <button id="upcomingTypeMovie" class="search-type-btn" onclick="setUpcomingType('movie')">Movies</button>
+<main id="libraryPage" class="page">
+    <div class="segmented-toggle three-way">
+        <button id="libraryTabTV" class="segmented-btn active" onclick="setLibraryView('tv')">TV Shows</button>
+        <button id="libraryTabMovies" class="segmented-btn" onclick="setLibraryView('movies')">Movies</button>
+        <button id="libraryTabUpcoming" class="segmented-btn" onclick="setLibraryView('upcoming')">Upcoming</button>
     </div>
 
-    <div style="margin-top: 20px;">
+    <!-- TV Shows sub-view -->
+    <div id="libraryViewTV" class="library-subview">
+        <div class="library-toolbar">
+            <div class="search-box">
+                <svg class="icon search-icon" viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="7"/>
+                    <path d="M20 20l-4-4"/>
+                </svg>
+                <input id="tvLibrarySearchInput" type="search" placeholder="Search TV shows library..." autocomplete="off">
+                <button class="search-clear-btn" type="button" onclick="clearSearch('tvLibrarySearchInput')" aria-label="Clear search">
+                    <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="tvLibraryCategories"></div>
+    </div>
+
+    <!-- Movies sub-view -->
+    <div id="libraryViewMovies" class="library-subview" style="display: none;">
+        <div class="library-toolbar">
+            <div class="search-box">
+                <svg class="icon search-icon" viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="7"/>
+                    <path d="M20 20l-4-4"/>
+                </svg>
+                <input id="movieLibrarySearchInput" type="search" placeholder="Search movies library..." autocomplete="off">
+                <button class="search-clear-btn" type="button" onclick="clearSearch('movieLibrarySearchInput')" aria-label="Clear search">
+                    <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="movieLibraryCategories"></div>
+    </div>
+
+    <!-- Upcoming sub-view -->
+    <div id="libraryViewUpcoming" class="library-subview" style="display: none;">
         <div id="upcomingResultsList" class="search-results-grid"></div>
     </div>
 </main>
 
 <!-- =====================================================
-     3. TV SHOWS TAB
-================================================     -->
-<main id="tvShowsPage" class="page">
-    <div class="tab-content-wrapper">
-        <div>
-            <div class="category-title">
-                <span>Continue Watching</span>
-            </div>
-            <div id="tvContinueGrid" class="library-grid"></div>
-        </div>
-
-        <div>
-            <div class="category-title">
-                <span>Start Watching</span>
-            </div>
-            <div id="tvStartGrid" class="library-grid"></div>
-        </div>
-
-        <div id="stoppedShowsSection" style="display: none;">
-            <div class="category-title">
-                <span>Stopped Watching</span>
-            </div>
-            <div id="tvStoppedGrid" class="library-grid"></div>
-        </div>
-
-        <div class="tab-nav-footer">
-            <button class="footer-browse-button" onclick="showPage('discover', 'tv')">
-                <svg class="icon icon-small" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
-                Browse All Shows
-            </button>
-        </div>
-    </div>
-</main>
-
-<!-- =====================================================
-     4. MOVIES TAB
-================================================     -->
-<main id="moviesPage" class="page">
-    <div class="tab-content-wrapper">
-        <div>
-            <div class="category-title">
-                <span>Unwatched Movies</span>
-            </div>
-            <div id="moviesUnwatchedGrid" class="library-grid"></div>
-        </div>
-
-        <div id="watchedMoviesSection" style="display: none;">
-            <div class="category-title">
-                <span>Watched Movies</span>
-            </div>
-            <div id="moviesWatchedGrid" class="library-grid"></div>
-        </div>
-
-        <div class="tab-nav-footer">
-            <button class="footer-browse-button" onclick="showPage('discover', 'movie')">
-                <svg class="icon icon-small" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
-                Browse All Movies
-            </button>
-        </div>
-    </div>
-</main>
-
-<!-- =====================================================
-     5. HOME TAB (DEFAULT LANDING)
+     3. HOME TAB (DEFAULT LANDING)
 ================================================     -->
 <main id="homePage" class="page active">
     <div class="tab-content-wrapper">
         
-        <!-- Profile Card -->
-        <div class="home-card">
-            <div class="home-row">
-                <div class="large-avatar" id="largeAvatar">G</div>
-                <div>
-                    <div class="home-name" id="homeName">Guest</div>
-                    <div class="home-subtitle" id="homeEmailSubtitle">Guest Account</div>
+        <!-- Hero Card -->
+        <div class="hero-card">
+            <div class="hero-top">
+                <div class="hero-profile">
+                    <div class="large-avatar" id="largeAvatar">G</div>
+                    <div>
+                        <div class="home-name" id="homeName">Guest</div>
+                        <div class="home-subtitle" id="homeEmailSubtitle">Guest Account</div>
+                    </div>
                 </div>
+                <button class="hero-signout-btn" onclick="handleSignOut()">Sign Out</button>
             </div>
 
-            <!-- Notifications Permission Control -->
-            <div style="border-top: 1px solid var(--glass-border-subtle); margin-top: 18px; padding-top: 16px; display: flex; flex-direction: column; gap: 10px;">
+            <div class="hero-notify-row">
                 <div>
-                    <div style="font-size: 14px; font-weight: 700;">Your Watchlist, Always Up to Date</div>
-                    <div style="font-size: 12px; color: var(--text-secondary);">Get alerts when new episodes and movies are released.</div>
+                    <div class="hero-notify-title">Stay in the loop</div>
+                    <div class="hero-notify-sub">Get alerts for new episodes & releases.</div>
                 </div>
-                <button class="action-button primary" id="notificationBtn" onclick="requestNotificationPermission()" style="width: 100%; height: 40px; font-size: 13px;">Enable</button>
-            </div>
-
-            <!-- Sign Out Section -->
-            <div style="border-top: 1px solid var(--glass-border-subtle); margin-top: 16px; padding-top: 16px;">
-                <button class="auth-btn secondary" style="width: 100%;" onclick="handleSignOut()">Sign Out</button>
+                <button class="hero-pill-btn" id="notificationBtn" onclick="requestNotificationPermission()">Enable</button>
             </div>
         </div>
 
@@ -1770,14 +1863,14 @@ img {
                         <circle cx="11" cy="11" r="7"/>
                         <path d="M20 20l-4-4"/>
                     </svg>
-                    <input id="tvLibrarySearchInput" type="search" placeholder="Search TV shows library..." autocomplete="off">
-                    <button class="search-clear-btn" type="button" onclick="clearSearch('tvLibrarySearchInput')" aria-label="Clear search">
+                    <input id="homeTvLibrarySearchInput" type="search" placeholder="Search TV shows library..." autocomplete="off">
+                    <button class="search-clear-btn" type="button" onclick="clearSearch('homeTvLibrarySearchInput')" aria-label="Clear search">
                         <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
                     </button>
                 </div>
             </div>
 
-            <div id="tvLibraryCategories"></div>
+            <div id="homeTvLibraryCategories"></div>
         </div>
 
         <!-- Movies Library Section -->
@@ -1792,14 +1885,14 @@ img {
                         <circle cx="11" cy="11" r="7"/>
                         <path d="M20 20l-4-4"/>
                     </svg>
-                    <input id="movieLibrarySearchInput" type="search" placeholder="Search movies library..." autocomplete="off">
-                    <button class="search-clear-btn" type="button" onclick="clearSearch('movieLibrarySearchInput')" aria-label="Clear search">
+                    <input id="homeMovieLibrarySearchInput" type="search" placeholder="Search movies library..." autocomplete="off">
+                    <button class="search-clear-btn" type="button" onclick="clearSearch('homeMovieLibrarySearchInput')" aria-label="Clear search">
                         <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
                     </button>
                 </div>
             </div>
 
-            <div id="movieLibraryCategories"></div>
+            <div id="homeMovieLibraryCategories"></div>
         </div>
     </div>
 </main>
@@ -1808,30 +1901,12 @@ img {
      BOTTOM NAVIGATION
 ================================================     -->
 <nav class="bottom-nav">
-    <button id="navTvShows" class="nav-button" onclick="showPage('tvShows')">
+    <button id="navHome" class="nav-button active" onclick="showPage('home')">
         <svg class="icon" viewBox="0 0 24 24">
-            <rect x="2" y="7" width="20" height="13" rx="2"/>
-            <path d="M17 2l-5 5-5-5"/>
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
         </svg>
-        TV Shows
-    </button>
-    <button id="navMovies" class="nav-button" onclick="showPage('movies')">
-        <svg class="icon" viewBox="0 0 24 24">
-            <rect x="2" y="7" width="20" height="14" rx="2"/>
-            <path d="M2 7l4-4h3l-4 4H2z"/>
-            <path d="M11 7l4-4h3l-4 4h-3z"/>
-            <line x1="2" y1="12" x2="22" y2="12"/>
-        </svg>
-        Movies
-    </button>
-    <button id="navUpcoming" class="nav-button" onclick="showPage('upcoming')">
-        <svg class="icon" viewBox="0 0 24 24">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-            <line x1="16" y1="2" x2="16" y2="6"/>
-            <line x1="8" y1="2" x2="8" y2="6"/>
-            <line x1="3" y1="10" x2="21" y2="10"/>
-        </svg>
-        Upcoming
+        Home
     </button>
     <button id="navDiscover" class="nav-button" onclick="showPage('discover')">
         <svg class="icon" viewBox="0 0 24 24">
@@ -1840,12 +1915,14 @@ img {
         </svg>
         Discover
     </button>
-    <button id="navHome" class="nav-button active" onclick="showPage('home')">
+    <button id="navLibrary" class="nav-button" onclick="showPage('library')">
         <svg class="icon" viewBox="0 0 24 24">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-            <circle cx="12" cy="7" r="4"/>
+            <rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/>
+            <rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/>
+            <rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/>
+            <rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/>
         </svg>
-        Home
+        Library
     </button>
 </nav>
 </div>
@@ -1856,6 +1933,13 @@ img {
 <div id="detailsModal" class="modal" onclick="closeModalOutside(event)">
     <div class="modal-sheet">
         <div class="modal-header-nav">
+            <button class="close-button" onclick="shareCurrentItem()" aria-label="Share">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M12 16V4"/>
+                    <path d="M7 9l5-5 5 5"/>
+                    <path d="M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/>
+                </svg>
+            </button>
             <button class="close-button" onclick="closeModal()" aria-label="Close">
                 <svg class="icon" viewBox="0 0 24 24">
                     <path d="M6 6l12 12"/>
@@ -1981,7 +2065,7 @@ let currentEpisode = null;
 let selectedSeason = 1;
 let currentSearchType = 'tv';
 let currentAuthMode = 'signin';
-let currentUpcomingType = 'tv';
+let currentLibraryView = 'tv';
 let toastTimer = null;
 let searchDebounceTimer = null;
 
@@ -2083,10 +2167,12 @@ function clearSearch(inputId) {
     if (inputId === "onlineSearchInput") fetchTrending();
     if (inputId === "tvLibrarySearchInput") renderTVLibrarySection();
     if (inputId === "movieLibrarySearchInput") renderMovieLibrarySection();
+    if (inputId === "homeTvLibrarySearchInput") renderTVLibrarySection("homeTvLibraryCategories", "homeTvLibrarySearchInput");
+    if (inputId === "homeMovieLibrarySearchInput") renderMovieLibrarySection("homeMovieLibraryCategories", "homeMovieLibrarySearchInput");
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const searchInputs = ['onlineSearchInput', 'tvLibrarySearchInput', 'movieLibrarySearchInput'];
+    const searchInputs = ['onlineSearchInput', 'tvLibrarySearchInput', 'movieLibrarySearchInput', 'homeTvLibrarySearchInput', 'homeMovieLibrarySearchInput'];
     
     searchInputs.forEach(id => {
         const input = document.getElementById(id);
@@ -2572,9 +2658,11 @@ async function handleSignOut() {
 }
 
 function refreshActivePage() {
-    if (document.getElementById("tvShowsPage").classList.contains("active")) renderTVShowsTab();
-    if (document.getElementById("moviesPage").classList.contains("active")) renderMoviesTab();
-    if (document.getElementById("upcomingPage").classList.contains("active")) renderUpcomingTab();
+    if (document.getElementById("libraryPage").classList.contains("active")) {
+        if (currentLibraryView === 'tv') renderTVLibrarySection();
+        if (currentLibraryView === 'movies') renderMovieLibrarySection();
+        if (currentLibraryView === 'upcoming') renderUpcomingTab();
+    }
     if (document.getElementById("homePage").classList.contains("active")) renderHomeTab();
     updateHomeUI();
 }
@@ -2602,12 +2690,39 @@ async function checkLibraryForUpdates() {
     try {
         for (let item of state.library) {
             if (!item.tmdbId) continue;
+            const changed = await refreshItemFromTMDB(item);
+            if (changed) updated = true;
+        }
 
-            try {
+        if (updated) {
+            refreshActivePage();
+        }
+
+        // Run regardless of whether anything changed above — the point is to
+        // catch the calendar day rolling over onto a release, not just new data.
+        checkTodaysReleases();
+        setLastLibraryCheck(now());
+    } finally {
+        isSyncingLibrary = false;
+    }
+}
+
+// Refreshes a single library item's TMDB-sourced fields (and watch
+// availability) in place, preserving user-specific data (watched flags,
+// stop/finished state, lastWatchedAt, etc). Returns true if anything
+// actually changed (and was saved), false otherwise. Shared by the
+// periodic background sync above and by the details modal below, which
+// calls this the moment it opens so info is never stale even if the last
+// background pass hasn't run recently.
+async function refreshItemFromTMDB(item) {
+    if (!item.tmdbId) return false;
+    let changed = false;
+
+    try {
                 if (item.type === 'movie') {
                     const res = await fetch(`https://api.themoviedb.org/3/movie/${item.tmdbId}?api_key=${TMDB_API_KEY}`);
                     const movieData = await res.json();
-                    if (!movieData || !movieData.id) continue;
+                    if (!movieData || !movieData.id) return false;
 
                     const newTitle = movieData.title || item.title;
                     const newYear = movieData.release_date ? movieData.release_date.substring(0, 4) : item.year;
@@ -2643,13 +2758,13 @@ async function checkLibraryForUpdates() {
                         item.rating = newRating;
 
                         await saveItem(item);
-                        updated = true;
+                        changed = true;
                     }
                 } else {
                     // TV Shows: refresh show-level metadata AND the full episode/season list.
                     const res = await fetch(`https://api.themoviedb.org/3/tv/${item.tmdbId}?api_key=${TMDB_API_KEY}`);
                     const showData = await res.json();
-                    if (!showData || !showData.seasons) continue;
+                    if (!showData || !showData.seasons) return false;
 
                     let newEpisodes = [];
                     const validSeasons = showData.seasons.filter(s => s.season_number > 0);
@@ -2762,7 +2877,7 @@ async function checkLibraryForUpdates() {
                         item.nextEpisodeAirDate = newNextAirDate;
 
                         await saveItem(item);
-                        updated = true;
+                        changed = true;
                     }
                 }
             } catch (err) {
@@ -2780,24 +2895,13 @@ async function checkLibraryForUpdates() {
                     item.inCinemas = availability.inCinemas;
                     item.watchLink = availability.link;
                     await saveItem(item);
-                    updated = true;
+                    changed = true;
                 }
             } catch (availErr) {
                 console.error(`Failed to refresh availability for ${item.title}:`, availErr);
             }
-        }
 
-        if (updated) {
-            refreshActivePage();
-        }
-
-        // Run regardless of whether anything changed above — the point is to
-        // catch the calendar day rolling over onto a release, not just new data.
-        checkTodaysReleases();
-        setLastLibraryCheck(now());
-    } finally {
-        isSyncingLibrary = false;
-    }
+    return changed;
 }
 
 /* =========================================================
@@ -2994,9 +3098,7 @@ if (auth) {
             document.getElementById("homeName").textContent = displayName;
             document.getElementById("homeEmailSubtitle").textContent = user.email;
             
-            const headerAvatar = document.getElementById("headerAvatar");
             const largeAvatar = document.getElementById("largeAvatar");
-            if (headerAvatar) headerAvatar.textContent = initial;
             if (largeAvatar) largeAvatar.textContent = initial;
 
             try {
@@ -3142,6 +3244,20 @@ function initSearchPage() {
         });
     }
 
+    const homeTvLibInput = document.getElementById("homeTvLibrarySearchInput");
+    if (homeTvLibInput) {
+        homeTvLibInput.addEventListener("input", () => {
+            renderTVLibrarySection("homeTvLibraryCategories", "homeTvLibrarySearchInput");
+        });
+    }
+
+    const homeMovieLibInput = document.getElementById("homeMovieLibrarySearchInput");
+    if (homeMovieLibInput) {
+        homeMovieLibInput.addEventListener("input", () => {
+            renderMovieLibrarySection("homeMovieLibraryCategories", "homeMovieLibrarySearchInput");
+        });
+    }
+
     fetchTrending();
 }
 
@@ -3228,14 +3344,12 @@ function renderSearchResults(results) {
                     <div class="search-card-overview">${escapeHTML(item.overview || 'No description available.')}</div>
                     
                     ${isAdded ? `
-                        <button class="search-add-btn added" onclick="event.stopPropagation();" disabled>
+                        <button class="search-add-btn added" onclick="event.stopPropagation();" disabled aria-label="Already in library" title="Already in library">
                             <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>
-                            In Library
                         </button>
                     ` : `
-                        <button class="search-add-btn" onclick="event.stopPropagation(); importMediaData(${item.id}, '${currentSearchType}', this)">
+                        <button class="search-add-btn" onclick="event.stopPropagation(); importMediaData(${item.id}, '${currentSearchType}', this)" aria-label="Add to library" title="Add to library">
                             <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-                            Add to Library
                         </button>
                     `}
                 </div>
@@ -3352,7 +3466,6 @@ async function importMediaData(id, type, buttonElement) {
 
     if (buttonElement) {
         buttonElement.disabled = true;
-        buttonElement.textContent = "Adding...";
     }
 
     showToast(`Adding ${type === 'movie' ? 'movie' : 'show'}...`);
@@ -3397,7 +3510,7 @@ async function importMediaData(id, type, buttonElement) {
 
             if (buttonElement) {
                 buttonElement.className = "search-add-btn added";
-                buttonElement.innerHTML = `<svg class="icon icon-small" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg> In Library`;
+                buttonElement.innerHTML = `<svg class="icon icon-small" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>`;
             }
             showToast(`Added ${movieData.title} to Library!`);
             sendAppNotification("Added to Library", { body: `You will be notified when ${movieData.title} releases.` });
@@ -3475,7 +3588,7 @@ async function importMediaData(id, type, buttonElement) {
 
             if (buttonElement) {
                 buttonElement.className = "search-add-btn added";
-                buttonElement.innerHTML = `<svg class="icon icon-small" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg> In Library`;
+                buttonElement.innerHTML = `<svg class="icon icon-small" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>`;
             }
             showToast(`Added ${showData.name} to Library!`);
             sendAppNotification("Added to Library", { body: `You will be notified for new episodes of ${showData.name}.` });
@@ -3504,10 +3617,12 @@ function getAvailableEpisodes(show) {
 
 function getNextUnwatchedEpisode(show) {
     if (!show.episodes || show.episodes.length === 0) return null;
-    const sortedEps = [...show.episodes].sort((a, b) => {
-        if (a.season !== b.season) return a.season - b.season;
-        return a.number - b.number;
-    });
+    const sortedEps = [...show.episodes]
+        .filter(ep => isReleased(ep.releaseDate))
+        .sort((a, b) => {
+            if (a.season !== b.season) return a.season - b.season;
+            return a.number - b.number;
+        });
     return sortedEps.find(ep => !ep.watched) || null;
 }
 
@@ -3629,9 +3744,7 @@ function showPage(page, subType = null) {
         nav.classList.add("active");
     }
 
-    if (page === "tvShows") renderTVShowsTab();
-    if (page === "movies") renderMoviesTab();
-    if (page === "upcoming") renderUpcomingTab();
+    if (page === "library") setLibraryView(subType || currentLibraryView);
     if (page === "discover") {
         if (subType) {
             setSearchType(subType);
@@ -3643,17 +3756,28 @@ function showPage(page, subType = null) {
     if (page === "home") renderHomeTab();
 }
 
+// Switches between the TV Shows / Movies / Upcoming sub-views inside the
+// merged Library tab, toggling the segmented control and showing/hiding
+// each sub-view's container rather than re-rendering the whole page.
+function setLibraryView(view) {
+    currentLibraryView = view;
+
+    document.getElementById("libraryTabTV").classList.toggle("active", view === 'tv');
+    document.getElementById("libraryTabMovies").classList.toggle("active", view === 'movies');
+    document.getElementById("libraryTabUpcoming").classList.toggle("active", view === 'upcoming');
+
+    document.getElementById("libraryViewTV").style.display = view === 'tv' ? 'block' : 'none';
+    document.getElementById("libraryViewMovies").style.display = view === 'movies' ? 'block' : 'none';
+    document.getElementById("libraryViewUpcoming").style.display = view === 'upcoming' ? 'block' : 'none';
+
+    if (view === 'tv') renderTVLibrarySection();
+    if (view === 'movies') renderMovieLibrarySection();
+    if (view === 'upcoming') renderUpcomingTab();
+}
+
 /* =========================================================
    1. UPCOMING TAB RENDER
 ========================================================= */
-function setUpcomingType(type) {
-    currentUpcomingType = type;
-    document.getElementById("upcomingTypeTV").classList.toggle("active", type === 'tv');
-    document.getElementById("upcomingTypeMovie").classList.toggle("active", type === 'movie');
-
-    renderUpcomingTab();
-}
-
 // Buckets items into Today / Tomorrow / This Week / Later so the list reads
 // like a schedule instead of one long undifferentiated feed.
 function groupUpcomingByTimeframe(items) {
@@ -3680,29 +3804,17 @@ function groupUpcomingByTimeframe(items) {
 // instead of re-embedding title/date strings into onclick attributes.
 let upcomingCalendarItems = [];
 
+// TV episodes and movie releases are shown together in one combined,
+// date-sorted list (getUpcomingItems with no filter returns both types).
 function renderUpcomingTab() {
     const listContainer = document.getElementById("upcomingResultsList");
     if (!listContainer) return;
 
-    // Keep the toggle buttons labeled with live counts so users can see at a
-    // glance whether there's anything upcoming before they even tap in.
-    const tvBtn = document.getElementById("upcomingTypeTV");
-    const movieBtn = document.getElementById("upcomingTypeMovie");
-    if (tvBtn) {
-        const tvCount = getUpcomingItems('tv').length;
-        tvBtn.textContent = tvCount ? `TV Shows (${tvCount})` : "TV Shows";
-    }
-    if (movieBtn) {
-        const movieCount = getUpcomingItems('movie').length;
-        movieBtn.textContent = movieCount ? `Movies (${movieCount})` : "Movies";
-    }
-
-    const items = getUpcomingItems(currentUpcomingType);
+    const items = getUpcomingItems();
     upcomingCalendarItems = items;
 
     if (!items || items.length === 0) {
-        const mediaLabel = currentUpcomingType === 'movie' ? 'movie releases' : 'TV episodes';
-        listContainer.innerHTML = emptyState("No Upcoming Releases", `No upcoming ${mediaLabel} scheduled in your library.`);
+        listContainer.innerHTML = emptyState("No Upcoming Releases", "No upcoming episodes or movies scheduled in your library.");
         return;
     }
 
@@ -3714,76 +3826,6 @@ function renderUpcomingTab() {
             ${group.items.map(data => createUpcomingCard(data, items.indexOf(data))).join("")}
         </div>
     `).join("");
-}
-
-/* =========================================================
-   2 & 3. TV SHOWS TAB RENDER
-========================================================= */
-function renderTVShowsTab() {
-    const tvShows = state.library.filter(item => item.type === 'tv' || !item.type);
-
-    const continueShows = sortTVShowsByLatestAired(tvShows.filter(show => {
-        if (show.isStopped) return false;
-        if (show.releaseDate && !isReleased(show.releaseDate)) return false;
-        if (!show.releaseDate && show.first_air_date && !isReleased(show.first_air_date)) return false;
-
-        const watchedEps = show.episodes ? show.episodes.filter(ep => ep.watched) : [];
-        if (watchedEps.length === 0) return false;
-
-        const nextEp = getNextUnwatchedEpisode(show);
-        if (!nextEp) return false;
-
-        return isReleased(nextEp.releaseDate);
-    }));
-
-    const startShows = sortTVShowsByLatestAired(tvShows.filter(show => {
-        if (show.isStopped) return false;
-        if (show.releaseDate && !isReleased(show.releaseDate)) return false;
-        if (!show.releaseDate && show.first_air_date && !isReleased(show.first_air_date)) return false;
-
-        const watchedEps = show.episodes ? show.episodes.filter(ep => ep.watched) : [];
-        if (watchedEps.length > 0) return false;
-
-        const availableEps = getAvailableEpisodes(show);
-        return availableEps.length > 0;
-    }));
-
-    const stoppedShows = sortTVShowsByLatestAired(tvShows.filter(show => show.isStopped));
-
-    renderGrid("tvContinueGrid", continueShows, "No TV shows currently in progress with available episodes.");
-    renderGrid("tvStartGrid", startShows, "No unwatched TV shows ready to start.");
-
-    const stoppedSection = document.getElementById("stoppedShowsSection");
-    if (stoppedSection) {
-        if (stoppedShows.length > 0) {
-            stoppedSection.style.display = "block";
-            renderGrid("tvStoppedGrid", stoppedShows, "");
-        } else {
-            stoppedSection.style.display = "none";
-        }
-    }
-}
-
-/* =========================================================
-   4. MOVIES TAB RENDER
-========================================================= */
-function renderMoviesTab() {
-    const movies = state.library.filter(item => item.type === 'movie');
-
-    const unwatchedMovies = movies.filter(item => !item.watched && isReleased(item.releaseDate));
-    const watchedMovies = sortMoviesByWatchedDate(movies.filter(item => item.watched));
-
-    renderGrid("moviesUnwatchedGrid", unwatchedMovies, "No unwatched movies in your library.");
-
-    const watchedSection = document.getElementById("watchedMoviesSection");
-    if (watchedSection) {
-        if (watchedMovies.length > 0) {
-            watchedSection.style.display = "block";
-            renderGrid("moviesWatchedGrid", watchedMovies, "");
-        } else {
-            watchedSection.style.display = "none";
-        }
-    }
 }
 
 /* =========================================================
@@ -3825,26 +3867,29 @@ function renderHomeTab() {
 
     document.getElementById("dashboardStats").innerHTML = `
         <div class="stat">
+            <svg class="icon stat-icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="M17 2l-5 5-5-5"/></svg>
             <div class="stat-value">${totalShows}</div>
             <div class="stat-label">TV Shows</div>
         </div>
         <div class="stat">
+            <svg class="icon stat-icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M2 7l4-4h3l-4 4H2z"/><path d="M11 7l4-4h3l-4 4h-3z"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
             <div class="stat-value">${totalMovies}</div>
             <div class="stat-label">Movies</div>
         </div>
         <div class="stat">
+            <svg class="icon stat-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
             <div class="stat-value">${totalWatchedEpisodes}</div>
             <div class="stat-label">Episodes</div>
         </div>
     `;
 
-    renderTVLibrarySection();
-    renderMovieLibrarySection();
+    renderTVLibrarySection("homeTvLibraryCategories", "homeTvLibrarySearchInput");
+    renderMovieLibrarySection("homeMovieLibraryCategories", "homeMovieLibrarySearchInput");
 }
 
-function renderTVLibrarySection() {
-    const container = document.getElementById("tvLibraryCategories");
-    const searchInput = document.getElementById("tvLibrarySearchInput");
+function renderTVLibrarySection(containerId = "tvLibraryCategories", inputId = "tvLibrarySearchInput") {
+    const container = document.getElementById(containerId);
+    const searchInput = document.getElementById(inputId);
     const query = searchInput ? searchInput.value.trim().toLowerCase() : "";
 
     let items = state.library.filter(i => i.type === 'tv' || !i.type);
@@ -3869,7 +3914,14 @@ function renderTVLibrarySection() {
     const unwatched = sortTVShowsByLatestAired(items.filter(item => {
         if (item.isStopped) return false;
         const p = getTVProgress(item);
-        return p.watched === 0;
+        return p.total > 0 && p.watched === 0;
+    }));
+    // Shows with no released episodes at all yet - kept visible but separate
+    // from Unwatched, since there's nothing available to start watching.
+    const comingSoon = sortTVShowsByLatestAired(items.filter(item => {
+        if (item.isStopped) return false;
+        const p = getTVProgress(item);
+        return p.total === 0;
     }));
     const stopped = sortTVShowsByLatestAired(items.filter(item => item.isStopped));
 
@@ -3879,6 +3931,7 @@ function renderTVLibrarySection() {
     if (upToDate.length > 0) html += renderCategoryBlock("Up to Date", upToDate);
     if (finished.length > 0) html += renderCategoryBlock("Finished", finished);
     if (unwatched.length > 0) html += renderCategoryBlock("Unwatched", unwatched);
+    if (comingSoon.length > 0) html += renderCategoryBlock("Coming Soon", comingSoon);
     if (stopped.length > 0) html += renderCategoryBlock("Stopped Watching", stopped);
 
     if (!html) {
@@ -3888,9 +3941,9 @@ function renderTVLibrarySection() {
     container.innerHTML = html;
 }
 
-function renderMovieLibrarySection() {
-    const container = document.getElementById("movieLibraryCategories");
-    const searchInput = document.getElementById("movieLibrarySearchInput");
+function renderMovieLibrarySection(containerId = "movieLibraryCategories", inputId = "movieLibrarySearchInput") {
+    const container = document.getElementById(containerId);
+    const searchInput = document.getElementById(inputId);
     const query = searchInput ? searchInput.value.trim().toLowerCase() : "";
 
     let items = state.library.filter(i => i.type === 'movie');
@@ -3904,12 +3957,14 @@ function renderMovieLibrarySection() {
         return;
     }
 
-    const unwatched = items.filter(item => !item.watched);
+    const unwatched = items.filter(item => !item.watched && isReleased(item.releaseDate));
+    const comingSoon = items.filter(item => !item.watched && !isReleased(item.releaseDate));
     const watched = sortMoviesByWatchedDate(items.filter(item => item.watched));
 
     let html = "";
 
     if (unwatched.length > 0) html += renderCategoryBlock("Unwatched", unwatched);
+    if (comingSoon.length > 0) html += renderCategoryBlock("Coming Soon", comingSoon);
     if (watched.length > 0) html += renderCategoryBlock("Watched", watched);
 
     if (!html) {
@@ -3959,17 +4014,22 @@ function createCard(item) {
         }
     }
 
+    const placeholderIcon = item.type === 'movie'
+        ? `<svg class="icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M2 7l4-4h3l-4 4H2z"/><path d="M11 7l4-4h3l-4 4h-3z"/><line x1="2" y1="12" x2="22" y2="12"/></svg>`
+        : `<svg class="icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="M17 2l-5 5-5-5"/></svg>`;
+
     return `
         <div class="card" onclick="openDetails('${item.id}')" data-id="${item.id}">
             <div class="poster">
                 ${hasPoster ? `
                     <img src="${item.poster}" alt="${escapeHTML(item.title)}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="poster-placeholder" style="display: none;">${escapeHTML(item.title)}</div>
+                    <div class="poster-placeholder" style="display: none;">${placeholderIcon}</div>
                 ` : `
-                    <div class="poster-placeholder">${escapeHTML(item.title)}</div>
+                    <div class="poster-placeholder">${placeholderIcon}</div>
                 `}
                 ${progressBarHTML}
             </div>
+            <div class="card-title">${escapeHTML(item.title)}</div>
         </div>
     `;
 }
@@ -4117,9 +4177,6 @@ function updateHomeUI() {
 
     const largeAvatarEl = document.getElementById("largeAvatar");
     if (largeAvatarEl) largeAvatarEl.textContent = initial;
-
-    const headerAvatarEl = document.getElementById("headerAvatar");
-    if (headerAvatarEl) headerAvatarEl.textContent = initial;
 }
 
 /* =========================================================
@@ -4167,6 +4224,45 @@ async function addModalItemToLibrary() {
     updateModalContent();
 }
 
+// Shares the item currently open in the details modal via the native share
+// sheet where available (mobile browsers), falling back to copying a
+// shareable TMDB link to the clipboard on desktop/unsupported browsers.
+async function shareCurrentItem() {
+    if (!currentItem) return;
+
+    const tmdbUrl = currentItem.type === 'movie'
+        ? `https://www.themoviedb.org/movie/${currentItem.tmdbId}`
+        : `https://www.themoviedb.org/tv/${currentItem.tmdbId}`;
+
+    const shareData = {
+        title: currentItem.title,
+        text: `Check out ${currentItem.title} on NovaWatch!`,
+        url: tmdbUrl
+    };
+
+    if (navigator.share) {
+        try {
+            await navigator.share(shareData);
+        } catch (err) {
+            if (err.name !== 'AbortError') console.error("Share failed:", err);
+        }
+        return;
+    }
+
+    if (navigator.clipboard) {
+        try {
+            await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
+            showToast("Link copied to clipboard!");
+        } catch (err) {
+            console.error("Clipboard write failed:", err);
+            showToast("Unable to share.");
+        }
+        return;
+    }
+
+    showToast("Sharing isn't supported on this device.");
+}
+
 function openDetails(itemId) {
     currentItem = getItem(itemId);
     if (!currentItem) return;
@@ -4181,6 +4277,29 @@ function openDetails(itemId) {
     updateModalContent();
     document.getElementById("detailsModal").classList.add("open");
     loadWatchAvailability(currentItem);
+
+    // Cached data renders immediately above; quietly pull the latest TMDB
+    // data for this one item so the modal never shows stale info while
+    // waiting on the periodic background sync.
+    refreshOpenItemFromTMDB(currentItem);
+}
+
+async function refreshOpenItemFromTMDB(item) {
+    if (!item || !item.tmdbId) return;
+
+    const changed = await refreshItemFromTMDB(item);
+
+    // The user may have closed the modal or opened a different item while
+    // this was in flight — only re-render if they're still looking at it.
+    if (changed && currentItem && currentItem.id === item.id) {
+        if (currentItem.type !== 'movie' && currentItem.episodes) {
+            const availableSeasons = [...new Set(currentItem.episodes.map(ep => ep.season))].sort((a, b) => a - b);
+            if (!availableSeasons.includes(selectedSeason) && availableSeasons.length > 0) {
+                selectedSeason = availableSeasons[0];
+            }
+        }
+        updateModalContent();
+    }
 }
 
 function closeModal() {
@@ -4276,20 +4395,23 @@ function updateModalContent() {
         const nextLabel = nextEp ? `S${nextEp.season} E${nextEp.number}` : 'Up to Date';
 
         actionsHTML = `
-            <div class="modal-actions-row" style="grid-template-columns: repeat(2, 1fr);">
+            <div class="modal-actions-row movie-actions-grid">
                 <button class="action-button primary" onclick="markNextEpisodeWatched('${currentItem.id}')">
                     Next: ${nextLabel}
                 </button>
                 <button class="action-button trailer" onclick="playTrailer(${currentItem.tmdbId}, 'tv')">
                     Trailer
                 </button>
+                <button class="action-button danger" onclick="removeCurrentItem()">
+                    Remove
+                </button>
             </div>
-            <div class="modal-actions-row" style="grid-template-columns: repeat(2, 1fr);">
+            <div class="modal-actions-row" style="grid-template-columns: repeat(2, 1fr); margin-top: 10px;">
                 <button class="action-button ${currentItem.isStopped ? 'primary' : 'warning'}" onclick="toggleStopWatching('${currentItem.id}')">
                     ${currentItem.isStopped ? 'Resume Show' : 'Stop Watching'}
                 </button>
-                <button class="action-button danger" onclick="removeCurrentItem()">
-                    Remove
+                <button id="modalAddLibBtn" class="action-button ${isAdded ? '' : 'primary'}" style="${isAdded ? 'background: var(--surface-2); color: var(--success); border: 1px solid rgba(52, 199, 89, 0.3);' : ''}" onclick="addModalItemToLibrary()" ${isAdded ? 'disabled' : ''}>
+                    ${isAdded ? 'In Library' : 'Add to Library'}
                 </button>
             </div>
         `;
@@ -4340,8 +4462,9 @@ function renderEpisodesList(container) {
             ${seasonEpisodes.map(ep => {
                 const hasStill = ep.still && ep.still.trim() !== "";
                 const dateStr = formatDate(ep.releaseDate);
-                const watchedText = ep.watched ? "Watched" : "Unwatched";
-                const watchedColor = ep.watched ? "var(--success)" : "var(--danger)";
+                const released = isReleased(ep.releaseDate);
+                const watchedText = !released ? "Not Released" : (ep.watched ? "Watched" : "Unwatched");
+                const watchedColor = !released ? "var(--text-muted)" : (ep.watched ? "var(--success)" : "var(--danger)");
 
                 return `
                     <div class="episode" onclick="openEpisodeDetails('${ep.id}')">
@@ -4427,12 +4550,19 @@ async function toggleEntireSeasonWatched(seasonNumber) {
 
     const seasonEps = currentItem.episodes.filter(ep => ep.season === seasonNumber);
     if (seasonEps.length === 0) return;
-    
-    const anyUnwatched = seasonEps.some(ep => !ep.watched);
-    seasonEps.forEach(ep => {
+
+    const releasedEps = seasonEps.filter(ep => isReleased(ep.releaseDate));
+    if (releasedEps.length === 0) {
+        showToast("No released episodes in this season yet.");
+        return;
+    }
+
+    // Only released episodes are ever touched - unaired ones always stay unwatched.
+    const anyUnwatched = releasedEps.some(ep => !ep.watched);
+    releasedEps.forEach(ep => {
         ep.watched = anyUnwatched;
     });
-    
+
     showToast(`Season ${seasonNumber} marked as ${anyUnwatched ? 'Watched' : 'Unwatched'}`);
     await saveItem(currentItem);
     updateModalContent();
@@ -4468,7 +4598,13 @@ function openEpisodeDetails(epId) {
     document.getElementById("episodeModalDescription").textContent = currentEpisode.overview || "No description available.";
     
     const btn = document.getElementById("episodeWatchedToggleBtn");
-    btn.textContent = currentEpisode.watched ? "Mark as Unwatched" : "Mark as Watched";
+    if (!currentEpisode.watched && !isReleased(currentEpisode.releaseDate)) {
+        btn.textContent = "Not Yet Released";
+        btn.disabled = true;
+    } else {
+        btn.textContent = currentEpisode.watched ? "Mark as Unwatched" : "Mark as Watched";
+        btn.disabled = false;
+    }
     
     document.getElementById("episodeDetailsModal").classList.add("open");
 }
@@ -4486,6 +4622,10 @@ async function toggleCurrentEpisodeWatched() {
     if (!currentItem || !currentEpisode) return;
     if (!isCurrentItemInLibrary()) {
         showToast("Add this to your library first.");
+        return;
+    }
+    if (!currentEpisode.watched && !isReleased(currentEpisode.releaseDate)) {
+        showToast("This episode hasn't been released yet.");
         return;
     }
     currentEpisode.watched = !currentEpisode.watched;
@@ -4509,6 +4649,10 @@ async function toggleMovieWatched(id) {
     if (!currentItem || currentItem.type !== 'movie') return;
     if (!isCurrentItemInLibrary()) {
         showToast("Add this to your library first.");
+        return;
+    }
+    if (!currentItem.watched && !isReleased(currentItem.releaseDate)) {
+        showToast("This movie hasn't been released yet.");
         return;
     }
     currentItem.watched = !currentItem.watched;
