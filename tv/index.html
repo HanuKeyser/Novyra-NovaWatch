@@ -2448,7 +2448,6 @@ document.addEventListener("DOMContentLoaded", () => {
     setAuthMode('signin');
     checkNotificationPermissionState();
     checkTodaysReleases();
-    initTabSwipeGestures();
 
     // Catches the moment something crosses into "released today" for
     // anyone who leaves the app open across midnight, without needing a
@@ -4086,97 +4085,6 @@ function showPage(page, subType = null, focusSearch = false) {
         }
     }
     if (page === "home") renderHomeTab();
-}
-
-// Left/right order for swipe navigation - matches the visual nav bar order.
-const TAB_SWIPE_ORDER = ['home', 'discover', 'library'];
-// Sub-tab orders, matched to each page's segmented control.
-const DISCOVER_SWIPE_ORDER = ['tv', 'movie'];
-const LIBRARY_SWIPE_ORDER = ['tv', 'movies', 'upcoming'];
-
-// Lets the person swipe left/right between Home, Discover, and Library
-// instead of only tapping the nav bar - and, once inside Discover or
-// Library, between their own TV Shows/Movies(/Upcoming) segmented tabs
-// first. Swiping past either end of a sub-tab set falls through to
-// switching the top-level tab, so the whole app reads as one continuous
-// swipe-through sequence rather than two disconnected gesture areas.
-// Deliberately conservative about what counts as a tab-swipe so it never
-// fights with normal vertical scrolling, text selection, or (in the details
-// modal) the season selector's own horizontal scroll:
-//   - Ignored entirely while a modal is open.
-//   - Ignored if the gesture starts on an input/textarea/select.
-//   - Only triggers once the horizontal movement is both large enough and
-//     clearly dominant over vertical movement, so a scroll that drifts
-//     slightly sideways never gets misread as a swipe.
-function initTabSwipeGestures() {
-    let startX = 0;
-    let startY = 0;
-    let tracking = false;
-
-    document.addEventListener("touchstart", (e) => {
-        if (document.querySelector(".modal.open")) {
-            tracking = false;
-            return;
-        }
-        if (e.target.closest("input, textarea, select")) {
-            tracking = false;
-            return;
-        }
-        if (e.touches.length !== 1) {
-            tracking = false;
-            return;
-        }
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
-        tracking = true;
-    }, { passive: true });
-
-    document.addEventListener("touchend", (e) => {
-        if (!tracking) return;
-        tracking = false;
-
-        const endX = e.changedTouches[0].clientX;
-        const endY = e.changedTouches[0].clientY;
-        const deltaX = endX - startX;
-        const deltaY = endY - startY;
-
-        const isHorizontal = Math.abs(deltaX) > 70 && Math.abs(deltaX) > Math.abs(deltaY) * 1.5;
-        if (!isHorizontal) return;
-
-        // Swiping left (finger moves right-to-left) advances forward, same
-        // direction convention as swiping between photos or carousel pages.
-        const forward = deltaX < 0;
-        const currentTab = getLastTab();
-
-        if (currentTab === 'discover') {
-            if (advanceSubTab(DISCOVER_SWIPE_ORDER, currentSearchType, forward, (next) => setSearchType(next))) return;
-        } else if (currentTab === 'library') {
-            if (advanceSubTab(LIBRARY_SWIPE_ORDER, currentLibraryView, forward, (next) => setLibraryView(next))) return;
-        }
-
-        const currentIndex = TAB_SWIPE_ORDER.indexOf(currentTab);
-        if (currentIndex === -1) return;
-
-        const nextIndex = forward ? currentIndex + 1 : currentIndex - 1;
-        if (nextIndex < 0 || nextIndex >= TAB_SWIPE_ORDER.length) return;
-
-        showPage(TAB_SWIPE_ORDER[nextIndex]);
-    }, { passive: true });
-}
-
-// Moves to the next/previous entry in a sub-tab order (e.g. Discover's
-// TV/Movie toggle). Returns true if it moved (so the caller stops there),
-// or false if already at that end, letting the caller fall through to
-// switching the top-level tab instead.
-function advanceSubTab(order, current, forward, setter) {
-    const index = order.indexOf(current);
-    if (index === -1) return false;
-
-    const nextIndex = forward ? index + 1 : index - 1;
-    if (nextIndex < 0 || nextIndex >= order.length) return false;
-
-    setter(order[nextIndex]);
-    return true;
 }
 
 // Switches between the TV Shows / Movies / Upcoming sub-views inside the
