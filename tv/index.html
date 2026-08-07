@@ -21,6 +21,10 @@
 <!-- Preconnect for faster API calls -->
 <link rel="preconnect" href="https://api.themoviedb.org">
 <link rel="preconnect" href="https://image.tmdb.org">
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://securetoken.googleapis.com" crossorigin>
 
 <!-- Firebase App & Services CDNs -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -1857,7 +1861,8 @@ img {
     letter-spacing: -0.1px;
     line-height: 1.35;
     transition: opacity 0.3s cubic-bezier(0.25, 1, 0.5, 1), transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-    max-width: 86vw;
+    width: calc(100% - 36px);
+    max-width: 420px;
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -3408,6 +3413,13 @@ if (auth) {
             showPage(getLastTab());
             updateNavIndicator(false);
 
+            // Handle a shared show/movie link immediately, in parallel with
+            // the personal library load below rather than after it - a
+            // shared link only needs its own TMDB fetch to open, so there's
+            // no reason to make the recipient wait on their whole library
+            // syncing first (which can be the slower of the two).
+            const openedSharedItem = openSharedItemFromURL();
+
             try {
                 // Fetch User Cloud Profile & Settings
                 const userDoc = await db.collection("users").doc(user.uid).get();
@@ -3459,8 +3471,9 @@ if (auth) {
                 refreshActivePage();
 
                 // If this session was opened via a shared show/movie link,
-                // jump straight to it instead of the generic welcome toast.
-                if (!openSharedItemFromURL()) {
+                // it was already handled above, in parallel with this fetch -
+                // skip the generic welcome toast so it doesn't talk over it.
+                if (!openedSharedItem) {
                     showToast("Welcome back!", "success");
                 }
 
@@ -3673,8 +3686,6 @@ async function openSearchResultDetails(tmdbId, type) {
         return;
     }
 
-    showToast(`Loading details...`);
-
     try {
         if (type === 'movie') {
             const movieRes = await fetch(`https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${TMDB_API_KEY}`);
@@ -3696,67 +3707,88 @@ async function openSearchResultDetails(tmdbId, type) {
                 isPreview: true,
                 watched: false
             };
-        } else {
-            const showRes = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${TMDB_API_KEY}`);
-            const showData = await showRes.json();
 
-            let episodes = [];
-            
-            if (showData.seasons && showData.seasons.length > 0) {
-                const validSeasons = showData.seasons.filter(s => s.season_number > 0);
-                const seasonPromises = validSeasons.map(season => 
-                    fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${season.season_number}?api_key=${TMDB_API_KEY}`)
-                    .then(res => res.json())
-                    .catch(e => { console.error(e); return null; })
-                );
-                
-                const seasonsData = await Promise.all(seasonPromises);
-                
-                seasonsData.forEach(seasonData => {
-                    if (seasonData && seasonData.episodes) {
-                        seasonData.episodes.forEach(ep => {
-                            episodes.push({
-                                id: `s${seasonData.season_number}e${ep.episode_number}`,
-                                season: seasonData.season_number,
-                                number: ep.episode_number,
-                                title: ep.name || `Episode ${ep.episode_number}`,
-                                overview: ep.overview || '',
-                                still: ep.still_path ? `https://image.tmdb.org/t/p/w300${ep.still_path}` : '',
-                                runtime: ep.runtime ? `${ep.runtime} min` : "45 min",
-                                watched: false,
-                                releaseDate: ep.air_date ? new Date(ep.air_date).toISOString() : new Date().toISOString()
-                            });
-                        });
-                    }
-                });
-            }
-
-            currentItem = {
-                id: `preview-tv-${showData.id}`,
-                tmdbId: showData.id,
-                type: 'tv',
-                title: showData.name,
-                year: showData.first_air_date ? showData.first_air_date.substring(0, 4) : "N/A",
-                poster: showData.poster_path ? `https://image.tmdb.org/t/p/w500${showData.poster_path}` : "",
-                backdrop: showData.backdrop_path ? `https://image.tmdb.org/t/p/w780${showData.backdrop_path}` : "",
-                description: showData.overview || "No description available.",
-                releaseDate: showData.first_air_date ? new Date(showData.first_air_date).toISOString() : null,
-                status: showData.status || '',
-                rating: (typeof showData.vote_average === 'number' && showData.vote_average > 0) ? showData.vote_average.toFixed(1) : '',
-                numberOfSeasons: (typeof showData.number_of_seasons === 'number') ? showData.number_of_seasons : null,
-                numberOfEpisodes: (typeof showData.number_of_episodes === 'number') ? showData.number_of_episodes : null,
-                nextEpisodeAirDate: (showData.next_episode_to_air && showData.next_episode_to_air.air_date) ? new Date(showData.next_episode_to_air.air_date).toISOString() : null,
-                isFinished: false,
-                isStopped: false,
-                isPreview: true,
-                episodes: episodes
-            };
+            updateModalContent();
+            document.getElementById("detailsModal").classList.add("open");
+            loadWatchAvailability(currentItem);
+            return;
         }
+
+        // TV: open the modal the moment the show's own info is back, then
+        // fill episodes in behind it. Fetching every season is the slow
+        // part (one request per season) and previously blocked the modal
+        // from appearing at all until every single one had returned.
+        const showRes = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${TMDB_API_KEY}`);
+        const showData = await showRes.json();
+        const previewId = `preview-tv-${showData.id}`;
+
+        currentItem = {
+            id: previewId,
+            tmdbId: showData.id,
+            type: 'tv',
+            title: showData.name,
+            year: showData.first_air_date ? showData.first_air_date.substring(0, 4) : "N/A",
+            poster: showData.poster_path ? `https://image.tmdb.org/t/p/w500${showData.poster_path}` : "",
+            backdrop: showData.backdrop_path ? `https://image.tmdb.org/t/p/w780${showData.backdrop_path}` : "",
+            description: showData.overview || "No description available.",
+            releaseDate: showData.first_air_date ? new Date(showData.first_air_date).toISOString() : null,
+            status: showData.status || '',
+            rating: (typeof showData.vote_average === 'number' && showData.vote_average > 0) ? showData.vote_average.toFixed(1) : '',
+            numberOfSeasons: (typeof showData.number_of_seasons === 'number') ? showData.number_of_seasons : null,
+            numberOfEpisodes: (typeof showData.number_of_episodes === 'number') ? showData.number_of_episodes : null,
+            nextEpisodeAirDate: (showData.next_episode_to_air && showData.next_episode_to_air.air_date) ? new Date(showData.next_episode_to_air.air_date).toISOString() : null,
+            isFinished: false,
+            isStopped: false,
+            isPreview: true,
+            episodes: [],
+            episodesLoading: true
+        };
 
         selectedSeason = 1;
         updateModalContent();
         document.getElementById("detailsModal").classList.add("open");
         loadWatchAvailability(currentItem);
+
+        let episodes = [];
+
+        if (showData.seasons && showData.seasons.length > 0) {
+            const validSeasons = showData.seasons.filter(s => s.season_number > 0);
+            const seasonPromises = validSeasons.map(season =>
+                fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${season.season_number}?api_key=${TMDB_API_KEY}`)
+                .then(res => res.json())
+                .catch(e => { console.error(e); return null; })
+            );
+
+            const seasonsData = await Promise.all(seasonPromises);
+
+            seasonsData.forEach(seasonData => {
+                if (seasonData && seasonData.episodes) {
+                    seasonData.episodes.forEach(ep => {
+                        episodes.push({
+                            id: `s${seasonData.season_number}e${ep.episode_number}`,
+                            season: seasonData.season_number,
+                            number: ep.episode_number,
+                            title: ep.name || `Episode ${ep.episode_number}`,
+                            overview: ep.overview || '',
+                            still: ep.still_path ? `https://image.tmdb.org/t/p/w300${ep.still_path}` : '',
+                            runtime: ep.runtime ? `${ep.runtime} min` : "45 min",
+                            watched: false,
+                            releaseDate: ep.air_date ? new Date(ep.air_date).toISOString() : new Date().toISOString()
+                        });
+                    });
+                }
+            });
+        }
+
+        // The person may have closed the modal or moved on to something
+        // else while the season data was in flight - only apply it if
+        // they're still looking at this same preview.
+        if (currentItem && currentItem.id === previewId) {
+            currentItem.episodes = episodes;
+            currentItem.episodesLoading = false;
+            scrollToNextEpisodeOnRender = true;
+            updateModalContent();
+        }
 
     } catch (err) {
         console.error("Error opening preview details:", err);
@@ -5008,6 +5040,11 @@ function updateModalContent() {
 function renderEpisodesList(container) {
     const shouldScrollToNext = scrollToNextEpisodeOnRender;
     scrollToNextEpisodeOnRender = false;
+
+    if (currentItem.episodesLoading) {
+        container.innerHTML = `<div class="spinner-container"><div class="spinner"></div></div>`;
+        return;
+    }
 
     if (!currentItem.episodes || currentItem.episodes.length === 0) {
         container.innerHTML = `<div style="font-size:13px; color:var(--text-muted); margin-top:20px;">No episode info available.</div>`;
