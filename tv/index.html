@@ -1875,22 +1875,6 @@ img {
     min-width: 0;
 }
 
-.toast-action-btn {
-    flex-shrink: 0;
-    height: 32px;
-    padding: 0 16px;
-    border-radius: 999px;
-    background: var(--blue);
-    color: white;
-    font-size: 12px;
-    font-weight: 800;
-    box-shadow: 0 6px 14px rgba(0, 102, 204, 0.35);
-}
-
-.toast-action-btn:active {
-    transform: scale(0.94);
-}
-
 .auth-field {
     width: 100%;
 }
@@ -2224,7 +2208,6 @@ img {
 
 <div id="toast" class="toast">
     <span id="toastMessage"></span>
-    <button id="toastActionBtn" class="toast-action-btn" style="display: none;"></button>
 </div>
 
 <script>  
@@ -2401,39 +2384,11 @@ function showToast(message) {
     if (!toast) return;
     document.getElementById("toastMessage").textContent = message;
 
-    const actionBtn = document.getElementById("toastActionBtn");
-    actionBtn.style.display = "none";
-    actionBtn.onclick = null;
-
     toast.classList.add("show");
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => {
         toast.classList.remove("show");
     }, 3000);
-}
-
-// A toast with an inline action button (e.g. "Removed X" + Undo), for
-// giving the user a quick way to reverse something without interrupting
-// them with a native confirm() popup first.
-function showActionToast(message, actionLabel, actionFn, duration = 5000) {
-    const toast = document.getElementById("toast");
-    if (!toast) return;
-    document.getElementById("toastMessage").textContent = message;
-
-    const actionBtn = document.getElementById("toastActionBtn");
-    actionBtn.textContent = actionLabel;
-    actionBtn.style.display = "inline-flex";
-    actionBtn.onclick = () => {
-        clearTimeout(toastTimer);
-        toast.classList.remove("show");
-        actionFn();
-    };
-
-    toast.classList.add("show");
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => {
-        toast.classList.remove("show");
-    }, duration);
 }
 
 function clearSearch(inputId) {
@@ -3772,8 +3727,6 @@ async function importMediaData(id, type, buttonElement) {
         buttonElement.disabled = true;
     }
 
-    showToast(`Adding ${type === 'movie' ? 'movie' : 'show'}...`);
-
     try {
         if (type === 'movie') {
             const availabilityPromise = fetchWatchAvailability(id, 'movie');
@@ -3782,7 +3735,6 @@ async function importMediaData(id, type, buttonElement) {
 
             const slug = `movie-${movieData.id}`;
             if (state.library.some(s => s.id === slug || s.tmdbId === movieData.id)) {
-                showToast("Movie is already in your library!");
                 return;
             }
 
@@ -3816,7 +3768,6 @@ async function importMediaData(id, type, buttonElement) {
                 buttonElement.className = "search-add-btn added";
                 buttonElement.innerHTML = `<svg class="icon icon-small" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>`;
             }
-            showToast(`Added ${movieData.title} to Library!`);
             sendAppNotification("Added to Library", { body: `You will be notified when ${movieData.title} releases.` });
 
         } else {
@@ -3826,7 +3777,6 @@ async function importMediaData(id, type, buttonElement) {
 
             const slug = "tv-" + showData.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
             if (state.library.some(s => s.id === slug || s.tmdbId === showData.id)) {
-                showToast("Show is already in your library!");
                 return;
             }
 
@@ -3894,7 +3844,6 @@ async function importMediaData(id, type, buttonElement) {
                 buttonElement.className = "search-add-btn added";
                 buttonElement.innerHTML = `<svg class="icon icon-small" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>`;
             }
-            showToast(`Added ${showData.name} to Library!`);
             sendAppNotification("Added to Library", { body: `You will be notified for new episodes of ${showData.name}.` });
         }
     } catch (error) {
@@ -5333,31 +5282,17 @@ async function removeCurrentItem() {
 
     const removedItem = currentItem;
 
-    // Optimistic removal with an Undo window, instead of interrupting with
-    // a native confirm() popup. The Firestore delete only actually commits
-    // once the toast's undo window has passed without being tapped.
     state.library.splice(removedIndex, 1);
     closeModal();
     refreshActivePage();
 
-    let undone = false;
-
-    showActionToast(`Removed "${removedItem.title}"`, "Undo", () => {
-        undone = true;
-        state.library.splice(removedIndex, 0, removedItem);
-        refreshActivePage();
-    }, 5000);
-
-    setTimeout(async () => {
-        if (undone) return;
-        if (auth && auth.currentUser) {
-            try {
-                await db.collection("users").doc(auth.currentUser.uid).collection("library").doc(removedItem.id).delete();
-            } catch (err) {
-                console.error("Failed to delete item:", err);
-            }
+    if (auth && auth.currentUser) {
+        try {
+            await db.collection("users").doc(auth.currentUser.uid).collection("library").doc(removedItem.id).delete();
+        } catch (err) {
+            console.error("Failed to delete item:", err);
         }
-    }, 5000);
+    }
 }
 
 function clearPasswordError() {
