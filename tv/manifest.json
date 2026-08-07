@@ -2,9 +2,13 @@
   "name": "NovaWatch",
   "short_name": "NovaWatch",
   "description": "Track what you watch and get release alerts for upcoming movies and TV episodes.",
+  "id": "/tv/",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
   "background_color": "#f1f5f9",
   "theme_color": "#f1f5f9",
   "icons": [
