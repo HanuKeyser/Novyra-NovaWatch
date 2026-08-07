@@ -1053,7 +1053,27 @@ img {
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 
+/* Single floating "liquid glass" capsule that glides beneath whichever tab
+   is active (JS positions it via transform/width), rather than each button
+   painting its own background — this is what makes it read as one fluid
+   piece of glass moving, like iOS's tab bar, instead of a color swap. */
+.nav-indicator {
+    position: absolute;
+    top: 7px;
+    left: 0;
+    height: calc(100% - 14px);
+    width: 0;
+    border-radius: 999px;
+    background: rgba(120, 128, 140, 0.14);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 1px rgba(0, 0, 0, 0.04);
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+    z-index: 0;
+}
+
 .nav-button {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1064,7 +1084,7 @@ img {
     font-size: 10.5px;
     font-weight: 700;
     border-radius: 999px;
-    transition: background 0.3s cubic-bezier(0.25, 1, 0.5, 1), color 0.3s cubic-bezier(0.25, 1, 0.5, 1), transform 0.2s ease;
+    transition: color 0.3s cubic-bezier(0.25, 1, 0.5, 1), transform 0.2s ease;
 }
 
 .nav-button:active {
@@ -1078,9 +1098,7 @@ img {
 }
 
 .nav-button.active {
-    color: white;
-    background: linear-gradient(135deg, var(--blue-light), var(--blue));
-    box-shadow: 0 8px 20px rgba(0, 102, 204, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    color: var(--blue);
 }
 
 .nav-button.active .icon {
@@ -2097,6 +2115,7 @@ img {
      BOTTOM NAVIGATION
 ================================================     -->
 <nav class="bottom-nav">
+    <div id="navIndicator" class="nav-indicator"></div>
     <button id="navHome" class="nav-button active" onclick="showPage('home')">
         <svg class="icon" viewBox="0 0 24 24">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -3385,6 +3404,7 @@ if (auth) {
             // content for a moment until the library finishes loading below,
             // then refreshActivePage() catches it up - same as Home already did.
             showPage(getLastTab());
+            updateNavIndicator(false);
 
             try {
                 // Fetch User Cloud Profile & Settings
@@ -4064,6 +4084,8 @@ function showPage(page, subType = null, focusSearch = false) {
         nav.classList.add("active");
     }
 
+    updateNavIndicator();
+
     if (page === "library") setLibraryView(subType || currentLibraryView);
     if (page === "discover") {
         if (subType) {
@@ -4086,6 +4108,35 @@ function showPage(page, subType = null, focusSearch = false) {
     }
     if (page === "home") renderHomeTab();
 }
+
+// Slides the shared glass capsule under whichever nav button is active,
+// measuring the button's actual box so it works regardless of tab count
+// or viewport width. animate=false snaps instantly (first paint, resize).
+function updateNavIndicator(animate = true) {
+    const nav = document.querySelector(".bottom-nav");
+    const indicator = document.getElementById("navIndicator");
+    const activeBtn = nav ? nav.querySelector(".nav-button.active") : null;
+    if (!nav || !indicator || !activeBtn) return;
+
+    const navRect = nav.getBoundingClientRect();
+    const btnRect = activeBtn.getBoundingClientRect();
+
+    if (!animate) {
+        indicator.style.transition = "none";
+    }
+
+    indicator.style.width = `${btnRect.width}px`;
+    indicator.style.transform = `translateX(${btnRect.left - navRect.left}px)`;
+
+    if (!animate) {
+        // Force layout before restoring the transition so the snap doesn't
+        // itself animate from whatever the width/transform previously were.
+        indicator.getBoundingClientRect();
+        indicator.style.transition = "";
+    }
+}
+
+window.addEventListener("resize", () => updateNavIndicator(false));
 
 // Switches between the TV Shows / Movies / Upcoming sub-views inside the
 // merged Library tab, toggling the segmented control and showing/hiding
