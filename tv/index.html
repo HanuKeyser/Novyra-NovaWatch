@@ -854,6 +854,182 @@ img {
 }
 
 /* =========================================================
+   CONTINUE WATCHING (HOME) — swipeable "up next" rows, styled
+   to match the Discover/search result list cards, but surfacing
+   the next episode's own info instead of the show's synopsis.
+========================================================= */
+.continue-group + .continue-group {
+    margin-top: 22px;
+}
+
+.continue-group-title {
+    font-size: 14.5px;
+    font-weight: 750;
+    color: var(--text);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.continue-group-title::before {
+    content: '';
+    width: 4px;
+    height: 14px;
+    border-radius: 3px;
+    background: linear-gradient(180deg, var(--blue-light), var(--blue));
+    flex-shrink: 0;
+}
+
+.continue-card-wrap {
+    position: relative;
+    border-radius: 20px;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+
+.continue-card-bg {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 0 26px;
+    background: linear-gradient(135deg, #34d472, #1fa851);
+    color: white;
+    font-size: 12.5px;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.continue-card-bg svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.continue-card {
+    position: relative;
+    display: flex;
+    gap: 14px;
+    padding: 14px;
+    align-items: flex-start;
+    background: var(--surface);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    box-shadow: var(--glass-shadow-sm);
+    touch-action: pan-y;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: box-shadow 0.2s ease;
+}
+
+.continue-card.dragging {
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.16);
+}
+
+.continue-poster {
+    flex: 0 0 80px;
+    width: 80px;
+    height: 116px;
+    border-radius: 16px;
+    object-fit: cover;
+    background: var(--surface-2);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    pointer-events: none;
+}
+
+.continue-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 2px;
+    padding-right: 40px;
+}
+
+.continue-title {
+    font-size: 15.5px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.continue-meta-line {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.continue-episode-name {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: 0;
+    margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.continue-overview {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-top: 2px;
+}
+
+.continue-check-btn {
+    position: absolute;
+    top: 14px;
+    right: 6px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--text-muted);
+    border: 1px solid var(--glass-border);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--glass-shadow-sm);
+    flex-shrink: 0;
+    transition: transform 0.15s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.continue-check-btn:active {
+    transform: scale(0.9);
+}
+
+.continue-check-btn:hover {
+    color: var(--success);
+    border-color: rgba(52, 199, 89, 0.35);
+}
+
+/* =========================================================
    BOTTOM NAV (Floating Pill)
 ========================================================= */
 .bottom-nav {
@@ -1906,48 +2082,13 @@ img {
             </div>
         </div>
 
-        <!-- TV Shows Library Section -->
+        <!-- Continue Watching Section -->
         <div>
             <div class="section-header">
-                <div class="section-title">TV Shows Library</div>
+                <div class="section-title">Continue Watching</div>
             </div>
 
-            <div class="library-toolbar">
-                <div class="search-box">
-                    <svg class="icon search-icon" viewBox="0 0 24 24">
-                        <circle cx="11" cy="11" r="7"/>
-                        <path d="M20 20l-4-4"/>
-                    </svg>
-                    <input id="homeTvLibrarySearchInput" type="search" placeholder="Search TV shows library..." autocomplete="off">
-                    <button class="search-clear-btn" type="button" onclick="clearSearch('homeTvLibrarySearchInput')" aria-label="Clear search">
-                        <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
-                    </button>
-                </div>
-            </div>
-
-            <div id="homeTvLibraryCategories"></div>
-        </div>
-
-        <!-- Movies Library Section -->
-        <div>
-            <div class="section-header">
-                <div class="section-title">Movies Library</div>
-            </div>
-
-            <div class="library-toolbar">
-                <div class="search-box">
-                    <svg class="icon search-icon" viewBox="0 0 24 24">
-                        <circle cx="11" cy="11" r="7"/>
-                        <path d="M20 20l-4-4"/>
-                    </svg>
-                    <input id="homeMovieLibrarySearchInput" type="search" placeholder="Search movies library..." autocomplete="off">
-                    <button class="search-clear-btn" type="button" onclick="clearSearch('homeMovieLibrarySearchInput')" aria-label="Clear search">
-                        <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
-                    </button>
-                </div>
-            </div>
-
-            <div id="homeMovieLibraryCategories"></div>
+            <div id="continueWatchingList"></div>
         </div>
     </div>
 </main>
@@ -2284,12 +2425,10 @@ function clearSearch(inputId) {
     if (inputId === "onlineSearchInput") fetchTrending();
     if (inputId === "tvLibrarySearchInput") renderTVLibrarySection();
     if (inputId === "movieLibrarySearchInput") renderMovieLibrarySection();
-    if (inputId === "homeTvLibrarySearchInput") renderTVLibrarySection("homeTvLibraryCategories", "homeTvLibrarySearchInput");
-    if (inputId === "homeMovieLibrarySearchInput") renderMovieLibrarySection("homeMovieLibraryCategories", "homeMovieLibrarySearchInput");
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const searchInputs = ['onlineSearchInput', 'tvLibrarySearchInput', 'movieLibrarySearchInput', 'homeTvLibrarySearchInput', 'homeMovieLibrarySearchInput'];
+    const searchInputs = ['onlineSearchInput', 'tvLibrarySearchInput', 'movieLibrarySearchInput'];
     
     searchInputs.forEach(id => {
         const input = document.getElementById(id);
@@ -3396,20 +3535,6 @@ function initSearchPage() {
         });
     }
 
-    const homeTvLibInput = document.getElementById("homeTvLibrarySearchInput");
-    if (homeTvLibInput) {
-        homeTvLibInput.addEventListener("input", () => {
-            debounceLibraryFilter("homeTvLib", () => renderTVLibrarySection("homeTvLibraryCategories", "homeTvLibrarySearchInput"));
-        });
-    }
-
-    const homeMovieLibInput = document.getElementById("homeMovieLibrarySearchInput");
-    if (homeMovieLibInput) {
-        homeMovieLibInput.addEventListener("input", () => {
-            debounceLibraryFilter("homeMovieLib", () => renderMovieLibrarySection("homeMovieLibraryCategories", "homeMovieLibrarySearchInput"));
-        });
-    }
-
     fetchTrending();
 }
 
@@ -4175,8 +4300,7 @@ function renderHomeTab() {
         </div>
     `;
 
-    renderTVLibrarySection("homeTvLibraryCategories", "homeTvLibrarySearchInput");
-    renderMovieLibrarySection("homeMovieLibraryCategories", "homeMovieLibrarySearchInput");
+    renderContinueWatching();
 }
 
 function renderTVLibrarySection(containerId = "tvLibraryCategories", inputId = "tvLibrarySearchInput") {
@@ -4353,6 +4477,244 @@ function createUpcomingCard(data) {
             </div>
         </div>
     `;
+}
+
+/* =========================================================
+   CONTINUE WATCHING (HOME)
+   The single next thing to watch for every show/movie in the
+   library: the next released-but-unwatched episode for TV shows,
+   or the movie itself if it hasn't been watched yet. Stopped
+   shows are excluded, same as "in progress" everywhere else.
+========================================================= */
+function getContinueWatchingItems() {
+    const tvShows = state.library.filter(item => {
+        if (item.isStopped || item.type === 'movie') return false;
+        return !!getNextUnwatchedEpisode(item);
+    });
+
+    const movies = state.library.filter(item => {
+        return item.type === 'movie' && !item.watched && isReleased(item.releaseDate);
+    });
+
+    const tvItems = sortTVShowsByLatestAired(tvShows).map(show => ({
+        show: show,
+        episode: getNextUnwatchedEpisode(show)
+    }));
+
+    const movieItems = [...movies].sort((a, b) => {
+        const dateA = a.releaseDate ? new Date(a.releaseDate).getTime() : 0;
+        const dateB = b.releaseDate ? new Date(b.releaseDate).getTime() : 0;
+        return dateB - dateA;
+    });
+
+    return { tvItems: tvItems, movieItems: movieItems };
+}
+
+function continuePlaceholderIcon(type) {
+    return type === 'movie'
+        ? `<svg class="icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M2 7l4-4h3l-4 4H2z"/><path d="M11 7l4-4h3l-4 4h-3z"/><line x1="2" y1="12" x2="22" y2="12"/></svg>`
+        : `<svg class="icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="M17 2l-5 5-5-5"/></svg>`;
+}
+
+// Builds one swipeable "up next" card. TV cards use the episode's own still
+// (its preview image) as the banner with the show's poster badged over the
+// bottom-left corner; movie cards fall back to the movie's backdrop/poster.
+function createContinueCard(type, item, episode) {
+    const hasPoster = item.poster && item.poster.trim() !== "";
+    const posterHTML = hasPoster
+        ? `<img src="${item.poster}" class="continue-poster" alt="${escapeHTML(item.title)}" loading="lazy" onerror="this.style.display='none'">`
+        : `<div class="continue-poster" style="display:flex; align-items:center; justify-content:center; text-align:center; font-size:10px; color:var(--text-muted); padding:5px;">${continuePlaceholderIcon(type)}</div>`;
+
+    // The meta line and description surface the *episode's* own info for TV
+    // (season/episode + its synopsis) rather than the show's general blurb,
+    // so this row tells you exactly what you're about to watch next.
+    const metaHTML = type === 'tv'
+        ? `<span>S${episode.season}</span><span>•</span><span>E${episode.number}</span>`
+        : `<span>${escapeHTML(item.year || 'N/A')}</span><span>•</span><span>Movie</span>`;
+
+    const episodeNameHTML = type === 'tv'
+        ? `<div class="continue-episode-name">${escapeHTML(episode.title)}</div>`
+        : '';
+
+    const overviewText = type === 'tv'
+        ? (episode.overview || item.description || 'No description available.')
+        : (item.description || 'No description available.');
+
+    const epId = type === 'tv' ? episode.id : '';
+
+    return `
+        <div class="continue-card-wrap">
+            <div class="continue-card-bg">
+                <span>Mark Watched</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="continue-card" data-type="${type}" data-item-id="${item.id}" data-ep-id="${epId}">
+                ${posterHTML}
+                <div class="continue-body">
+                    <div class="continue-title">${escapeHTML(item.title)}</div>
+                    <div class="continue-meta-line">${metaHTML}</div>
+                    ${episodeNameHTML}
+                    <div class="continue-overview">${escapeHTML(overviewText)}</div>
+                </div>
+                <button class="continue-check-btn" onclick="event.stopPropagation(); markContinueItemWatched('${type}', '${item.id}', '${epId}')" aria-label="Mark watched" title="Mark watched">
+                    <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function renderContinueWatching(containerId = "continueWatchingList") {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const data = getContinueWatchingItems();
+    const tvItems = data.tvItems;
+    const movieItems = data.movieItems;
+
+    if (tvItems.length === 0 && movieItems.length === 0) {
+        container.innerHTML = emptyState(
+            "You're All Caught Up",
+            "New episodes and unwatched movies from your library will show up here.",
+            { label: "Browse Discover", onclick: "showPage('discover', null, true)" }
+        );
+        return;
+    }
+
+    let html = "";
+
+    if (tvItems.length > 0) {
+        html += `
+            <div class="continue-group">
+                <div class="continue-group-title"><span>TV Shows</span></div>
+                ${tvItems.map(entry => createContinueCard('tv', entry.show, entry.episode)).join("")}
+            </div>
+        `;
+    }
+
+    if (movieItems.length > 0) {
+        html += `
+            <div class="continue-group">
+                <div class="continue-group-title"><span>Movies</span></div>
+                ${movieItems.map(movie => createContinueCard('movie', movie, null)).join("")}
+            </div>
+        `;
+    }
+
+    container.innerHTML = html;
+    initContinueCardSwipe(container);
+}
+
+// Pointer-based swipe-to-dismiss: dragging a card left or right past the
+// threshold marks that episode/movie as watched and lets it fly off; a
+// short drag springs back. A vertical drag (scrolling) is left alone.
+function initContinueCardSwipe(container) {
+    const threshold = 90;
+
+    container.querySelectorAll(".continue-card").forEach(card => {
+        let startX = 0, startY = 0, deltaX = 0, dragging = false, axisLocked = null, pointerId = null;
+
+        function setBgOpacity(value) {
+            const bg = card.parentElement.querySelector(".continue-card-bg");
+            if (bg) bg.style.opacity = String(value);
+        }
+
+        function springBack() {
+            card.style.transition = "transform 0.25s cubic-bezier(0.25,1,0.5,1), opacity 0.25s ease";
+            card.style.transform = "translateX(0)";
+            card.style.opacity = "1";
+            setBgOpacity(0);
+            card.classList.remove("dragging");
+        }
+
+        card.addEventListener("pointerdown", (e) => {
+            if (e.pointerType === "mouse" && e.button !== 0) return;
+            dragging = true;
+            axisLocked = null;
+            pointerId = e.pointerId;
+            startX = e.clientX;
+            startY = e.clientY;
+            deltaX = 0;
+            card.style.transition = "";
+        });
+
+        card.addEventListener("pointermove", (e) => {
+            if (!dragging || e.pointerId !== pointerId) return;
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+
+            if (axisLocked === null) {
+                if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+                axisLocked = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+                if (axisLocked === "x") {
+                    card.setPointerCapture(pointerId);
+                    card.classList.add("dragging");
+                }
+            }
+            if (axisLocked !== "x") return;
+
+            deltaX = dx;
+            card.style.transform = `translateX(${deltaX}px)`;
+            const progress = Math.min(Math.abs(deltaX) / threshold, 1);
+            card.style.opacity = String(1 - progress * 0.35);
+            setBgOpacity(progress);
+        });
+
+        function finishDrag() {
+            if (!dragging) return;
+            dragging = false;
+
+            if (axisLocked !== "x") {
+                axisLocked = null;
+                return;
+            }
+
+            if (Math.abs(deltaX) > threshold) {
+                const dir = deltaX < 0 ? -1 : 1;
+                card.style.transition = "transform 0.25s ease, opacity 0.25s ease";
+                card.style.transform = `translateX(${dir * 500}px)`;
+                card.style.opacity = "0";
+
+                const type = card.dataset.type;
+                const itemId = card.dataset.itemId;
+                const epId = card.dataset.epId;
+                setTimeout(() => {
+                    markContinueItemWatched(type, itemId, epId);
+                }, 240);
+            } else {
+                springBack();
+            }
+            axisLocked = null;
+        }
+
+        card.addEventListener("pointerup", finishDrag);
+        card.addEventListener("pointercancel", finishDrag);
+
+        card.addEventListener("click", (e) => {
+            if (Math.abs(deltaX) > 6) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+            openDetails(card.dataset.itemId);
+        });
+    });
+}
+
+async function markContinueItemWatched(type, itemId, epId) {
+    const item = getItem(itemId);
+    if (!item) return;
+
+    if (type === 'movie') {
+        item.watched = true;
+        item.lastWatchedAt = new Date().toISOString();
+    } else if (item.episodes) {
+        const ep = item.episodes.find(e => e.id === epId);
+        if (ep) ep.watched = true;
+    }
+
+    await saveItem(item);
+    refreshActivePage();
 }
 
 function renderGrid(containerId, items, emptyText) {
