@@ -1842,32 +1842,62 @@ img {
     left: 50%;
     bottom: 118px;
     z-index: 500;
-    transform: translateX(-50%) translateY(20px);
+    transform: translateX(-50%) translateY(14px) scale(0.92);
     opacity: 0;
     pointer-events: none;
-    padding: 12px 12px 12px 20px;
+    padding: 13px 22px;
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.94);
     backdrop-filter: blur(40px) saturate(200%);
     -webkit-backdrop-filter: blur(40px) saturate(200%);
     border: 1px solid var(--glass-border);
     color: var(--text);
-    font-size: 13px;
+    font-size: 13.5px;
     font-weight: 700;
-    transition: 0.25s cubic-bezier(0.25, 1, 0.5, 1);
-    max-width: 90vw;
+    letter-spacing: -0.1px;
+    line-height: 1.35;
+    transition: opacity 0.3s cubic-bezier(0.25, 1, 0.5, 1), transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    max-width: 86vw;
     display: flex;
     align-items: center;
+    justify-content: flex-start;
+    text-align: left;
     gap: 10px;
     white-space: normal;
     word-break: break-word;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18), 0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    box-shadow: 0 20px 44px rgba(0, 0, 0, 0.18), 0 6px 16px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 
 .toast.show {
     opacity: 1;
     pointer-events: auto;
-    transform: translateX(-50%) translateY(0);
+    transform: translateX(-50%) translateY(0) scale(1);
+}
+
+.toast-icon {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.toast-icon svg {
+    width: 12px;
+    height: 12px;
+}
+
+.toast-icon.success {
+    background: linear-gradient(135deg, #34d472, #1fa851);
+    box-shadow: 0 3px 8px rgba(31, 168, 81, 0.4);
+}
+
+.toast-icon.error {
+    background: linear-gradient(135deg, #ff6961, #ff3b30);
+    box-shadow: 0 3px 8px rgba(255, 59, 48, 0.4);
 }
 
 #toastMessage {
@@ -1950,7 +1980,7 @@ img {
         <div class="auth-footer-row">
             <button class="auth-forgot-link" onclick="handleForgotPassword()">Forgot password?</button>
             <span class="auth-footer-sep">|</span>
-            <a href="https://www.novyra.co.za/novawatch/privacy.html" target="_blank" rel="noopener" class="auth-forgot-link">Privacy Notice</a>
+            <a href="https://www.novyra.co.za/tv/privacy.html" target="_blank" rel="noopener" class="auth-forgot-link">Privacy Notice</a>
         </div>
     </div>
 </div>
@@ -2207,6 +2237,7 @@ img {
 </div>
 
 <div id="toast" class="toast">
+    <div id="toastIcon" class="toast-icon" style="display: none;"></div>
     <span id="toastMessage"></span>
 </div>
 
@@ -2251,7 +2282,7 @@ try {
    APP STATE & CONFIG
 ========================================================= */
 const TMDB_API_KEY = "c8dc4239290060d91afd45c40d8182b7";
-const NOVAWATCH_APP_URL = "https://www.novyra.co.za/novawatch/";
+const NOVAWATCH_APP_URL = "https://www.novyra.co.za/tv/";
 
 // Remembers which top-level tab (Home / Discover / Library) the user was
 // last on, so reloading the app doesn't always dump them back on Home.
@@ -2326,23 +2357,23 @@ function checkNotificationPermissionState() {
 
 async function requestNotificationPermission() {
     if (!("Notification" in window)) {
-        showToast("Notifications not supported on this browser/device.");
+        showToast("Notifications not supported on this browser/device.", "error");
         return;
     }
     try {
         const permission = await Notification.requestPermission();
         checkNotificationPermissionState();
         if (permission === "granted") {
-            showToast("Notifications enabled successfully!");
+            showToast("Notifications enabled successfully!", "success");
             sendAppNotification("NovaWatch Notifications Active", {
                 body: "You will now receive alerts for upcoming releases and new episodes!"
             });
         } else {
-            showToast("Notification permission denied.");
+            showToast("Notification permission denied.", "error");
         }
     } catch (err) {
         console.error("Error requesting notification permission:", err);
-        showToast("Could not enable notifications.");
+        showToast("Could not enable notifications.", "error");
     }
 }
 
@@ -2379,10 +2410,26 @@ function escapeHTML(str) {
         .replace(/'/g, "&#039;");
 }
 
-function showToast(message) {
+function showToast(message, type = null) {
     const toast = document.getElementById("toast");
     if (!toast) return;
     document.getElementById("toastMessage").textContent = message;
+
+    const icon = document.getElementById("toastIcon");
+    if (icon) {
+        if (type === "success") {
+            icon.style.display = "flex";
+            icon.className = "toast-icon success";
+            icon.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+        } else if (type === "error") {
+            icon.style.display = "flex";
+            icon.className = "toast-icon error";
+            icon.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+        } else {
+            icon.style.display = "none";
+            icon.innerHTML = "";
+        }
+    }
 
     toast.classList.add("show");
     clearTimeout(toastTimer);
@@ -2649,17 +2696,17 @@ async function saveUserProfile() {
 
 async function handleGoogleSignIn() {
     if (!auth) {
-        showToast("Cloud sync not configured yet.");
+        showToast("Cloud sync not configured yet.", "error");
         return;
     }
 
     try {
         const provider = new firebase.auth.GoogleAuthProvider();
         await auth.signInWithPopup(provider);
-        showToast("Signed in with Google!");
+        showToast("Signed in with Google!", "success");
     } catch (err) {
         console.error("Google Sign-In Error:", err);
-        showToast(err.message || "Failed to sign in with Google.");
+        showToast(err.message || "Failed to sign in with Google.", "error");
     }
 }
 
@@ -2694,19 +2741,19 @@ async function handleSignIn() {
     const password = document.getElementById("authPassword").value;
 
     if (!auth) {
-        showToast("Cloud sync not configured yet.");
+        showToast("Cloud sync not configured yet.", "error");
         return;
     }
 
     clearPasswordError();
 
     if (!email) {
-        showToast("Please enter your email address.");
+        showToast("Please enter your email address.", "error");
         return;
     }
 
     if (!password) {
-        showToast("Please enter your password.");
+        showToast("Please enter your password.", "error");
         return;
     }
 
@@ -2718,22 +2765,22 @@ async function handleSignIn() {
 
     try {
         await auth.signInWithEmailAndPassword(email, password);
-        showToast("Welcome back!");
+        showToast("Welcome back!", "success");
     } catch (err) {
         console.error("Sign-In Error:", err);
 
         if (err.code === "auth/wrong-password" || err.code === "auth/invalid-credential") {
             showPasswordError("Incorrect password. Please try again.");
         } else if (err.code === "auth/user-not-found") {
-            showToast("No account found with that email address.");
+            showToast("No account found with that email address.", "error");
         } else if (err.code === "auth/invalid-email") {
-            showToast("Please enter a valid email address.");
+            showToast("Please enter a valid email address.", "error");
         } else if (err.code === "auth/too-many-requests") {
-            showToast("Too many attempts. Please try again later.");
+            showToast("Too many attempts. Please try again later.", "error");
         } else if (err.code === "auth/user-disabled") {
-            showToast("This account has been disabled.");
+            showToast("This account has been disabled.", "error");
         } else {
-            showToast(err.message || "Unable to sign in.");
+            showToast(err.message || "Unable to sign in.", "error");
         }
     } finally {
         if (signInBtn) {
@@ -2756,7 +2803,7 @@ function showPasswordError(message) {
 
 async function handleForgotPassword() {
     if (!auth) {
-        showToast("Cloud sync not configured yet.");
+        showToast("Cloud sync not configured yet.", "error");
         return;
     }
 
@@ -2772,19 +2819,19 @@ async function handleForgotPassword() {
 
     try {
         await auth.sendPasswordResetEmail(email);
-        showToast(`Password reset email sent to ${email}.`);
+        showToast(`Password reset email sent to ${email}.`, "success");
     } catch (err) {
         console.error("Password Reset Error:", err);
 
         if (err.code === "auth/user-not-found") {
             // Deliberately vague to avoid confirming which emails have accounts.
-            showToast("If that email has an account, a reset link has been sent.");
+            showToast("If that email has an account, a reset link has been sent.", "success");
         } else if (err.code === "auth/invalid-email") {
-            showToast("Please enter a valid email address.");
+            showToast("Please enter a valid email address.", "error");
         } else if (err.code === "auth/too-many-requests") {
-            showToast("Too many attempts. Please try again later.");
+            showToast("Too many attempts. Please try again later.", "error");
         } else {
-            showToast(err.message || "Couldn't send reset email right now.");
+            showToast(err.message || "Couldn't send reset email right now.", "error");
         }
     }
 }
@@ -2795,7 +2842,7 @@ async function handleSignUp() {
     const password = document.getElementById("authPassword").value;
 
     if (!auth) {
-        showToast("Cloud sync not configured yet.");
+        showToast("Cloud sync not configured yet.", "error");
         return;
     }
 
@@ -2803,18 +2850,18 @@ async function handleSignUp() {
 
     // Username validation
     if (!username) {
-        showToast("Please enter a username to register.");
+        showToast("Please enter a username to register.", "error");
         return;
     }
 
     if (!email) {
-        showToast("Please enter your email address.");
+        showToast("Please enter your email address.", "error");
         return;
     }
 
     // Password validation
     if (!password) {
-        showToast("Please enter a password.");
+        showToast("Please enter a password.", "error");
         return;
     }
 
@@ -2853,7 +2900,7 @@ async function handleSignUp() {
 
         await saveUserProfile();
 
-        showToast("Account created & logged in!");
+        showToast("Account created & logged in!", "success");
 
     } catch (err) {
         console.error("Registration Error:", err);
@@ -2861,11 +2908,11 @@ async function handleSignUp() {
         if (err.code === "auth/weak-password") {
             showPasswordError("Password is too short. It must be at least 6 characters.");
         } else if (err.code === "auth/email-already-in-use") {
-            showToast("This email address is already registered.");
+            showToast("This email address is already registered.", "error");
         } else if (err.code === "auth/invalid-email") {
-            showToast("Please enter a valid email address.");
+            showToast("Please enter a valid email address.", "error");
         } else {
-            showToast(err.message || "Unable to create your account.");
+            showToast(err.message || "Unable to create your account.", "error");
         }
     } finally {
         if (signUpBtn) {
@@ -2881,9 +2928,9 @@ async function handleSignOut() {
         await auth.signOut();
         state.library = [];
         refreshActivePage();
-        showToast("Signed out successfully.");
+        showToast("Signed out successfully.", "success");
     } catch (err) {
-        showToast(err.message);
+        showToast(err.message, "error");
     }
 }
 
@@ -3414,7 +3461,7 @@ if (auth) {
                 // If this session was opened via a shared show/movie link,
                 // jump straight to it instead of the generic welcome toast.
                 if (!openSharedItemFromURL()) {
-                    showToast("Welcome back!");
+                    showToast("Welcome back!", "success");
                 }
 
                 // Trigger Background Updates & Notifications
@@ -3444,7 +3491,7 @@ if (auth) {
                     });
             } catch (err) {
                 console.error("Error fetching cloud data:", err);
-                showToast("Library sync failed.");
+                showToast("Library sync failed.", "error");
                 refreshActivePage();
             }
         } else {
@@ -3713,13 +3760,13 @@ async function openSearchResultDetails(tmdbId, type) {
 
     } catch (err) {
         console.error("Error opening preview details:", err);
-        showToast("Unable to load details.");
+        showToast("Unable to load details.", "error");
     }
 }
 
 async function importMediaData(id, type, buttonElement) {
     if (!auth || !auth.currentUser) {
-        showToast("Please sign in to add items to your library.");
+        showToast("Please sign in to add items to your library.", "error");
         return;
     }
 
@@ -3848,7 +3895,7 @@ async function importMediaData(id, type, buttonElement) {
         }
     } catch (error) {
         console.error("Error adding media:", error);
-        showToast("Failed to add item.");
+        showToast("Failed to add item.", "error");
         if (buttonElement) {
             buttonElement.disabled = false;
             buttonElement.textContent = "Add to Library";
@@ -4700,11 +4747,11 @@ async function playTrailer(tmdbId, type) {
         if (trailer) {
             window.open(`https://www.youtube.com/watch?v=${trailer.key}`, '_blank');
         } else {
-            showToast("No official trailer found.");
+            showToast("No official trailer found.", "error");
         }
     } catch (err) {
         console.error("Error playing trailer:", err);
-        showToast("Could not load trailer.");
+        showToast("Could not load trailer.", "error");
     }
 }
 
@@ -4778,15 +4825,15 @@ async function shareCurrentItem() {
     if (navigator.clipboard) {
         try {
             await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
-            showToast("Link copied to clipboard!");
+            showToast("Link copied to clipboard!", "success");
         } catch (err) {
             console.error("Clipboard write failed:", err);
-            showToast("Unable to share.");
+            showToast("Unable to share.", "error");
         }
         return;
     }
 
-    showToast("Sharing isn't supported on this device.");
+    showToast("Sharing isn't supported on this device.", "error");
 }
 
 function openDetails(itemId) {
@@ -4829,7 +4876,7 @@ async function refreshOpenItemFromTMDB(item) {
         // Quiet, honest heads-up rather than silently showing possibly-stale
         // info with no explanation - only shown for this direct, user-facing
         // refresh, never for the silent background sync loop.
-        showToast("Couldn't reach TMDB - showing saved info.");
+        showToast("Couldn't reach TMDB - showing saved info.", "error");
     }
 }
 
@@ -5089,7 +5136,7 @@ function handleSeasonClick(event, seasonNumber) {
 async function toggleEntireSeasonWatched(seasonNumber) {
     if (!currentItem || !currentItem.episodes) return;
     if (!isCurrentItemInLibrary()) {
-        showToast("Add this to your library first.");
+        showToast("Add this to your library first.", "error");
         return;
     }
 
@@ -5098,7 +5145,7 @@ async function toggleEntireSeasonWatched(seasonNumber) {
 
     const releasedEps = seasonEps.filter(ep => isReleased(ep.releaseDate));
     if (releasedEps.length === 0) {
-        showToast("No released episodes in this season yet.");
+        showToast("No released episodes in this season yet.", "error");
         return;
     }
 
@@ -5108,7 +5155,7 @@ async function toggleEntireSeasonWatched(seasonNumber) {
         ep.watched = anyUnwatched;
     });
 
-    showToast(`Season ${seasonNumber} marked as ${anyUnwatched ? 'Watched' : 'Unwatched'}`);
+    showToast(`Season ${seasonNumber} marked as ${anyUnwatched ? 'Watched' : 'Unwatched'}`, "success");
     await saveItem(currentItem);
     updateModalContent();
     refreshActivePage();
@@ -5175,11 +5222,11 @@ function closeEpisodeModalOutside(event) {
 async function toggleCurrentEpisodeWatched() {
     if (!currentItem || !currentEpisode) return;
     if (!isCurrentItemInLibrary()) {
-        showToast("Add this to your library first.");
+        showToast("Add this to your library first.", "error");
         return;
     }
     if (!currentEpisode.watched && !isReleased(currentEpisode.releaseDate)) {
-        showToast("This episode hasn't been released yet.");
+        showToast("This episode hasn't been released yet.", "error");
         return;
     }
     currentEpisode.watched = !currentEpisode.watched;
@@ -5195,7 +5242,7 @@ async function toggleCurrentEpisodeWatched() {
 async function markWatchedUpToCurrentEpisode() {
     if (!currentItem || !currentEpisode || !currentItem.episodes) return;
     if (!isCurrentItemInLibrary()) {
-        showToast("Add this to your library first.");
+        showToast("Add this to your library first.", "error");
         return;
     }
 
@@ -5212,7 +5259,7 @@ async function markWatchedUpToCurrentEpisode() {
     if (count === 0) return;
 
     await saveItem(currentItem);
-    showToast(`Marked ${count} episode${count === 1 ? '' : 's'} as watched.`);
+    showToast(`Marked ${count} episode${count === 1 ? '' : 's'} as watched.`, "success");
     closeEpisodeModal();
     updateModalContent();
     refreshActivePage();
@@ -5231,11 +5278,11 @@ function isCurrentItemInLibrary() {
 async function toggleMovieWatched(id) {
     if (!currentItem || currentItem.type !== 'movie') return;
     if (!isCurrentItemInLibrary()) {
-        showToast("Add this to your library first.");
+        showToast("Add this to your library first.", "error");
         return;
     }
     if (!currentItem.watched && !isReleased(currentItem.releaseDate)) {
-        showToast("This movie hasn't been released yet.");
+        showToast("This movie hasn't been released yet.", "error");
         return;
     }
     currentItem.watched = !currentItem.watched;
@@ -5248,7 +5295,7 @@ async function toggleMovieWatched(id) {
 async function markNextEpisodeWatched(id) {
     if (!currentItem || currentItem.type === 'movie') return;
     if (!isCurrentItemInLibrary()) {
-        showToast("Add this to your library first.");
+        showToast("Add this to your library first.", "error");
         return;
     }
     const nextEp = getNextUnwatchedEpisode(currentItem);
@@ -5263,7 +5310,7 @@ async function markNextEpisodeWatched(id) {
 async function toggleStopWatching(id) {
     if (!currentItem) return;
     if (!isCurrentItemInLibrary()) {
-        showToast("Add this to your library first.");
+        showToast("Add this to your library first.", "error");
         return;
     }
     currentItem.isStopped = !currentItem.isStopped;
