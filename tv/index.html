@@ -3385,6 +3385,49 @@ async function loadWatchAvailability(item) {
     }
 }
 
+// Defensive cleanup for a data-integrity issue where a "preview" item
+// (opened via search or a shared link, before ever being added) ended up
+// persisted as its own Firestore document alongside the real entry once
+// the show was actually added. These show up as duplicate, sparser-looking
+// entries - e.g. a second copy in Upcoming - since they share the same
+// tmdbId as the real item but a different doc id ("preview-tv-123" vs
+// "tv-some-show"). This strips any that slipped through, de-dupes by
+// tmdbId+type as a second safety net, and permanently deletes the
+// leftovers from Firestore so they don't keep coming back on future loads.
+function dedupeAndCleanLibrary(rawLibrary, uid) {
+    const seen = new Set();
+    const cleaned = [];
+    const staleIds = [];
+
+    rawLibrary.forEach(item => {
+        if (!item || !item.id) return;
+
+        if (item.isPreview || item.id.startsWith('preview-')) {
+            staleIds.push(item.id);
+            return;
+        }
+
+        const key = `${item.type}-${item.tmdbId}`;
+        if (item.tmdbId && seen.has(key)) {
+            staleIds.push(item.id);
+            return;
+        }
+
+        if (item.tmdbId) seen.add(key);
+        cleaned.push(item);
+    });
+
+    if (staleIds.length > 0 && uid && db) {
+        const batch = db.batch();
+        staleIds.forEach(id => {
+            batch.delete(db.collection("users").doc(uid).collection("library").doc(id));
+        });
+        batch.commit().catch(err => console.error("Failed to clean up stale library entries:", err));
+    }
+
+    return cleaned;
+}
+
 if (auth) {
     auth.onAuthStateChanged(async (user) => {
         currentUser = user;
@@ -3462,7 +3505,7 @@ if (auth) {
                         console.error("Cache fetch also failed:", cacheErr);
                     }
                 }
-                state.library = cloudLibrary;
+                state.library = dedupeAndCleanLibrary(cloudLibrary, user.uid);
                
                 if (!state.profiles || state.profiles.length === 0) {
                     state.profiles = [{ id: "profile-main", name: displayName, initials: initial }];
@@ -3489,6 +3532,12 @@ if (auth) {
 
                         snapshot.docChanges().forEach((change) => {
                             const itemData = change.doc.data();
+                            if (!itemData || !itemData.id) return;
+
+                            // Never let a stray "preview" doc back into the
+                            // live library - see dedupeAndCleanLibrary above.
+                            if (itemData.isPreview || itemData.id.startsWith('preview-')) return;
+
                             const index = updatedLibrary.findIndex(i => i.id === itemData.id);
 
                             if (change.type === "added" || change.type === "modified") {
