@@ -3417,12 +3417,27 @@ function dedupeAndCleanLibrary(rawLibrary, uid) {
         cleaned.push(item);
     });
 
-    if (staleIds.length > 0 && uid && db) {
-        const batch = db.batch();
-        staleIds.forEach(id => {
-            batch.delete(db.collection("users").doc(uid).collection("library").doc(id));
-        });
-        batch.commit().catch(err => console.error("Failed to clean up stale library entries:", err));
+    // The Firestore cleanup below is a nice-to-have side effect, never part
+    // of the critical path - anything that goes wrong here (a malformed
+    // legacy doc id Firestore's .doc() rejects, a permission error, etc.)
+    // must never stop the library itself from loading, so it's fully
+    // isolated in its own try/catch rather than letting an exception
+    // escape into the caller.
+    try {
+        // .doc() throws synchronously for ids that aren't valid single path
+        // segments (empty, containing "/", etc.) - skip anything that could
+        // trip that rather than letting one bad legacy id abort the batch.
+        const deletableIds = staleIds.filter(id => typeof id === 'string' && id.length > 0 && !id.includes('/'));
+
+        if (deletableIds.length > 0 && uid && db) {
+            const batch = db.batch();
+            deletableIds.forEach(id => {
+                batch.delete(db.collection("users").doc(uid).collection("library").doc(id));
+            });
+            batch.commit().catch(err => console.error("Failed to clean up stale library entries:", err));
+        }
+    } catch (err) {
+        console.error("Skipped stale library cleanup due to an error:", err);
     }
 
     return cleaned;
@@ -3505,7 +3520,13 @@ if (auth) {
                         console.error("Cache fetch also failed:", cacheErr);
                     }
                 }
-                state.library = dedupeAndCleanLibrary(cloudLibrary, user.uid);
+                let dedupedLibrary = cloudLibrary;
+                try {
+                    dedupedLibrary = dedupeAndCleanLibrary(cloudLibrary, user.uid);
+                } catch (dedupeErr) {
+                    console.error("Library dedupe/cleanup failed, using library as-is:", dedupeErr);
+                }
+                state.library = dedupedLibrary;
                
                 if (!state.profiles || state.profiles.length === 0) {
                     state.profiles = [{ id: "profile-main", name: displayName, initials: initial }];
