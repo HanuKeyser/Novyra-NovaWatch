@@ -352,34 +352,6 @@ img {
     transform: scale(0.96);
 }
 
-.card-remove-btn {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    z-index: 3;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.55);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.15s ease, background 0.2s ease;
-}
-
-.card-remove-btn svg {
-    width: 12px;
-    height: 12px;
-}
-
-.card-remove-btn:active {
-    transform: scale(0.85);
-    background: rgba(255, 59, 48, 0.85);
-}
-
 .poster {
     position: relative;
     width: 126px;
@@ -4566,9 +4538,6 @@ function createCard(item) {
                 `}
                 ${isNew ? `<div class="new-episode-badge">NEW</div>` : ''}
                 ${progressBarHTML}
-                <button class="card-remove-btn" onclick="quickRemoveLibraryItem('${item.id}', event)" aria-label="Remove from library" title="Remove from library">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
-                </button>
             </div>
             <div class="card-title">${escapeHTML(item.title)}</div>
         </div>
@@ -5515,26 +5484,6 @@ async function removeCurrentItem() {
 // grid, without needing to open its details modal first - a guaranteed
 // path to clear anything out (including any oddly-shaped leftover entry
 // automatic cleanup didn't confidently catch), not just a fallback.
-async function quickRemoveLibraryItem(itemId, event) {
-    if (event) event.stopPropagation();
-
-    const removedIndex = state.library.findIndex(i => i.id === itemId);
-    if (removedIndex === -1) return;
-
-    const removedItem = state.library[removedIndex];
-
-    state.library.splice(removedIndex, 1);
-    refreshActivePage();
-
-    if (auth && auth.currentUser) {
-        try {
-            await db.collection("users").doc(auth.currentUser.uid).collection("library").doc(removedItem.id).delete();
-        } catch (err) {
-            console.error("Failed to delete item:", err);
-        }
-    }
-}
-
 function clearPasswordError() {
     const passwordInput = document.getElementById("authPassword");
     const passwordError = document.getElementById("authPasswordError");
