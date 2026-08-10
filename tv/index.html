@@ -110,15 +110,17 @@
    it only ever reaches for the variables re-defined here.
 ========================================================= */
 :root[data-theme="dark"] {
-    --bg-mesh: linear-gradient(135deg, #0a0f1a 0%, #111827 50%, #0b1526 100%);
-    --surface: rgba(30, 41, 59, 0.6);
-    --surface-2: rgba(30, 41, 59, 0.42);
-    --surface-3: rgba(30, 41, 59, 0.28);
+    /* Neutral near-black charcoal instead of a navy/slate tint, so the
+       "dark theme" reads as genuinely dark rather than dark blue. */
+    --bg-mesh: linear-gradient(135deg, #08090b 0%, #101113 50%, #0a0b0d 100%);
+    --surface: rgba(32, 32, 36, 0.62);
+    --surface-2: rgba(32, 32, 36, 0.44);
+    --surface-3: rgba(32, 32, 36, 0.3);
 
     --glass-border: rgba(255, 255, 255, 0.14);
     --glass-border-subtle: rgba(255, 255, 255, 0.08);
-    --glass-shadow: 0 22px 46px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    --glass-shadow-sm: 0 10px 28px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    --glass-shadow: 0 22px 46px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    --glass-shadow-sm: 0 10px 28px rgba(0, 0, 0, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 
     --blue: #3b93ff;
     --blue-light: #6bb3ff;
@@ -133,10 +135,10 @@
     --success: #32d74b;
     --danger: #ff453a;
 
-    --frost-strong: rgba(35, 46, 66, 0.8);
-    --modal-surface-rgb: 15, 21, 33;
+    --frost-strong: rgba(38, 38, 43, 0.82);
+    --modal-surface-rgb: 16, 16, 18;
 
-    background: #0a0f1a;
+    background: #08090b;
     color-scheme: dark;
 }
 
@@ -220,6 +222,24 @@ img {
 
 .page.active {
     display: block;
+    animation: pageFadeIn 0.32s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+@keyframes pageFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .page.active {
+        animation: none;
+    }
 }
 
 .tab-content-wrapper {
@@ -821,6 +841,13 @@ img {
     animation: spin 0.8s linear infinite;
 }
 
+[data-theme="dark"] .spinner {
+    /* The light track color above is invisible against a dark card, so
+       swap it for a translucent white track in dark mode. */
+    border-color: rgba(255, 255, 255, 0.12);
+    border-top-color: var(--blue);
+}
+
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
@@ -1007,9 +1034,9 @@ img {
 }
 
 [data-theme="dark"] .continue-card {
-    background: rgba(42, 55, 78, 0.74);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    box-shadow: 0 16px 38px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    background: rgba(36, 36, 40, 0.76);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 16px 38px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .continue-card.dragging {
@@ -1610,9 +1637,9 @@ img {
 }
 
 [data-theme="dark"] .hero-card {
-    background: linear-gradient(135deg, rgba(30,41,59,0.88) 0%, rgba(13,22,38,0.78) 100%);
-    border: 1px solid rgba(59, 147, 255, 0.28);
-    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    background: linear-gradient(135deg, rgba(34,34,38,0.9) 0%, rgba(14,14,16,0.8) 100%);
+    border: 1px solid rgba(59, 147, 255, 0.24);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .hero-top {
@@ -1630,7 +1657,8 @@ img {
 
 .hero-actions {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-end;
     gap: 8px;
     flex-shrink: 0;
 }
@@ -1901,6 +1929,29 @@ img {
     padding: 20px;
 }
 
+.auth-theme-btn {
+    position: absolute;
+    top: max(20px, env(safe-area-inset-top));
+    right: 20px;
+    z-index: 1;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    color: var(--text-secondary);
+    box-shadow: var(--glass-shadow-sm);
+    transition: transform 0.15s ease;
+}
+
+.auth-theme-btn:active {
+    transform: scale(0.92);
+}
+
 /* Blur backdrop overlay */
 #authScreen::before {
     content: '';
@@ -2032,7 +2083,7 @@ img {
 
 .auth-error {
     display: none;
-    color: #ff3b30;
+    color: var(--danger);
     font-size: 12px;
     font-weight: 600;
     margin-top: 6px;
@@ -2044,7 +2095,7 @@ img {
 }
 
 .auth-input.input-error {
-    border: 1px solid #ff3b30 !important;
+    border: 1px solid var(--danger) !important;
     box-shadow: 0 0 0 2px rgba(255, 59, 48, 0.12);
 }
 </style>
@@ -2054,6 +2105,10 @@ img {
 
 <!-- DEDICATED AUTH OVERLAY -->
 <div id="authScreen">
+    <button class="auth-theme-btn" id="authThemeToggleBtn" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode">
+        <svg id="authThemeIconSun" class="icon icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        <svg id="authThemeIconMoon" class="icon icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
     <div class="auth-overlay-card">
         <img src="https://www.novyra.co.za/NovaWatch_Logo.png" alt="NovaWatch Logo" class="auth-logo">
         <h1 class="auth-title">Welcome to NovaWatch</h1>
@@ -2437,7 +2492,7 @@ function getLastTab() {
 ========================================================= */
 const THEME_KEY = "novawatch_theme";
 const THEME_COLOR_LIGHT = "#f1f5f9";
-const THEME_COLOR_DARK = "#0a0f1a";
+const THEME_COLOR_DARK = "#08090b";
 
 function getCurrentTheme() {
     return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
@@ -2447,12 +2502,18 @@ function getCurrentTheme() {
 // on its own: the sun/moon icon swap, the PWA status-bar meta color, and
 // the manifest theme_color equivalent for elements outside the stylesheet.
 function syncThemeUI(theme) {
-    const sunIcon = document.getElementById("themeIconSun");
-    const moonIcon = document.getElementById("themeIconMoon");
-    if (sunIcon && moonIcon) {
-        sunIcon.style.display = theme === "dark" ? "none" : "";
-        moonIcon.style.display = theme === "dark" ? "" : "none";
-    }
+    const iconPairs = [
+        ["themeIconSun", "themeIconMoon"],
+        ["authThemeIconSun", "authThemeIconMoon"]
+    ];
+    iconPairs.forEach(([sunId, moonId]) => {
+        const sunIcon = document.getElementById(sunId);
+        const moonIcon = document.getElementById(moonId);
+        if (sunIcon && moonIcon) {
+            sunIcon.style.display = theme === "dark" ? "none" : "";
+            moonIcon.style.display = theme === "dark" ? "" : "none";
+        }
+    });
 
     const meta = document.getElementById("themeColorMeta");
     if (meta) {
