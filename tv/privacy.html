@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#f1f5f9" id="themeColorMeta">
+<meta name="theme-color" content="#c6cacf" id="themeColorMeta">
 <title>Privacy Notice | NovaWatch</title>
 <link rel="icon" type="image/png" href="https://www.novyra.co.za/NovaWatch_Logo.png">
 
@@ -35,7 +35,7 @@
 }
 
 :root {
-    --bg-mesh: linear-gradient(135deg, #e2e8f0 0%, #f8fafc 50%, #eff6ff 100%);
+    --bg-mesh: linear-gradient(135deg, #c6cacf 0%, #dadde1 50%, #c9cdd3 100%);
     --surface: rgba(255, 255, 255, 0.64);
     --surface-2: rgba(255, 255, 255, 0.42);
     --glass-border: rgba(255, 255, 255, 0.7);
@@ -70,7 +70,7 @@
 }
 
 html {
-    background: #e2e8f0;
+    background: #c6cacf;
     color-scheme: light;
 }
 
@@ -154,16 +154,18 @@ body {
 .theme-toggle-btn {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    width: 36px;
+    gap: 6px;
     height: 36px;
-    border-radius: 50%;
+    padding: 0 14px;
+    border-radius: 999px;
     background: var(--surface);
     backdrop-filter: blur(30px);
     -webkit-backdrop-filter: blur(30px);
     border: 1px solid var(--glass-border);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
     color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 700;
     flex-shrink: 0;
     transition: transform 0.15s ease;
 }
@@ -263,6 +265,7 @@ a:hover {
             <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode">
                 <svg id="themeIconSun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
                 <svg id="themeIconMoon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                <span id="themeToggleLabel">Light</span>
             </button>
         </div>
     </div>
@@ -306,7 +309,7 @@ a:hover {
 
 <script>
 const THEME_KEY = "novawatch_theme";
-const THEME_COLOR_LIGHT = "#f1f5f9";
+const THEME_COLOR_LIGHT = "#c6cacf";
 const THEME_COLOR_DARK = "#08090b";
 
 function getCurrentTheme() {
@@ -320,6 +323,9 @@ function syncThemeUI(theme) {
         sunIcon.style.display = theme === "dark" ? "none" : "";
         moonIcon.style.display = theme === "dark" ? "" : "none";
     }
+
+    const label = document.getElementById("themeToggleLabel");
+    if (label) label.textContent = theme === "dark" ? "Dark" : "Light";
 
     const meta = document.getElementById("themeColorMeta");
     if (meta) {
