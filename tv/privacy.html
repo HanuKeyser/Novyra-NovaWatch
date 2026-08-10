@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#c6cacf" id="themeColorMeta">
+<meta name="theme-color" content="#f4f6fb" id="themeColorMeta">
 <title>Privacy Notice | NovaWatch</title>
 <link rel="icon" type="image/png" href="https://www.novyra.co.za/NovaWatch_Logo.png">
 
@@ -35,42 +35,53 @@
 }
 
 :root {
-    --bg-mesh: linear-gradient(135deg, #c6cacf 0%, #dadde1 50%, #c9cdd3 100%);
-    --surface: rgba(255, 255, 255, 0.64);
-    --surface-2: rgba(255, 255, 255, 0.42);
-    --glass-border: rgba(255, 255, 255, 0.7);
-    --glass-border-subtle: rgba(255, 255, 255, 0.4);
-    --glass-shadow: 0 22px 50px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.95);
-    --blue: #0066cc;
-    --blue-light: #4792ff;
-    --text: #1d1d1f;
-    --text-secondary: #424245;
-    --text-muted: #86868b;
-    --border: rgba(0, 0, 0, 0.08);
-    --modal-surface-rgb: 255, 255, 255;
+    /* "Crystal Aura" - matches the main app's light theme: soft blue
+       glow blobs behind an airy off-white base. */
+    --bg-mesh:
+        radial-gradient(circle at 14% 18%, rgba(147, 197, 253, 0.6) 0%, transparent 42%),
+        radial-gradient(circle at 86% 78%, rgba(191, 219, 254, 0.65) 0%, transparent 42%),
+        linear-gradient(135deg, #eef2f8 0%, #f4f7fb 50%, #eef1f7 100%);
+    --surface: rgba(255, 255, 255, 0.65);
+    --surface-2: rgba(255, 255, 255, 0.45);
+    --glass-border: rgba(255, 255, 255, 0.9);
+    --glass-border-subtle: rgba(209, 213, 219, 0.4);
+    --glass-shadow: 0 22px 50px rgba(15, 23, 42, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 rgba(209, 213, 219, 0.45);
+    --blue: #2563eb;
+    --blue-light: #3b82f6;
+    --accent-rgb: 37, 99, 235;
+    --text: #0f172a;
+    --text-secondary: #4b5563;
+    --text-muted: #8b93a3;
+    --border: rgba(15, 23, 42, 0.08);
+    --modal-surface-rgb: 244, 246, 251;
 }
 
-/* Same neutral near-black palette as the main app's dark theme. */
+/* "Deep Cosmos" - matches the main app's dark theme: near-black with a
+   soft blue nebula glow and extremely sheer glass panels. */
 :root[data-theme="dark"] {
-    --bg-mesh: linear-gradient(135deg, #08090b 0%, #101113 50%, #0a0b0d 100%);
-    --surface: rgba(32, 32, 36, 0.62);
-    --surface-2: rgba(32, 32, 36, 0.44);
-    --glass-border: rgba(255, 255, 255, 0.14);
-    --glass-border-subtle: rgba(255, 255, 255, 0.08);
-    --glass-shadow: 0 22px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    --blue: #3b93ff;
-    --blue-light: #6bb3ff;
-    --text: #f2f4f8;
-    --text-secondary: #b6bcc7;
-    --text-muted: #7c8494;
+    --bg-mesh:
+        radial-gradient(circle at 18% 15%, rgba(59, 130, 246, 0.3) 0%, transparent 45%),
+        radial-gradient(circle at 82% 82%, rgba(37, 99, 235, 0.26) 0%, transparent 45%),
+        linear-gradient(135deg, #08080a 0%, #0a0a0c 50%, #08080a 100%);
+    --surface: rgba(255, 255, 255, 0.04);
+    --surface-2: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-border-subtle: rgba(255, 255, 255, 0.06);
+    --glass-shadow: 0 22px 50px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    --blue: #60a5fa;
+    --blue-light: #93c5fd;
+    --accent-rgb: 96, 165, 250;
+    --text: #f3f4f6;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
     --border: rgba(255, 255, 255, 0.1);
-    --modal-surface-rgb: 32, 32, 36;
-    background: #08090b;
+    --modal-surface-rgb: 10, 10, 12;
+    background: #0a0a0c;
     color-scheme: dark;
 }
 
 html {
-    background: #c6cacf;
+    background: #f4f6fb;
     color-scheme: light;
 }
 
@@ -116,39 +127,25 @@ body {
     font-weight: 700;
 }
 
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.brand img {
-    width: 26px;
-    height: 26px;
-    border-radius: 7px;
-}
-
-.brand span {
-    font-size: 15px;
-    font-weight: 800;
-    letter-spacing: -0.2px;
+[data-theme="dark"] .back-link {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
 .hero {
     padding: 26px 28px;
     margin-bottom: 18px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.78) 0%, rgba(224,238,255,0.62) 100%);
+    background: linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(191,219,254,0.55) 100%);
     backdrop-filter: blur(46px) saturate(210%);
     -webkit-backdrop-filter: blur(46px) saturate(210%);
-    border: 1px solid rgba(0, 102, 204, 0.2);
+    border: 1px solid rgba(var(--accent-rgb), 0.2);
     border-radius: 28px;
-    box-shadow: 0 20px 48px rgba(0, 102, 204, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    box-shadow: 0 20px 48px rgba(var(--accent-rgb), 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 rgba(209, 213, 219, 0.4);
 }
 
 [data-theme="dark"] .hero {
-    background: linear-gradient(135deg, rgba(34,34,38,0.9) 0%, rgba(14,14,16,0.8) 100%);
-    border: 1px solid rgba(59, 147, 255, 0.24);
-    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(37,99,235,0.06) 100%);
+    border: 1px solid rgba(var(--accent-rgb), 0.22);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .theme-toggle-btn {
@@ -258,10 +255,6 @@ a:hover {
             Back to NovaWatch
         </a>
         <div class="top-actions">
-            <div class="brand">
-                <img src="https://www.novyra.co.za/NovaWatch_Logo.png" alt="NovaWatch Logo">
-                <span>NovaWatch</span>
-            </div>
             <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode">
                 <svg id="themeIconSun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
                 <svg id="themeIconMoon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -272,7 +265,7 @@ a:hover {
 
     <div class="hero">
         <h1>Privacy Notice</h1>
-        <div class="updated">Last updated: 10 August 2026</div>
+        <div class="updated">Last updated: 1 September 2026</div>
     </div>
 
     <div class="card">
@@ -309,8 +302,8 @@ a:hover {
 
 <script>
 const THEME_KEY = "novawatch_theme";
-const THEME_COLOR_LIGHT = "#c6cacf";
-const THEME_COLOR_DARK = "#08090b";
+const THEME_COLOR_LIGHT = "#f4f6fb";
+const THEME_COLOR_DARK = "#0a0a0c";
 
 function getCurrentTheme() {
     return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
