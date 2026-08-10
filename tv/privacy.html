@@ -3,9 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#f1f5f9">
+<meta name="theme-color" content="#f1f5f9" id="themeColorMeta">
 <title>Privacy Notice | NovaWatch</title>
 <link rel="icon" type="image/png" href="https://www.novyra.co.za/NovaWatch_Logo.png">
+
+<!-- Applied before paint so this page opens in the same theme the user
+     last chose in the app itself (shared localStorage key), instead of
+     flashing light mode first. -->
+<script>
+(function () {
+    try {
+        var saved = localStorage.getItem("novawatch_theme");
+        var theme = (saved === "dark" || saved === "light")
+            ? saved
+            : (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        if (theme === "dark") {
+            document.documentElement.setAttribute("data-theme", "dark");
+        }
+    } catch (e) {
+        // Storage unavailable - default to light theme.
+    }
+})();
+</script>
+
 <style>
 * {
     box-sizing: border-box;
@@ -27,6 +47,31 @@
     --text-secondary: #424245;
     --text-muted: #86868b;
     --border: rgba(0, 0, 0, 0.08);
+    --modal-surface-rgb: 255, 255, 255;
+}
+
+/* Same neutral near-black palette as the main app's dark theme. */
+:root[data-theme="dark"] {
+    --bg-mesh: linear-gradient(135deg, #08090b 0%, #101113 50%, #0a0b0d 100%);
+    --surface: rgba(32, 32, 36, 0.62);
+    --surface-2: rgba(32, 32, 36, 0.44);
+    --glass-border: rgba(255, 255, 255, 0.14);
+    --glass-border-subtle: rgba(255, 255, 255, 0.08);
+    --glass-shadow: 0 22px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    --blue: #3b93ff;
+    --blue-light: #6bb3ff;
+    --text: #f2f4f8;
+    --text-secondary: #b6bcc7;
+    --text-muted: #7c8494;
+    --border: rgba(255, 255, 255, 0.1);
+    --modal-surface-rgb: 32, 32, 36;
+    background: #08090b;
+    color-scheme: dark;
+}
+
+html {
+    background: #e2e8f0;
+    color-scheme: light;
 }
 
 body {
@@ -98,6 +143,43 @@ body {
     border: 1px solid rgba(0, 102, 204, 0.2);
     border-radius: 28px;
     box-shadow: 0 20px 48px rgba(0, 102, 204, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+[data-theme="dark"] .hero {
+    background: linear-gradient(135deg, rgba(34,34,38,0.9) 0%, rgba(14,14,16,0.8) 100%);
+    border: 1px solid rgba(59, 147, 255, 0.24);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.theme-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--surface);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    transition: transform 0.15s ease;
+}
+
+[data-theme="dark"] .theme-toggle-btn {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.theme-toggle-btn:active {
+    transform: scale(0.92);
+}
+
+.top-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 h1 {
@@ -173,9 +255,15 @@ a:hover {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
             Back to NovaWatch
         </a>
-        <div class="brand">
-            <img src="https://www.novyra.co.za/NovaWatch_Logo.png" alt="NovaWatch Logo">
-            <span>NovaWatch</span>
+        <div class="top-actions">
+            <div class="brand">
+                <img src="https://www.novyra.co.za/NovaWatch_Logo.png" alt="NovaWatch Logo">
+                <span>NovaWatch</span>
+            </div>
+            <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode">
+                <svg id="themeIconSun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                <svg id="themeIconMoon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
         </div>
     </div>
 
@@ -215,5 +303,50 @@ a:hover {
         </section>
     </div>
 </div>
+
+<script>
+const THEME_KEY = "novawatch_theme";
+const THEME_COLOR_LIGHT = "#f1f5f9";
+const THEME_COLOR_DARK = "#08090b";
+
+function getCurrentTheme() {
+    return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+}
+
+function syncThemeUI(theme) {
+    const sunIcon = document.getElementById("themeIconSun");
+    const moonIcon = document.getElementById("themeIconMoon");
+    if (sunIcon && moonIcon) {
+        sunIcon.style.display = theme === "dark" ? "none" : "";
+        moonIcon.style.display = theme === "dark" ? "" : "none";
+    }
+
+    const meta = document.getElementById("themeColorMeta");
+    if (meta) {
+        meta.setAttribute("content", theme === "dark" ? THEME_COLOR_DARK : THEME_COLOR_LIGHT);
+    }
+}
+
+function applyTheme(theme) {
+    if (theme === "dark") {
+        document.documentElement.setAttribute("data-theme", "dark");
+    } else {
+        document.documentElement.removeAttribute("data-theme");
+    }
+    syncThemeUI(theme);
+}
+
+function toggleTheme() {
+    const next = getCurrentTheme() === "dark" ? "light" : "dark";
+    applyTheme(next);
+    try {
+        localStorage.setItem(THEME_KEY, next);
+    } catch (e) {
+        // Private browsing / storage disabled - theme just won't persist.
+    }
+}
+
+syncThemeUI(getCurrentTheme());
+</script>
 </body>
 </html>
