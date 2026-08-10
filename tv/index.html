@@ -5004,30 +5004,19 @@ function openDetails(itemId) {
     currentItem = getItem(itemId);
     if (!currentItem) return;
 
-    try {
-        if (currentItem.type !== 'movie' && currentItem.episodes) {
-            selectedSeason = getCurrentSeasonForShow(currentItem);
-            scrollToNextEpisodeOnRender = true;
-        }
-
-        updateModalContent();
-        document.getElementById("detailsModal").classList.add("open");
-        loadWatchAvailability(currentItem);
-
-        // Cached data renders immediately above; quietly pull the latest TMDB
-        // data for this one item so the modal never shows stale info while
-        // waiting on the periodic background sync.
-        refreshOpenItemFromTMDB(currentItem);
-    } catch (err) {
-        // A malformed/legacy item shouldn't be able to silently do nothing
-        // when tapped - close whatever partial modal state got left behind,
-        // say clearly what happened, and point at the always-available
-        // remove button (the "x" on the card itself) as the way out.
-        console.error("Failed to open details:", err);
-        document.getElementById("detailsModal").classList.remove("open");
-        currentItem = null;
-        showToast("Couldn't open this item - tap the × on its card to remove it.", "error");
+    if (currentItem.type !== 'movie' && currentItem.episodes) {
+        selectedSeason = getCurrentSeasonForShow(currentItem);
+        scrollToNextEpisodeOnRender = true;
     }
+
+    updateModalContent();
+    document.getElementById("detailsModal").classList.add("open");
+    loadWatchAvailability(currentItem);
+
+    // Cached data renders immediately above; quietly pull the latest TMDB
+    // data for this one item so the modal never shows stale info while
+    // waiting on the periodic background sync.
+    refreshOpenItemFromTMDB(currentItem);
 }
 
 async function refreshOpenItemFromTMDB(item) {
