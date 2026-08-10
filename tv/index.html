@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#f1f5f9" id="themeColorMeta">
+<meta name="theme-color" content="#c6cacf" id="themeColorMeta">
 <title>NovaWatch | Track What You Watch</title>
 
 <!-- Applied as early as possible (before the rest of <head> and before any
@@ -68,7 +68,10 @@
 }
 
 :root {
-    --bg-mesh: linear-gradient(135deg, #e2e8f0 0%, #f8fafc 50%, #eff6ff 100%);
+    /* A genuinely gray backdrop (not near-white) so the translucent white
+       glass panels have something to contrast against and actually read
+       as "frosted glass" instead of blending into the page. */
+    --bg-mesh: linear-gradient(135deg, #c6cacf 0%, #dadde1 50%, #c9cdd3 100%);
     --surface: rgba(255, 255, 255, 0.58);
     --surface-2: rgba(255, 255, 255, 0.36);
     --surface-3: rgba(255, 255, 255, 0.22);
@@ -143,7 +146,7 @@
 }
 
 html {
-    background: #e2e8f0;
+    background: #c6cacf;
     color-scheme: light;
 }
 
@@ -220,19 +223,23 @@ img {
     padding: 36px 18px 36px;
 }
 
+/* Opacity-only (no transform) - the Library tab in particular renders a
+   lot of individual backdrop-filter "glass" cards, and animating a
+   transform on their container forces the browser to keep re-sampling
+   the blur backdrop every frame as it moves, which is what made that
+   transition laggy. A plain opacity fade is compositor-cheap since it
+   doesn't move anything or invalidate the blur sampling. */
 .page.active {
     display: block;
-    animation: pageFadeIn 0.32s cubic-bezier(0.25, 1, 0.5, 1);
+    animation: pageFadeIn 0.18s ease-out;
 }
 
 @keyframes pageFadeIn {
     from {
         opacity: 0;
-        transform: translateY(10px);
     }
     to {
         opacity: 1;
-        transform: translateY(0);
     }
 }
 
@@ -1655,32 +1662,33 @@ img {
     gap: 16px;
 }
 
-.hero-actions {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 8px;
-    flex-shrink: 0;
-}
-
-.hero-icon-btn {
-    flex-shrink: 0;
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
+.hero-actions-row {
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.hero-theme-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 34px;
+    padding: 0 16px;
+    border-radius: 999px;
     background: var(--surface);
     backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
     color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 700;
     box-shadow: var(--glass-shadow-sm);
     transition: transform 0.15s ease, color 0.2s ease;
 }
 
-.hero-icon-btn:active {
-    transform: scale(0.92);
+.hero-theme-btn:active {
+    transform: scale(0.96);
 }
 
 .hero-signout-btn {
@@ -1798,6 +1806,16 @@ img {
     border: 1px solid rgba(0,0,0,0.1);
     box-shadow: 0 4px 12px rgba(0,0,0,0.06);
     transition: transform 0.15s ease;
+}
+
+/* Google's own dark-mode button spec: dark gray fill, light text, a
+   lighter outline - rather than the light "Sign in with Google" pill
+   sitting oddly on an otherwise dark screen. */
+[data-theme="dark"] .google-auth-btn {
+    background: #131314;
+    color: #e3e3e3;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .google-auth-btn:active {
@@ -1934,22 +1952,24 @@ img {
     top: max(20px, env(safe-area-inset-top));
     right: 20px;
     z-index: 1;
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
+    gap: 6px;
+    height: 34px;
+    padding: 0 14px;
+    border-radius: 999px;
     background: var(--surface);
     backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
     color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 700;
     box-shadow: var(--glass-shadow-sm);
     transition: transform 0.15s ease;
 }
 
 .auth-theme-btn:active {
-    transform: scale(0.92);
+    transform: scale(0.94);
 }
 
 /* Blur backdrop overlay */
@@ -2108,6 +2128,7 @@ img {
     <button class="auth-theme-btn" id="authThemeToggleBtn" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode">
         <svg id="authThemeIconSun" class="icon icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
         <svg id="authThemeIconMoon" class="icon icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <span id="authThemeToggleLabel">Light</span>
     </button>
     <div class="auth-overlay-card">
         <img src="https://www.novyra.co.za/NovaWatch_Logo.png" alt="NovaWatch Logo" class="auth-logo">
@@ -2259,13 +2280,15 @@ img {
                         <div class="home-subtitle" id="homeEmailSubtitle">Guest Account</div>
                     </div>
                 </div>
-                <div class="hero-actions">
-                    <button class="hero-icon-btn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode">
-                        <svg id="themeIconSun" class="icon icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
-                        <svg id="themeIconMoon" class="icon icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                    </button>
-                    <button class="hero-signout-btn" onclick="handleSignOut()">Sign Out</button>
-                </div>
+            </div>
+
+            <div class="hero-actions-row">
+                <button class="hero-theme-btn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode">
+                    <svg id="themeIconSun" class="icon icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                    <svg id="themeIconMoon" class="icon icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    <span id="themeToggleLabel">Light</span>
+                </button>
+                <button class="hero-signout-btn" onclick="handleSignOut()">Sign Out</button>
             </div>
 
             <div class="hero-notify-row">
@@ -2491,7 +2514,7 @@ function getLastTab() {
    THEME (Light / Dark)
 ========================================================= */
 const THEME_KEY = "novawatch_theme";
-const THEME_COLOR_LIGHT = "#f1f5f9";
+const THEME_COLOR_LIGHT = "#c6cacf";
 const THEME_COLOR_DARK = "#08090b";
 
 function getCurrentTheme() {
@@ -2513,6 +2536,12 @@ function syncThemeUI(theme) {
             sunIcon.style.display = theme === "dark" ? "none" : "";
             moonIcon.style.display = theme === "dark" ? "" : "none";
         }
+    });
+
+    const labelText = theme === "dark" ? "Dark" : "Light";
+    ["themeToggleLabel", "authThemeToggleLabel"].forEach(id => {
+        const label = document.getElementById(id);
+        if (label) label.textContent = labelText;
     });
 
     const meta = document.getElementById("themeColorMeta");
@@ -4458,27 +4487,34 @@ function showPage(page, subType = null, focusSearch = false) {
 
     updateNavIndicator();
 
-    if (page === "library") setLibraryView(subType || currentLibraryView);
-    if (page === "discover") {
-        if (subType) {
-            setSearchType(subType);
-        } else {
-            const query = document.getElementById("onlineSearchInput").value.trim();
-            if (!query) fetchTrending();
-        }
+    // Deferred one frame so the tab-switch fade can actually paint before
+    // any per-tab rendering work runs - Library in particular can build a
+    // lot of glass cards at once, and doing that synchronously here was
+    // blocking the animation's first frame and making the switch feel
+    // laggy.
+    requestAnimationFrame(() => {
+        if (page === "library") setLibraryView(subType || currentLibraryView);
+        if (page === "discover") {
+            if (subType) {
+                setSearchType(subType);
+            } else {
+                const query = document.getElementById("onlineSearchInput").value.trim();
+                if (!query) fetchTrending();
+            }
 
-        // Only auto-focus when the person actually tapped their way to
-        // Discover (focusSearch=true from the nav button) — never on the
-        // programmatic tab restore on load, which would pop the mobile
-        // keyboard unexpectedly the moment the app opens.
-        if (focusSearch) {
-            const input = document.getElementById("onlineSearchInput");
-            if (input) {
-                setTimeout(() => input.focus(), 150);
+            // Only auto-focus when the person actually tapped their way to
+            // Discover (focusSearch=true from the nav button) — never on the
+            // programmatic tab restore on load, which would pop the mobile
+            // keyboard unexpectedly the moment the app opens.
+            if (focusSearch) {
+                const input = document.getElementById("onlineSearchInput");
+                if (input) {
+                    setTimeout(() => input.focus(), 150);
+                }
             }
         }
-    }
-    if (page === "home") renderHomeTab();
+        if (page === "home") renderHomeTab();
+    });
 }
 
 // Slides the shared glass capsule under whichever nav button is active,
