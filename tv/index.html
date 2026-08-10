@@ -352,6 +352,34 @@ img {
     transform: scale(0.96);
 }
 
+.card-remove-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    z-index: 3;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.card-remove-btn svg {
+    width: 12px;
+    height: 12px;
+}
+
+.card-remove-btn:active {
+    transform: scale(0.85);
+    background: rgba(255, 59, 48, 0.85);
+}
+
 .poster {
     position: relative;
     width: 126px;
@@ -3385,15 +3413,20 @@ async function loadWatchAvailability(item) {
     }
 }
 
-// Defensive cleanup for a data-integrity issue where a "preview" item
-// (opened via search or a shared link, before ever being added) ended up
-// persisted as its own Firestore document alongside the real entry once
-// the show was actually added. These show up as duplicate, sparser-looking
-// entries - e.g. a second copy in Upcoming - since they share the same
-// tmdbId as the real item but a different doc id ("preview-tv-123" vs
-// "tv-some-show"). This strips any that slipped through, de-dupes by
-// tmdbId+type as a second safety net, and permanently deletes the
-// leftovers from Firestore so they don't keep coming back on future loads.
+// Defensive cleanup for a couple of data-integrity issues that leave
+// broken-looking entries in the library:
+//   1. A "preview" item (opened via search or a shared link, before ever
+//      being added) that ended up persisted as its own doc alongside the
+//      real entry - a duplicate, since it shares the same tmdbId as the
+//      real item but a different doc id ("preview-tv-123" vs "tv-some-show").
+//   2. A stub document missing fields the app's own add flow always fills
+//      in (type, description, an episodes array for TV) - these render as
+//      the generic placeholder icon and, when type is missing, even get
+//      miscategorized into the wrong (TV vs Movie) library section. The
+//      current add flow never produces a doc shaped like this, so seeing
+//      one is a reliable sign it's leftover junk, never a real add.
+// Both categories get stripped from what's shown and permanently deleted
+// from Firestore so they don't keep coming back on future loads.
 function dedupeAndCleanLibrary(rawLibrary, uid) {
     const seen = new Set();
     const cleaned = [];
@@ -3403,6 +3436,24 @@ function dedupeAndCleanLibrary(rawLibrary, uid) {
         if (!item || !item.id) return;
 
         if (item.isPreview || item.id.startsWith('preview-')) {
+            staleIds.push(item.id);
+            return;
+        }
+
+        const isBrokenStub = !item.type
+            || item.title === undefined
+            || item.description === undefined
+            || (item.type !== 'movie' && item.episodes === undefined)
+            // Same idea, but for a doc that has these fields present, just
+            // left empty rather than missing outright - no poster, no
+            // season/episode data, and (for TV) no episodes at all. A show
+            // genuinely still tracked by TMDB always has at least season
+            // counts even before it premieres, so an entry with none of
+            // that is stale junk, not a real "hasn't aired yet" title.
+            || (item.type !== 'movie' && Array.isArray(item.episodes) && item.episodes.length === 0 && !item.numberOfSeasons && !item.poster)
+            || (item.type === 'movie' && !item.poster && !item.backdrop && !item.runtime);
+
+        if (isBrokenStub) {
             staleIds.push(item.id);
             return;
         }
@@ -3555,9 +3606,17 @@ if (auth) {
                             const itemData = change.doc.data();
                             if (!itemData || !itemData.id) return;
 
-                            // Never let a stray "preview" doc back into the
-                            // live library - see dedupeAndCleanLibrary above.
-                            if (itemData.isPreview || itemData.id.startsWith('preview-')) return;
+                            // Never let a stray "preview" doc, or a broken
+                            // stub missing fields the real add flow always
+                            // sets, back into the live library - see
+                            // dedupeAndCleanLibrary above.
+                            const isBrokenStub = !itemData.type
+                                || itemData.title === undefined
+                                || itemData.description === undefined
+                                || (itemData.type !== 'movie' && itemData.episodes === undefined)
+                                || (itemData.type !== 'movie' && Array.isArray(itemData.episodes) && itemData.episodes.length === 0 && !itemData.numberOfSeasons && !itemData.poster)
+                                || (itemData.type === 'movie' && !itemData.poster && !itemData.backdrop && !itemData.runtime);
+                            if (itemData.isPreview || itemData.id.startsWith('preview-') || isBrokenStub) return;
 
                             const index = updatedLibrary.findIndex(i => i.id === itemData.id);
 
@@ -4507,6 +4566,9 @@ function createCard(item) {
                 `}
                 ${isNew ? `<div class="new-episode-badge">NEW</div>` : ''}
                 ${progressBarHTML}
+                <button class="card-remove-btn" onclick="quickRemoveLibraryItem('${item.id}', event)" aria-label="Remove from library" title="Remove from library">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+                </button>
             </div>
             <div class="card-title">${escapeHTML(item.title)}</div>
         </div>
@@ -4942,19 +5004,30 @@ function openDetails(itemId) {
     currentItem = getItem(itemId);
     if (!currentItem) return;
 
-    if (currentItem.type !== 'movie' && currentItem.episodes) {
-        selectedSeason = getCurrentSeasonForShow(currentItem);
-        scrollToNextEpisodeOnRender = true;
+    try {
+        if (currentItem.type !== 'movie' && currentItem.episodes) {
+            selectedSeason = getCurrentSeasonForShow(currentItem);
+            scrollToNextEpisodeOnRender = true;
+        }
+
+        updateModalContent();
+        document.getElementById("detailsModal").classList.add("open");
+        loadWatchAvailability(currentItem);
+
+        // Cached data renders immediately above; quietly pull the latest TMDB
+        // data for this one item so the modal never shows stale info while
+        // waiting on the periodic background sync.
+        refreshOpenItemFromTMDB(currentItem);
+    } catch (err) {
+        // A malformed/legacy item shouldn't be able to silently do nothing
+        // when tapped - close whatever partial modal state got left behind,
+        // say clearly what happened, and point at the always-available
+        // remove button (the "x" on the card itself) as the way out.
+        console.error("Failed to open details:", err);
+        document.getElementById("detailsModal").classList.remove("open");
+        currentItem = null;
+        showToast("Couldn't open this item - tap the × on its card to remove it.", "error");
     }
-
-    updateModalContent();
-    document.getElementById("detailsModal").classList.add("open");
-    loadWatchAvailability(currentItem);
-
-    // Cached data renders immediately above; quietly pull the latest TMDB
-    // data for this one item so the modal never shows stale info while
-    // waiting on the periodic background sync.
-    refreshOpenItemFromTMDB(currentItem);
 }
 
 async function refreshOpenItemFromTMDB(item) {
@@ -5438,6 +5511,30 @@ async function removeCurrentItem() {
 
     state.library.splice(removedIndex, 1);
     closeModal();
+    refreshActivePage();
+
+    if (auth && auth.currentUser) {
+        try {
+            await db.collection("users").doc(auth.currentUser.uid).collection("library").doc(removedItem.id).delete();
+        } catch (err) {
+            console.error("Failed to delete item:", err);
+        }
+    }
+}
+
+// A quick, always-visible way to remove any card straight from a library
+// grid, without needing to open its details modal first - a guaranteed
+// path to clear anything out (including any oddly-shaped leftover entry
+// automatic cleanup didn't confidently catch), not just a fallback.
+async function quickRemoveLibraryItem(itemId, event) {
+    if (event) event.stopPropagation();
+
+    const removedIndex = state.library.findIndex(i => i.id === itemId);
+    if (removedIndex === -1) return;
+
+    const removedItem = state.library[removedIndex];
+
+    state.library.splice(removedIndex, 1);
     refreshActivePage();
 
     if (auth && auth.currentUser) {
