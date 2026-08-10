@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#c6cacf" id="themeColorMeta">
+<meta name="theme-color" content="#f4f6fb" id="themeColorMeta">
 <title>NovaWatch | Track What You Watch</title>
 
 <!-- Applied as early as possible (before the rest of <head> and before any
@@ -68,85 +68,103 @@
 }
 
 :root {
-    /* A genuinely gray backdrop (not near-white) so the translucent white
-       glass panels have something to contrast against and actually read
-       as "frosted glass" instead of blending into the page. */
-    --bg-mesh: linear-gradient(135deg, #c6cacf 0%, #dadde1 50%, #c9cdd3 100%);
-    --surface: rgba(255, 255, 255, 0.58);
-    --surface-2: rgba(255, 255, 255, 0.36);
-    --surface-3: rgba(255, 255, 255, 0.22);
+    /* "Crystal Aura" - airy cool-white base with soft blue aurora blobs
+       glowing through from behind, so the frosted glass panels have real
+       light/color to refract instead of sitting on a flat gray. */
+    --bg-mesh:
+        radial-gradient(circle at 14% 18%, rgba(147, 197, 253, 0.6) 0%, transparent 42%),
+        radial-gradient(circle at 86% 78%, rgba(191, 219, 254, 0.65) 0%, transparent 42%),
+        linear-gradient(135deg, #eef2f8 0%, #f4f7fb 50%, #eef1f7 100%);
+    --surface: rgba(255, 255, 255, 0.65);
+    --surface-2: rgba(255, 255, 255, 0.45);
+    --surface-3: rgba(255, 255, 255, 0.3);
 
-    --glass-border: rgba(255, 255, 255, 0.7);
-    --glass-border-subtle: rgba(255, 255, 255, 0.38);
-    --glass-shadow: 0 22px 46px rgba(0, 0, 0, 0.09), inset 0 1px 0 rgba(255, 255, 255, 0.95);
-    --glass-shadow-sm: 0 10px 28px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    /* Dual-layer "crystalline edge": a bright top/left highlight plus a
+       cooler, dimmer bottom edge (built into --glass-shadow's insets
+       below) to fake a beveled, physical piece of glass. */
+    --glass-border: rgba(255, 255, 255, 0.9);
+    --glass-border-subtle: rgba(209, 213, 219, 0.4);
+    --glass-shadow: 0 22px 46px rgba(15, 23, 42, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 rgba(209, 213, 219, 0.45);
+    --glass-shadow-sm: 0 10px 28px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.85), inset 0 -1px 0 rgba(209, 213, 219, 0.35);
 
-    --blue: #0066cc;      /* Apple System Blue */
-    --blue-light: #4792ff; 
-    --blue-dark: #004c99;
+    /* Vivid Blue - the CTA/interactive accent */
+    --blue: #2563eb;
+    --blue-light: #3b82f6;
+    --blue-dark: #1d4ed8;
+    /* Bare RGB triplet of the accent above, so glow/tint effects that need
+       their own alpha (badge backgrounds, focus rings, hover tints) can
+       build off it via rgba(var(--accent-rgb), a) instead of hardcoding a
+       color that would go stale the moment the accent changes. */
+    --accent-rgb: 37, 99, 235;
 
-    --text: #1d1d1f;
-    --text-secondary: #424245;
-    --text-muted: #86868b;
+    --text: #0f172a;
+    --text-secondary: #4b5563;
+    --text-muted: #8b93a3;
 
-    --border: rgba(0, 0, 0, 0.08);
+    --border: rgba(15, 23, 42, 0.08);
 
     --success: #34c759;
     --danger: #ff3b30;
 
     /* Strong-frost variant for elements that need to read as more opaque
        "glass" than the standard --surface (focus states, close buttons) */
-    --frost-strong: rgba(255, 255, 255, 0.9);
+    --frost-strong: rgba(255, 255, 255, 0.88);
     /* RGB triplet (no alpha) so modal backgrounds can build several alpha
        stops off the same base color via rgba(var(--modal-surface-rgb), a) */
-    --modal-surface-rgb: 248, 250, 252;
+    --modal-surface-rgb: 244, 246, 251;
 
     --radius: 20px;
 }
 
 /* =========================================================
-   DARK THEME
-   Same glass-morphism approach as light mode, just re-based on a deep
-   slate/navy backdrop: translucent panels get a dark tint instead of
-   white so the blur still reads as "frosted glass" rather than a flat
-   dark box, and every component below keeps working unchanged because
-   it only ever reaches for the variables re-defined here.
+   DARK THEME - "Deep Cosmos"
+   Near-black backdrop with a soft blue nebula glow behind extremely
+   sheer glass panels, in the vein of visionOS/macOS dark glass: the
+   panels themselves barely tint the light passing through them, so
+   almost all of the richness comes from the blur+saturate picking up
+   the glow blobs and from crisp hairline borders defining each edge.
+   Every component below keeps working unchanged because it only ever
+   reaches for the variables re-defined here.
 ========================================================= */
 :root[data-theme="dark"] {
-    /* Neutral near-black charcoal instead of a navy/slate tint, so the
-       "dark theme" reads as genuinely dark rather than dark blue. */
-    --bg-mesh: linear-gradient(135deg, #08090b 0%, #101113 50%, #0a0b0d 100%);
-    --surface: rgba(32, 32, 36, 0.62);
-    --surface-2: rgba(32, 32, 36, 0.44);
-    --surface-3: rgba(32, 32, 36, 0.3);
+    --bg-mesh:
+        radial-gradient(circle at 18% 15%, rgba(59, 130, 246, 0.3) 0%, transparent 45%),
+        radial-gradient(circle at 82% 82%, rgba(37, 99, 235, 0.26) 0%, transparent 45%),
+        linear-gradient(135deg, #08080a 0%, #0a0a0c 50%, #08080a 100%);
+    --surface: rgba(255, 255, 255, 0.04);
+    --surface-2: rgba(255, 255, 255, 0.03);
+    --surface-3: rgba(255, 255, 255, 0.02);
 
-    --glass-border: rgba(255, 255, 255, 0.14);
-    --glass-border-subtle: rgba(255, 255, 255, 0.08);
-    --glass-shadow: 0 22px 46px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    --glass-shadow-sm: 0 10px 28px rgba(0, 0, 0, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-border-subtle: rgba(255, 255, 255, 0.06);
+    --glass-shadow: 0 22px 46px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    --glass-shadow-sm: 0 10px 28px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 
-    --blue: #3b93ff;
-    --blue-light: #6bb3ff;
-    --blue-dark: #1f6fd1;
+    /* Electric blue - brighter than the light theme's accent so it
+       still pops against near-black */
+    --blue: #60a5fa;
+    --blue-light: #93c5fd;
+    --blue-dark: #3b82f6;
+    --accent-rgb: 96, 165, 250;
 
-    --text: #f2f4f8;
-    --text-secondary: #b6bcc7;
-    --text-muted: #7c8494;
+    --text: #f3f4f6;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
 
     --border: rgba(255, 255, 255, 0.1);
 
     --success: #32d74b;
     --danger: #ff453a;
 
-    --frost-strong: rgba(38, 38, 43, 0.82);
-    --modal-surface-rgb: 16, 16, 18;
+    --frost-strong: rgba(255, 255, 255, 0.08);
+    --modal-surface-rgb: 10, 10, 12;
 
-    background: #08090b;
+    background: #0a0a0c;
     color-scheme: dark;
 }
 
 html {
-    background: #c6cacf;
+    background: #f4f6fb;
     color-scheme: light;
 }
 
@@ -402,7 +420,7 @@ img {
     align-items: center;
     gap: 14px;
     padding-bottom: 14px;
-    border-bottom: 1px solid rgba(0, 102, 204, 0.12);
+    border-bottom: 1px solid rgba(var(--accent-rgb), 0.12);
 }
 
 .analytics-icon-badge {
@@ -414,7 +432,7 @@ img {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.4);
+    box-shadow: 0 6px 16px rgba(var(--accent-rgb), 0.35), inset 0 1px 0 rgba(255,255,255,0.4);
     flex-shrink: 0;
 }
 
@@ -477,7 +495,7 @@ img {
     align-items: center;
     justify-content: center;
     text-align: center;
-    background: linear-gradient(135deg, rgba(0,102,204,0.14), rgba(0,102,204,0.05));
+    background: linear-gradient(135deg, rgba(var(--accent-rgb),0.14), rgba(var(--accent-rgb),0.05));
     color: var(--blue);
 }
 
@@ -576,7 +594,7 @@ img {
     color: white;
     font-size: 13px;
     font-weight: 750;
-    box-shadow: 0 8px 20px rgba(0, 102, 204, 0.3), inset 0 1px 0 rgba(255,255,255,0.35);
+    box-shadow: 0 8px 20px rgba(var(--accent-rgb), 0.3), inset 0 1px 0 rgba(255,255,255,0.35);
 }
 
 .empty-state-cta:active {
@@ -617,7 +635,7 @@ img {
 .search-box input:focus {
     border-color: var(--blue);
     background: var(--frost-strong);
-    box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.15), var(--glass-shadow-sm);
+    box-shadow: 0 0 0 4px rgba(var(--accent-rgb), 0.15), var(--glass-shadow-sm);
 }
 
 .search-icon {
@@ -681,7 +699,11 @@ img {
 .search-type-btn.active {
     background: var(--surface);
     color: var(--text);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+}
+
+[data-theme="dark"] .search-type-btn.active {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.1);
 }
 
 .search-type-toggle.three-way {
@@ -718,7 +740,7 @@ img {
 .segmented-btn.active {
     background: linear-gradient(135deg, var(--blue-light), var(--blue));
     color: white;
-    box-shadow: 0 8px 18px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.3);
+    box-shadow: 0 8px 18px rgba(var(--accent-rgb), 0.35), inset 0 1px 0 rgba(255,255,255,0.3);
 }
 
 .library-subview {
@@ -737,14 +759,9 @@ img {
     padding: 14px 6px;
     align-items: flex-start;
     border-radius: 18px;
-    border-bottom: 1px solid var(--glass-border-subtle);
     transition: background 0.2s ease, transform 0.15s ease;
     cursor: pointer;
     position: relative;
-}
-
-.search-card:last-child {
-    border-bottom: none;
 }
 
 .search-card:active {
@@ -815,7 +832,7 @@ img {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.4);
+    box-shadow: 0 6px 16px rgba(var(--accent-rgb), 0.35), inset 0 1px 0 rgba(255,255,255,0.4);
     flex-shrink: 0;
 }
 
@@ -1021,16 +1038,15 @@ img {
     gap: 14px;
     padding: 14px;
     align-items: flex-start;
-    /* Deliberately stronger/more opaque than the generic --surface glass
-       used elsewhere, plus a heavier blur+saturate and a crisper border,
-       so these cards read clearly as frosted panels against the equally
-       light page background instead of nearly disappearing into it. */
-    background: rgba(255, 255, 255, 0.74);
+    /* A modest step up in opacity from the generic --surface glass, plus
+       a heavier blur+saturate, so these cards read clearly as their own
+       frosted layer rather than blending into the page behind them. */
+    background: rgba(255, 255, 255, 0.72);
     backdrop-filter: blur(44px) saturate(220%);
     -webkit-backdrop-filter: blur(44px) saturate(220%);
-    border: 1px solid rgba(255, 255, 255, 0.9);
+    border: 1px solid var(--glass-border);
     border-radius: 20px;
-    box-shadow: 0 16px 38px rgba(0, 0, 0, 0.13), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    box-shadow: 0 16px 38px rgba(15, 23, 42, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 rgba(209, 213, 219, 0.4);
     touch-action: pan-y;
     cursor: pointer;
     user-select: none;
@@ -1039,9 +1055,9 @@ img {
 }
 
 [data-theme="dark"] .continue-card {
-    background: rgba(36, 36, 40, 0.76);
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    box-shadow: 0 16px 38px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 16px 38px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .continue-card.dragging {
@@ -1178,15 +1194,15 @@ img {
     height: calc(100% - 14px);
     width: 0;
     border-radius: 999px;
-    background: rgba(120, 128, 140, 0.14);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 1px rgba(0, 0, 0, 0.04);
+    background: rgba(var(--accent-rgb), 0.12);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 1px rgba(15, 23, 42, 0.04);
     transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
     pointer-events: none;
     z-index: 0;
 }
 
 [data-theme="dark"] .nav-indicator {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(var(--accent-rgb), 0.18);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 -1px 1px rgba(0, 0, 0, 0.2);
 }
 
@@ -1255,6 +1271,10 @@ img {
     border: 1px solid var(--glass-border);
     position: relative;
     box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+[data-theme="dark"] .modal-sheet {
+    box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .modal-backdrop-header {
@@ -1412,7 +1432,7 @@ img {
     align-items: center;
     justify-content: center;
     border: none;
-    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3);
+    box-shadow: 0 6px 16px rgba(var(--accent-rgb), 0.3);
 }
 
 .cinema-chip .watch-provider-name {
@@ -1483,7 +1503,7 @@ img {
     background: var(--blue);
     color: white;
     border: none;
-    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3), inset 0 1px 0 rgba(255,255,255,0.4);
+    box-shadow: 0 6px 16px rgba(var(--accent-rgb), 0.3), inset 0 1px 0 rgba(255,255,255,0.4);
 }
 
 .action-button.trailer {
@@ -1540,7 +1560,7 @@ img {
     background: var(--blue);
     color: white;
     border-color: var(--blue);
-    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3);
+    box-shadow: 0 6px 16px rgba(var(--accent-rgb), 0.3);
 }
 
 .episode {
@@ -1559,7 +1579,7 @@ img {
 }
 
 .episode-up-next {
-    background: rgba(0, 102, 204, 0.06);
+    background: rgba(var(--accent-rgb), 0.06);
     border-bottom-color: transparent;
 }
 
@@ -1633,18 +1653,18 @@ img {
 ========================================================= */
 .hero-card {
     padding: 26px 24px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(224,238,255,0.78) 100%);
+    background: linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(191,219,254,0.55) 100%);
     backdrop-filter: blur(40px) saturate(200%);
     -webkit-backdrop-filter: blur(40px) saturate(200%);
-    border: 1px solid rgba(0, 102, 204, 0.2);
+    border: 1px solid rgba(var(--accent-rgb), 0.2);
     border-radius: 28px;
-    box-shadow: 0 20px 48px rgba(0, 102, 204, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    box-shadow: 0 20px 48px rgba(var(--accent-rgb), 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 rgba(209, 213, 219, 0.4);
 }
 
 [data-theme="dark"] .hero-card {
-    background: linear-gradient(135deg, rgba(34,34,38,0.9) 0%, rgba(14,14,16,0.8) 100%);
-    border: 1px solid rgba(59, 147, 255, 0.24);
-    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(37,99,235,0.06) 100%);
+    border: 1px solid rgba(var(--accent-rgb), 0.22);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .hero-top {
@@ -1718,7 +1738,7 @@ img {
     gap: 14px;
     margin-top: 20px;
     padding-top: 18px;
-    border-top: 1px solid rgba(0, 102, 204, 0.14);
+    border-top: 1px solid rgba(var(--accent-rgb), 0.14);
 }
 
 .hero-notify-title {
@@ -1742,7 +1762,7 @@ img {
     color: white;
     font-size: 12.5px;
     font-weight: 750;
-    box-shadow: 0 8px 20px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.35);
+    box-shadow: 0 8px 20px rgba(var(--accent-rgb), 0.35), inset 0 1px 0 rgba(255,255,255,0.35);
 }
 
 .hero-pill-btn:active {
@@ -1776,7 +1796,7 @@ img {
     color: white;
     font-size: 22px;
     font-weight: 800;
-    box-shadow: 0 8px 20px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.4);
+    box-shadow: 0 8px 20px rgba(var(--accent-rgb), 0.35), inset 0 1px 0 rgba(255,255,255,0.4);
     flex-shrink: 0;
 }
 
@@ -1882,7 +1902,7 @@ img {
 .auth-input:focus {
     border-color: var(--blue);
     background: var(--surface);
-    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.15);
 }
 
 .auth-actions {
@@ -1899,7 +1919,7 @@ img {
     font-weight: 700;
     background: var(--blue);
     color: white;
-    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3);
+    box-shadow: 0 6px 16px rgba(var(--accent-rgb), 0.3);
 }
 
 .auth-btn.secondary {
@@ -1949,31 +1969,6 @@ img {
     padding: 20px;
 }
 
-.auth-theme-btn {
-    position: absolute;
-    top: max(20px, env(safe-area-inset-top));
-    right: 20px;
-    z-index: 1;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    height: 34px;
-    padding: 0 14px;
-    border-radius: 999px;
-    background: var(--surface);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
-    color: var(--text-secondary);
-    font-size: 12px;
-    font-weight: 700;
-    box-shadow: var(--glass-shadow-sm);
-    transition: transform 0.15s ease;
-}
-
-.auth-theme-btn:active {
-    transform: scale(0.94);
-}
-
 /* Blur backdrop overlay */
 #authScreen::before {
     content: '';
@@ -1989,18 +1984,27 @@ img {
     max-width: 400px;
     max-height: 100%;
     overflow-y: auto;
-    background: var(--surface);
+    /* Same premium gradient + accent-tinted edge as the home tab's hero
+       card, so sign-in reads as part of the same design system instead
+       of a plain generic panel. */
+    background: linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(191,219,254,0.55) 100%);
     backdrop-filter: blur(48px) saturate(210%);
     -webkit-backdrop-filter: blur(48px) saturate(210%);
-    border: 1px solid var(--glass-border);
+    border: 1px solid rgba(var(--accent-rgb), 0.2);
     border-radius: 28px;
     padding: 18px 22px;
-    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    box-shadow: 0 24px 48px rgba(var(--accent-rgb), 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 rgba(209, 213, 219, 0.4);
     text-align: center;
     display: flex;
     flex-direction: column;
     gap: 10px;
     animation: authFadeIn 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+[data-theme="dark"] .auth-overlay-card {
+    background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(37,99,235,0.06) 100%);
+    border: 1px solid rgba(var(--accent-rgb), 0.22);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 @keyframes authFadeIn {
@@ -2127,11 +2131,6 @@ img {
 
 <!-- DEDICATED AUTH OVERLAY -->
 <div id="authScreen">
-    <button class="auth-theme-btn" id="authThemeToggleBtn" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode">
-        <svg id="authThemeIconSun" class="icon icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
-        <svg id="authThemeIconMoon" class="icon icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        <span id="authThemeToggleLabel">Light</span>
-    </button>
     <div class="auth-overlay-card">
         <img src="https://www.novyra.co.za/NovaWatch_Logo.png" alt="NovaWatch Logo" class="auth-logo">
         <h1 class="auth-title">Welcome to NovaWatch</h1>
@@ -2516,8 +2515,8 @@ function getLastTab() {
    THEME (Light / Dark)
 ========================================================= */
 const THEME_KEY = "novawatch_theme";
-const THEME_COLOR_LIGHT = "#c6cacf";
-const THEME_COLOR_DARK = "#08090b";
+const THEME_COLOR_LIGHT = "#f4f6fb";
+const THEME_COLOR_DARK = "#0a0a0c";
 
 function getCurrentTheme() {
     return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
@@ -2527,24 +2526,15 @@ function getCurrentTheme() {
 // on its own: the sun/moon icon swap, the PWA status-bar meta color, and
 // the manifest theme_color equivalent for elements outside the stylesheet.
 function syncThemeUI(theme) {
-    const iconPairs = [
-        ["themeIconSun", "themeIconMoon"],
-        ["authThemeIconSun", "authThemeIconMoon"]
-    ];
-    iconPairs.forEach(([sunId, moonId]) => {
-        const sunIcon = document.getElementById(sunId);
-        const moonIcon = document.getElementById(moonId);
-        if (sunIcon && moonIcon) {
-            sunIcon.style.display = theme === "dark" ? "none" : "";
-            moonIcon.style.display = theme === "dark" ? "" : "none";
-        }
-    });
+    const sunIcon = document.getElementById("themeIconSun");
+    const moonIcon = document.getElementById("themeIconMoon");
+    if (sunIcon && moonIcon) {
+        sunIcon.style.display = theme === "dark" ? "none" : "";
+        moonIcon.style.display = theme === "dark" ? "" : "none";
+    }
 
-    const labelText = theme === "dark" ? "Dark" : "Light";
-    ["themeToggleLabel", "authThemeToggleLabel"].forEach(id => {
-        const label = document.getElementById(id);
-        if (label) label.textContent = labelText;
-    });
+    const label = document.getElementById("themeToggleLabel");
+    if (label) label.textContent = theme === "dark" ? "Dark" : "Light";
 
     const meta = document.getElementById("themeColorMeta");
     if (meta) {
