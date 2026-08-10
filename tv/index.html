@@ -454,13 +454,12 @@ img {
     overflow: hidden;
     border-radius: 20px;
     background: var(--surface-2);
-    border: 1px solid var(--glass-border);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.14);
     transition: box-shadow 0.25s ease;
 }
 
 .card:active .poster {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
 }
 
 .poster img {
@@ -760,7 +759,11 @@ img {
     border-radius: 16px;
     object-fit: cover;
     background: var(--surface-2);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.16);
+}
+
+[data-theme="dark"] .search-card-poster {
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
 }
 
 .search-card-info {
@@ -1665,23 +1668,24 @@ img {
 .hero-actions-row {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     margin-top: 16px;
 }
 
 .hero-theme-btn {
-    flex-shrink: 0;
+    flex: 1;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
-    height: 34px;
+    height: 38px;
     padding: 0 16px;
     border-radius: 999px;
     background: var(--surface);
     backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
     color: var(--text-secondary);
-    font-size: 12px;
+    font-size: 12.5px;
     font-weight: 700;
     box-shadow: var(--glass-shadow-sm);
     transition: transform 0.15s ease, color 0.2s ease;
@@ -1692,15 +1696,18 @@ img {
 }
 
 .hero-signout-btn {
-    flex-shrink: 0;
-    height: 34px;
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 38px;
     padding: 0 16px;
     border-radius: 999px;
     background: var(--surface);
     backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
     color: var(--text-secondary);
-    font-size: 12px;
+    font-size: 12.5px;
     font-weight: 700;
     box-shadow: var(--glass-shadow-sm);
 }
