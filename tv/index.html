@@ -3,27 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#f4f6fb" id="themeColorMeta">
+<meta name="theme-color" content="#f1f5f9">
 <title>NovaWatch | Track What You Watch</title>
-
-<!-- Applied as early as possible (before the rest of <head> and before any
-     paint) so a returning user in dark mode never sees a flash of the
-     light theme while the page loads. -->
-<script>
-(function () {
-    try {
-        var saved = localStorage.getItem("novawatch_theme");
-        var theme = (saved === "dark" || saved === "light")
-            ? saved
-            : (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-        if (theme === "dark") {
-            document.documentElement.setAttribute("data-theme", "dark");
-        }
-    } catch (e) {
-        // Storage unavailable - default to light theme.
-    }
-})();
-</script>
 
 <!-- Tab Icons & Custom App Icons -->
 <link rel="icon" type="image/png" href="https://www.novyra.co.za/NovaWatch_Logo.png">
@@ -68,103 +49,34 @@
 }
 
 :root {
-    /* "Crystal Aura" - airy cool-white base with soft blue aurora blobs
-       glowing through from behind, so the frosted glass panels have real
-       light/color to refract instead of sitting on a flat gray. */
-    --bg-mesh:
-        radial-gradient(circle at 14% 18%, rgba(147, 197, 253, 0.6) 0%, transparent 42%),
-        radial-gradient(circle at 86% 78%, rgba(191, 219, 254, 0.65) 0%, transparent 42%),
-        linear-gradient(135deg, #eef2f8 0%, #f4f7fb 50%, #eef1f7 100%);
-    --surface: rgba(255, 255, 255, 0.65);
-    --surface-2: rgba(255, 255, 255, 0.45);
-    --surface-3: rgba(255, 255, 255, 0.3);
+    --bg-mesh: linear-gradient(135deg, #e2e8f0 0%, #f8fafc 50%, #eff6ff 100%);
+    --surface: rgba(255, 255, 255, 0.58);
+    --surface-2: rgba(255, 255, 255, 0.36);
+    --surface-3: rgba(255, 255, 255, 0.22);
 
-    /* Dual-layer "crystalline edge": a bright top/left highlight plus a
-       cooler, dimmer bottom edge (built into --glass-shadow's insets
-       below) to fake a beveled, physical piece of glass. */
-    --glass-border: rgba(255, 255, 255, 0.9);
-    --glass-border-subtle: rgba(209, 213, 219, 0.4);
-    --glass-shadow: 0 22px 46px rgba(15, 23, 42, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 rgba(209, 213, 219, 0.45);
-    --glass-shadow-sm: 0 10px 28px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.85), inset 0 -1px 0 rgba(209, 213, 219, 0.35);
+    --glass-border: rgba(255, 255, 255, 0.7);
+    --glass-border-subtle: rgba(255, 255, 255, 0.38);
+    --glass-shadow: 0 22px 46px rgba(0, 0, 0, 0.09), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    --glass-shadow-sm: 0 10px 28px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.85);
 
-    /* Vivid Blue - the CTA/interactive accent */
-    --blue: #2563eb;
-    --blue-light: #3b82f6;
-    --blue-dark: #1d4ed8;
-    /* Bare RGB triplet of the accent above, so glow/tint effects that need
-       their own alpha (badge backgrounds, focus rings, hover tints) can
-       build off it via rgba(var(--accent-rgb), a) instead of hardcoding a
-       color that would go stale the moment the accent changes. */
-    --accent-rgb: 37, 99, 235;
+    --blue: #0066cc;      /* Apple System Blue */
+    --blue-light: #4792ff; 
+    --blue-dark: #004c99;
 
-    --text: #0f172a;
-    --text-secondary: #4b5563;
-    --text-muted: #8b93a3;
+    --text: #1d1d1f;
+    --text-secondary: #424245;
+    --text-muted: #86868b;
 
-    --border: rgba(15, 23, 42, 0.08);
+    --border: rgba(0, 0, 0, 0.08);
 
     --success: #34c759;
     --danger: #ff3b30;
 
-    /* Strong-frost variant for elements that need to read as more opaque
-       "glass" than the standard --surface (focus states, close buttons) */
-    --frost-strong: rgba(255, 255, 255, 0.88);
-    /* RGB triplet (no alpha) so modal backgrounds can build several alpha
-       stops off the same base color via rgba(var(--modal-surface-rgb), a) */
-    --modal-surface-rgb: 244, 246, 251;
-
     --radius: 20px;
 }
 
-/* =========================================================
-   DARK THEME - "Deep Cosmos"
-   Near-black backdrop with a soft blue nebula glow behind extremely
-   sheer glass panels, in the vein of visionOS/macOS dark glass: the
-   panels themselves barely tint the light passing through them, so
-   almost all of the richness comes from the blur+saturate picking up
-   the glow blobs and from crisp hairline borders defining each edge.
-   Every component below keeps working unchanged because it only ever
-   reaches for the variables re-defined here.
-========================================================= */
-:root[data-theme="dark"] {
-    --bg-mesh:
-        radial-gradient(circle at 18% 15%, rgba(59, 130, 246, 0.3) 0%, transparent 45%),
-        radial-gradient(circle at 82% 82%, rgba(37, 99, 235, 0.26) 0%, transparent 45%),
-        linear-gradient(135deg, #08080a 0%, #0a0a0c 50%, #08080a 100%);
-    --surface: rgba(255, 255, 255, 0.04);
-    --surface-2: rgba(255, 255, 255, 0.03);
-    --surface-3: rgba(255, 255, 255, 0.02);
-
-    --glass-border: rgba(255, 255, 255, 0.12);
-    --glass-border-subtle: rgba(255, 255, 255, 0.06);
-    --glass-shadow: 0 22px 46px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    --glass-shadow-sm: 0 10px 28px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-
-    /* Electric blue - brighter than the light theme's accent so it
-       still pops against near-black */
-    --blue: #60a5fa;
-    --blue-light: #93c5fd;
-    --blue-dark: #3b82f6;
-    --accent-rgb: 96, 165, 250;
-
-    --text: #f3f4f6;
-    --text-secondary: #9ca3af;
-    --text-muted: #6b7280;
-
-    --border: rgba(255, 255, 255, 0.1);
-
-    --success: #32d74b;
-    --danger: #ff453a;
-
-    --frost-strong: rgba(255, 255, 255, 0.08);
-    --modal-surface-rgb: 10, 10, 12;
-
-    background: #0a0a0c;
-    color-scheme: dark;
-}
-
 html {
-    background: #f4f6fb;
+    background: #e2e8f0;
     color-scheme: light;
 }
 
@@ -241,30 +153,8 @@ img {
     padding: 36px 18px 36px;
 }
 
-/* Opacity-only (no transform) - the Library tab in particular renders a
-   lot of individual backdrop-filter "glass" cards, and animating a
-   transform on their container forces the browser to keep re-sampling
-   the blur backdrop every frame as it moves, which is what made that
-   transition laggy. A plain opacity fade is compositor-cheap since it
-   doesn't move anything or invalidate the blur sampling. */
 .page.active {
     display: block;
-    animation: pageFadeIn 0.18s ease-out;
-}
-
-@keyframes pageFadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .page.active {
-        animation: none;
-    }
 }
 
 .tab-content-wrapper {
@@ -396,10 +286,11 @@ img {
    VIEWING ANALYTICS (Modern Polished UI)
 ========================================================= */
 .analytics-section {
-    /* Spacing between home-tab sections comes entirely from
-       .tab-content-wrapper's flex `gap` now, so every section sits an
-       equal distance apart instead of this adding an extra 24px on
-       top of that gap only after this particular section. */
+    /* No margin-bottom here: this section is a direct child of
+       .tab-content-wrapper, which already applies a consistent 26px gap
+       between all its top-level sections - an extra margin here on top of
+       that flex gap was creating a bigger gap under this section than the
+       one below every other section on Home. */
 }
 
 .analytics-card {
@@ -420,7 +311,7 @@ img {
     align-items: center;
     gap: 14px;
     padding-bottom: 14px;
-    border-bottom: 1px solid rgba(var(--accent-rgb), 0.12);
+    border-bottom: 1px solid rgba(0, 102, 204, 0.12);
 }
 
 .analytics-icon-badge {
@@ -432,7 +323,7 @@ img {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 6px 16px rgba(var(--accent-rgb), 0.35), inset 0 1px 0 rgba(255,255,255,0.4);
+    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.4);
     flex-shrink: 0;
 }
 
@@ -472,12 +363,13 @@ img {
     overflow: hidden;
     border-radius: 20px;
     background: var(--surface-2);
-    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.14);
+    border: none;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
     transition: box-shadow 0.25s ease;
 }
 
 .card:active .poster {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .poster img {
@@ -495,7 +387,7 @@ img {
     align-items: center;
     justify-content: center;
     text-align: center;
-    background: linear-gradient(135deg, rgba(var(--accent-rgb),0.14), rgba(var(--accent-rgb),0.05));
+    background: linear-gradient(135deg, rgba(0,102,204,0.14), rgba(0,102,204,0.05));
     color: var(--blue);
 }
 
@@ -594,7 +486,7 @@ img {
     color: white;
     font-size: 13px;
     font-weight: 750;
-    box-shadow: 0 8px 20px rgba(var(--accent-rgb), 0.3), inset 0 1px 0 rgba(255,255,255,0.35);
+    box-shadow: 0 8px 20px rgba(0, 102, 204, 0.3), inset 0 1px 0 rgba(255,255,255,0.35);
 }
 
 .empty-state-cta:active {
@@ -634,8 +526,8 @@ img {
 
 .search-box input:focus {
     border-color: var(--blue);
-    background: var(--frost-strong);
-    box-shadow: 0 0 0 4px rgba(var(--accent-rgb), 0.15), var(--glass-shadow-sm);
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.15), var(--glass-shadow-sm);
 }
 
 .search-icon {
@@ -699,11 +591,7 @@ img {
 .search-type-btn.active {
     background: var(--surface);
     color: var(--text);
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255,255,255,0.9);
-}
-
-[data-theme="dark"] .search-type-btn.active {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255,255,255,0.9);
 }
 
 .search-type-toggle.three-way {
@@ -720,7 +608,7 @@ img {
     padding: 5px;
     border-radius: 999px;
     border: 1px solid var(--glass-border-subtle);
-    margin-bottom: 18px;
+    margin-bottom: 16px;
 }
 
 .segmented-toggle.three-way {
@@ -740,7 +628,7 @@ img {
 .segmented-btn.active {
     background: linear-gradient(135deg, var(--blue-light), var(--blue));
     color: white;
-    box-shadow: 0 8px 18px rgba(var(--accent-rgb), 0.35), inset 0 1px 0 rgba(255,255,255,0.3);
+    box-shadow: 0 8px 18px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.3);
 }
 
 .library-subview {
@@ -759,9 +647,14 @@ img {
     padding: 14px 6px;
     align-items: flex-start;
     border-radius: 18px;
+    border-bottom: 1px solid var(--glass-border-subtle);
     transition: background 0.2s ease, transform 0.15s ease;
     cursor: pointer;
     position: relative;
+}
+
+.search-card:last-child {
+    border-bottom: none;
 }
 
 .search-card:active {
@@ -776,6 +669,7 @@ img {
     border-radius: 16px;
     object-fit: cover;
     background: var(--surface-2);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
 .search-card-info {
@@ -832,7 +726,7 @@ img {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 6px 16px rgba(var(--accent-rgb), 0.35), inset 0 1px 0 rgba(255,255,255,0.4);
+    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.4);
     flex-shrink: 0;
 }
 
@@ -861,13 +755,6 @@ img {
     border-top-color: var(--blue);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
-}
-
-[data-theme="dark"] .spinner {
-    /* The light track color above is invisible against a dark card, so
-       swap it for a translucent white track in dark mode. */
-    border-color: rgba(255, 255, 255, 0.12);
-    border-top-color: var(--blue);
 }
 
 @keyframes spin {
@@ -1038,26 +925,22 @@ img {
     gap: 14px;
     padding: 14px;
     align-items: flex-start;
-    /* A modest step up in opacity from the generic --surface glass, plus
-       a heavier blur+saturate, so these cards read clearly as their own
-       frosted layer rather than blending into the page behind them. */
-    background: rgba(255, 255, 255, 0.72);
-    backdrop-filter: blur(44px) saturate(220%);
-    -webkit-backdrop-filter: blur(44px) saturate(220%);
-    border: 1px solid var(--glass-border);
+    /* Stronger, more visibly "glass" treatment than the default .card/
+       --surface combo: lower fill opacity so the blurred backdrop reads
+       through clearly, heavier blur+saturation, and a brighter border/
+       shadow pairing so the edge of the glass is obvious rather than the
+       card just looking like a flat off-white panel. */
+    background: rgba(255, 255, 255, 0.46);
+    backdrop-filter: blur(44px) saturate(240%);
+    -webkit-backdrop-filter: blur(44px) saturate(240%);
+    border: 1px solid rgba(255, 255, 255, 0.85);
     border-radius: 20px;
-    box-shadow: 0 16px 38px rgba(15, 23, 42, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 rgba(209, 213, 219, 0.4);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 1), inset 0 0 0 1px rgba(255, 255, 255, 0.25);
     touch-action: pan-y;
     cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
     transition: box-shadow 0.2s ease;
-}
-
-[data-theme="dark"] .continue-card {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid var(--glass-border);
-    box-shadow: 0 16px 38px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .continue-card.dragging {
@@ -1175,12 +1058,12 @@ img {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 4px;
-    background: var(--surface);
+    background: rgba(255, 255, 255, 0.58);
     backdrop-filter: blur(56px) saturate(220%);
     -webkit-backdrop-filter: blur(56px) saturate(220%);
     border: 1px solid var(--glass-border);
     border-radius: 999px;
-    box-shadow: var(--glass-shadow);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 
 /* Single floating "liquid glass" capsule that glides beneath whichever tab
@@ -1194,16 +1077,11 @@ img {
     height: calc(100% - 14px);
     width: 0;
     border-radius: 999px;
-    background: rgba(var(--accent-rgb), 0.12);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 1px rgba(15, 23, 42, 0.04);
+    background: rgba(120, 128, 140, 0.14);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 1px rgba(0, 0, 0, 0.04);
     transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
     pointer-events: none;
     z-index: 0;
-}
-
-[data-theme="dark"] .nav-indicator {
-    background: rgba(var(--accent-rgb), 0.18);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 -1px 1px rgba(0, 0, 0, 0.2);
 }
 
 .nav-button {
@@ -1264,17 +1142,13 @@ img {
     max-height: 92vh;
     margin: 0 auto;
     overflow-y: auto;
-    background: rgba(var(--modal-surface-rgb), 0.68);
+    background: rgba(248, 250, 252, 0.68);
     backdrop-filter: blur(68px) saturate(230%);
     -webkit-backdrop-filter: blur(68px) saturate(230%);
     border-radius: 28px 28px 0 0;
-    border: 1px solid var(--glass-border);
+    border: none;
     position: relative;
     box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 1);
-}
-
-[data-theme="dark"] .modal-sheet {
-    box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .modal-backdrop-header {
@@ -1292,7 +1166,7 @@ img {
 .modal-backdrop-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(var(--modal-surface-rgb),0.05) 0%, rgba(var(--modal-surface-rgb),0.96) 100%);
+    background: linear-gradient(180deg, rgba(248,250,252,0.05) 0%, rgba(248,250,252,0.96) 100%);
 }
 
 .modal-header-nav {
@@ -1311,7 +1185,7 @@ img {
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: var(--frost-strong);
+    background: rgba(255, 255, 255, 0.6);
     color: var(--text);
     backdrop-filter: blur(24px);
     border: 1px solid var(--glass-border);
@@ -1432,7 +1306,7 @@ img {
     align-items: center;
     justify-content: center;
     border: none;
-    box-shadow: 0 6px 16px rgba(var(--accent-rgb), 0.3);
+    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3);
 }
 
 .cinema-chip .watch-provider-name {
@@ -1503,11 +1377,11 @@ img {
     background: var(--blue);
     color: white;
     border: none;
-    box-shadow: 0 6px 16px rgba(var(--accent-rgb), 0.3), inset 0 1px 0 rgba(255,255,255,0.4);
+    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3), inset 0 1px 0 rgba(255,255,255,0.4);
 }
 
 .action-button.trailer {
-    background: var(--frost-strong);
+    background: rgba(255, 255, 255, 0.55);
     border: 1px solid var(--glass-border);
     backdrop-filter: blur(24px);
 }
@@ -1560,7 +1434,7 @@ img {
     background: var(--blue);
     color: white;
     border-color: var(--blue);
-    box-shadow: 0 6px 16px rgba(var(--accent-rgb), 0.3);
+    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3);
 }
 
 .episode {
@@ -1579,7 +1453,7 @@ img {
 }
 
 .episode-up-next {
-    background: rgba(var(--accent-rgb), 0.06);
+    background: rgba(0, 102, 204, 0.06);
     border-bottom-color: transparent;
 }
 
@@ -1653,18 +1527,12 @@ img {
 ========================================================= */
 .hero-card {
     padding: 26px 24px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(191,219,254,0.55) 100%);
+    background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(224,238,255,0.78) 100%);
     backdrop-filter: blur(40px) saturate(200%);
     -webkit-backdrop-filter: blur(40px) saturate(200%);
-    border: 1px solid rgba(var(--accent-rgb), 0.2);
+    border: 1px solid rgba(0, 102, 204, 0.2);
     border-radius: 28px;
-    box-shadow: 0 20px 48px rgba(var(--accent-rgb), 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 rgba(209, 213, 219, 0.4);
-}
-
-[data-theme="dark"] .hero-card {
-    background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(37,99,235,0.06) 100%);
-    border: 1px solid rgba(var(--accent-rgb), 0.22);
-    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    box-shadow: 0 20px 48px rgba(0, 102, 204, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 
 .hero-top {
@@ -1680,49 +1548,16 @@ img {
     gap: 16px;
 }
 
-.hero-actions-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 16px;
-}
-
-.hero-theme-btn {
-    flex: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    height: 38px;
-    padding: 0 16px;
-    border-radius: 999px;
-    background: var(--surface);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
-    color: var(--text-secondary);
-    font-size: 12.5px;
-    font-weight: 700;
-    box-shadow: var(--glass-shadow-sm);
-    transition: transform 0.15s ease, color 0.2s ease;
-}
-
-.hero-theme-btn:active {
-    transform: scale(0.96);
-}
-
 .hero-signout-btn {
-    flex: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 38px;
+    flex-shrink: 0;
+    height: 34px;
     padding: 0 16px;
     border-radius: 999px;
     background: var(--surface);
     backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
     color: var(--text-secondary);
-    font-size: 12.5px;
+    font-size: 12px;
     font-weight: 700;
     box-shadow: var(--glass-shadow-sm);
 }
@@ -1738,7 +1573,7 @@ img {
     gap: 14px;
     margin-top: 20px;
     padding-top: 18px;
-    border-top: 1px solid rgba(var(--accent-rgb), 0.14);
+    border-top: 1px solid rgba(0, 102, 204, 0.14);
 }
 
 .hero-notify-title {
@@ -1762,7 +1597,7 @@ img {
     color: white;
     font-size: 12.5px;
     font-weight: 750;
-    box-shadow: 0 8px 20px rgba(var(--accent-rgb), 0.35), inset 0 1px 0 rgba(255,255,255,0.35);
+    box-shadow: 0 8px 20px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.35);
 }
 
 .hero-pill-btn:active {
@@ -1796,7 +1631,7 @@ img {
     color: white;
     font-size: 22px;
     font-weight: 800;
-    box-shadow: 0 8px 20px rgba(var(--accent-rgb), 0.35), inset 0 1px 0 rgba(255,255,255,0.4);
+    box-shadow: 0 8px 20px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.4);
     flex-shrink: 0;
 }
 
@@ -1828,16 +1663,6 @@ img {
     border: 1px solid rgba(0,0,0,0.1);
     box-shadow: 0 4px 12px rgba(0,0,0,0.06);
     transition: transform 0.15s ease;
-}
-
-/* Google's own dark-mode button spec: dark gray fill, light text, a
-   lighter outline - rather than the light "Sign in with Google" pill
-   sitting oddly on an otherwise dark screen. */
-[data-theme="dark"] .google-auth-btn {
-    background: #131314;
-    color: #e3e3e3;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .google-auth-btn:active {
@@ -1902,7 +1727,7 @@ img {
 .auth-input:focus {
     border-color: var(--blue);
     background: var(--surface);
-    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.15);
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
 }
 
 .auth-actions {
@@ -1919,7 +1744,7 @@ img {
     font-weight: 700;
     background: var(--blue);
     color: white;
-    box-shadow: 0 6px 16px rgba(var(--accent-rgb), 0.3);
+    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3);
 }
 
 .auth-btn.secondary {
@@ -1984,27 +1809,18 @@ img {
     max-width: 400px;
     max-height: 100%;
     overflow-y: auto;
-    /* Same premium gradient + accent-tinted edge as the home tab's hero
-       card, so sign-in reads as part of the same design system instead
-       of a plain generic panel. */
-    background: linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(191,219,254,0.55) 100%);
+    background: var(--surface);
     backdrop-filter: blur(48px) saturate(210%);
     -webkit-backdrop-filter: blur(48px) saturate(210%);
-    border: 1px solid rgba(var(--accent-rgb), 0.2);
+    border: 1px solid var(--glass-border);
     border-radius: 28px;
     padding: 18px 22px;
-    box-shadow: 0 24px 48px rgba(var(--accent-rgb), 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 rgba(209, 213, 219, 0.4);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.9);
     text-align: center;
     display: flex;
     flex-direction: column;
     gap: 10px;
     animation: authFadeIn 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-[data-theme="dark"] .auth-overlay-card {
-    background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(37,99,235,0.06) 100%);
-    border: 1px solid rgba(var(--accent-rgb), 0.22);
-    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 @keyframes authFadeIn {
@@ -2037,14 +1853,17 @@ img {
 .toast {
     position: fixed;
     left: 50%;
-    bottom: 100px;
+    /* Nav bar sits at bottom:22px with height:70px, so its top edge is at
+       92px - this keeps the toast a consistent, intentional 12px above
+       that edge instead of floating in the middle of the screen. */
+    bottom: 104px;
     z-index: 500;
     transform: translateX(-50%) translateY(14px) scale(0.92);
     opacity: 0;
     pointer-events: none;
     padding: 13px 22px;
     border-radius: 999px;
-    background: var(--surface);
+    background: rgba(255, 255, 255, 0.58);
     backdrop-filter: blur(56px) saturate(220%);
     -webkit-backdrop-filter: blur(56px) saturate(220%);
     border: 1px solid var(--glass-border);
@@ -2063,7 +1882,7 @@ img {
     gap: 10px;
     white-space: normal;
     word-break: break-word;
-    box-shadow: var(--glass-shadow);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 
 .toast.show {
@@ -2109,7 +1928,7 @@ img {
 
 .auth-error {
     display: none;
-    color: var(--danger);
+    color: #ff3b30;
     font-size: 12px;
     font-weight: 600;
     margin-top: 6px;
@@ -2121,7 +1940,7 @@ img {
 }
 
 .auth-input.input-error {
-    border: 1px solid var(--danger) !important;
+    border: 1px solid #ff3b30 !important;
     box-shadow: 0 0 0 2px rgba(255, 59, 48, 0.12);
 }
 </style>
@@ -2281,14 +2100,6 @@ img {
                         <div class="home-subtitle" id="homeEmailSubtitle">Guest Account</div>
                     </div>
                 </div>
-            </div>
-
-            <div class="hero-actions-row">
-                <button class="hero-theme-btn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode">
-                    <svg id="themeIconSun" class="icon icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
-                    <svg id="themeIconMoon" class="icon icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                    <span id="themeToggleLabel">Light</span>
-                </button>
                 <button class="hero-signout-btn" onclick="handleSignOut()">Sign Out</button>
             </div>
 
@@ -2511,56 +2322,6 @@ function getLastTab() {
     }
 }
 
-/* =========================================================
-   THEME (Light / Dark)
-========================================================= */
-const THEME_KEY = "novawatch_theme";
-const THEME_COLOR_LIGHT = "#f4f6fb";
-const THEME_COLOR_DARK = "#0a0a0c";
-
-function getCurrentTheme() {
-    return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
-}
-
-// Syncs everything that can't just react to the [data-theme] CSS attribute
-// on its own: the sun/moon icon swap, the PWA status-bar meta color, and
-// the manifest theme_color equivalent for elements outside the stylesheet.
-function syncThemeUI(theme) {
-    const sunIcon = document.getElementById("themeIconSun");
-    const moonIcon = document.getElementById("themeIconMoon");
-    if (sunIcon && moonIcon) {
-        sunIcon.style.display = theme === "dark" ? "none" : "";
-        moonIcon.style.display = theme === "dark" ? "" : "none";
-    }
-
-    const label = document.getElementById("themeToggleLabel");
-    if (label) label.textContent = theme === "dark" ? "Dark" : "Light";
-
-    const meta = document.getElementById("themeColorMeta");
-    if (meta) {
-        meta.setAttribute("content", theme === "dark" ? THEME_COLOR_DARK : THEME_COLOR_LIGHT);
-    }
-}
-
-function applyTheme(theme) {
-    if (theme === "dark") {
-        document.documentElement.setAttribute("data-theme", "dark");
-    } else {
-        document.documentElement.removeAttribute("data-theme");
-    }
-    syncThemeUI(theme);
-}
-
-function toggleTheme() {
-    const next = getCurrentTheme() === "dark" ? "light" : "dark";
-    applyTheme(next);
-    try {
-        localStorage.setItem(THEME_KEY, next);
-    } catch (e) {
-        // Private browsing / storage disabled - theme just won't persist.
-    }
-}
-
 let state = {
     library: [],
     profiles: [
@@ -2705,8 +2466,6 @@ function clearSearch(inputId) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    syncThemeUI(getCurrentTheme());
-
     const searchInputs = ['onlineSearchInput', 'tvLibrarySearchInput', 'movieLibrarySearchInput'];
     
     searchInputs.forEach(id => {
@@ -3740,8 +3499,8 @@ if (auth) {
             const largeAvatar = document.getElementById("largeAvatar");
             if (largeAvatar) largeAvatar.textContent = initial;
 
-            // Always land on Home after signing in / reloading, regardless
-            // of whichever tab the user was last on.
+            // Always land on Home on load/refresh, regardless of whichever
+            // tab the user was last on.
             showPage('home');
             updateNavIndicator(false);
 
@@ -4401,27 +4160,45 @@ function getTVProgress(show) {
     };
 }
 
-function isTVUpToDate(show) {
+// `upcomingShowIds` is an optional pre-computed Set of show ids that have
+// upcoming episodes (see getUpcomingTVShowIds()). Passing it in lets callers
+// that need this check across the whole library compute the upcoming list
+// ONCE instead of once per show - without it, this falls back to computing
+// it fresh (still correct, just slower if called in a per-show loop).
+function isTVUpToDate(show, upcomingShowIds = null) {
     if (show.type === 'movie' || show.isStopped) return false;
     const progress = getTVProgress(show);
-    const upcoming = getUpcomingItems('tv').filter(u => u.item.id === show.id);
+    const hasUpcoming = upcomingShowIds
+        ? upcomingShowIds.has(show.id)
+        : getUpcomingItems('tv').some(u => u.item.id === show.id);
     return (
         progress.total > 0 &&
         progress.watched === progress.total &&
-        upcoming.length > 0
+        hasUpcoming
     );
 }
 
-function isTVFinished(show) {
+function isTVFinished(show, upcomingShowIds = null) {
     if (show.type === 'movie') return show.watched;
     if (show.isStopped) return false;
     const progress = getTVProgress(show);
-    const upcoming = getUpcomingItems('tv').filter(u => u.item.id === show.id);
+    const hasUpcoming = upcomingShowIds
+        ? upcomingShowIds.has(show.id)
+        : getUpcomingItems('tv').some(u => u.item.id === show.id);
     return (
         progress.total > 0 &&
         progress.watched === progress.total &&
-        upcoming.length === 0
+        !hasUpcoming
     );
+}
+
+// Computes the "has an upcoming episode" check for every TV show in one
+// single pass over the library/episodes, instead of the old approach where
+// isTVUpToDate/isTVFinished each re-scanned the entire library from scratch
+// for every single show (an O(n^2) cost that's what made switching to the
+// Library tab feel laggy on any library of meaningful size).
+function getUpcomingTVShowIds() {
+    return new Set(getUpcomingItems('tv').map(u => u.item.id));
 }
 
 function getLatestAiredEpisodeDate(show) {
@@ -4434,17 +4211,6 @@ function getLatestAiredEpisodeDate(show) {
 
 function sortTVShowsByLatestAired(shows) {
     return shows.sort((a, b) => getLatestAiredEpisodeDate(b) - getLatestAiredEpisodeDate(a));
-}
-
-// Most-recently-added-to-library show first, oldest-tracked show last.
-// Used for the Home tab's "Continue Watching" row specifically, rather
-// than sortTVShowsByLatestAired (which the Library tab still uses).
-function sortTVShowsByTrackedDate(shows) {
-    return shows.sort((a, b) => {
-        const timeA = a.addedAt ? new Date(a.addedAt).getTime() : 0;
-        const timeB = b.addedAt ? new Date(b.addedAt).getTime() : 0;
-        return timeB - timeA;
-    });
 }
 
 function sortMoviesByWatchedDate(movies) {
@@ -4479,34 +4245,27 @@ function showPage(page, subType = null, focusSearch = false) {
 
     updateNavIndicator();
 
-    // Deferred one frame so the tab-switch fade can actually paint before
-    // any per-tab rendering work runs - Library in particular can build a
-    // lot of glass cards at once, and doing that synchronously here was
-    // blocking the animation's first frame and making the switch feel
-    // laggy.
-    requestAnimationFrame(() => {
-        if (page === "library") setLibraryView(subType || currentLibraryView);
-        if (page === "discover") {
-            if (subType) {
-                setSearchType(subType);
-            } else {
-                const query = document.getElementById("onlineSearchInput").value.trim();
-                if (!query) fetchTrending();
-            }
+    if (page === "library") setLibraryView(subType || currentLibraryView);
+    if (page === "discover") {
+        if (subType) {
+            setSearchType(subType);
+        } else {
+            const query = document.getElementById("onlineSearchInput").value.trim();
+            if (!query) fetchTrending();
+        }
 
-            // Only auto-focus when the person actually tapped their way to
-            // Discover (focusSearch=true from the nav button) — never on the
-            // programmatic tab restore on load, which would pop the mobile
-            // keyboard unexpectedly the moment the app opens.
-            if (focusSearch) {
-                const input = document.getElementById("onlineSearchInput");
-                if (input) {
-                    setTimeout(() => input.focus(), 150);
-                }
+        // Only auto-focus when the person actually tapped their way to
+        // Discover (focusSearch=true from the nav button) — never on the
+        // programmatic tab restore on load, which would pop the mobile
+        // keyboard unexpectedly the moment the app opens.
+        if (focusSearch) {
+            const input = document.getElementById("onlineSearchInput");
+            if (input) {
+                setTimeout(() => input.focus(), 150);
             }
         }
-        if (page === "home") renderHomeTab();
-    });
+    }
+    if (page === "home") renderHomeTab();
 }
 
 // Slides the shared glass capsule under whichever nav button is active,
@@ -4678,14 +4437,19 @@ function renderTVLibrarySection(containerId = "tvLibraryCategories", inputId = "
         return;
     }
 
+    // Computed once up front and reused for every show below, rather than
+    // each show re-scanning the whole library for its own upcoming-episode
+    // check - see getUpcomingTVShowIds().
+    const upcomingShowIds = getUpcomingTVShowIds();
+
     const inProgress = sortTVShowsByLatestAired(items.filter(item => {
         if (item.isStopped) return false;
         const p = getTVProgress(item);
         return p.watched > 0 && p.watched < p.total;
     }));
 
-    const upToDate = sortTVShowsByLatestAired(items.filter(item => !item.isStopped && isTVUpToDate(item)));
-    const finished = sortTVShowsByLatestAired(items.filter(item => !item.isStopped && isTVFinished(item)));
+    const upToDate = sortTVShowsByLatestAired(items.filter(item => !item.isStopped && isTVUpToDate(item, upcomingShowIds)));
+    const finished = sortTVShowsByLatestAired(items.filter(item => !item.isStopped && isTVFinished(item, upcomingShowIds)));
     const unwatched = sortTVShowsByLatestAired(items.filter(item => {
         if (item.isStopped) return false;
         const p = getTVProgress(item);
@@ -4702,12 +4466,12 @@ function renderTVLibrarySection(containerId = "tvLibraryCategories", inputId = "
 
     let html = "";
 
-    if (inProgress.length > 0) html += renderCategoryBlock("In Progress", inProgress);
-    if (upToDate.length > 0) html += renderCategoryBlock("Up to Date", upToDate);
-    if (finished.length > 0) html += renderCategoryBlock("Finished", finished);
-    if (unwatched.length > 0) html += renderCategoryBlock("Unwatched", unwatched);
-    if (comingSoon.length > 0) html += renderCategoryBlock("Coming Soon", comingSoon);
-    if (stopped.length > 0) html += renderCategoryBlock("Stopped Watching", stopped);
+    if (inProgress.length > 0) html += renderCategoryBlock("In Progress", inProgress, upcomingShowIds);
+    if (upToDate.length > 0) html += renderCategoryBlock("Up to Date", upToDate, upcomingShowIds);
+    if (finished.length > 0) html += renderCategoryBlock("Finished", finished, upcomingShowIds);
+    if (unwatched.length > 0) html += renderCategoryBlock("Unwatched", unwatched, upcomingShowIds);
+    if (comingSoon.length > 0) html += renderCategoryBlock("Coming Soon", comingSoon, upcomingShowIds);
+    if (stopped.length > 0) html += renderCategoryBlock("Stopped Watching", stopped, upcomingShowIds);
 
     if (!html) {
         html = emptyState("No TV Shows Matching", "No TV shows match your search query.");
@@ -4749,7 +4513,7 @@ function renderMovieLibrarySection(containerId = "movieLibraryCategories", input
     container.innerHTML = html;
 }
 
-function renderCategoryBlock(title, items) {
+function renderCategoryBlock(title, items, upcomingShowIds = null) {
     return `
         <div class="category-block">
             <div class="category-title">
@@ -4757,7 +4521,7 @@ function renderCategoryBlock(title, items) {
                 <span class="category-count">${items.length}</span>
             </div>
             <div class="library-grid">
-                ${items.map(item => createCard(item)).join("")}
+                ${items.map(item => createCard(item, upcomingShowIds)).join("")}
             </div>
         </div>
     `;
@@ -4766,7 +4530,7 @@ function renderCategoryBlock(title, items) {
 /* =========================================================
    CARDS
 ========================================================= */
-function createCard(item) {
+function createCard(item, upcomingShowIds = null) {
     const hasPoster = item.poster && item.poster.trim() !== "";
 
     // A small "NEW" badge for shows with a released-but-unwatched episode
@@ -4781,9 +4545,9 @@ function createCard(item) {
             let barColor = 'var(--blue)';
             if (item.isStopped) {
                 barColor = 'var(--text-muted)';
-            } else if (isTVFinished(item)) {
+            } else if (isTVFinished(item, upcomingShowIds)) {
                 barColor = 'var(--danger)';
-            } else if (isTVUpToDate(item)) {
+            } else if (isTVUpToDate(item, upcomingShowIds)) {
                 barColor = 'var(--success)';
             }
             progressBarHTML = `
@@ -4855,14 +4619,17 @@ function getContinueWatchingItems() {
         return item.type === 'movie' && !item.watched && isReleased(item.releaseDate);
     });
 
-    const tvItems = sortTVShowsByTrackedDate(tvShows).map(show => ({
+    const tvItems = sortTVShowsByLatestAired(tvShows).map(show => ({
         show: show,
         episode: getNextUnwatchedEpisode(show)
     }));
 
+    // Newest to oldest by when the movie was most recently watched/updated
+    // in your library (falls back to release date for older library items
+    // saved before this was tracked).
     const movieItems = [...movies].sort((a, b) => {
-        const dateA = a.releaseDate ? new Date(a.releaseDate).getTime() : 0;
-        const dateB = b.releaseDate ? new Date(b.releaseDate).getTime() : 0;
+        const dateA = a.lastWatchedAt ? new Date(a.lastWatchedAt).getTime() : (a.addedAt ? new Date(a.addedAt).getTime() : (a.releaseDate ? new Date(a.releaseDate).getTime() : 0));
+        const dateB = b.lastWatchedAt ? new Date(b.lastWatchedAt).getTime() : (b.addedAt ? new Date(b.addedAt).getTime() : (b.releaseDate ? new Date(b.releaseDate).getTime() : 0));
         return dateB - dateA;
     });
 
