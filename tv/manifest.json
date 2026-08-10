@@ -10,8 +10,8 @@
   "launch_handler": {
     "client_mode": "navigate-existing"
   },
-  "background_color": "#c6cacf",
-  "theme_color": "#c6cacf",
+  "background_color": "#f4f6fb",
+  "theme_color": "#f4f6fb",
   "icons": [
     {
       "src": "https://www.novyra.co.za/NovaWatch_Logo.png",
