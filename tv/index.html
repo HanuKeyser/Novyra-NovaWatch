@@ -3,8 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#f1f5f9">
+<meta name="theme-color" content="#f1f5f9" id="themeColorMeta">
 <title>NovaWatch | Track What You Watch</title>
+
+<!-- Applied as early as possible (before the rest of <head> and before any
+     paint) so a returning user in dark mode never sees a flash of the
+     light theme while the page loads. -->
+<script>
+(function () {
+    try {
+        var saved = localStorage.getItem("novawatch_theme");
+        var theme = (saved === "dark" || saved === "light")
+            ? saved
+            : (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        if (theme === "dark") {
+            document.documentElement.setAttribute("data-theme", "dark");
+        }
+    } catch (e) {
+        // Storage unavailable - default to light theme.
+    }
+})();
+</script>
 
 <!-- Tab Icons & Custom App Icons -->
 <link rel="icon" type="image/png" href="https://www.novyra.co.za/NovaWatch_Logo.png">
@@ -72,7 +91,53 @@
     --success: #34c759;
     --danger: #ff3b30;
 
+    /* Strong-frost variant for elements that need to read as more opaque
+       "glass" than the standard --surface (focus states, close buttons) */
+    --frost-strong: rgba(255, 255, 255, 0.9);
+    /* RGB triplet (no alpha) so modal backgrounds can build several alpha
+       stops off the same base color via rgba(var(--modal-surface-rgb), a) */
+    --modal-surface-rgb: 248, 250, 252;
+
     --radius: 20px;
+}
+
+/* =========================================================
+   DARK THEME
+   Same glass-morphism approach as light mode, just re-based on a deep
+   slate/navy backdrop: translucent panels get a dark tint instead of
+   white so the blur still reads as "frosted glass" rather than a flat
+   dark box, and every component below keeps working unchanged because
+   it only ever reaches for the variables re-defined here.
+========================================================= */
+:root[data-theme="dark"] {
+    --bg-mesh: linear-gradient(135deg, #0a0f1a 0%, #111827 50%, #0b1526 100%);
+    --surface: rgba(30, 41, 59, 0.6);
+    --surface-2: rgba(30, 41, 59, 0.42);
+    --surface-3: rgba(30, 41, 59, 0.28);
+
+    --glass-border: rgba(255, 255, 255, 0.14);
+    --glass-border-subtle: rgba(255, 255, 255, 0.08);
+    --glass-shadow: 0 22px 46px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    --glass-shadow-sm: 0 10px 28px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+    --blue: #3b93ff;
+    --blue-light: #6bb3ff;
+    --blue-dark: #1f6fd1;
+
+    --text: #f2f4f8;
+    --text-secondary: #b6bcc7;
+    --text-muted: #7c8494;
+
+    --border: rgba(255, 255, 255, 0.1);
+
+    --success: #32d74b;
+    --danger: #ff453a;
+
+    --frost-strong: rgba(35, 46, 66, 0.8);
+    --modal-surface-rgb: 15, 21, 33;
+
+    background: #0a0f1a;
+    color-scheme: dark;
 }
 
 html {
@@ -286,7 +351,10 @@ img {
    VIEWING ANALYTICS (Modern Polished UI)
 ========================================================= */
 .analytics-section {
-    margin-bottom: 24px;
+    /* Spacing between home-tab sections comes entirely from
+       .tab-content-wrapper's flex `gap` now, so every section sits an
+       equal distance apart instead of this adding an extra 24px on
+       top of that gap only after this particular section. */
 }
 
 .analytics-card {
@@ -522,7 +590,7 @@ img {
 
 .search-box input:focus {
     border-color: var(--blue);
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--frost-strong);
     box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.15), var(--glass-shadow-sm);
 }
 
@@ -921,17 +989,27 @@ img {
     gap: 14px;
     padding: 14px;
     align-items: flex-start;
-    background: var(--surface);
-    backdrop-filter: blur(30px) saturate(180%);
-    -webkit-backdrop-filter: blur(30px) saturate(180%);
-    border: 1px solid var(--glass-border);
+    /* Deliberately stronger/more opaque than the generic --surface glass
+       used elsewhere, plus a heavier blur+saturate and a crisper border,
+       so these cards read clearly as frosted panels against the equally
+       light page background instead of nearly disappearing into it. */
+    background: rgba(255, 255, 255, 0.74);
+    backdrop-filter: blur(44px) saturate(220%);
+    -webkit-backdrop-filter: blur(44px) saturate(220%);
+    border: 1px solid rgba(255, 255, 255, 0.9);
     border-radius: 20px;
-    box-shadow: var(--glass-shadow-sm);
+    box-shadow: 0 16px 38px rgba(0, 0, 0, 0.13), inset 0 1px 0 rgba(255, 255, 255, 0.95);
     touch-action: pan-y;
     cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
     transition: box-shadow 0.2s ease;
+}
+
+[data-theme="dark"] .continue-card {
+    background: rgba(42, 55, 78, 0.74);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 16px 38px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .continue-card.dragging {
@@ -1049,12 +1127,12 @@ img {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 4px;
-    background: rgba(255, 255, 255, 0.58);
+    background: var(--surface);
     backdrop-filter: blur(56px) saturate(220%);
     -webkit-backdrop-filter: blur(56px) saturate(220%);
     border: 1px solid var(--glass-border);
     border-radius: 999px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    box-shadow: var(--glass-shadow);
 }
 
 /* Single floating "liquid glass" capsule that glides beneath whichever tab
@@ -1073,6 +1151,11 @@ img {
     transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
     pointer-events: none;
     z-index: 0;
+}
+
+[data-theme="dark"] .nav-indicator {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 -1px 1px rgba(0, 0, 0, 0.2);
 }
 
 .nav-button {
@@ -1133,11 +1216,11 @@ img {
     max-height: 92vh;
     margin: 0 auto;
     overflow-y: auto;
-    background: rgba(248, 250, 252, 0.68);
+    background: rgba(var(--modal-surface-rgb), 0.68);
     backdrop-filter: blur(68px) saturate(230%);
     -webkit-backdrop-filter: blur(68px) saturate(230%);
     border-radius: 28px 28px 0 0;
-    border: 1px solid rgba(255, 255, 255, 0.85);
+    border: 1px solid var(--glass-border);
     position: relative;
     box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 1);
 }
@@ -1157,7 +1240,7 @@ img {
 .modal-backdrop-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(248,250,252,0.05) 0%, rgba(248,250,252,0.96) 100%);
+    background: linear-gradient(180deg, rgba(var(--modal-surface-rgb),0.05) 0%, rgba(var(--modal-surface-rgb),0.96) 100%);
 }
 
 .modal-header-nav {
@@ -1176,7 +1259,7 @@ img {
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.6);
+    background: var(--frost-strong);
     color: var(--text);
     backdrop-filter: blur(24px);
     border: 1px solid var(--glass-border);
@@ -1372,7 +1455,7 @@ img {
 }
 
 .action-button.trailer {
-    background: rgba(255, 255, 255, 0.55);
+    background: var(--frost-strong);
     border: 1px solid var(--glass-border);
     backdrop-filter: blur(24px);
 }
@@ -1526,6 +1609,12 @@ img {
     box-shadow: 0 20px 48px rgba(0, 102, 204, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 
+[data-theme="dark"] .hero-card {
+    background: linear-gradient(135deg, rgba(30,41,59,0.88) 0%, rgba(13,22,38,0.78) 100%);
+    border: 1px solid rgba(59, 147, 255, 0.28);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
 .hero-top {
     display: flex;
     align-items: flex-start;
@@ -1537,6 +1626,33 @@ img {
     display: flex;
     align-items: center;
     gap: 16px;
+}
+
+.hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.hero-icon-btn {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    color: var(--text-secondary);
+    box-shadow: var(--glass-shadow-sm);
+    transition: transform 0.15s ease, color 0.2s ease;
+}
+
+.hero-icon-btn:active {
+    transform: scale(0.92);
 }
 
 .hero-signout-btn {
@@ -1844,14 +1960,14 @@ img {
 .toast {
     position: fixed;
     left: 50%;
-    bottom: 118px;
+    bottom: 100px;
     z-index: 500;
     transform: translateX(-50%) translateY(14px) scale(0.92);
     opacity: 0;
     pointer-events: none;
     padding: 13px 22px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.58);
+    background: var(--surface);
     backdrop-filter: blur(56px) saturate(220%);
     -webkit-backdrop-filter: blur(56px) saturate(220%);
     border: 1px solid var(--glass-border);
@@ -1870,7 +1986,7 @@ img {
     gap: 10px;
     white-space: normal;
     word-break: break-word;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    box-shadow: var(--glass-shadow);
 }
 
 .toast.show {
@@ -2088,7 +2204,13 @@ img {
                         <div class="home-subtitle" id="homeEmailSubtitle">Guest Account</div>
                     </div>
                 </div>
-                <button class="hero-signout-btn" onclick="handleSignOut()">Sign Out</button>
+                <div class="hero-actions">
+                    <button class="hero-icon-btn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode">
+                        <svg id="themeIconSun" class="icon icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                        <svg id="themeIconMoon" class="icon icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    </button>
+                    <button class="hero-signout-btn" onclick="handleSignOut()">Sign Out</button>
+                </div>
             </div>
 
             <div class="hero-notify-row">
@@ -2310,6 +2432,53 @@ function getLastTab() {
     }
 }
 
+/* =========================================================
+   THEME (Light / Dark)
+========================================================= */
+const THEME_KEY = "novawatch_theme";
+const THEME_COLOR_LIGHT = "#f1f5f9";
+const THEME_COLOR_DARK = "#0a0f1a";
+
+function getCurrentTheme() {
+    return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+}
+
+// Syncs everything that can't just react to the [data-theme] CSS attribute
+// on its own: the sun/moon icon swap, the PWA status-bar meta color, and
+// the manifest theme_color equivalent for elements outside the stylesheet.
+function syncThemeUI(theme) {
+    const sunIcon = document.getElementById("themeIconSun");
+    const moonIcon = document.getElementById("themeIconMoon");
+    if (sunIcon && moonIcon) {
+        sunIcon.style.display = theme === "dark" ? "none" : "";
+        moonIcon.style.display = theme === "dark" ? "" : "none";
+    }
+
+    const meta = document.getElementById("themeColorMeta");
+    if (meta) {
+        meta.setAttribute("content", theme === "dark" ? THEME_COLOR_DARK : THEME_COLOR_LIGHT);
+    }
+}
+
+function applyTheme(theme) {
+    if (theme === "dark") {
+        document.documentElement.setAttribute("data-theme", "dark");
+    } else {
+        document.documentElement.removeAttribute("data-theme");
+    }
+    syncThemeUI(theme);
+}
+
+function toggleTheme() {
+    const next = getCurrentTheme() === "dark" ? "light" : "dark";
+    applyTheme(next);
+    try {
+        localStorage.setItem(THEME_KEY, next);
+    } catch (e) {
+        // Private browsing / storage disabled - theme just won't persist.
+    }
+}
+
 let state = {
     library: [],
     profiles: [
@@ -2454,6 +2623,8 @@ function clearSearch(inputId) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    syncThemeUI(getCurrentTheme());
+
     const searchInputs = ['onlineSearchInput', 'tvLibrarySearchInput', 'movieLibrarySearchInput'];
     
     searchInputs.forEach(id => {
@@ -3487,11 +3658,9 @@ if (auth) {
             const largeAvatar = document.getElementById("largeAvatar");
             if (largeAvatar) largeAvatar.textContent = initial;
 
-            // Land back on whichever tab the user was last on rather than
-            // always resetting to Home. Any page still shows stale/empty
-            // content for a moment until the library finishes loading below,
-            // then refreshActivePage() catches it up - same as Home already did.
-            showPage(getLastTab());
+            // Always land on Home after signing in / reloading, regardless
+            // of whichever tab the user was last on.
+            showPage('home');
             updateNavIndicator(false);
 
             // Handle a shared show/movie link immediately, in parallel with
@@ -3936,6 +4105,7 @@ async function importMediaData(id, type, buttonElement) {
                 rating: (typeof movieData.vote_average === 'number' && movieData.vote_average > 0) ? movieData.vote_average.toFixed(1) : '',
                 watched: false,
                 lastWatchedAt: null,
+                addedAt: new Date().toISOString(),
                 watchProviders: availability.providers,
                 inCinemas: availability.inCinemas,
                 watchLink: availability.link
@@ -4011,6 +4181,7 @@ async function importMediaData(id, type, buttonElement) {
                 nextEpisodeAirDate: (showData.next_episode_to_air && showData.next_episode_to_air.air_date) ? new Date(showData.next_episode_to_air.air_date).toISOString() : null,
                 isFinished: false,
                 isStopped: false,
+                addedAt: new Date().toISOString(),
                 episodes: episodes,
                 watchProviders: availability.providers,
                 inCinemas: availability.inCinemas,
@@ -4181,6 +4352,17 @@ function getLatestAiredEpisodeDate(show) {
 
 function sortTVShowsByLatestAired(shows) {
     return shows.sort((a, b) => getLatestAiredEpisodeDate(b) - getLatestAiredEpisodeDate(a));
+}
+
+// Most-recently-added-to-library show first, oldest-tracked show last.
+// Used for the Home tab's "Continue Watching" row specifically, rather
+// than sortTVShowsByLatestAired (which the Library tab still uses).
+function sortTVShowsByTrackedDate(shows) {
+    return shows.sort((a, b) => {
+        const timeA = a.addedAt ? new Date(a.addedAt).getTime() : 0;
+        const timeB = b.addedAt ? new Date(b.addedAt).getTime() : 0;
+        return timeB - timeA;
+    });
 }
 
 function sortMoviesByWatchedDate(movies) {
@@ -4584,7 +4766,7 @@ function getContinueWatchingItems() {
         return item.type === 'movie' && !item.watched && isReleased(item.releaseDate);
     });
 
-    const tvItems = sortTVShowsByLatestAired(tvShows).map(show => ({
+    const tvItems = sortTVShowsByTrackedDate(tvShows).map(show => ({
         show: show,
         episode: getNextUnwatchedEpisode(show)
     }));
