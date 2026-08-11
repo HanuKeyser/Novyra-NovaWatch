@@ -49,7 +49,7 @@
 }
 
 :root {
-    --bg-mesh: linear-gradient(135deg, #e2e8f0 0%, #f8fafc 50%, #eff6ff 100%);
+    --bg-mesh: #F4F6FB;
     --surface: rgba(255, 255, 255, 0.58);
     --surface-2: rgba(255, 255, 255, 0.36);
     --surface-3: rgba(255, 255, 255, 0.22);
@@ -76,7 +76,7 @@
 }
 
 html {
-    background: #e2e8f0;
+    background: #F4F6FB;
     color-scheme: light;
 }
 
@@ -1549,15 +1549,18 @@ img {
 }
 
 .hero-signout-btn {
-    flex-shrink: 0;
-    height: 34px;
-    padding: 0 16px;
-    border-radius: 999px;
+    width: 100%;
+    height: 40px;
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
     background: var(--surface);
     backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
     color: var(--text-secondary);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 700;
     box-shadow: var(--glass-shadow-sm);
 }
@@ -2100,8 +2103,9 @@ img {
                         <div class="home-subtitle" id="homeEmailSubtitle">Guest Account</div>
                     </div>
                 </div>
-                <button class="hero-signout-btn" onclick="handleSignOut()">Sign Out</button>
             </div>
+
+            <button class="hero-signout-btn" onclick="handleSignOut()">Sign Out</button>
 
             <div class="hero-notify-row">
                 <div>
@@ -4668,13 +4672,21 @@ function createContinueCard(type, item, episode) {
 
     const epId = type === 'tv' ? episode.id : '';
 
+    // Left-swipe action for TV cards only: shows with no watched episodes
+    // yet get removed outright, shows with any watched episodes get marked
+    // Stopped Watching instead of losing that watch history. Movies keep
+    // the original single "swipe = mark watched" behavior in both
+    // directions.
+    const hasWatchedEpisode = type === 'tv' && item.episodes && item.episodes.some(ep => ep.watched);
+    const leftAction = type === 'tv' ? (hasWatchedEpisode ? 'stop' : 'remove') : '';
+
     return `
         <div class="continue-card-wrap">
             <div class="continue-card-bg">
                 <span>Mark Watched</span>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
-            <div class="continue-card" data-type="${type}" data-item-id="${item.id}" data-ep-id="${epId}">
+            <div class="continue-card" data-type="${type}" data-item-id="${item.id}" data-ep-id="${epId}" data-left-action="${leftAction}">
                 ${posterHTML}
                 <div class="continue-body">
                     <div class="continue-title">${escapeHTML(item.title)}</div>
@@ -4732,17 +4744,48 @@ function renderContinueWatching(containerId = "continueWatchingList") {
 }
 
 // Pointer-based swipe-to-dismiss: dragging a card left or right past the
-// threshold marks that episode/movie as watched and lets it fly off; a
-// short drag springs back. A vertical drag (scrolling) is left alone.
+// threshold triggers an action and lets it fly off; a short drag springs
+// back. A vertical drag (scrolling) is left alone.
+//
+// Direction matters for TV cards: swiping right still marks the up-next
+// episode watched (green), but swiping left now removes the show (if
+// nothing's been watched yet) or marks it Stopped Watching (if some
+// episodes have been watched) - shown in red/orange while dragging so the
+// alternate action is clear before letting go. Movie cards don't have a
+// distinct left action, so they keep the original single "mark watched"
+// behavior in both directions.
 function initContinueCardSwipe(container) {
     const threshold = 90;
 
+    const RIGHT_BG_HTML = `<span>Mark Watched</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+    const STOP_BG_HTML = `<span>Stop Watching</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>`;
+    const REMOVE_BG_HTML = `<span>Remove</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>`;
+    const RIGHT_BG_COLOR = "linear-gradient(135deg, #34d472, #1fa851)";
+    const STOP_BG_COLOR = "linear-gradient(135deg, #ffb15c, #ff9500)";
+    const REMOVE_BG_COLOR = "linear-gradient(135deg, #ff6961, #ff3b30)";
+
     container.querySelectorAll(".continue-card").forEach(card => {
         let startX = 0, startY = 0, deltaX = 0, dragging = false, axisLocked = null, pointerId = null;
+        const leftAction = card.dataset.leftAction; // 'stop' | 'remove' | '' (movies)
 
         function setBgOpacity(value) {
             const bg = card.parentElement.querySelector(".continue-card-bg");
             if (bg) bg.style.opacity = String(value);
+        }
+
+        // Swaps the reveal panel's color/icon/label to match whichever
+        // direction is currently being dragged, so the person sees exactly
+        // what letting go will do.
+        function updateBgForDirection(dir) {
+            const bg = card.parentElement.querySelector(".continue-card-bg");
+            if (!bg) return;
+            if (dir === -1 && leftAction) {
+                bg.style.background = leftAction === 'stop' ? STOP_BG_COLOR : REMOVE_BG_COLOR;
+                bg.innerHTML = leftAction === 'stop' ? STOP_BG_HTML : REMOVE_BG_HTML;
+            } else {
+                bg.style.background = RIGHT_BG_COLOR;
+                bg.innerHTML = RIGHT_BG_HTML;
+            }
         }
 
         function springBack() {
@@ -4783,6 +4826,7 @@ function initContinueCardSwipe(container) {
             card.style.transform = `translateX(${deltaX}px)`;
             const progress = Math.min(Math.abs(deltaX) / threshold, 1);
             card.style.opacity = String(1 - progress * 0.35);
+            updateBgForDirection(deltaX < 0 ? -1 : 1);
             setBgOpacity(progress);
         });
 
@@ -4805,7 +4849,13 @@ function initContinueCardSwipe(container) {
                 const itemId = card.dataset.itemId;
                 const epId = card.dataset.epId;
                 setTimeout(() => {
-                    markContinueItemWatched(type, itemId, epId);
+                    if (dir === -1 && leftAction === 'stop') {
+                        markShowStoppedById(itemId);
+                    } else if (dir === -1 && leftAction === 'remove') {
+                        removeLibraryItemById(itemId);
+                    } else {
+                        markContinueItemWatched(type, itemId, epId);
+                    }
                 }, 240);
             } else {
                 springBack();
@@ -5493,6 +5543,36 @@ async function toggleStopWatching(id) {
     await saveItem(currentItem);
     updateModalContent();
     refreshActivePage();
+}
+
+// Generic, id-based versions of stop-watching/remove that don't depend on
+// a details modal being open with `currentItem` set - used by the Continue
+// Watching left-swipe gesture, which acts on whichever card was dragged.
+async function markShowStoppedById(id) {
+    const item = state.library.find(i => i.id === id);
+    if (!item) return;
+    item.isStopped = true;
+    await saveItem(item);
+    refreshActivePage();
+    showToast(`Marked "${item.title}" as Stopped Watching.`, "success");
+}
+
+async function removeLibraryItemById(id) {
+    const idx = state.library.findIndex(i => i.id === id);
+    if (idx === -1) return;
+    const removedItem = state.library[idx];
+
+    state.library.splice(idx, 1);
+    refreshActivePage();
+    showToast(`Removed "${removedItem.title}" from your library.`, "success");
+
+    if (auth && auth.currentUser) {
+        try {
+            await db.collection("users").doc(auth.currentUser.uid).collection("library").doc(removedItem.id).delete();
+        } catch (err) {
+            console.error("Failed to delete item:", err);
+        }
+    }
 }
 
 async function removeCurrentItem() {
