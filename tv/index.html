@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#F4F6FB">
+<meta name="theme-color" content="#F0F2F6">
 <title>NovaWatch | Track What You Watch</title>
 
 <!-- Tab Icons & Custom App Icons -->
@@ -95,6 +95,13 @@
     --blue: #0066cc;      /* Apple System Blue */
     --blue-light: #4792ff; 
     --blue-dark: #004c99;
+    /* Canonical "primary" fill for every blue action button in the app
+       (Sign In, Add to Library, Mark Watched, empty-state CTAs, active
+       segmented pills, etc) - a subtle two-tone gradient instead of a
+       flat fill so primary buttons read as tinted glass like everything
+       else, not a flat color chip sitting next to translucent ones.
+       Always paired with --glass-sheen on top for the same reason. */
+    --blue-gradient: linear-gradient(135deg, var(--blue-light), var(--blue));
 
     --text: #1d1d1f;
     --text-secondary: #424245;
@@ -123,7 +130,7 @@
 }
 
 html {
-    background: #F4F6FB;
+    background: #F0F2F6;
     color-scheme: light;
 }
 
@@ -529,11 +536,11 @@ img {
     height: 40px;
     padding: 0 22px;
     border-radius: 999px;
-    background: var(--blue);
+    background: var(--glass-sheen), var(--blue-gradient);
     color: white;
     font-size: 13px;
-    font-weight: 750;
-    box-shadow: 0 8px 20px rgba(0, 102, 204, 0.3), inset 0 1px 0 rgba(255,255,255,0.35);
+    font-weight: 700;
+    box-shadow: 0 8px 20px rgba(0, 102, 204, 0.3), inset 0 1px 0 rgba(255,255,255,0.5);
 }
 
 .empty-state-cta:active {
@@ -627,7 +634,7 @@ img {
 }
 
 .search-type-btn {
-    height: 38px;
+    height: 40px;
     border-radius: 10px;
     background: transparent;
     color: var(--text-secondary);
@@ -781,7 +788,7 @@ img {
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    background: var(--glass-sheen), var(--blue);
+    background: var(--glass-sheen), var(--blue-gradient);
     color: white;
     display: inline-flex;
     align-items: center;
@@ -1462,7 +1469,7 @@ img {
 }
 
 .action-button.primary {
-    background: var(--glass-sheen), var(--blue);
+    background: var(--glass-sheen), var(--blue-gradient);
     color: white;
     border: none;
     box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3), inset 0 1px 0 rgba(255,255,255,0.5);
@@ -1505,7 +1512,7 @@ img {
 
 .season-button {
     flex: 0 0 auto;
-    height: 38px;
+    height: 40px;
     padding: 0 16px;
     border-radius: var(--radius-sm);
     background: var(--glass-sheen), var(--surface);
@@ -1513,7 +1520,7 @@ img {
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     border: 1px solid var(--glass-border);
     color: var(--text-secondary);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 700;
     box-shadow: var(--glass-shadow-sm);
     user-select: none;
@@ -1689,14 +1696,14 @@ img {
 
 .hero-pill-btn {
     flex-shrink: 0;
-    height: 38px;
+    height: 40px;
     padding: 0 18px;
     border-radius: 999px;
-    background: var(--glass-sheen), var(--blue);
+    background: var(--glass-sheen), var(--blue-gradient);
     color: white;
-    font-size: 12.5px;
-    font-weight: 750;
-    box-shadow: 0 8px 20px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.45);
+    font-size: 13px;
+    font-weight: 700;
+    box-shadow: 0 8px 20px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.5);
 }
 
 .hero-pill-btn:active {
@@ -1837,18 +1844,24 @@ img {
 
 .auth-btn {
     flex: 1;
-    height: 38px;
+    height: 40px;
     border-radius: var(--radius-sm);
     font-size: 13px;
     font-weight: 700;
-    background: var(--blue);
+    background: var(--glass-sheen), var(--blue-gradient);
     color: white;
-    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3);
+    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3), inset 0 1px 0 rgba(255,255,255,0.5);
+    transition: transform 0.15s ease;
+}
+
+.auth-btn:active {
+    transform: scale(0.97);
 }
 
 .auth-btn.secondary {
-    background: var(--surface);
-    backdrop-filter: blur(20px);
+    background: var(--glass-sheen), var(--surface);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
     color: var(--text-secondary);
     border: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow-sm);
