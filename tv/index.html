@@ -49,7 +49,20 @@
 }
 
 :root {
-    --bg-mesh: #F4F6FB;
+    /* A flat color gives the glass nothing to actually refract - Liquid
+       Glass depends on there being tonal variation behind it to bend and
+       blur. This is a soft mesh of white/grey tones (no color) at
+       different depths over a pale grey base, so glass surfaces still
+       have real light and shadow to pick up without ever reading as
+       colorful. background-attachment: fixed keeps it still as the page
+       scrolls, so the refraction reads as consistent, not scrolling text. */
+    --bg-mesh:
+        radial-gradient(at 15% 12%, rgba(255, 255, 255, 0.9) 0px, transparent 48%),
+        radial-gradient(at 85% 8%, rgba(203, 210, 222, 0.55) 0px, transparent 50%),
+        radial-gradient(at 90% 75%, rgba(255, 255, 255, 0.7) 0px, transparent 50%),
+        radial-gradient(at 10% 88%, rgba(210, 216, 226, 0.5) 0px, transparent 50%),
+        radial-gradient(at 50% 45%, rgba(255, 255, 255, 0.6) 0px, transparent 65%),
+        #F0F2F6;
     --surface: rgba(255, 255, 255, 0.58);
     --surface-2: rgba(255, 255, 255, 0.36);
     --surface-3: rgba(255, 255, 255, 0.22);
@@ -58,6 +71,26 @@
     --glass-border-subtle: rgba(255, 255, 255, 0.38);
     --glass-shadow: 0 22px 46px rgba(0, 0, 0, 0.09), inset 0 1px 0 rgba(255, 255, 255, 0.95);
     --glass-shadow-sm: 0 10px 28px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+
+    /* =====================================================
+       LIQUID GLASS "CHROME" SYSTEM
+       Modeled after Apple's Liquid Glass material: reserved for the
+       floating/functional layer (nav, sheets, toasts, pill controls,
+       circular buttons) rather than large content areas, so it reads as
+       one dynamic, reflective layer sitting *above* the content instead
+       of everything looking uniformly "glassy". Versus --surface, this
+       has heavier blur+saturation (more optical distortion of what's
+       behind it), a brighter top specular edge, and a two-layer elevation
+       shadow (a tight contact shadow + a soft ambient one) for real depth.
+       --glass-sheen is a diagonal highlight meant to be layered as an
+       extra background-image on top of a base fill, simulating light
+       glancing off the surface of the glass.
+    ===================================================== */
+    --glass-chrome-fill: rgba(255, 255, 255, 0.52);
+    --glass-chrome-blur: blur(60px) saturate(220%);
+    --glass-chrome-border: rgba(255, 255, 255, 0.92);
+    --glass-chrome-shadow: 0 2px 6px rgba(0, 0, 0, 0.05), 0 24px 48px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 1), inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+    --glass-sheen: linear-gradient(112deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.06) 22%, rgba(255, 255, 255, 0) 55%, rgba(255, 255, 255, 0) 78%, rgba(255, 255, 255, 0.28) 100%);
 
     --blue: #0066cc;      /* Apple System Blue */
     --blue-light: #4792ff; 
@@ -73,6 +106,20 @@
     --danger: #ff3b30;
 
     --radius: 20px;
+
+    /* =====================================================
+       CORNER RADIUS SCALE
+       A consistent set of steps so same-role elements share the same
+       roundness instead of each picking a nearby-but-different value
+       (e.g. a button at 12px next to one at 14px). Pills/circles still
+       use 999px/50% - this scale is for the "how rounded is a rounded
+       rectangle" steps in between.
+    ===================================================== */
+    --radius-xs: 10px;   /* small chips: category-count, episode-still */
+    --radius-sm: 14px;   /* buttons, inputs, small pill controls */
+    --radius-md: 18px;   /* list rows / mid cards: search-card, upcoming-card, stat, episode row */
+    --radius-lg: 20px;   /* posters, continue-card, avatars, empty-state */
+    --radius-2xl: 28px;  /* top-level sheets/hero cards: hero-card, analytics-card, modal-sheet, auth card */
 }
 
 html {
@@ -195,15 +242,15 @@ img {
     align-items: center;
     justify-content: center;
     gap: 10px;
-    border-radius: 16px;
-    background: var(--surface);
-    backdrop-filter: blur(30px) saturate(180%);
-    -webkit-backdrop-filter: blur(30px) saturate(180%);
-    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    background: var(--glass-sheen), var(--glass-chrome-fill);
+    backdrop-filter: var(--glass-chrome-blur);
+    -webkit-backdrop-filter: var(--glass-chrome-blur);
+    border: 1px solid var(--glass-chrome-border);
     color: var(--blue);
     font-size: 14px;
     font-weight: 700;
-    box-shadow: var(--glass-shadow-sm);
+    box-shadow: var(--glass-chrome-shadow);
 }
 
 .footer-browse-button:active {
@@ -238,7 +285,7 @@ img {
     background: var(--surface-2);
     border: 1px solid var(--glass-border-subtle);
     padding: 2px 8px;
-    border-radius: 10px;
+    border-radius: var(--radius-xs);
     color: var(--text-secondary);
 }
 
@@ -256,7 +303,7 @@ img {
     text-align: center;
     background: var(--surface-2);
     border: 1px solid var(--glass-border-subtle);
-    border-radius: 18px;
+    border-radius: var(--radius-md);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -295,11 +342,11 @@ img {
 
 .analytics-card {
     padding: 20px;
-    background: var(--surface);
+    background: var(--glass-sheen), var(--surface);
     backdrop-filter: blur(40px) saturate(200%);
     -webkit-backdrop-filter: blur(40px) saturate(200%);
     border: 1px solid var(--glass-border);
-    border-radius: 24px;
+    border-radius: var(--radius-2xl);
     box-shadow: var(--glass-shadow);
     display: flex;
     flex-direction: column;
@@ -317,7 +364,7 @@ img {
 .analytics-icon-badge {
     width: 44px;
     height: 44px;
-    border-radius: 14px;
+    border-radius: var(--radius-sm);
     background: linear-gradient(135deg, var(--blue-light), var(--blue));
     color: white;
     display: flex;
@@ -361,7 +408,7 @@ img {
     width: 126px;
     height: 184px;
     overflow: hidden;
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
     background: var(--surface-2);
     border: none;
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
@@ -513,14 +560,14 @@ img {
     height: 50px;
     padding: 0 46px 0 48px;
     outline: none;
-    background: var(--surface);
-    backdrop-filter: blur(30px) saturate(180%);
-    -webkit-backdrop-filter: blur(30px) saturate(180%);
-    border: 1px solid var(--glass-border);
+    background: var(--glass-sheen), var(--glass-chrome-fill);
+    backdrop-filter: var(--glass-chrome-blur);
+    -webkit-backdrop-filter: var(--glass-chrome-blur);
+    border: 1px solid var(--glass-chrome-border);
     border-radius: 999px;
     color: var(--text);
     font-size: 14px;
-    box-shadow: var(--glass-shadow-sm);
+    box-shadow: var(--glass-chrome-shadow);
     transition: all 0.2s ease;
 }
 
@@ -573,7 +620,7 @@ img {
     background: var(--surface);
     backdrop-filter: blur(30px);
     padding: 5px;
-    border-radius: 14px;
+    border-radius: var(--radius-sm);
     border: 1px solid var(--glass-border);
     margin-bottom: 16px;
     box-shadow: var(--glass-shadow-sm);
@@ -586,12 +633,19 @@ img {
     color: var(--text-secondary);
     font-size: 13px;
     font-weight: 700;
+    transition: background 0.3s cubic-bezier(0.25, 1, 0.5, 1), color 0.3s cubic-bezier(0.25, 1, 0.5, 1), transform 0.15s ease;
+}
+
+.search-type-btn:active {
+    transform: scale(0.96);
 }
 
 .search-type-btn.active {
-    background: var(--surface);
+    background: var(--glass-sheen), var(--glass-chrome-fill);
+    backdrop-filter: blur(20px) saturate(200%);
+    -webkit-backdrop-filter: blur(20px) saturate(200%);
     color: var(--text);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 0 0 1px rgba(255, 255, 255, 0.4);
 }
 
 .search-type-toggle.three-way {
@@ -622,13 +676,19 @@ img {
     color: var(--text-secondary);
     font-size: 13px;
     font-weight: 700;
-    transition: background 0.3s cubic-bezier(0.25, 1, 0.5, 1), color 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: background 0.3s cubic-bezier(0.25, 1, 0.5, 1), color 0.3s cubic-bezier(0.25, 1, 0.5, 1), transform 0.15s ease;
+}
+
+.segmented-btn:active {
+    transform: scale(0.96);
 }
 
 .segmented-btn.active {
-    background: linear-gradient(135deg, var(--blue-light), var(--blue));
+    /* Sheen layered over the color fill so the active pill reads as
+       tinted glass rather than a flat colored chip. */
+    background: var(--glass-sheen), linear-gradient(135deg, var(--blue-light), var(--blue));
     color: white;
-    box-shadow: 0 8px 18px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.3);
+    box-shadow: 0 8px 18px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.15);
 }
 
 .library-subview {
@@ -646,7 +706,7 @@ img {
     gap: 14px;
     padding: 14px 6px;
     align-items: flex-start;
-    border-radius: 18px;
+    border-radius: var(--radius-md);
     border-bottom: 1px solid var(--glass-border-subtle);
     transition: background 0.2s ease, transform 0.15s ease;
     cursor: pointer;
@@ -721,12 +781,12 @@ img {
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    background: var(--blue);
+    background: var(--glass-sheen), var(--blue);
     color: white;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.4);
+    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.5);
     flex-shrink: 0;
 }
 
@@ -770,7 +830,7 @@ img {
     gap: 14px;
     padding: 14px 6px;
     align-items: flex-start;
-    border-radius: 18px;
+    border-radius: var(--radius-md);
     border-bottom: 1px solid var(--glass-border-subtle);
     cursor: pointer;
     transition: background 0.2s ease, transform 0.15s ease;
@@ -891,7 +951,7 @@ img {
 
 .continue-card-wrap {
     position: relative;
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
     margin-bottom: 12px;
     overflow: hidden;
 }
@@ -925,16 +985,16 @@ img {
     gap: 14px;
     padding: 14px;
     align-items: flex-start;
-    /* Stronger, more visibly "glass" treatment than the default .card/
-       --surface combo: lower fill opacity so the blurred backdrop reads
-       through clearly, heavier blur+saturation, and a brighter border/
-       shadow pairing so the edge of the glass is obvious rather than the
-       card just looking like a flat off-white panel. */
-    background: rgba(255, 255, 255, 0.46);
+    /* Liquid-Glass-style treatment: a diagonal sheen layered over a
+       translucent fill (lower opacity so the blurred backdrop reads
+       through clearly), heavy blur+saturation, and a bright top-edge
+       highlight so the glass reads as a lit, curved surface rather than a
+       flat off-white panel. */
+    background: var(--glass-sheen), rgba(255, 255, 255, 0.46);
     backdrop-filter: blur(44px) saturate(240%);
     -webkit-backdrop-filter: blur(44px) saturate(240%);
     border: 1px solid rgba(255, 255, 255, 0.85);
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
     box-shadow: 0 18px 40px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 1), inset 0 0 0 1px rgba(255, 255, 255, 0.25);
     touch-action: pan-y;
     cursor: pointer;
@@ -1022,13 +1082,15 @@ img {
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    background: var(--surface);
+    background: var(--glass-sheen), var(--glass-chrome-fill);
     color: var(--text-muted);
-    border: 1px solid var(--glass-border);
+    border: 1px solid var(--glass-chrome-border);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    box-shadow: var(--glass-shadow-sm);
+    backdrop-filter: blur(30px) saturate(200%);
+    -webkit-backdrop-filter: blur(30px) saturate(200%);
+    box-shadow: var(--glass-chrome-shadow);
     flex-shrink: 0;
     transition: transform 0.15s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
@@ -1058,12 +1120,16 @@ img {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 4px;
-    background: rgba(255, 255, 255, 0.58);
-    backdrop-filter: blur(56px) saturate(220%);
-    -webkit-backdrop-filter: blur(56px) saturate(220%);
-    border: 1px solid var(--glass-border);
+    /* Sheen gradient layered over the base fill so the pill reads as one
+       curved piece of glass catching light, rather than a flat tinted
+       panel - the strongest "chrome" treatment in the app, since this is
+       the one surface that's always floating above everything else. */
+    background: var(--glass-sheen), var(--glass-chrome-fill);
+    backdrop-filter: var(--glass-chrome-blur);
+    -webkit-backdrop-filter: var(--glass-chrome-blur);
+    border: 1px solid var(--glass-chrome-border);
     border-radius: 999px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    box-shadow: var(--glass-chrome-shadow);
 }
 
 /* Single floating "liquid glass" capsule that glides beneath whichever tab
@@ -1077,9 +1143,11 @@ img {
     height: calc(100% - 14px);
     width: 0;
     border-radius: 999px;
-    background: rgba(120, 128, 140, 0.14);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 1px rgba(0, 0, 0, 0.04);
-    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 1px rgba(0, 0, 0, 0.04), inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), width 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s ease;
     pointer-events: none;
     z-index: 0;
 }
@@ -1142,13 +1210,17 @@ img {
     max-height: 92vh;
     margin: 0 auto;
     overflow-y: auto;
-    background: rgba(248, 250, 252, 0.68);
-    backdrop-filter: blur(68px) saturate(230%);
-    -webkit-backdrop-filter: blur(68px) saturate(230%);
-    border-radius: 28px 28px 0 0;
+    /* Soft top-lit sheen (light "entering" from the drag-handle edge of the
+       sheet) layered over the base fill, instead of a flat tint - no hard
+       border (kept borderless per earlier request), just a bright inset
+       top edge + a two-layer elevation shadow for depth. */
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 32%), rgba(248, 250, 252, 0.68);
+    backdrop-filter: blur(70px) saturate(230%);
+    -webkit-backdrop-filter: blur(70px) saturate(230%);
+    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
     border: none;
     position: relative;
-    box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 1);
+    box-shadow: 0 -6px 16px rgba(0, 0, 0, 0.05), 0 -28px 64px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
 .modal-backdrop-header {
@@ -1160,7 +1232,7 @@ img {
     display: flex;
     align-items: flex-end;
     padding: 20px;
-    border-radius: 28px 28px 0 0;
+    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
 }
 
 .modal-backdrop-overlay {
@@ -1185,11 +1257,17 @@ img {
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.6);
+    background: var(--glass-sheen), var(--glass-chrome-fill);
     color: var(--text);
-    backdrop-filter: blur(24px);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow-sm);
+    backdrop-filter: var(--glass-chrome-blur);
+    -webkit-backdrop-filter: var(--glass-chrome-blur);
+    border: 1px solid var(--glass-chrome-border);
+    box-shadow: var(--glass-chrome-shadow);
+    transition: transform 0.15s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.close-button:active {
+    transform: scale(0.9);
 }
 
 .modal-hero-title-container {
@@ -1271,7 +1349,7 @@ img {
 .watch-provider-logo {
     width: 48px;
     height: 48px;
-    border-radius: 14px;
+    border-radius: var(--radius-sm);
     object-fit: cover;
     background: var(--surface);
     border: 1px solid var(--glass-border);
@@ -1356,9 +1434,10 @@ img {
     min-width: 0;
     min-height: 46px;
     padding: 0 8px;
-    border-radius: 14px;
-    background: var(--surface);
-    backdrop-filter: blur(20px);
+    border-radius: var(--radius-sm);
+    background: var(--glass-sheen), var(--surface);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
     color: var(--text);
     border: 1px solid var(--glass-border);
     font-size: 12px;
@@ -1373,17 +1452,22 @@ img {
     box-shadow: var(--glass-shadow-sm);
 }
 
+.action-button:active {
+    transform: scale(0.97);
+}
+
 .action-button.primary {
-    background: var(--blue);
+    background: var(--glass-sheen), var(--blue);
     color: white;
     border: none;
-    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3), inset 0 1px 0 rgba(255,255,255,0.4);
+    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3), inset 0 1px 0 rgba(255,255,255,0.5);
 }
 
 .action-button.trailer {
-    background: rgba(255, 255, 255, 0.55);
+    background: var(--glass-sheen), rgba(255, 255, 255, 0.55);
     border: 1px solid var(--glass-border);
-    backdrop-filter: blur(24px);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
 }
 
 .action-button.warning {
@@ -1418,9 +1502,10 @@ img {
     flex: 0 0 auto;
     height: 38px;
     padding: 0 16px;
-    border-radius: 12px;
-    background: var(--surface);
-    backdrop-filter: blur(20px);
+    border-radius: var(--radius-sm);
+    background: var(--glass-sheen), var(--surface);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
     border: 1px solid var(--glass-border);
     color: var(--text-secondary);
     font-size: 12px;
@@ -1428,13 +1513,18 @@ img {
     box-shadow: var(--glass-shadow-sm);
     user-select: none;
     -webkit-user-select: none;
+    transition: transform 0.15s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.season-button:active {
+    transform: scale(0.95);
 }
 
 .season-button.active {
-    background: var(--blue);
+    background: var(--glass-sheen), linear-gradient(135deg, var(--blue-light), var(--blue));
     color: white;
     border-color: var(--blue);
-    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3);
+    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .episode {
@@ -1444,7 +1534,7 @@ img {
     padding: 16px 10px;
     margin: 0 -10px;
     border-bottom: 1px solid var(--glass-border-subtle);
-    border-radius: 16px;
+    border-radius: var(--radius-md);
     cursor: pointer;
 }
 
@@ -1480,7 +1570,7 @@ img {
 .episode-still {
     width: 116px;
     height: 65px;
-    border-radius: 10px;
+    border-radius: var(--radius-xs);
     object-fit: cover;
     background: var(--surface-2);
     flex-shrink: 0;
@@ -1531,7 +1621,7 @@ img {
     backdrop-filter: blur(40px) saturate(200%);
     -webkit-backdrop-filter: blur(40px) saturate(200%);
     border: 1px solid rgba(0, 102, 204, 0.2);
-    border-radius: 28px;
+    border-radius: var(--radius-2xl);
     box-shadow: 0 20px 48px rgba(0, 102, 204, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 
@@ -1555,14 +1645,15 @@ img {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 14px;
-    background: var(--surface);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    background: var(--glass-sheen), var(--glass-chrome-fill);
+    backdrop-filter: var(--glass-chrome-blur);
+    -webkit-backdrop-filter: var(--glass-chrome-blur);
+    border: 1px solid var(--glass-chrome-border);
     color: var(--text-secondary);
     font-size: 13px;
     font-weight: 700;
-    box-shadow: var(--glass-shadow-sm);
+    box-shadow: var(--glass-chrome-shadow);
 }
 
 .hero-signout-btn:active {
@@ -1596,11 +1687,11 @@ img {
     height: 38px;
     padding: 0 18px;
     border-radius: 999px;
-    background: var(--blue);
+    background: var(--glass-sheen), var(--blue);
     color: white;
     font-size: 12.5px;
     font-weight: 750;
-    box-shadow: 0 8px 20px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.35);
+    box-shadow: 0 8px 20px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.45);
 }
 
 .hero-pill-btn:active {
@@ -1629,7 +1720,7 @@ img {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
     background: linear-gradient(135deg, var(--blue-light), var(--blue));
     color: white;
     font-size: 22px;
@@ -1654,7 +1745,7 @@ img {
 .google-auth-btn {
     width: 100%;
     height: 42px;
-    border-radius: 12px;
+    border-radius: var(--radius-sm);
     background: #ffffff;
     color: #1f1f1f;
     font-size: 14px;
@@ -1722,7 +1813,7 @@ img {
     background: var(--surface-2);
     backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
-    border-radius: 12px;
+    border-radius: var(--radius-sm);
     color: var(--text);
     font-size: 13px;
 }
@@ -1742,7 +1833,7 @@ img {
 .auth-btn {
     flex: 1;
     height: 38px;
-    border-radius: 12px;
+    border-radius: var(--radius-sm);
     font-size: 13px;
     font-weight: 700;
     background: var(--blue);
@@ -1816,7 +1907,7 @@ img {
     backdrop-filter: blur(48px) saturate(210%);
     -webkit-backdrop-filter: blur(48px) saturate(210%);
     border: 1px solid var(--glass-border);
-    border-radius: 28px;
+    border-radius: var(--radius-2xl);
     padding: 18px 22px;
     box-shadow: 0 24px 48px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.9);
     text-align: center;
@@ -1866,10 +1957,10 @@ img {
     pointer-events: none;
     padding: 13px 22px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.58);
-    backdrop-filter: blur(56px) saturate(220%);
-    -webkit-backdrop-filter: blur(56px) saturate(220%);
-    border: 1px solid var(--glass-border);
+    background: var(--glass-sheen), var(--glass-chrome-fill);
+    backdrop-filter: var(--glass-chrome-blur);
+    -webkit-backdrop-filter: var(--glass-chrome-blur);
+    border: 1px solid var(--glass-chrome-border);
     color: var(--text);
     font-size: 13.5px;
     font-weight: 700;
@@ -1885,7 +1976,7 @@ img {
     gap: 10px;
     white-space: normal;
     word-break: break-word;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    box-shadow: var(--glass-chrome-shadow);
 }
 
 .toast.show {
