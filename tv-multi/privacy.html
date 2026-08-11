@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#F0F2F6">
+<title>Privacy Notice &amp; Terms of Service</title>
+<link rel="icon" type="image/png" href="https://www.novyra.co.za/NovaWatch_Logo.png">
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+    /* Kept in sync with the main app's design tokens (index.html) so this
+       page reads as part of the same product rather than a bolted-on
+       legal page. */
+    --bg-mesh:
+        radial-gradient(at 15% 12%, rgba(255, 255, 255, 0.9) 0px, transparent 48%),
+        radial-gradient(at 85% 8%, rgba(203, 210, 222, 0.55) 0px, transparent 50%),
+        radial-gradient(at 90% 75%, rgba(255, 255, 255, 0.7) 0px, transparent 50%),
+        radial-gradient(at 10% 88%, rgba(210, 216, 226, 0.5) 0px, transparent 50%),
+        radial-gradient(at 50% 45%, rgba(255, 255, 255, 0.6) 0px, transparent 65%),
+        #F0F2F6;
+    --surface: rgba(255, 255, 255, 0.58);
+    --surface-2: rgba(255, 255, 255, 0.36);
+    --glass-border: rgba(255, 255, 255, 0.7);
+    --glass-border-subtle: rgba(255, 255, 255, 0.38);
+    --glass-shadow: 0 22px 46px rgba(0, 0, 0, 0.09), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+
+    --glass-chrome-fill: rgba(255, 255, 255, 0.52);
+    --glass-chrome-blur: blur(60px) saturate(220%);
+    --glass-chrome-border: rgba(255, 255, 255, 0.92);
+    --glass-chrome-shadow: 0 2px 6px rgba(0, 0, 0, 0.05), 0 24px 48px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 1), inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+    --glass-sheen: linear-gradient(112deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.06) 22%, rgba(255, 255, 255, 0) 55%, rgba(255, 255, 255, 0) 78%, rgba(255, 255, 255, 0.28) 100%);
+
+    --blue: #0066cc;
+    --blue-light: #4792ff;
+    --blue-gradient: linear-gradient(135deg, var(--blue-light), var(--blue));
+    --text: #1d1d1f;
+    --text-secondary: #424245;
+    --text-muted: #86868b;
+    --border: rgba(0, 0, 0, 0.08);
+
+    --radius-sm: 14px;
+    --radius-2xl: 28px;
+}
+
+html {
+    background: #F0F2F6;
+    color-scheme: light;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg-mesh);
+    background-attachment: fixed;
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px 80px;
+    -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+    width: 100%;
+    max-width: 620px;
+}
+
+.top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 36px;
+    padding: 0 16px;
+    border-radius: 999px;
+    background: var(--glass-sheen), var(--glass-chrome-fill);
+    backdrop-filter: var(--glass-chrome-blur);
+    -webkit-backdrop-filter: var(--glass-chrome-blur);
+    border: 1px solid var(--glass-chrome-border);
+    box-shadow: var(--glass-chrome-shadow);
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    transition: transform 0.15s ease;
+}
+
+.back-link:active {
+    transform: scale(0.96);
+}
+
+.hero {
+    padding: 26px 28px;
+    margin-bottom: 18px;
+    background: var(--glass-sheen), linear-gradient(135deg, rgba(255,255,255,0.78) 0%, rgba(224,238,255,0.62) 100%);
+    backdrop-filter: blur(46px) saturate(210%);
+    -webkit-backdrop-filter: blur(46px) saturate(210%);
+    border: 1px solid rgba(0, 102, 204, 0.2);
+    border-radius: var(--radius-2xl);
+    box-shadow: 0 20px 48px rgba(0, 102, 204, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+h1 {
+    font-size: 25px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+}
+
+.updated {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--blue);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.card {
+    background: var(--glass-sheen), var(--surface);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: var(--radius-2xl);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    padding: 30px 28px;
+}
+
+section + section {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--glass-border-subtle);
+}
+
+h2 {
+    font-size: 14.5px;
+    font-weight: 750;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+h2::before {
+    content: '';
+    width: 4px;
+    height: 14px;
+    border-radius: 3px;
+    background: linear-gradient(180deg, var(--blue-light), var(--blue));
+    flex-shrink: 0;
+}
+
+p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+}
+
+a {
+    color: var(--blue);
+    text-decoration: none;
+    font-weight: 700;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+    <div class="top-row">
+        <a class="back-link" href="index.html">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            Back
+        </a>
+    </div>
+
+    <div class="hero">
+        <h1>Privacy Notice</h1>
+        <div class="updated">Last updated: 1 September 2026</div>
+    </div>
+
+    <div class="card">
+        <section>
+            <p>This notice explains, in plain terms, how this app handles your information.</p>
+        </section>
+
+        <section>
+            <h2>What we collect</h2>
+            <p>When you create an account, we collect the information needed to set up and run that account, such as your email address and the sign-in details provided by your chosen sign-in method (for example, Google Sign-In). We also store the watchlist data you build inside the app — the movies and TV shows you add, your watch progress, and your preferences — so it's there the next time you sign in.</p>
+        </section>
+
+        <section>
+            <h2>What we use it for</h2>
+            <p>We use your information for one purpose only: to create and operate your account and to provide the app's features to you (such as syncing your library across devices and sending release alerts you've opted into). We do not use your information for anything else — no advertising, no selling or sharing it with third parties for marketing, and no profiling beyond what's needed to run the app itself.</p>
+        </section>
+
+        <section>
+            <h2>Third-party services</h2>
+            <p>This app retrieves publicly available movie and TV metadata from The Movie Database (TMDB) to display titles, posters, and related information, and streaming-availability information from JustWatch to show where a title can be watched. Both are one-way lookups of show/movie data — neither is linked to your personal account information.</p>
+        </section>
+
+        <section>
+            <h2>Deleting your account</h2>
+            <p>You can permanently delete your account and all associated library data at any time from within the app, under your profile on the Home tab — no need to contact us. If you'd rather we do it for you, or you're unable to access the app, email <a href="mailto:delete@novawatch.site">delete@novawatch.site</a> and we'll take care of it.</p>
+        </section>
+
+        <section>
+            <h2>Questions</h2>
+            <p>If you have any questions about this notice or how your information is handled, email <a href="mailto:info@novawatch.site">info@novawatch.site</a>.</p>
+        </section>
+
+        <section>
+            <h2>Credits &amp; attribution</h2>
+            <p>This product uses the TMDB API but is not endorsed or certified by TMDB. Movie and TV metadata, posters, and artwork are sourced from <a href="https://www.themoviedb.org/" target="_blank" rel="noopener">The Movie Database (TMDB)</a>. Streaming availability information is provided by JustWatch.</p>
+        </section>
+    </div>
+
+    <div class="hero" style="margin-top: 28px;">
+        <h1>Terms of Service</h1>
+        <div class="updated">Last updated: 1 September 2026</div>
+    </div>
+
+    <div class="card">
+        <section>
+            <p>These terms cover your use of this app. By creating an account or using the app, you agree to them.</p>
+        </section>
+
+        <section>
+            <h2>The service</h2>
+            <p>This app lets you track TV shows and movies you're watching, mark episodes and titles as watched, and get notified about new releases. Show and movie data (titles, posters, descriptions, air dates) comes from The Movie Database (TMDB); streaming availability comes from JustWatch. We don't control that data and can't guarantee it's always accurate, complete, or up to date.</p>
+        </section>
+
+        <section>
+            <h2>Your account</h2>
+            <p>You're responsible for the accuracy of the information you provide when creating an account, and for keeping your password confidential. You must be old enough to legally use this kind of service in your country to create an account. You can delete your account at any time — see the Privacy Notice above for how.</p>
+        </section>
+
+        <section>
+            <h2>Acceptable use</h2>
+            <p>Use the app the way it's intended: to track your own watching. Don't try to interfere with the app or its infrastructure, attempt to access another user's account or data, scrape or resell the data the app surfaces, or use the service for anything illegal.</p>
+        </section>
+
+        <section>
+            <h2>Availability &amp; changes</h2>
+            <p>We aim to keep the app running reliably, but we don't guarantee it will always be available, error-free, or uninterrupted — it depends in part on third-party services (TMDB, JustWatch, Firebase) that are outside our control. We may add, change, or remove features over time.</p>
+        </section>
+
+        <section>
+            <h2>No warranty</h2>
+            <p>The app is provided "as is," without warranties of any kind, express or implied. We don't warrant that release dates, watch-provider availability, or any other third-party data shown in the app will be accurate.</p>
+        </section>
+
+        <section>
+            <h2>Limitation of liability</h2>
+            <p>To the extent permitted by law, we aren't liable for any indirect, incidental, or consequential damages arising from your use of, or inability to use, the app.</p>
+        </section>
+
+        <section>
+            <h2>Changes to these terms</h2>
+            <p>We may update these terms from time to time. If we make material changes, we'll update the date at the top of this section. Continuing to use the app after a change means you accept the updated terms.</p>
+        </section>
+
+        <section>
+            <h2>Contact</h2>
+            <p>Questions about these terms? Email <a href="mailto:info@novawatch.site">info@novawatch.site</a>.</p>
+        </section>
+    </div>
+</div>
+</body>
+</html>
