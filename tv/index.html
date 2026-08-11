@@ -444,6 +444,26 @@ img {
     object-position: center;
 }
 
+/* Long-pressing a poster is how the "Change Poster" picker opens (see
+   startPosterPress below), but on a phone that same gesture is also what
+   the browser uses to pop up its own "Save/Copy Image" menu on any <img>.
+   Left unchecked, that native menu fights with (and usually wins over)
+   our own picker. Disabling the callout/selection/drag behavior on every
+   poster-style thumbnail stops the OS menu from appearing at all, so a
+   long-press only ever triggers the app's own handling. */
+.poster,
+.poster img,
+.search-card-poster,
+.continue-poster,
+.upcoming-poster img,
+.poster-picker-item img {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    user-drag: none;
+}
+
 .poster-placeholder {
     width: 100%;
     height: 100%;
@@ -2156,6 +2176,29 @@ img {
     z-index: -1;
 }
 
+/* Same treatment as #authScreen above - shares its layout rules rather
+   than the two drifting apart over time, since they're mutually exclusive
+   full-screen gates that never show at once. */
+#verifyScreen {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: var(--bg-mesh);
+    display: none; /* Hidden by default, controlled via JS */
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+#verifyScreen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: -1;
+}
+
 .auth-overlay-card {
     width: 100%;
     max-width: 400px;
@@ -2355,7 +2398,32 @@ img {
         </div>
     </div>
 </div>
-  
+
+<!-- DEDICATED EMAIL VERIFICATION OVERLAY
+     Shown right after an email/password account is created (and on every
+     future sign-in until confirmed) so verification happens as part of
+     getting into the app, not as a banner discovered later once already
+     inside it. Google sign-in accounts skip this entirely since Google
+     has already verified that address. -->
+<div id="verifyScreen">
+    <div class="auth-overlay-card">
+        <img src="https://www.novyra.co.za/NovaWatch_Logo.png" alt="NovaWatch Logo" class="auth-logo">
+        <h1 class="auth-title">Verify your email</h1>
+        <p class="auth-subtitle">We've sent a confirmation link to <strong id="verifyEmailAddress">your email address</strong>. Open it on this device or any other, then come back and continue.</p>
+
+        <div class="auth-actions">
+            <button id="verifyContinueBtn" class="auth-btn" onclick="checkVerificationStatus()">I've Verified &mdash; Continue</button>
+        </div>
+        <div class="auth-actions">
+            <button id="resendVerifyBtn" class="auth-btn secondary" onclick="resendVerificationEmail()">Resend Email</button>
+        </div>
+
+        <div class="auth-footer-row">
+            <button class="auth-forgot-link" onclick="handleSignOut()">Wrong email? Sign out</button>
+        </div>
+    </div>
+</div>
+
 <div class="app">
 
 <!-- =====================================================
@@ -2459,14 +2527,6 @@ img {
             <div class="hero-account-actions">
                 <button class="hero-signout-btn" onclick="handleSignOut()">Sign Out</button>
                 <button class="hero-delete-link" onclick="handleDeleteAccount()">Delete Account</button>
-            </div>
-
-            <div class="hero-notify-row" id="emailVerifyRow" style="display:none;">
-                <div>
-                    <div class="hero-notify-title">Verify your email</div>
-                    <div class="hero-notify-sub">Check your inbox to confirm your address.</div>
-                </div>
-                <button class="hero-pill-btn" id="resendVerifyBtn" onclick="resendVerificationEmail()">Resend</button>
             </div>
 
             <div class="hero-notify-row">
@@ -3383,15 +3443,75 @@ async function handleSignOut() {
 
 /* =========================================================
    EMAIL VERIFICATION
+   Password accounts are gated behind #verifyScreen (a full-screen overlay,
+   same tier as #authScreen) until confirmed - verification is required
+   right at account creation rather than being a banner discovered later
+   inside the app. Google sign-in accounts skip this entirely since
+   Google has already verified that address.
 ========================================================= */
-// Google sign-in accounts are already verified by Google, so the banner
-// only ever shows for email/password accounts that haven't confirmed yet.
-function updateEmailVerifyBanner(user) {
-    const row = document.getElementById("emailVerifyRow");
-    if (!row) return;
-    const isPasswordAccount = user.providerData.some(p => p.providerId === 'password');
-    row.style.display = (isPasswordAccount && !user.emailVerified) ? "flex" : "none";
+function showVerifyScreen(user) {
+    const authScreen = document.getElementById("authScreen");
+    const mainApp = document.querySelector(".app");
+    const verifyScreen = document.getElementById("verifyScreen");
+    if (authScreen) authScreen.style.display = "none";
+    if (mainApp) mainApp.style.display = "none";
+    if (verifyScreen) {
+        verifyScreen.style.display = "flex";
+        const emailEl = document.getElementById("verifyEmailAddress");
+        if (emailEl) emailEl.textContent = user.email;
+    }
 }
+
+function hideVerifyScreen() {
+    const verifyScreen = document.getElementById("verifyScreen");
+    if (verifyScreen) verifyScreen.style.display = "none";
+}
+
+// Reloading the user only refreshes the cached emailVerified flag locally -
+// it does not re-fire onAuthStateChanged - so a successful check has to
+// hand off into proceedToApp itself rather than waiting on that listener.
+// silent=true is used for the automatic check on tab-focus below, so
+// coming back from the email link doesn't need a manual tap, but a
+// still-unverified state doesn't nag with an error toast either.
+async function checkVerificationStatus(silent = false) {
+    if (!auth || !auth.currentUser) return;
+    const btn = document.getElementById("verifyContinueBtn");
+    if (btn && !silent) {
+        btn.disabled = true;
+        btn.textContent = "Checking...";
+    }
+    try {
+        await auth.currentUser.reload();
+        if (auth.currentUser.emailVerified) {
+            hideVerifyScreen();
+            const authScreen = document.getElementById("authScreen");
+            const mainApp = document.querySelector(".app");
+            await proceedToApp(auth.currentUser, authScreen, mainApp);
+            showToast("Email verified - welcome to NovaWatch!", "success");
+        } else if (!silent) {
+            showToast("Not verified yet - tap the link in your email first.", "error");
+        }
+    } catch (err) {
+        console.error("Failed to refresh verification status:", err);
+        if (!silent) showToast("Couldn't check verification status. Please try again.", "error");
+    } finally {
+        if (btn && !silent) {
+            btn.disabled = false;
+            btn.textContent = "I've Verified — Continue";
+        }
+    }
+}
+
+// Coming back to the tab (e.g. after tapping the link in a mail app) is
+// the most common way people actually verify - check automatically rather
+// than making them remember to tap "Continue" themselves.
+document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "visible") return;
+    const verifyScreen = document.getElementById("verifyScreen");
+    if (verifyScreen && verifyScreen.style.display !== "none") {
+        checkVerificationStatus(true);
+    }
+});
 
 async function resendVerificationEmail() {
     if (!auth || !auth.currentUser) return;
@@ -4057,6 +4177,40 @@ if (auth) {
         const mainApp = document.querySelector(".app");
 
         if (user) {
+            // Password accounts must confirm their email before the app
+            // opens at all - verification happens as part of account
+            // creation itself, not as a banner discovered later once
+            // already inside. Google sign-in accounts are pre-verified
+            // by Google, so they skip straight through.
+            const isPasswordAccount = user.providerData.some(p => p.providerId === 'password');
+            if (isPasswordAccount && !user.emailVerified) {
+                showVerifyScreen(user);
+                return;
+            }
+
+            hideVerifyScreen();
+            await proceedToApp(user, authScreen, mainApp);
+        } else {
+            hideVerifyScreen();
+
+            // User is logged out: Show Auth Screen, Hide Main App
+            authScreen.style.display = "flex";
+            mainApp.style.display = "none";
+
+            // Clear local state
+            state.library = [];
+            document.getElementById("homeName").textContent = "Guest";
+            document.getElementById("homeEmailSubtitle").textContent = "Please sign in";
+        }
+    });
+}
+
+// Everything involved in actually entering the app once a user is signed
+// in AND verified (or on a provider that never needed verification) -
+// factored out so both the normal auth listener above and a successful
+// in-app verification check (checkVerificationStatus) land in the same
+// place instead of duplicating this logic.
+async function proceedToApp(user, authScreen, mainApp) {
             // Hide Auth Screen, Show Main App
             authScreen.style.display = "none";
             mainApp.style.display = "block";
@@ -4070,8 +4224,6 @@ if (auth) {
             
             const largeAvatar = document.getElementById("largeAvatar");
             if (largeAvatar) largeAvatar.textContent = initial;
-
-            updateEmailVerifyBanner(user);
 
             // Always land on Home on load/refresh, regardless of whichever
             // tab the user was last on.
@@ -4192,17 +4344,6 @@ if (auth) {
                 showToast("Library sync failed.", "error");
                 refreshActivePage();
             }
-        } else {
-            // User is logged out: Show Auth Screen, Hide Main App
-            authScreen.style.display = "flex";
-            mainApp.style.display = "none";
-            
-            // Clear local state
-            state.library = [];
-            document.getElementById("homeName").textContent = "Guest";
-            document.getElementById("homeEmailSubtitle").textContent = "Please sign in";
-        }
-    });
 }
 /* =========================================================
    TMDB SEARCH & DISCOVER
@@ -4335,7 +4476,7 @@ function renderSearchResults(results) {
         return `
             <div class="search-card" onclick="openSearchResultDetails(${item.id}, '${currentSearchType}')">
                 ${posterUrl ? 
-                    `<img src="${posterUrl}" class="search-card-poster" alt="${escapeHTML(title)}" loading="lazy" onerror="this.style.display='none'">` :
+                    `<img src="${posterUrl}" class="search-card-poster" alt="${escapeHTML(title)}" draggable="false" loading="lazy" onerror="this.style.display='none'">` :
                     `<div class="search-card-poster" style="display:flex; align-items:center; justify-content:center; text-align:center; font-size:10px; color:var(--text-muted); padding:5px;">${escapeHTML(title)}</div>`
                 }
                 <div class="search-card-info">
@@ -5139,6 +5280,7 @@ function createCard(item, upcomingShowIds = null) {
     return `
         <div class="card" onclick="handleCardClick(event, '${item.id}')" data-id="${item.id}">
             <div class="poster"
+                 oncontextmenu="return false;"
                  onmousedown="startPosterPress('${item.id}', '${item.type}')"
                  onmouseup="endPosterPress()"
                  onmouseleave="endPosterPress()"
@@ -5146,7 +5288,7 @@ function createCard(item, upcomingShowIds = null) {
                  ontouchend="endPosterPress()"
                  ontouchcancel="endPosterPress()">
                 ${hasPoster ? `
-                    <img src="${item.poster}" alt="${escapeHTML(item.title)}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <img src="${item.poster}" alt="${escapeHTML(item.title)}" draggable="false" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                     <div class="poster-placeholder" style="display: none;">${placeholderIcon}</div>
                 ` : `
                     <div class="poster-placeholder">${placeholderIcon}</div>
@@ -5165,7 +5307,7 @@ function createUpcomingCard(data) {
         <div class="upcoming-card" onclick="openDetails('${data.item.id}')">
             <div class="upcoming-poster">
                 ${hasPoster ? `
-                    <img src="${data.item.poster}" alt="${escapeHTML(data.title)}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <img src="${data.item.poster}" alt="${escapeHTML(data.title)}" draggable="false" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                     <div class="upcoming-poster-placeholder" style="display: none;">${escapeHTML(data.title)}</div>
                 ` : `
                     <div class="upcoming-poster-placeholder">${escapeHTML(data.title)}</div>
@@ -5227,7 +5369,7 @@ function continuePlaceholderIcon(type) {
 function createContinueCard(type, item, episode) {
     const hasPoster = item.poster && item.poster.trim() !== "";
     const posterHTML = hasPoster
-        ? `<img src="${item.poster}" class="continue-poster" alt="${escapeHTML(item.title)}" loading="lazy" onerror="this.style.display='none'">`
+        ? `<img src="${item.poster}" class="continue-poster" alt="${escapeHTML(item.title)}" draggable="false" loading="lazy" onerror="this.style.display='none'">`
         : `<div class="continue-poster" style="display:flex; align-items:center; justify-content:center; text-align:center; font-size:10px; color:var(--text-muted); padding:5px;">${continuePlaceholderIcon(type)}</div>`;
 
     // The meta line and description surface the *episode's* own info for TV
