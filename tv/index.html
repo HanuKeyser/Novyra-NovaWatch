@@ -1684,6 +1684,29 @@ img {
     transform: scale(0.96);
 }
 
+/* Deliberately low-emphasis relative to Sign Out (small centered text
+   link, not another full-width glass button) since this is a rare,
+   destructive action - it shouldn't compete visually with everyday
+   actions, just stay reachable. */
+.hero-delete-link {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 4px;
+    background: transparent;
+    color: var(--danger);
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0.75;
+}
+
+.hero-delete-link:hover,
+.hero-delete-link:active {
+    opacity: 1;
+    text-decoration: underline;
+}
+
 .hero-notify-row {
     display: flex;
     align-items: center;
@@ -2121,7 +2144,7 @@ img {
         <div class="auth-footer-row">
             <button class="auth-forgot-link" onclick="handleForgotPassword()">Forgot password?</button>
             <span class="auth-footer-sep">|</span>
-            <a href="https://www.novyra.co.za/tv/privacy.html" target="_blank" rel="noopener" class="auth-forgot-link">Privacy Notice</a>
+            <a href="https://www.novyra.co.za/tv/privacy.html" target="_blank" rel="noopener" class="auth-forgot-link">Privacy &amp; Terms</a>
         </div>
     </div>
 </div>
@@ -2227,6 +2250,15 @@ img {
             </div>
 
             <button class="hero-signout-btn" onclick="handleSignOut()">Sign Out</button>
+            <button class="hero-delete-link" onclick="handleDeleteAccount()">Delete Account</button>
+
+            <div class="hero-notify-row" id="emailVerifyRow" style="display:none;">
+                <div>
+                    <div class="hero-notify-title">Verify your email</div>
+                    <div class="hero-notify-sub">Check your inbox to confirm your address.</div>
+                </div>
+                <button class="hero-pill-btn" id="resendVerifyBtn" onclick="resendVerificationEmail()">Resend</button>
+            </div>
 
             <div class="hero-notify-row">
                 <div>
@@ -3042,7 +3074,13 @@ async function handleSignUp() {
 
         await saveUserProfile();
 
-        showToast("Account created & logged in!", "success");
+        // Fire-and-forget: verification email shouldn't block account
+        // creation from succeeding if sending it fails for some reason.
+        userCredential.user.sendEmailVerification().catch((err) => {
+            console.warn("Failed to send verification email:", err);
+        });
+
+        showToast("Account created! Check your inbox to verify your email.", "success");
 
     } catch (err) {
         console.error("Registration Error:", err);
@@ -3073,6 +3111,121 @@ async function handleSignOut() {
         showToast("Signed out successfully.", "success");
     } catch (err) {
         showToast(err.message, "error");
+    }
+}
+
+/* =========================================================
+   EMAIL VERIFICATION
+========================================================= */
+// Google sign-in accounts are already verified by Google, so the banner
+// only ever shows for email/password accounts that haven't confirmed yet.
+function updateEmailVerifyBanner(user) {
+    const row = document.getElementById("emailVerifyRow");
+    if (!row) return;
+    const isPasswordAccount = user.providerData.some(p => p.providerId === 'password');
+    row.style.display = (isPasswordAccount && !user.emailVerified) ? "flex" : "none";
+}
+
+async function resendVerificationEmail() {
+    if (!auth || !auth.currentUser) return;
+    const btn = document.getElementById("resendVerifyBtn");
+    if (btn) btn.disabled = true;
+    try {
+        await auth.currentUser.sendEmailVerification();
+        showToast("Verification email sent - check your inbox.", "success");
+    } catch (err) {
+        console.error("Failed to resend verification email:", err);
+        if (err.code === "auth/too-many-requests") {
+            showToast("Please wait a bit before requesting another email.", "error");
+        } else {
+            showToast("Couldn't send verification email. Please try again.", "error");
+        }
+    } finally {
+        if (btn) btn.disabled = false;
+    }
+}
+
+/* =========================================================
+   SELF-SERVICE ACCOUNT DELETION
+   Deletes the person's Firestore library data and their Firebase Auth
+   account itself - no manual/email-support step required. Firebase
+   requires a *recent* sign-in for an operation this sensitive, so if the
+   session is older than a few minutes this re-prompts for credentials
+   (password re-entry for email/password accounts, a fresh Google popup
+   for Google accounts) and retries once.
+========================================================= */
+async function reauthenticateCurrentUser(user) {
+    const isGoogleAccount = user.providerData.some(p => p.providerId === 'google.com');
+    try {
+        if (isGoogleAccount) {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            await user.reauthenticateWithPopup(provider);
+        } else {
+            const password = prompt("For your security, please re-enter your password to confirm account deletion:");
+            if (!password) return false;
+            const credential = firebase.auth.EmailAuthProvider.credential(user.email, password);
+            await user.reauthenticateWithCredential(credential);
+        }
+        return true;
+    } catch (err) {
+        console.error("Reauthentication failed:", err);
+        return false;
+    }
+}
+
+// Firestore doesn't cascade-delete a subcollection when its parent
+// document is deleted, so the library subcollection has to be cleared out
+// document-by-document (batched, since a batch write tops out at 500 ops).
+async function deleteAllUserData(uid) {
+    const librarySnap = await db.collection("users").doc(uid).collection("library").get();
+    const docs = librarySnap.docs;
+    const BATCH_LIMIT = 400;
+
+    for (let i = 0; i < docs.length; i += BATCH_LIMIT) {
+        const batch = db.batch();
+        docs.slice(i, i + BATCH_LIMIT).forEach(doc => batch.delete(doc.ref));
+        await batch.commit();
+    }
+
+    await db.collection("users").doc(uid).delete().catch(() => {});
+}
+
+async function handleDeleteAccount() {
+    if (!auth || !auth.currentUser) return;
+
+    const confirmed = confirm(
+        "This permanently deletes your account and all of your library data. This cannot be undone.\n\nAre you sure you want to continue?"
+    );
+    if (!confirmed) return;
+
+    const user = auth.currentUser;
+
+    async function attemptDelete() {
+        await deleteAllUserData(user.uid);
+        await user.delete();
+    }
+
+    try {
+        await attemptDelete();
+        showToast("Your account has been deleted.", "success");
+    } catch (err) {
+        if (err.code === "auth/requires-recent-login") {
+            const reauthed = await reauthenticateCurrentUser(user);
+            if (!reauthed) {
+                showToast("Account deletion cancelled - please try again.", "error");
+                return;
+            }
+            try {
+                await attemptDelete();
+                showToast("Your account has been deleted.", "success");
+            } catch (err2) {
+                console.error("Account deletion failed after reauthentication:", err2);
+                showToast("Couldn't delete your account. Please try again.", "error");
+            }
+        } else {
+            console.error("Account deletion failed:", err);
+            showToast("Couldn't delete your account. Please try again.", "error");
+        }
     }
 }
 
@@ -3623,6 +3776,8 @@ if (auth) {
             
             const largeAvatar = document.getElementById("largeAvatar");
             if (largeAvatar) largeAvatar.textContent = initial;
+
+            updateEmailVerifyBanner(user);
 
             // Always land on Home on load/refresh, regardless of whichever
             // tab the user was last on.
