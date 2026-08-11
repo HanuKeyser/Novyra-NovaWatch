@@ -511,6 +511,67 @@ img {
 }
 
 /* =========================================================
+   CHANGE POSTER / BACKDROP PICKER
+========================================================= */
+.poster-picker-title {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+    margin-bottom: 16px;
+}
+
+.poster-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding-bottom: 8px;
+}
+
+.poster-picker-grid.backdrop-mode {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.poster-picker-item {
+    position: relative;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--surface-2);
+    border: 2px solid transparent;
+    box-shadow: var(--glass-shadow-sm);
+    transition: transform 0.15s ease, border-color 0.2s ease;
+}
+
+.poster-picker-item:active {
+    transform: scale(0.96);
+}
+
+.poster-picker-item.selected {
+    border-color: var(--flat-blue);
+}
+
+.poster-picker-item.selected::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 136, 255, 0.15);
+}
+
+.poster-picker-item img {
+    width: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.poster-picker-grid:not(.backdrop-mode) .poster-picker-item img {
+    aspect-ratio: 0.685;
+}
+
+.poster-picker-grid.backdrop-mode .poster-picker-item img {
+    aspect-ratio: 1.78;
+}
+
+/* =========================================================
    EMPTY STATE
 ========================================================= */
 .empty-state {
@@ -2559,6 +2620,32 @@ img {
 </div>
 
 <!-- =====================================================
+     CHANGE POSTER / BACKDROP PICKER
+     Opened by long-pressing a poster in the Library grid.
+================================================     -->
+<div id="posterPickerModal" class="modal" onclick="closePosterPickerOutside(event)">
+    <div class="modal-sheet" style="max-height: 80vh;">
+        <div class="modal-header-nav">
+            <button class="close-button" onclick="closePosterPicker()" aria-label="Close">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M6 6l12 12"/>
+                    <path d="M18 6L6 18"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="modal-content" style="padding-top: 60px;">
+            <h2 class="poster-picker-title">Change Poster</h2>
+            <div class="segmented-toggle">
+                <button id="posterPickerTabPoster" class="segmented-btn active" onclick="setPosterPickerTab('poster')">Poster</button>
+                <button id="posterPickerTabBackdrop" class="segmented-btn" onclick="setPosterPickerTab('backdrop')">Backdrop</button>
+            </div>
+            <div id="posterPickerGrid" class="poster-picker-grid"></div>
+        </div>
+    </div>
+</div>
+
+<!-- =====================================================
      DELETE ACCOUNT CONFIRMATION
 ================================================     -->
 <div id="deleteAccountModal" class="confirm-overlay" onclick="closeDeleteAccountModalOutside(event)">
@@ -3523,8 +3610,11 @@ async function refreshItemFromTMDBInternal(item) {
 
                     const newTitle = movieData.title || item.title;
                     const newYear = movieData.release_date ? movieData.release_date.substring(0, 4) : item.year;
-                    const newPoster = movieData.poster_path ? `https://image.tmdb.org/t/p/w500${movieData.poster_path}` : item.poster;
-                    const newBackdrop = movieData.backdrop_path ? `https://image.tmdb.org/t/p/w780${movieData.backdrop_path}` : item.backdrop;
+                    // A custom poster/backdrop (picked via long-press) is never
+                    // overwritten by this background refresh - only TMDB's own
+                    // "primary" image gets auto-updated.
+                    const newPoster = item.customPoster ? item.poster : (movieData.poster_path ? `https://image.tmdb.org/t/p/w500${movieData.poster_path}` : item.poster);
+                    const newBackdrop = item.customBackdrop ? item.backdrop : (movieData.backdrop_path ? `https://image.tmdb.org/t/p/w780${movieData.backdrop_path}` : item.backdrop);
                     const newDescription = movieData.overview || item.description;
                     const newRuntime = movieData.runtime ? `${movieData.runtime} min` : item.runtime;
                     const newReleaseDate = movieData.release_date ? new Date(movieData.release_date).toISOString() : item.releaseDate;
@@ -3631,8 +3721,9 @@ async function refreshItemFromTMDBInternal(item) {
                     // plus TV-specific fields (status, season/episode counts, next air date).
                     const newTitle = showData.name || item.title;
                     const newYear = showData.first_air_date ? showData.first_air_date.substring(0, 4) : item.year;
-                    const newPoster = showData.poster_path ? `https://image.tmdb.org/t/p/w500${showData.poster_path}` : item.poster;
-                    const newBackdrop = showData.backdrop_path ? `https://image.tmdb.org/t/p/w780${showData.backdrop_path}` : item.backdrop;
+                    // Same custom-image guard as the movie branch above.
+                    const newPoster = item.customPoster ? item.poster : (showData.poster_path ? `https://image.tmdb.org/t/p/w500${showData.poster_path}` : item.poster);
+                    const newBackdrop = item.customBackdrop ? item.backdrop : (showData.backdrop_path ? `https://image.tmdb.org/t/p/w780${showData.backdrop_path}` : item.backdrop);
                     const newDescription = showData.overview || item.description;
                     const newReleaseDate = showData.first_air_date ? new Date(showData.first_air_date).toISOString() : item.releaseDate;
                     const newStatus = showData.status || item.status || '';
@@ -5046,8 +5137,14 @@ function createCard(item, upcomingShowIds = null) {
         : `<svg class="icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="M17 2l-5 5-5-5"/></svg>`;
 
     return `
-        <div class="card" onclick="openDetails('${item.id}')" data-id="${item.id}">
-            <div class="poster">
+        <div class="card" onclick="handleCardClick(event, '${item.id}')" data-id="${item.id}">
+            <div class="poster"
+                 onmousedown="startPosterPress('${item.id}', '${item.type}')"
+                 onmouseup="endPosterPress()"
+                 onmouseleave="endPosterPress()"
+                 ontouchstart="startPosterPress('${item.id}', '${item.type}')"
+                 ontouchend="endPosterPress()"
+                 ontouchcancel="endPosterPress()">
                 ${hasPoster ? `
                     <img src="${item.poster}" alt="${escapeHTML(item.title)}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                     <div class="poster-placeholder" style="display: none;">${placeholderIcon}</div>
@@ -5841,6 +5938,155 @@ function handleSeasonClick(event, seasonNumber) {
     }
     selectedSeason = seasonNumber;
     updateModalContent();
+}
+
+/* =========================================================
+   CHANGE POSTER / BACKDROP
+   Long-pressing a poster (Library grid) opens a picker of every
+   poster/backdrop TMDB has for that title - same 600ms long-press
+   pattern as the season selector above, including the click-suppression
+   so the long-press doesn't also open the details modal underneath it.
+========================================================= */
+let posterPressTimer = null;
+let isPosterLongPress = false;
+
+function startPosterPress(itemId, type) {
+    isPosterLongPress = false;
+    posterPressTimer = setTimeout(() => {
+        isPosterLongPress = true;
+        if (navigator.vibrate) navigator.vibrate(50);
+        openChangePosterPicker(itemId, type);
+    }, 600);
+}
+
+function endPosterPress() {
+    if (posterPressTimer) {
+        clearTimeout(posterPressTimer);
+        posterPressTimer = null;
+    }
+}
+
+// Wraps the card's normal tap-to-open behavior so a long-press (which
+// already opened the picker above) doesn't also open the details modal
+// underneath it.
+function handleCardClick(event, itemId) {
+    if (isPosterLongPress) {
+        event.preventDefault();
+        event.stopPropagation();
+        isPosterLongPress = false;
+        return;
+    }
+    openDetails(itemId);
+}
+
+// TMDB keeps a whole gallery of posters/backdrops per title (different
+// languages, fan-submitted alternates, different crops) beyond the one
+// "primary" image the app shows by default. include_image_language pulls
+// in the language-neutral and English-labeled sets, which covers the vast
+// majority of what's actually available without fetching every language.
+async function fetchItemImages(tmdbId, type) {
+    try {
+        const endpoint = type === 'movie'
+            ? `https://api.themoviedb.org/3/movie/${tmdbId}/images?api_key=${TMDB_API_KEY}&include_image_language=en,null`
+            : `https://api.themoviedb.org/3/tv/${tmdbId}/images?api_key=${TMDB_API_KEY}&include_image_language=en,null`;
+        const res = await fetch(endpoint);
+        const data = await res.json();
+        return {
+            posters: (data.posters || []).map(img => `https://image.tmdb.org/t/p/w500${img.file_path}`),
+            backdrops: (data.backdrops || []).map(img => `https://image.tmdb.org/t/p/w780${img.file_path}`)
+        };
+    } catch (err) {
+        console.error("Failed to fetch alternate images:", err);
+        return { posters: [], backdrops: [] };
+    }
+}
+
+let posterPickerItemId = null;
+let posterPickerType = null;
+let posterPickerTab = 'poster';
+let posterPickerImages = { posters: [], backdrops: [] };
+
+async function openChangePosterPicker(itemId, type) {
+    const item = getItem(itemId);
+    if (!item || !item.tmdbId) return;
+
+    posterPickerItemId = itemId;
+    posterPickerType = type;
+    posterPickerTab = 'poster';
+
+    document.getElementById("posterPickerTabPoster").classList.add("active");
+    document.getElementById("posterPickerTabBackdrop").classList.remove("active");
+
+    const grid = document.getElementById("posterPickerGrid");
+    grid.className = "poster-picker-grid";
+    grid.innerHTML = `<div class="spinner-container"><div class="spinner"></div></div>`;
+    document.getElementById("posterPickerModal").classList.add("open");
+
+    posterPickerImages = await fetchItemImages(item.tmdbId, type);
+
+    // The picker could still be open for this same item when the fetch
+    // resolves, or the person could have already closed it / long-pressed
+    // a different card in the meantime - only render if it's still relevant.
+    if (posterPickerItemId === itemId) {
+        renderPosterPickerGrid();
+    }
+}
+
+function setPosterPickerTab(tab) {
+    posterPickerTab = tab;
+    document.getElementById("posterPickerTabPoster").classList.toggle("active", tab === 'poster');
+    document.getElementById("posterPickerTabBackdrop").classList.toggle("active", tab === 'backdrop');
+    renderPosterPickerGrid();
+}
+
+function renderPosterPickerGrid() {
+    const grid = document.getElementById("posterPickerGrid");
+    const item = getItem(posterPickerItemId);
+    if (!grid || !item) return;
+
+    const images = posterPickerTab === 'poster' ? posterPickerImages.posters : posterPickerImages.backdrops;
+    const currentUrl = posterPickerTab === 'poster' ? item.poster : item.backdrop;
+
+    grid.className = `poster-picker-grid ${posterPickerTab === 'backdrop' ? 'backdrop-mode' : 'poster-mode'}`;
+
+    if (!images.length) {
+        grid.innerHTML = emptyState("No Images Found", `TMDB doesn't have any alternate ${posterPickerTab}s for this title.`);
+        return;
+    }
+
+    grid.innerHTML = images.map(url => `
+        <div class="poster-picker-item ${url === currentUrl ? 'selected' : ''}" onclick="selectPickerImage('${url}')">
+            <img src="${url}" loading="lazy" alt="">
+        </div>
+    `).join("");
+}
+
+async function selectPickerImage(url) {
+    const item = getItem(posterPickerItemId);
+    if (!item) return;
+
+    if (posterPickerTab === 'poster') {
+        item.poster = url;
+        item.customPoster = true;
+    } else {
+        item.backdrop = url;
+        item.customBackdrop = true;
+    }
+
+    await saveItem(item);
+    refreshActivePage();
+    if (currentItem && currentItem.id === item.id) updateModalContent();
+    closePosterPicker();
+    showToast(`${posterPickerTab === 'poster' ? 'Poster' : 'Backdrop'} updated.`, "success");
+}
+
+function closePosterPicker() {
+    document.getElementById("posterPickerModal").classList.remove("open");
+    posterPickerItemId = null;
+}
+
+function closePosterPickerOutside(event) {
+    if (event.target.id === "posterPickerModal") closePosterPicker();
 }
 
 async function toggleEntireSeasonWatched(seasonNumber) {
