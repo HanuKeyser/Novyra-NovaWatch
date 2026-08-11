@@ -666,6 +666,16 @@ img {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 0 0 1px rgba(255, 255, 255, 0.4);
 }
 
+/* Scoped to the auth screen only, so the Sign In / Join tabs pick up the
+   same flat-blue treatment as Sign In, Join, Sign Out, and Trailer,
+   without changing the shared .search-type-btn.active style used
+   elsewhere (Discover's TV Shows/Movies toggle). */
+#authScreen .search-type-btn.active {
+    background: var(--glass-sheen), var(--flat-blue);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 136, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+
 .search-type-toggle.three-way {
     grid-template-columns: repeat(3, 1fr);
 }
