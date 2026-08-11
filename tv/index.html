@@ -979,7 +979,10 @@ img {
 
 .continue-card-wrap {
     position: relative;
-    border-radius: var(--radius-lg);
+    /* Matches the same 28px corner radius as the hero card, analytics
+       card, and nav bar around it - the rest of the Home tab's top-level
+       surfaces - instead of the smaller poster-scale radius. */
+    border-radius: var(--radius-2xl);
     margin-bottom: 12px;
     overflow: hidden;
 }
@@ -1031,7 +1034,7 @@ img {
     backdrop-filter: blur(44px) saturate(240%);
     -webkit-backdrop-filter: blur(44px) saturate(240%);
     border: 1px solid rgba(255, 255, 255, 0.85);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-2xl);
     box-shadow: 0 18px 40px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 1), inset 0 0 0 1px rgba(255, 255, 255, 0.25);
     touch-action: pan-y;
     cursor: pointer;
@@ -2150,7 +2153,9 @@ img {
     opacity: 0;
     pointer-events: none;
     padding: 13px 22px;
-    border-radius: 999px;
+    /* Matches the bottom nav's corner radius, since the two sit stacked
+       right above one another as the app's floating chrome layer. */
+    border-radius: var(--radius-2xl);
     background: var(--glass-sheen), var(--glass-chrome-fill);
     backdrop-filter: var(--glass-chrome-blur);
     -webkit-backdrop-filter: var(--glass-chrome-blur);
@@ -3005,6 +3010,17 @@ function setLastLibraryCheck(date) {
 async function saveItem(item) {
     try {
         if (!auth || !auth.currentUser || !db || !item || !item.id) {
+            return;
+        }
+
+        // Belt-and-suspenders: a shared/searched item opened before being
+        // explicitly added ("preview") should never reach Firestore, no
+        // matter which caller passes it in. Every call site is already
+        // supposed to check isCurrentItemInLibrary() first, but guarding
+        // it here too means a future caller forgetting that check can't
+        // silently write a placeholder doc into someone's library.
+        if (item.isPreview || item.id.startsWith('preview-')) {
+            console.warn(`Refused to save preview item "${item.id}" - it isn't in the library yet.`);
             return;
         }
 
