@@ -1663,12 +1663,15 @@ img {
 }
 
 .hero-signout-btn {
-    width: 100%;
+    flex: 1;
     height: 40px;
-    margin-top: 16px;
+    padding: 0 8px;
     display: flex;
     align-items: center;
     justify-content: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     border-radius: var(--radius-sm);
     background: var(--glass-sheen), var(--glass-chrome-fill);
     backdrop-filter: var(--glass-chrome-blur);
@@ -1684,27 +1687,36 @@ img {
     transform: scale(0.96);
 }
 
-/* Deliberately low-emphasis relative to Sign Out (small centered text
-   link, not another full-width glass button) since this is a rare,
-   destructive action - it shouldn't compete visually with everyday
-   actions, just stay reachable. */
-.hero-delete-link {
-    display: block;
-    width: 100%;
-    margin-top: 10px;
-    padding: 4px;
-    background: transparent;
-    color: var(--danger);
-    text-align: center;
-    font-size: 12px;
-    font-weight: 600;
-    opacity: 0.75;
+.hero-account-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
 }
 
-.hero-delete-link:hover,
+/* Same filled-glass "danger" treatment as .action-button.danger (the
+   Remove button in the details modal) - sheen + red gradient + white
+   text - so this reads as the same kind of destructive action everywhere
+   it appears, not a separate, lower-emphasis style. */
+.hero-delete-link {
+    flex: 1;
+    height: 40px;
+    padding: 0 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-radius: var(--radius-sm);
+    background: var(--glass-sheen), var(--red-gradient);
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    box-shadow: 0 6px 16px rgba(255, 59, 48, 0.3), inset 0 1px 0 rgba(255,255,255,0.5);
+}
+
 .hero-delete-link:active {
-    opacity: 1;
-    text-decoration: underline;
+    transform: scale(0.96);
 }
 
 .hero-notify-row {
@@ -2249,8 +2261,10 @@ img {
                 </div>
             </div>
 
-            <button class="hero-signout-btn" onclick="handleSignOut()">Sign Out</button>
-            <button class="hero-delete-link" onclick="handleDeleteAccount()">Delete Account</button>
+            <div class="hero-account-actions">
+                <button class="hero-signout-btn" onclick="handleSignOut()">Sign Out</button>
+                <button class="hero-delete-link" onclick="handleDeleteAccount()">Delete Account</button>
+            </div>
 
             <div class="hero-notify-row" id="emailVerifyRow" style="display:none;">
                 <div>
