@@ -102,6 +102,12 @@
        else, not a flat color chip sitting next to translucent ones.
        Always paired with --glass-sheen on top for the same reason. */
     --blue-gradient: linear-gradient(135deg, var(--blue-light), var(--blue));
+    /* Same "filled glass" recipe as blue, just in the other accent colors -
+       used anywhere a warning/danger/success action needs the same solid,
+       sheen-lit glass feel as a primary blue button. */
+    --orange-gradient: linear-gradient(135deg, #ffb15c, #ff9500);
+    --red-gradient: linear-gradient(135deg, #ff6961, #ff3b30);
+    --green-gradient: linear-gradient(135deg, #34d472, #1fa851);
 
     --text: #1d1d1f;
     --text-secondary: #424245;
@@ -976,13 +982,17 @@ img {
     justify-content: flex-start;
     gap: 8px;
     padding: 0 26px;
-    background: linear-gradient(135deg, #34d472, #1fa851);
+    background: var(--glass-sheen), var(--green-gradient);
     color: white;
     font-size: 12.5px;
     font-weight: 800;
     letter-spacing: 0.2px;
     opacity: 0;
     pointer-events: none;
+    /* Same bright top-edge highlight every other filled glass button in
+       the app gets, so this reads as the same family of control just in
+       a different color for each action. */
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .continue-card-bg svg {
@@ -1483,15 +1493,17 @@ img {
 }
 
 .action-button.warning {
-    background: rgba(255, 149, 0, 0.12);
-    color: #d97706;
-    border: 1px solid rgba(255, 149, 0, 0.3);
+    background: var(--glass-sheen), var(--orange-gradient);
+    color: white;
+    border: none;
+    box-shadow: 0 6px 16px rgba(255, 149, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.5);
 }
 
 .action-button.danger {
-    background: rgba(255, 59, 48, 0.1);
-    color: var(--danger);
-    border: 1px solid rgba(255, 59, 48, 0.2);
+    background: var(--glass-sheen), var(--red-gradient);
+    color: white;
+    border: none;
+    box-shadow: 0 6px 16px rgba(255, 59, 48, 0.3), inset 0 1px 0 rgba(255,255,255,0.5);
 }
 
 .season-selector-wrapper {
@@ -4868,9 +4880,9 @@ function initContinueCardSwipe(container) {
     const RIGHT_BG_HTML = `<span>Mark Watched</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
     const STOP_BG_HTML = `<span>Stop Watching</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>`;
     const REMOVE_BG_HTML = `<span>Remove</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>`;
-    const RIGHT_BG_COLOR = "linear-gradient(135deg, #34d472, #1fa851)";
-    const STOP_BG_COLOR = "linear-gradient(135deg, #ffb15c, #ff9500)";
-    const REMOVE_BG_COLOR = "linear-gradient(135deg, #ff6961, #ff3b30)";
+    const RIGHT_BG_COLOR = "var(--glass-sheen), var(--green-gradient)";
+    const STOP_BG_COLOR = "var(--glass-sheen), var(--orange-gradient)";
+    const REMOVE_BG_COLOR = "var(--glass-sheen), var(--red-gradient)";
 
     container.querySelectorAll(".continue-card").forEach(card => {
         let startX = 0, startY = 0, deltaX = 0, dragging = false, axisLocked = null, pointerId = null;
