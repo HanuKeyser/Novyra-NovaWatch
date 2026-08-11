@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#F4F6FB">
+<meta name="theme-color" content="#F0F2F6">
 <title>Privacy Notice</title>
 <link rel="icon" type="image/png" href="https://www.novyra.co.za/NovaWatch_Logo.png">
 <style>
@@ -15,18 +15,43 @@
 }
 
 :root {
-    --bg-mesh: #F4F6FB;
+    /* Kept in sync with the main app's design tokens (index.html) so this
+       page reads as part of the same product rather than a bolted-on
+       legal page. */
+    --bg-mesh:
+        radial-gradient(at 15% 12%, rgba(255, 255, 255, 0.9) 0px, transparent 48%),
+        radial-gradient(at 85% 8%, rgba(203, 210, 222, 0.55) 0px, transparent 50%),
+        radial-gradient(at 90% 75%, rgba(255, 255, 255, 0.7) 0px, transparent 50%),
+        radial-gradient(at 10% 88%, rgba(210, 216, 226, 0.5) 0px, transparent 50%),
+        radial-gradient(at 50% 45%, rgba(255, 255, 255, 0.6) 0px, transparent 65%),
+        #F0F2F6;
     --surface: rgba(255, 255, 255, 0.64);
     --surface-2: rgba(255, 255, 255, 0.42);
     --glass-border: rgba(255, 255, 255, 0.7);
     --glass-border-subtle: rgba(255, 255, 255, 0.4);
     --glass-shadow: 0 22px 50px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+
+    --glass-chrome-fill: rgba(255, 255, 255, 0.52);
+    --glass-chrome-blur: blur(60px) saturate(220%);
+    --glass-chrome-border: rgba(255, 255, 255, 0.92);
+    --glass-chrome-shadow: 0 2px 6px rgba(0, 0, 0, 0.05), 0 24px 48px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 1), inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+    --glass-sheen: linear-gradient(112deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.06) 22%, rgba(255, 255, 255, 0) 55%, rgba(255, 255, 255, 0) 78%, rgba(255, 255, 255, 0.28) 100%);
+
     --blue: #0066cc;
     --blue-light: #4792ff;
+    --blue-gradient: linear-gradient(135deg, var(--blue-light), var(--blue));
     --text: #1d1d1f;
     --text-secondary: #424245;
     --text-muted: #86868b;
     --border: rgba(0, 0, 0, 0.08);
+
+    --radius-sm: 14px;
+    --radius-2xl: 28px;
+}
+
+html {
+    background: #F0F2F6;
+    color-scheme: light;
 }
 
 body {
@@ -60,25 +85,30 @@ body {
     height: 36px;
     padding: 0 16px;
     border-radius: 999px;
-    background: var(--surface);
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
-    border: 1px solid var(--glass-border);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    background: var(--glass-sheen), var(--glass-chrome-fill);
+    backdrop-filter: var(--glass-chrome-blur);
+    -webkit-backdrop-filter: var(--glass-chrome-blur);
+    border: 1px solid var(--glass-chrome-border);
+    box-shadow: var(--glass-chrome-shadow);
     color: var(--text-secondary);
     text-decoration: none;
     font-size: 13px;
     font-weight: 700;
+    transition: transform 0.15s ease;
+}
+
+.back-link:active {
+    transform: scale(0.96);
 }
 
 .hero {
     padding: 26px 28px;
     margin-bottom: 18px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.78) 0%, rgba(224,238,255,0.62) 100%);
+    background: var(--glass-sheen), linear-gradient(135deg, rgba(255,255,255,0.78) 0%, rgba(224,238,255,0.62) 100%);
     backdrop-filter: blur(46px) saturate(210%);
     -webkit-backdrop-filter: blur(46px) saturate(210%);
     border: 1px solid rgba(0, 102, 204, 0.2);
-    border-radius: 28px;
+    border-radius: var(--radius-2xl);
     box-shadow: 0 20px 48px rgba(0, 102, 204, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 
@@ -98,10 +128,10 @@ h1 {
 }
 
 .card {
-    background: var(--surface);
+    background: var(--glass-sheen), var(--surface);
     border: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow);
-    border-radius: 28px;
+    border-radius: var(--radius-2xl);
     backdrop-filter: blur(30px) saturate(180%);
     -webkit-backdrop-filter: blur(30px) saturate(180%);
     padding: 30px 28px;
