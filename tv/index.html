@@ -931,6 +931,66 @@ img {
 }
 
 /* =========================================================
+   SKELETON LOADERS
+   Shown instead of the bare spinner above wherever loading content has a
+   predictable shape (a list of search-card-style rows, or a grid of
+   poster tiles) - placeholders sized to match the real layout mean the
+   page doesn't jump when content arrives, and it's obvious at a glance
+   *what kind* of thing is loading rather than just "wait".
+========================================================= */
+@keyframes skeletonShimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.skeleton {
+    background: linear-gradient(90deg, var(--surface-2) 25%, rgba(255, 255, 255, 0.6) 50%, var(--surface-2) 75%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.4s ease-in-out infinite;
+    border-radius: var(--radius-sm);
+}
+
+/* Row skeleton - mirrors the .search-card / .episode layout: a thumbnail
+   rectangle plus a few text-shaped bars, repeated to fill the list. */
+.skeleton-row {
+    display: flex;
+    gap: 14px;
+    padding: 14px 6px;
+    align-items: flex-start;
+}
+
+.skeleton-row-thumb {
+    flex: 0 0 80px;
+    width: 80px;
+    height: 116px;
+    border-radius: 16px;
+}
+
+.skeleton-row-lines {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    padding-top: 6px;
+}
+
+.skeleton-line {
+    height: 11px;
+}
+
+/* Grid skeleton - mirrors the poster picker's 3-column layout. */
+.skeleton-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.skeleton-grid-item {
+    aspect-ratio: 2 / 3;
+    border-radius: var(--radius-md);
+}
+
+/* =========================================================
    UPCOMING CARDS
 ========================================================= */
 .upcoming-card {
@@ -2389,8 +2449,8 @@ img {
 
         <div class="auth-form">
             <div class="auth-row">
-                <input type="text" id="authUsername" class="auth-input" placeholder="Username" style="display:none;">
-                <input type="email" id="authEmail" class="auth-input" placeholder="Email address">
+                <input type="text" id="authUsername" class="auth-input" placeholder="Username" style="display:none;" onkeydown="handleAuthKeydown(event)">
+                <input type="email" id="authEmail" class="auth-input" placeholder="Email address" onkeydown="handleAuthKeydown(event)">
             </div>
             <div class="auth-field">
 <input
@@ -2399,6 +2459,7 @@ img {
     class="auth-input"
     placeholder="Password"
     oninput="clearPasswordError()"
+    onkeydown="handleAuthKeydown(event)"
 >
 <div id="authPasswordError" class="auth-error"></div>
 </div>
@@ -3281,6 +3342,19 @@ function setAuthMode(mode) {
     }
 
     clearPasswordError();
+}
+
+// Lets the mobile keyboard's Go/Done key (or a desktop Enter press) submit
+// the form from any of its fields, the same as tapping the Sign In/Join
+// button - there's no <form> element here to get native submit-on-Enter
+// for free, and #authSignInBtn's onclick is already kept pointed at
+// whichever handler is currently active by setAuthMode above, so this
+// just triggers that same button rather than duplicating the mode logic.
+function handleAuthKeydown(event) {
+    if (event.key !== 'Enter') return;
+    event.preventDefault();
+    const btn = document.getElementById("authSignInBtn");
+    if (btn && !btn.disabled) btn.click();
 }
 
 async function handleSignIn() {
@@ -4458,7 +4532,7 @@ async function fetchTrending() {
 
     const mediaLabel = currentSearchType === 'movie' ? 'Movies' : 'TV Shows';
     if (heading) heading.textContent = `Trending ${mediaLabel}`;
-    listContainer.innerHTML = `<div class="spinner-container"><div class="spinner"></div></div>`;
+    listContainer.innerHTML = skeletonRows();
 
     const endpoint = currentSearchType === 'movie' 
         ? `https://api.themoviedb.org/3/trending/movie/week?api_key=${TMDB_API_KEY}`
@@ -4479,7 +4553,7 @@ async function performTMDBSearch(query) {
     const heading = document.getElementById("searchResultsHeading");
 
     if (heading) heading.textContent = `Results for "${query}"`;
-    listContainer.innerHTML = `<div class="spinner-container"><div class="spinner"></div></div>`;
+    listContainer.innerHTML = skeletonRows();
 
     const endpoint = currentSearchType === 'movie'
         ? `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}`
@@ -5727,6 +5801,32 @@ function emptyState(title, message = "Check back later or search for new shows a
     `;
 }
 
+// Loading placeholders for the two content shapes used across the app -
+// a row list (search results, episodes) and a 3-column grid (poster
+// picker). Sized/laid out to match the real content that replaces them,
+// so nothing shifts when it arrives - see the .skeleton-* CSS above.
+function skeletonRows(count = 6) {
+    return Array.from({ length: count }, () => `
+        <div class="skeleton-row">
+            <div class="skeleton skeleton-row-thumb"></div>
+            <div class="skeleton-row-lines">
+                <div class="skeleton skeleton-line" style="width: 55%;"></div>
+                <div class="skeleton skeleton-line" style="width: 35%; height: 9px;"></div>
+                <div class="skeleton skeleton-line" style="width: 92%;"></div>
+                <div class="skeleton skeleton-line" style="width: 68%;"></div>
+            </div>
+        </div>
+    `).join("");
+}
+
+function skeletonGrid(count = 9) {
+    return `
+        <div class="skeleton-grid">
+            ${Array.from({ length: count }, () => `<div class="skeleton skeleton-grid-item"></div>`).join("")}
+        </div>
+    `;
+}
+
 /* =========================================================
    HOME UI HANDLING
 ========================================================= */
@@ -6039,7 +6139,7 @@ function renderEpisodesList(container) {
     scrollToNextEpisodeOnRender = false;
 
     if (currentItem.episodesLoading) {
-        container.innerHTML = `<div class="spinner-container"><div class="spinner"></div></div>`;
+        container.innerHTML = skeletonRows(5);
         return;
     }
 
@@ -6246,7 +6346,7 @@ async function openChangePosterPicker(itemId, type) {
 
     const grid = document.getElementById("posterPickerGrid");
     grid.className = "poster-picker-grid";
-    grid.innerHTML = `<div class="spinner-container"><div class="spinner"></div></div>`;
+    grid.innerHTML = skeletonGrid();
     document.getElementById("posterPickerModal").classList.add("open");
 
     posterPickerImages = await fetchItemImages(item.tmdbId, type);
