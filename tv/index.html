@@ -961,7 +961,12 @@ img {
     inset: 0;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    /* Swiping right to mark watched slides the card right, uncovering
+       this panel on the LEFT - so the label sits at the left edge (flex-
+       start) for that direction. The left-swipe (remove/stop) panel is
+       revealed on the right instead, so JS flips this to flex-end for
+       that direction - see updateBgForDirection(). */
+    justify-content: flex-start;
     gap: 8px;
     padding: 0 26px;
     background: linear-gradient(135deg, #34d472, #1fa851);
@@ -4669,7 +4674,6 @@ function createCard(item, upcomingShowIds = null) {
                 ${isNew ? `<div class="new-episode-badge">NEW</div>` : ''}
                 ${progressBarHTML}
             </div>
-            <div class="card-title">${escapeHTML(item.title)}</div>
         </div>
     `;
 }
@@ -4866,16 +4870,22 @@ function initContinueCardSwipe(container) {
 
         // Swaps the reveal panel's color/icon/label to match whichever
         // direction is currently being dragged, so the person sees exactly
-        // what letting go will do.
+        // what letting go will do. Justify-content flips with it: a
+        // right-swipe reveals this panel on the left of the card (so the
+        // label sits flex-start), a left-swipe reveals it on the right
+        // (so the label sits flex-end) - matching whichever side of the
+        // card actually uncovers.
         function updateBgForDirection(dir) {
             const bg = card.parentElement.querySelector(".continue-card-bg");
             if (!bg) return;
             if (dir === -1 && leftAction) {
                 bg.style.background = leftAction === 'stop' ? STOP_BG_COLOR : REMOVE_BG_COLOR;
                 bg.innerHTML = leftAction === 'stop' ? STOP_BG_HTML : REMOVE_BG_HTML;
+                bg.style.justifyContent = 'flex-end';
             } else {
                 bg.style.background = RIGHT_BG_COLOR;
                 bg.innerHTML = RIGHT_BG_HTML;
+                bg.style.justifyContent = 'flex-start';
             }
         }
 
