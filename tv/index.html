@@ -3683,16 +3683,26 @@ async function reauthenticateCurrentUser(user) {
 // Firestore doesn't cascade-delete a subcollection when its parent
 // document is deleted, so the library subcollection has to be cleared out
 // document-by-document (batched, since a batch write tops out at 500 ops).
+// Deletes every trace of the user's library data - both the live library
+// and any archived watch history left behind by removeLibraryItem (see
+// there) for shows that were removed but not permanently deleted. The
+// Privacy Notice promises "all associated library data" goes with the
+// account, so both collections have to go, not just the visible one.
 async function deleteAllUserData(uid) {
-    const librarySnap = await db.collection("users").doc(uid).collection("library").get();
-    const docs = librarySnap.docs;
     const BATCH_LIMIT = 400;
 
-    for (let i = 0; i < docs.length; i += BATCH_LIMIT) {
-        const batch = db.batch();
-        docs.slice(i, i + BATCH_LIMIT).forEach(doc => batch.delete(doc.ref));
-        await batch.commit();
+    async function deleteCollection(collectionName) {
+        const snap = await db.collection("users").doc(uid).collection(collectionName).get();
+        const docs = snap.docs;
+        for (let i = 0; i < docs.length; i += BATCH_LIMIT) {
+            const batch = db.batch();
+            docs.slice(i, i + BATCH_LIMIT).forEach(doc => batch.delete(doc.ref));
+            await batch.commit();
+        }
     }
+
+    await deleteCollection("library");
+    await deleteCollection("archivedShows");
 
     await db.collection("users").doc(uid).delete().catch(() => {});
 }
