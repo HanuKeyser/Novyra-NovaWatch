@@ -2008,11 +2008,43 @@ img {
     animation: authFadeIn 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
+.profile-select-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 6px;
+}
+
 .profile-select-logo {
     width: 44px;
     height: 44px;
-    margin-bottom: 6px;
     object-fit: contain;
+}
+
+/* Sits to the right of the centered logo rather than the title row, so it
+   reads as a persistent screen-level control (like "Edit" on a real
+   streaming service's profile screen) instead of competing with "Who's
+   Watching?" for attention. */
+.profile-manage-btn {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 34px;
+    padding: 0 16px;
+    border-radius: 999px;
+    background: var(--glass-sheen), var(--surface-2);
+    border: 1px solid var(--glass-border-subtle);
+    color: var(--blue);
+    font-size: 12.5px;
+    font-weight: 700;
+    display: none; /* toggled on via JS once there's something to manage */
+}
+
+.profile-manage-btn:active {
+    transform: translateY(-50%) scale(0.94);
 }
 
 .profile-select-title {
@@ -2020,6 +2052,7 @@ img {
     font-weight: 800;
     letter-spacing: -0.5px;
     color: var(--text);
+    margin-top: 14px;
 }
 
 .profile-select-subtitle {
@@ -2028,18 +2061,15 @@ img {
     margin: 6px 0 32px;
     max-width: 380px;
     line-height: 1.5;
+    min-height: 1.5em;
 }
 
 .profile-select-grid {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 22px;
+    gap: 20px 18px;
     width: 100%;
-}
-
-.profile-select-tile-wrap {
-    position: relative;
 }
 
 .profile-select-tile {
@@ -2047,26 +2077,44 @@ img {
     flex-direction: column;
     align-items: center;
     gap: 10px;
-    width: 118px;
-    padding: 6px;
+    width: 128px;
+    padding: 10px 8px;
     text-align: center;
     border-radius: var(--radius-lg);
 }
 
+.profile-select-tile:active {
+    transform: scale(0.96);
+}
+
+/* Manage-mode cards aren't tap-to-enter, so they get their own resting
+   surface (like any other card in the app) instead of the plain, no-chrome
+   look of a normal selectable tile - that visual difference itself signals
+   "this behaves differently right now" before the user even reads it. */
+.profile-select-tile-managing {
+    background: var(--glass-sheen), var(--surface-2);
+    border: 1px solid var(--glass-border-subtle);
+    padding: 16px 10px 14px;
+}
+
+.profile-select-tile-managing:active {
+    transform: none;
+}
+
 .profile-select-avatar {
-    width: 96px;
-    height: 96px;
-    border-radius: var(--radius-lg);
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     background: var(--glass-sheen), var(--blue-gradient);
     color: white;
     font-weight: 800;
-    font-size: 34px;
+    font-size: 32px;
     box-shadow: 0 12px 28px rgba(0, 102, 204, 0.22), inset 0 1px 0 rgba(255,255,255,0.5);
     border: 3px solid transparent;
-    transition: border-color 0.2s ease, transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: border-color 0.2s ease;
 }
 
 .profile-select-avatar.household {
@@ -2074,12 +2122,15 @@ img {
     box-shadow: 0 12px 28px rgba(255, 149, 0, 0.22), inset 0 1px 0 rgba(255,255,255,0.5);
 }
 
-.profile-select-tile.active .profile-select-avatar {
-    border-color: var(--blue);
+.profile-select-avatar.add {
+    background: var(--surface-2);
+    border: 2px dashed var(--glass-border);
+    color: var(--text-muted);
+    box-shadow: none;
 }
 
-.profile-select-tile:active .profile-select-avatar {
-    transform: scale(0.94);
+.profile-select-tile.active .profile-select-avatar {
+    border-color: var(--blue);
 }
 
 .profile-select-name {
@@ -2093,78 +2144,87 @@ img {
 }
 
 .profile-select-sub {
-    font-size: 11px;
+    font-size: 11.5px;
     color: var(--text-muted);
-    margin-top: -6px;
 }
 
-.profile-select-share {
-    position: absolute;
-    top: -2px;
-    right: -2px;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
+.profile-select-invite-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--glass-sheen), var(--surface);
-    border: 1px solid var(--glass-border);
-    color: var(--text-secondary);
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
-}
-
-.profile-select-share:active {
-    transform: scale(0.92);
-}
-
-.profile-select-new {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    gap: 6px;
     width: 100%;
-    max-width: 400px;
-    margin-top: 36px;
+    height: 36px;
+    margin-top: 4px;
+    border-radius: 999px;
+    background: var(--glass-sheen), var(--blue-gradient);
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    box-shadow: 0 6px 14px rgba(0, 102, 204, 0.28), inset 0 1px 0 rgba(255,255,255,0.5);
+}
+
+.profile-select-invite-btn:active {
+    transform: scale(0.94);
 }
 
 .profile-select-signout {
-    margin-top: 28px;
+    margin-top: 36px;
     font-size: 12.5px;
     font-weight: 700;
     color: var(--text-muted);
     text-decoration: underline;
 }
 
-.profile-new-input {
-    flex: 1;
-    height: 46px;
-    padding: 0 14px;
+/* ---- Create-watchlist panel ---- */
+.create-watchlist-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 340px;
+}
+
+.create-watchlist-input {
+    height: 50px;
+    padding: 0 16px;
     border-radius: var(--radius-md);
     background: var(--surface-2);
     border: 1px solid var(--glass-border-subtle);
-    font-size: 13.5px;
+    font-size: 15px;
     color: var(--text);
+    text-align: center;
 }
 
-.profile-new-input::placeholder {
+.create-watchlist-input::placeholder {
     color: var(--text-muted);
 }
 
-.profile-tile-add {
-    flex-shrink: 0;
-    width: 46px;
-    height: 46px;
+.create-watchlist-submit {
+    height: 50px;
     border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
     background: var(--glass-sheen), var(--blue-gradient);
     color: white;
-    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3), inset 0 1px 0 rgba(255,255,255,0.5);
+    font-size: 14.5px;
+    font-weight: 700;
+    box-shadow: 0 10px 24px rgba(0, 102, 204, 0.3), inset 0 1px 0 rgba(255,255,255,0.5);
 }
 
-.profile-tile-add:active {
-    transform: scale(0.94);
+.create-watchlist-submit:active {
+    transform: scale(0.97);
+}
+
+.create-watchlist-cancel {
+    height: 44px;
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 13.5px;
+    font-weight: 700;
+}
+
+.create-watchlist-cancel:active {
+    transform: scale(0.97);
 }
 
 .hero-signout-btn {
@@ -2751,23 +2811,40 @@ img {
      before the main app itself - matches the "who's watching" pattern
      from streaming services. Selecting a tile is what actually enters the
      app; nothing here lives inside the main page's own navigation.
+
+     Two panels, only one visible at a time:
+       - #profileSelectGridPanel: the actual picker. Tapping a tile enters
+         it immediately - no icons, inputs, or other chrome competing for
+         attention. A "Manage" toggle reveals an Invite button under each
+         shared tile for anyone who actually wants that, instead of
+         showing it all the time.
+       - #createWatchlistPanel: a focused, single-purpose screen for naming
+         a new shared watchlist, swapped in when "Add Watchlist" is tapped
+         rather than an always-visible text field on the picker itself.
 ================================================     -->
 <div id="profileSelectScreen">
-    <div class="profile-select-wrap">
-        <img src="https://www.novyra.co.za/NovaWatch_Logo.png" alt="NovaWatch Logo" class="profile-select-logo">
+    <div id="profileSelectGridPanel" class="profile-select-wrap">
+        <div class="profile-select-header">
+            <img src="https://www.novyra.co.za/NovaWatch_Logo.png" alt="NovaWatch Logo" class="profile-select-logo">
+            <button id="profileManageBtn" class="profile-manage-btn" onclick="toggleProfileManageMode()">Manage</button>
+        </div>
         <h1 class="profile-select-title">Who's Watching?</h1>
-        <p class="profile-select-subtitle">Pick your personal library, or a watchlist shared with your household.</p>
+        <p id="profileSelectSubtitle" class="profile-select-subtitle">Tap a library to open it.</p>
 
         <div id="profileSelectGrid" class="profile-select-grid"></div>
 
-        <div class="profile-select-new">
-            <input id="newHouseholdName" type="text" placeholder="Name a new shared watchlist..." class="profile-new-input">
-            <button class="profile-tile-add" onclick="createHousehold(document.getElementById('newHouseholdName').value); document.getElementById('newHouseholdName').value='';" aria-label="Create shared watchlist">
-                <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-            </button>
-        </div>
-
         <button class="profile-select-signout" onclick="handleSignOut()">Sign Out</button>
+    </div>
+
+    <div id="createWatchlistPanel" class="profile-select-wrap" style="display:none;">
+        <h1 class="profile-select-title">Name Your Watchlist</h1>
+        <p class="profile-select-subtitle">Anyone you invite can add, remove, and mark titles watched together.</p>
+
+        <div class="create-watchlist-form">
+            <input id="newHouseholdName" type="text" placeholder="e.g. The Smiths, Movie Night Crew..." class="create-watchlist-input" maxlength="40" onkeydown="if(event.key==='Enter') submitCreateHousehold();">
+            <button class="create-watchlist-submit" onclick="submitCreateHousehold()">Create Watchlist</button>
+            <button class="create-watchlist-cancel" onclick="cancelCreateHousehold()">Cancel</button>
+        </div>
     </div>
 </div>
 
@@ -2882,7 +2959,6 @@ img {
                     <div class="large-avatar" id="largeAvatar">G</div>
                     <div>
                         <div class="home-name" id="homeName">Guest</div>
-                        <div class="home-subtitle" id="homeEmailSubtitle">Guest Account</div>
                     </div>
                 </div>
             </div>
@@ -3820,9 +3896,23 @@ function showProfileSelectScreen() {
         librarySubscription();
         librarySubscription = null;
     }
+    profileManageMode = false;
+    cancelCreateHousehold();
     renderProfileSelectScreen();
     document.querySelector(".app").style.display = "none";
     document.getElementById("profileSelectScreen").style.display = "flex";
+}
+
+// Whether the picker is currently showing Invite buttons (true) or is in
+// its normal, tap-to-enter state (false). Toggled by the header's
+// Manage/Done button - kept out of the default view so the everyday picker
+// stays as uncluttered as a real streaming service's profile screen, with
+// sharing tucked one tap away rather than always on display.
+let profileManageMode = false;
+
+function toggleProfileManageMode() {
+    profileManageMode = !profileManageMode;
+    renderProfileSelectScreen();
 }
 
 function renderProfileSelectScreen() {
@@ -3831,32 +3921,103 @@ function renderProfileSelectScreen() {
 
     const activeSource = state.activeLibrarySource || { type: "personal" };
     const isPersonalActive = activeSource.type === "personal";
+    const hasHouseholds = state.households.length > 0;
 
+    const manageBtn = document.getElementById("profileManageBtn");
+    if (manageBtn) {
+        // Managing only makes sense once there's at least one shared
+        // watchlist to invite people to - hide it entirely otherwise
+        // rather than showing a toggle with nothing for it to reveal.
+        manageBtn.style.display = hasHouseholds ? "block" : "none";
+        manageBtn.textContent = profileManageMode ? "Done" : "Manage";
+    }
+
+    const subtitle = document.getElementById("profileSelectSubtitle");
+    if (subtitle) {
+        subtitle.textContent = profileManageMode
+            ? "Tap Invite to share a watchlist with your household."
+            : "Tap a library to open it.";
+    }
+
+    // Personal library tile - always present, never editable/shareable, so
+    // it's exempt from manage mode entirely.
     let html = `
         <button class="profile-select-tile ${isPersonalActive ? 'active' : ''}" onclick="enterLibrary({type:'personal'})">
             <div class="profile-select-avatar">${(state.profiles && state.profiles[0] && state.profiles[0].initials) || "Y"}</div>
             <div class="profile-select-name">Personal Library</div>
+            <div class="profile-select-sub">Just you</div>
         </button>
     `;
 
     state.households.forEach(h => {
         const isActive = activeSource.type === "household" && activeSource.id === h.id;
         const memberCount = (h.memberIds || []).length;
-        html += `
-            <div class="profile-select-tile-wrap">
+        const safeName = (h.name || "Shared Watchlist").replace(/'/g, "&#39;");
+
+        if (profileManageMode) {
+            // In manage mode the tile itself no longer enters the library
+            // (tapping the avatar area does nothing) - the whole card is
+            // just here to host a clear, full-width Invite button, so
+            // there's no ambiguity between "select this" and "share this".
+            html += `
+                <div class="profile-select-tile profile-select-tile-managing">
+                    <div class="profile-select-avatar household">${safeName.charAt(0).toUpperCase()}</div>
+                    <div class="profile-select-name">${safeName}</div>
+                    <div class="profile-select-sub">${memberCount} member${memberCount === 1 ? '' : 's'}</div>
+                    <button class="profile-select-invite-btn" onclick="generateHouseholdInviteLink('${h.id}')">
+                        <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M18 8a3 3 0 1 0-2.83-4H15a3 3 0 0 0 .05 3.1L8.91 10.9a3 3 0 1 0 0 2.2l6.14 3.8A3 3 0 1 0 18 16a2.99 2.99 0 0 0-.05 3.1"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="5" r="3"/><circle cx="18" cy="19" r="3"/></svg>
+                        Invite
+                    </button>
+                </div>
+            `;
+        } else {
+            html += `
                 <button class="profile-select-tile ${isActive ? 'active' : ''}" onclick="enterLibrary({type:'household', id:'${h.id}'})">
-                    <div class="profile-select-avatar household">${(h.name || "?").charAt(0).toUpperCase()}</div>
-                    <div class="profile-select-name">${h.name}</div>
+                    <div class="profile-select-avatar household">${safeName.charAt(0).toUpperCase()}</div>
+                    <div class="profile-select-name">${safeName}</div>
                     <div class="profile-select-sub">${memberCount} member${memberCount === 1 ? '' : 's'}</div>
                 </button>
-                <button class="profile-select-share" onclick="event.stopPropagation(); generateHouseholdInviteLink('${h.id}')" aria-label="Invite someone to ${h.name}">
-                    <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M18 8a3 3 0 1 0-2.83-4H15a3 3 0 0 0 .05 3.1L8.91 10.9a3 3 0 1 0 0 2.2l6.14 3.8A3 3 0 1 0 18 16a2.99 2.99 0 0 0-.05 3.1"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="5" r="3"/><circle cx="18" cy="19" r="3"/></svg>
-                </button>
-            </div>
-        `;
+            `;
+        }
     });
 
+    // "Add Watchlist" tile - always last, always available (even while
+    // managing) - a dashed-border tile in the same grid, same size as
+    // every other tile, rather than a separate input row bolted on below.
+    html += `
+        <button class="profile-select-tile profile-select-add-tile" onclick="showCreateWatchlistPanel()">
+            <div class="profile-select-avatar add">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            </div>
+            <div class="profile-select-name">Add Watchlist</div>
+        </button>
+    `;
+
     grid.innerHTML = html;
+}
+
+function showCreateWatchlistPanel() {
+    document.getElementById("profileSelectGridPanel").style.display = "none";
+    document.getElementById("createWatchlistPanel").style.display = "flex";
+    const input = document.getElementById("newHouseholdName");
+    input.value = "";
+    // Focusing immediately on a screen the user just tapped into (rather
+    // than a background modal) is the expected mobile keyboard behavior
+    // here - a small delay lets the panel actually be visible first so
+    // the keyboard animates in against the right content.
+    setTimeout(() => input.focus(), 50);
+}
+
+function cancelCreateHousehold() {
+    const panel = document.getElementById("createWatchlistPanel");
+    const grid = document.getElementById("profileSelectGridPanel");
+    if (panel) panel.style.display = "none";
+    if (grid) grid.style.display = "flex";
+}
+
+function submitCreateHousehold() {
+    const input = document.getElementById("newHouseholdName");
+    createHousehold(input.value);
 }
 
 async function handleGoogleSignIn() {
@@ -4924,7 +5085,6 @@ if (auth) {
             state.activeLibrarySource = { type: "personal" };
             libraryLoaded = false;
             document.getElementById("homeName").textContent = "Guest";
-            document.getElementById("homeEmailSubtitle").textContent = "Please sign in";
         }
     });
 }
@@ -4946,7 +5106,6 @@ async function proceedToApp(user, authScreen, mainApp) {
             const initial = displayName.charAt(0).toUpperCase();
             
             document.getElementById("homeName").textContent = displayName;
-            document.getElementById("homeEmailSubtitle").textContent = user.email;
             
             const largeAvatar = document.getElementById("largeAvatar");
             if (largeAvatar) largeAvatar.textContent = initial;
@@ -6506,13 +6665,6 @@ function updateHomeUI() {
 
     const homeNameEl = document.getElementById("homeName");
     if (homeNameEl) homeNameEl.textContent = displayName;
-
-    const homeEmailSub = document.getElementById("homeEmailSubtitle");
-    if (homeEmailSub) {
-        homeEmailSub.textContent = (auth && auth.currentUser) 
-            ? auth.currentUser.email 
-            : "Guest Account";
-    }
 
     const largeAvatarEl = document.getElementById("largeAvatar");
     if (largeAvatarEl) largeAvatarEl.textContent = initial;
