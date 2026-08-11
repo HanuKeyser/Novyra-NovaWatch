@@ -2288,6 +2288,36 @@ img {
     transform: translateX(-50%) translateY(0) scale(1);
 }
 
+/* Offline banner - a slim, non-dismissible bar pinned to the very top of
+   the screen (the same overlay treatment iOS/Android use for their own
+   "No Internet" indicator) rather than a normal toast, since it needs to
+   stay up for as long as the connection is actually down, not fade after
+   a few seconds. */
+.offline-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 900;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 9px 16px;
+    padding-top: calc(9px + env(safe-area-inset-top, 0px));
+    background: linear-gradient(135deg, #ffb340, #ff9500);
+    color: white;
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: -0.1px;
+    text-align: center;
+    box-shadow: 0 4px 14px rgba(255, 149, 0, 0.35);
+}
+
+.offline-banner.show {
+    display: flex;
+}
+
 .toast-icon {
     flex-shrink: 0;
     width: 22px;
@@ -2425,6 +2455,22 @@ img {
 </div>
 
 <div class="app">
+
+<!-- Persistent top banner - shown whenever the device has no network
+     connection, so a lost connection is obvious immediately instead of
+     only surfacing later as a failed search or a stuck spinner. -->
+<div id="offlineBanner" class="offline-banner">
+    <svg class="icon icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="1" y1="1" x2="23" y2="23"/>
+        <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/>
+        <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/>
+        <path d="M10.71 5.05A16 16 0 0 1 22.58 9"/>
+        <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/>
+        <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+        <line x1="12" y1="20" x2="12.01" y2="20"/>
+    </svg>
+    You're offline - showing what's already saved
+</div>
 
 <!-- =====================================================
      1. DISCOVER TAB
@@ -4686,6 +4732,20 @@ async function importMediaData(id, type, buttonElement) {
                 return;
             }
 
+            // A previous removal may have archived this exact show's watch
+            // history (see removeLibraryItem) under this same slug - check
+            // for it now so a re-add can restore watched episodes instead
+            // of starting the show over from scratch.
+            let archivedShow = null;
+            if (auth && auth.currentUser && db) {
+                try {
+                    const archivedDoc = await db.collection("users").doc(auth.currentUser.uid).collection("archivedShows").doc(slug).get();
+                    if (archivedDoc.exists) archivedShow = archivedDoc.data();
+                } catch (err) {
+                    console.warn("Failed to check for archived watch history:", err);
+                }
+            }
+
             let episodes = [];
 
             if (showData.seasons && showData.seasons.length > 0) {
@@ -4717,6 +4777,17 @@ async function importMediaData(id, type, buttonElement) {
                 });
             }
 
+            // Carry watched flags over from the archived copy, matched by
+            // each episode's stable "sXeY" id - the freshly-fetched list
+            // may include newer episodes the archive never saw, which is
+            // fine, they just stay unwatched like any other new episode.
+            if (archivedShow && Array.isArray(archivedShow.episodes)) {
+                const watchedMap = new Map(archivedShow.episodes.map(ep => [ep.id, ep.watched]));
+                episodes.forEach(ep => {
+                    if (watchedMap.get(ep.id)) ep.watched = true;
+                });
+            }
+
             const availability = await availabilityPromise;
 
             const newShow = {
@@ -4736,7 +4807,7 @@ async function importMediaData(id, type, buttonElement) {
                 numberOfEpisodes: (typeof showData.number_of_episodes === 'number') ? showData.number_of_episodes : null,
                 nextEpisodeAirDate: (showData.next_episode_to_air && showData.next_episode_to_air.air_date) ? new Date(showData.next_episode_to_air.air_date).toISOString() : null,
                 isFinished: false,
-                isStopped: false,
+                isStopped: archivedShow ? !!archivedShow.isStopped : false,
                 addedAt: new Date().toISOString(),
                 episodes: episodes,
                 watchProviders: availability.providers,
@@ -4747,9 +4818,23 @@ async function importMediaData(id, type, buttonElement) {
             state.library.push(newShow);
             await saveItem(newShow);
 
+            // The restore is complete now that the show is back in the
+            // live library - clear the archive entry so it doesn't linger
+            // as a stale duplicate of what's now the real item.
+            if (archivedShow && auth && auth.currentUser && db) {
+                try {
+                    await db.collection("users").doc(auth.currentUser.uid).collection("archivedShows").doc(slug).delete();
+                } catch (err) {
+                    console.warn("Failed to clear archived watch history after restore:", err);
+                }
+            }
+
             if (buttonElement) {
                 buttonElement.className = "search-add-btn added";
                 buttonElement.innerHTML = `<svg class="icon icon-small" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>`;
+            }
+            if (archivedShow) {
+                showToast(`Welcome back! Your watch history for "${showData.name}" was restored.`, "success");
             }
             sendAppNotification("Added to Library", { body: `You will be notified for new episodes of ${showData.name}.` });
         }
@@ -6429,6 +6514,33 @@ async function markShowStoppedById(id) {
     showToast(`Marked "${item.title}" as Stopped Watching.`, "success");
 }
 
+// Removing a TV show from the library shouldn't throw away which episodes
+// you'd already watched - if you re-add the same show later (same slug id,
+// since that's derived deterministically from its title), that progress
+// should still be there. So for TV shows, instead of deleting the library
+// doc outright, this parks a copy of it in a separate "archivedShows"
+// collection first, keyed by the same id. importMediaData checks that
+// collection when a show is (re-)added and, if a match turns up, carries
+// the watched flags (and isStopped) over onto the freshly-fetched episode
+// list before clearing the archive entry out.
+//
+// Movies only ever track a single watched boolean rather than per-episode
+// history, so there's nothing meaningful to preserve there - those are
+// still deleted outright, same as before.
+async function removeLibraryItem(item) {
+    if (auth && auth.currentUser && db) {
+        const uid = auth.currentUser.uid;
+        try {
+            if (item.type !== 'movie') {
+                await db.collection("users").doc(uid).collection("archivedShows").doc(item.id).set(item);
+            }
+            await db.collection("users").doc(uid).collection("library").doc(item.id).delete();
+        } catch (err) {
+            console.error("Failed to remove item:", err);
+        }
+    }
+}
+
 async function removeLibraryItemById(id) {
     const idx = state.library.findIndex(i => i.id === id);
     if (idx === -1) return;
@@ -6436,15 +6548,12 @@ async function removeLibraryItemById(id) {
 
     state.library.splice(idx, 1);
     refreshActivePage();
-    showToast(`Removed "${removedItem.title}" from your library.`, "success");
+    const message = removedItem.type !== 'movie'
+        ? `Removed "${removedItem.title}" - your watch history is saved if you add it back.`
+        : `Removed "${removedItem.title}" from your library.`;
+    showToast(message, "success");
 
-    if (auth && auth.currentUser) {
-        try {
-            await db.collection("users").doc(auth.currentUser.uid).collection("library").doc(removedItem.id).delete();
-        } catch (err) {
-            console.error("Failed to delete item:", err);
-        }
-    }
+    await removeLibraryItem(removedItem);
 }
 
 async function removeCurrentItem() {
@@ -6461,13 +6570,7 @@ async function removeCurrentItem() {
     closeModal();
     refreshActivePage();
 
-    if (auth && auth.currentUser) {
-        try {
-            await db.collection("users").doc(auth.currentUser.uid).collection("library").doc(removedItem.id).delete();
-        } catch (err) {
-            console.error("Failed to delete item:", err);
-        }
-    }
+    await removeLibraryItem(removedItem);
 }
 
 // A quick, always-visible way to remove any card straight from a library
@@ -6484,6 +6587,36 @@ function clearPasswordError() {
     passwordError.classList.remove("show");
     passwordInput.classList.remove("input-error");
 }
+
+/* =========================================================
+   CONNECTIVITY STATE
+   navigator.onLine/the online/offline events don't guarantee TMDB or
+   Firebase are actually reachable (a captive portal can report "online"
+   with no real connectivity), but they're a reliable, zero-cost signal
+   for the common case of the device itself losing its connection - which
+   is the case worth surfacing immediately rather than waiting for the
+   next search or add-to-library action to fail and confuse the user.
+========================================================= */
+function updateOfflineBanner() {
+    const banner = document.getElementById("offlineBanner");
+    if (!banner) return;
+    banner.classList.toggle("show", !navigator.onLine);
+}
+
+window.addEventListener("online", () => {
+    updateOfflineBanner();
+    showToast("Back online.", "success");
+});
+
+window.addEventListener("offline", () => {
+    updateOfflineBanner();
+    showToast("You're offline - some features won't work until you're back.", "error");
+});
+
+// Covers the case where the app is opened while already offline (e.g.
+// launched from the home screen with no signal), not just the moment the
+// connection drops mid-session.
+updateOfflineBanner();
 
 /* =========================================================
    SERVICE WORKER REGISTRATION (PWA installability + notifications)
