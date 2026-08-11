@@ -1973,97 +1973,166 @@ img {
     opacity: 0.5;
 }
 
-/* ---- Profiles / shared-watchlist switcher modal ---- */
-.profile-modal-sub {
-    font-size: 13px;
-    color: var(--text-secondary);
-    line-height: 1.5;
-    margin: -6px 0 18px;
+/* ---- Profile / shared-watchlist select screen ---- */
+#profileSelectScreen {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: var(--bg-mesh);
+    display: none; /* Hidden by default, controlled via JS */
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow-y: auto;
 }
 
-.profiles-list {
+#profileSelectScreen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: -1;
+}
+
+.profile-select-wrap {
+    width: 100%;
+    max-width: 640px;
+    max-height: 100%;
+    overflow-y: auto;
+    text-align: center;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    padding: 24px 4px 8px;
+    animation: authFadeIn 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.profile-select-logo {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 6px;
+    object-fit: contain;
+}
+
+.profile-select-title {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text);
+}
+
+.profile-select-subtitle {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    margin: 6px 0 32px;
+    max-width: 380px;
+    line-height: 1.5;
+}
+
+.profile-select-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 22px;
+    width: 100%;
+}
+
+.profile-select-tile-wrap {
+    position: relative;
+}
+
+.profile-select-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     gap: 10px;
+    width: 118px;
+    padding: 6px;
+    text-align: center;
+    border-radius: var(--radius-lg);
 }
 
-.profile-tile-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.profile-tile {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 12px 14px;
-    border-radius: var(--radius-md);
-    background: var(--glass-sheen), var(--surface-2);
-    border: 1px solid var(--glass-border-subtle);
-    text-align: left;
-}
-
-.profile-tile.active {
-    border: 1px solid rgba(0, 102, 204, 0.35);
-    background: var(--glass-sheen), rgba(0, 102, 204, 0.08);
-}
-
-.profile-tile-avatar {
-    flex-shrink: 0;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+.profile-select-avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--blue-gradient);
+    background: var(--glass-sheen), var(--blue-gradient);
     color: white;
-    font-weight: 700;
-    font-size: 15px;
+    font-weight: 800;
+    font-size: 34px;
+    box-shadow: 0 12px 28px rgba(0, 102, 204, 0.22), inset 0 1px 0 rgba(255,255,255,0.5);
+    border: 3px solid transparent;
+    transition: border-color 0.2s ease, transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-.profile-tile-info {
-    flex: 1;
-    min-width: 0;
+.profile-select-avatar.household {
+    background: var(--glass-sheen), var(--orange-gradient);
+    box-shadow: 0 12px 28px rgba(255, 149, 0, 0.22), inset 0 1px 0 rgba(255,255,255,0.5);
 }
 
-.profile-tile-name {
-    font-size: 14px;
+.profile-select-tile.active .profile-select-avatar {
+    border-color: var(--blue);
+}
+
+.profile-select-tile:active .profile-select-avatar {
+    transform: scale(0.94);
+}
+
+.profile-select-name {
+    font-size: 13.5px;
     font-weight: 700;
+    color: var(--text);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 100%;
 }
 
-.profile-tile-sub {
-    font-size: 12px;
+.profile-select-sub {
+    font-size: 11px;
     color: var(--text-muted);
-    margin-top: 1px;
+    margin-top: -6px;
 }
 
-.profile-tile-check {
-    flex-shrink: 0;
-    color: var(--blue);
-    font-weight: 800;
-}
-
-.profile-tile-share {
-    flex-shrink: 0;
-    width: 42px;
-    height: 42px;
+.profile-select-share {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--glass-sheen), var(--surface-2);
-    border: 1px solid var(--glass-border-subtle);
+    background: var(--glass-sheen), var(--surface);
+    border: 1px solid var(--glass-border);
     color: var(--text-secondary);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
 }
 
-.profile-tile-share:active {
-    transform: scale(0.94);
+.profile-select-share:active {
+    transform: scale(0.92);
+}
+
+.profile-select-new {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 400px;
+    margin-top: 36px;
+}
+
+.profile-select-signout {
+    margin-top: 28px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-decoration: underline;
 }
 
 .profile-new-input {
@@ -2646,7 +2715,7 @@ img {
         <div class="auth-footer-row">
             <button class="auth-forgot-link" onclick="handleForgotPassword()">Forgot password?</button>
             <span class="auth-footer-sep">|</span>
-            <a href="https://www.novyra.co.za/tv/privacy.html" target="_blank" rel="noopener" class="auth-forgot-link">Privacy &amp; Terms</a>
+            <a href="https://www.novyra.co.za/tv-multi/privacy.html" target="_blank" rel="noopener" class="auth-forgot-link">Privacy &amp; Terms</a>
         </div>
     </div>
 </div>
@@ -2673,6 +2742,32 @@ img {
         <div class="auth-footer-row">
             <button class="auth-forgot-link" onclick="handleSignOut()">Wrong email? Sign out</button>
         </div>
+    </div>
+</div>
+
+<!-- =====================================================
+     PROFILE / WATCHLIST SELECT SCREEN
+     Shown right after sign-in (and reachable again from inside the app),
+     before the main app itself - matches the "who's watching" pattern
+     from streaming services. Selecting a tile is what actually enters the
+     app; nothing here lives inside the main page's own navigation.
+================================================     -->
+<div id="profileSelectScreen">
+    <div class="profile-select-wrap">
+        <img src="https://www.novyra.co.za/NovaWatch_Logo.png" alt="NovaWatch Logo" class="profile-select-logo">
+        <h1 class="profile-select-title">Who's Watching?</h1>
+        <p class="profile-select-subtitle">Pick your personal library, or a watchlist shared with your household.</p>
+
+        <div id="profileSelectGrid" class="profile-select-grid"></div>
+
+        <div class="profile-select-new">
+            <input id="newHouseholdName" type="text" placeholder="Name a new shared watchlist..." class="profile-new-input">
+            <button class="profile-tile-add" onclick="createHousehold(document.getElementById('newHouseholdName').value); document.getElementById('newHouseholdName').value='';" aria-label="Create shared watchlist">
+                <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+        </div>
+
+        <button class="profile-select-signout" onclick="handleSignOut()">Sign Out</button>
     </div>
 </div>
 
@@ -2792,7 +2887,7 @@ img {
                 </div>
             </div>
 
-            <button class="active-library-chip" onclick="openProfilesModal()">
+            <button class="active-library-chip" onclick="showProfileSelectScreen()">
                 <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                 <span id="activeLibraryChip">Personal Library</span>
                 <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
@@ -2979,26 +3074,6 @@ img {
     </div>
 </div>
 
-<!-- Profile / shared-watchlist switcher -->
-<div id="profilesModal" class="modal" onclick="closeProfilesModalOutside(event)">
-    <div class="modal-sheet" style="max-height: 80vh;">
-        <div class="modal-header-nav">
-            <button class="close-button" onclick="closeProfilesModal()" aria-label="Close">
-                <svg class="icon" viewBox="0 0 24 24">
-                    <path d="M6 6l12 12"/>
-                    <path d="M18 6L6 18"/>
-                </svg>
-            </button>
-        </div>
-
-        <div class="modal-content" style="padding-top: 60px;">
-            <h2 class="poster-picker-title">Watchlists</h2>
-            <p class="profile-modal-sub">Switch between your personal library and any watchlists shared with a household.</p>
-            <div id="profilesList" class="profiles-list"></div>
-        </div>
-    </div>
-</div>
-
 <!-- =====================================================
      DELETE ACCOUNT CONFIRMATION
 ================================================     -->
@@ -3066,7 +3141,7 @@ try {
    APP STATE & CONFIG
 ========================================================= */
 const TMDB_API_KEY = "c8dc4239290060d91afd45c40d8182b7";
-const NOVAWATCH_APP_URL = "https://www.novyra.co.za/tv/";
+const NOVAWATCH_APP_URL = "https://www.novyra.co.za/tv-multi/";
 
 // Remembers which top-level tab (Home / Discover / Library) the user was
 // last on, so reloading the app doesn't always dump them back on Home.
@@ -3494,7 +3569,15 @@ function getActiveArchivedShowsRef() {
     return db.collection("users").doc(auth.currentUser.uid).collection("archivedShows");
 }
 
-async function saveItem(item) {
+// libraryRef is optional - when omitted, resolves to whatever library is
+// currently active (correct for one-off saves triggered by a user action
+// against the library they're currently looking at). Callers that loop
+// over many items across awaited network calls (checkLibraryForUpdates)
+// MUST pass the ref they captured at the start of the loop instead -
+// otherwise a profile switch mid-loop would silently redirect later
+// writes in that same loop to whichever library became active, instead of
+// the one the loop was actually syncing.
+async function saveItem(item, libraryRef) {
     try {
         if (!auth || !auth.currentUser || !db || !item || !item.id) {
             return;
@@ -3511,7 +3594,7 @@ async function saveItem(item) {
             return;
         }
 
-        const libraryRef = getActiveLibraryCollectionRef();
+        if (!libraryRef) libraryRef = getActiveLibraryCollectionRef();
         if (!libraryRef) return;
 
         await libraryRef.doc(item.id).set(item, { merge: true });
@@ -3572,22 +3655,35 @@ async function createHousehold(name) {
         };
         const ref = await db.collection("households").add(newHousehold);
         state.households.push({ id: ref.id, ...newHousehold });
-        await switchLibrarySource({ type: "household", id: ref.id }, `"${trimmed}" created.`);
+        await enterLibrary({ type: "household", id: ref.id }, `"${trimmed}" created.`);
     } catch (err) {
         console.error("Failed to create shared watchlist:", err);
         showToast("Couldn't create shared watchlist.", "error");
     }
 }
 
-// Switches which library is active (personal, or a specific household),
-// reloads it, and updates the UI to reflect the new selection.
-async function switchLibrarySource(source, toastMessage) {
+// Enters a library (personal, or a specific household): sets it active,
+// reloads its data, hides the picker screen, and shows the main app. This
+// is the one function that actually "opens" the app - the picker screen
+// itself never shows library content, it only ever leads here.
+async function enterLibrary(source, toastMessage) {
     state.activeLibrarySource = source;
-    closeProfilesModal();
     updateActiveProfileChip();
+
+    document.getElementById("profileSelectScreen").style.display = "none";
+    document.querySelector(".app").style.display = "block";
+
     await loadActiveLibrary();
     showPage('home');
-    if (toastMessage) {
+
+    // Trigger background TMDB sync & release-alert checks now that a
+    // library is actually active - there's nothing to sync before this.
+    checkLibraryForUpdates();
+
+    if (toastMessage === false) {
+        // Explicitly suppressed - caller is about to show its own, more
+        // specific feedback instead (e.g. opening a shared item link).
+    } else if (toastMessage) {
         showToast(toastMessage, "success");
     } else {
         const label = source.type === "household"
@@ -3640,8 +3736,8 @@ async function generateHouseholdInviteLink(householdId) {
 
 // Reads a ?invite=<token> param from the URL, if present, and joins the
 // household it points to. Returns true if a household was actually joined
-// (and the active library already switched to it), so the caller can skip
-// the redundant initial personal-library load.
+// (and the app already entered it), so the caller can skip showing the
+// picker screen / loading the personal library first.
 async function joinHouseholdFromURL() {
     const params = new URLSearchParams(window.location.search);
     const token = params.get('invite');
@@ -3670,13 +3766,13 @@ async function joinHouseholdFromURL() {
         }
         const householdData = householdDoc.data();
 
-        // Already a member (e.g. reopened their own invite) - just switch
-        // to it rather than erroring.
+        // Already a member (e.g. reopened their own invite) - just enter
+        // it rather than erroring.
         if (householdData.memberIds && householdData.memberIds.includes(auth.currentUser.uid)) {
             if (!state.households.some(h => h.id === householdId)) {
                 state.households.push({ id: householdId, ...householdData });
             }
-            await switchLibrarySource({ type: "household", id: householdId }, `You're already in "${householdData.name}".`);
+            await enterLibrary({ type: "household", id: householdId }, `You're already in "${householdData.name}".`);
             return true;
         }
 
@@ -3688,7 +3784,7 @@ async function joinHouseholdFromURL() {
         const updatedMemberIds = [...(householdData.memberIds || []), auth.currentUser.uid];
         state.households.push({ id: householdId, ...householdData, memberIds: updatedMemberIds });
 
-        await switchLibrarySource({ type: "household", id: householdId }, `Joined "${householdData.name}"!`);
+        await enterLibrary({ type: "household", id: householdId }, `Joined "${householdData.name}"!`);
         return true;
     } catch (err) {
         console.error("Failed to join shared watchlist:", err);
@@ -3698,11 +3794,10 @@ async function joinHouseholdFromURL() {
 }
 
 /* =========================================================
-   PROFILE / WATCHLIST SWITCHER UI
+   PROFILE / WATCHLIST SELECT SCREEN
 ========================================================= */
 
-// Small "Watching: X" chip on Home that opens the switcher, plus the
-// large avatar's initial reflects a household by first letter of its name.
+// Small "Watching: X" chip on Home that links back to the select screen.
 function updateActiveProfileChip() {
     const chip = document.getElementById("activeLibraryChip");
     if (!chip) return;
@@ -3715,35 +3810,32 @@ function updateActiveProfileChip() {
     }
 }
 
-function openProfilesModal() {
-    renderProfilesModal();
-    document.getElementById("profilesModal").classList.add("open");
+// Navigates back to the picker from inside the app (via the Home chip).
+// Tears down the active library's real-time listener while the picker is
+// up, same as switching directly between two libraries would - there's no
+// reason to keep paying for a live subscription to a library that isn't
+// currently being shown anywhere.
+function showProfileSelectScreen() {
+    if (typeof librarySubscription === "function") {
+        librarySubscription();
+        librarySubscription = null;
+    }
+    renderProfileSelectScreen();
+    document.querySelector(".app").style.display = "none";
+    document.getElementById("profileSelectScreen").style.display = "flex";
 }
 
-function closeProfilesModal() {
-    const modal = document.getElementById("profilesModal");
-    if (modal) modal.classList.remove("open");
-}
-
-function closeProfilesModalOutside(event) {
-    if (event.target.id === "profilesModal") closeProfilesModal();
-}
-
-function renderProfilesModal() {
-    const list = document.getElementById("profilesList");
-    if (!list) return;
+function renderProfileSelectScreen() {
+    const grid = document.getElementById("profileSelectGrid");
+    if (!grid) return;
 
     const activeSource = state.activeLibrarySource || { type: "personal" };
     const isPersonalActive = activeSource.type === "personal";
 
     let html = `
-        <button class="profile-tile ${isPersonalActive ? 'active' : ''}" onclick="switchLibrarySource({type:'personal'})">
-            <div class="profile-tile-avatar">${(state.profiles && state.profiles[0] && state.profiles[0].initials) || "Y"}</div>
-            <div class="profile-tile-info">
-                <div class="profile-tile-name">Personal Library</div>
-                <div class="profile-tile-sub">Just you</div>
-            </div>
-            ${isPersonalActive ? '<span class="profile-tile-check">&#10003;</span>' : ''}
+        <button class="profile-select-tile ${isPersonalActive ? 'active' : ''}" onclick="enterLibrary({type:'personal'})">
+            <div class="profile-select-avatar">${(state.profiles && state.profiles[0] && state.profiles[0].initials) || "Y"}</div>
+            <div class="profile-select-name">Personal Library</div>
         </button>
     `;
 
@@ -3751,32 +3843,20 @@ function renderProfilesModal() {
         const isActive = activeSource.type === "household" && activeSource.id === h.id;
         const memberCount = (h.memberIds || []).length;
         html += `
-            <div class="profile-tile-row">
-                <button class="profile-tile ${isActive ? 'active' : ''}" onclick="switchLibrarySource({type:'household', id:'${h.id}'})">
-                    <div class="profile-tile-avatar">${(h.name || "?").charAt(0).toUpperCase()}</div>
-                    <div class="profile-tile-info">
-                        <div class="profile-tile-name">${h.name}</div>
-                        <div class="profile-tile-sub">${memberCount} member${memberCount === 1 ? '' : 's'}</div>
-                    </div>
-                    ${isActive ? '<span class="profile-tile-check">&#10003;</span>' : ''}
+            <div class="profile-select-tile-wrap">
+                <button class="profile-select-tile ${isActive ? 'active' : ''}" onclick="enterLibrary({type:'household', id:'${h.id}'})">
+                    <div class="profile-select-avatar household">${(h.name || "?").charAt(0).toUpperCase()}</div>
+                    <div class="profile-select-name">${h.name}</div>
+                    <div class="profile-select-sub">${memberCount} member${memberCount === 1 ? '' : 's'}</div>
                 </button>
-                <button class="profile-tile-share" onclick="generateHouseholdInviteLink('${h.id}')" aria-label="Invite someone to ${h.name}">
+                <button class="profile-select-share" onclick="event.stopPropagation(); generateHouseholdInviteLink('${h.id}')" aria-label="Invite someone to ${h.name}">
                     <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M18 8a3 3 0 1 0-2.83-4H15a3 3 0 0 0 .05 3.1L8.91 10.9a3 3 0 1 0 0 2.2l6.14 3.8A3 3 0 1 0 18 16a2.99 2.99 0 0 0-.05 3.1"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="5" r="3"/><circle cx="18" cy="19" r="3"/></svg>
                 </button>
             </div>
         `;
     });
 
-    html += `
-        <div class="profile-tile-row" style="margin-top: 6px;">
-            <input id="newHouseholdName" type="text" placeholder="Shared watchlist name (e.g. The Smiths)" class="profile-new-input">
-            <button class="profile-tile-add" onclick="createHousehold(document.getElementById('newHouseholdName').value); document.getElementById('newHouseholdName').value='';">
-                <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-            </button>
-        </div>
-    `;
-
-    list.innerHTML = html;
+    grid.innerHTML = html;
 }
 
 async function handleGoogleSignIn() {
@@ -4050,8 +4130,10 @@ function showVerifyScreen(user) {
     const authScreen = document.getElementById("authScreen");
     const mainApp = document.querySelector(".app");
     const verifyScreen = document.getElementById("verifyScreen");
+    const profileSelectScreen = document.getElementById("profileSelectScreen");
     if (authScreen) authScreen.style.display = "none";
     if (mainApp) mainApp.style.display = "none";
+    if (profileSelectScreen) profileSelectScreen.style.display = "none";
     if (verifyScreen) {
         verifyScreen.style.display = "flex";
         const emailEl = document.getElementById("verifyEmailAddress");
@@ -4269,18 +4351,35 @@ let isSyncingLibrary = false;
 // on-open modal refresh happen to land on the same item at the same time.
 const itemRefreshesInFlight = new Map();
 
-function refreshItemFromTMDB(item) {
+// Stable string key for a library source, used to namespace the in-flight
+// refresh cache below - without this, a personal item and a household item
+// that happen to share the same deterministic id (both derived from the
+// same TMDB id/title) would collide in the cache and could get refreshed
+// against the wrong library.
+function getLibrarySourceKey(source) {
+    source = source || state.activeLibrarySource || { type: "personal" };
+    return source.type === "household" ? `household:${source.id}` : "personal";
+}
+
+// libraryRef/sourceKey are optional - omitted for the single-item refresh
+// triggered by opening a details modal (correct to use whatever's
+// currently active, since that's the library the open item belongs to).
+// checkLibraryForUpdates always passes both explicitly, pinned to the
+// library it started syncing, for the same reason saveItem's libraryRef
+// param exists - see the comment there.
+function refreshItemFromTMDB(item, libraryRef, sourceKey) {
     if (!item.tmdbId) return Promise.resolve({ changed: false, failed: false });
 
-    if (itemRefreshesInFlight.has(item.id)) {
-        return itemRefreshesInFlight.get(item.id);
+    const key = `${sourceKey || getLibrarySourceKey()}:${item.id}`;
+    if (itemRefreshesInFlight.has(key)) {
+        return itemRefreshesInFlight.get(key);
     }
 
-    const promise = refreshItemFromTMDBInternal(item).finally(() => {
-        itemRefreshesInFlight.delete(item.id);
+    const promise = refreshItemFromTMDBInternal(item, libraryRef).finally(() => {
+        itemRefreshesInFlight.delete(key);
     });
 
-    itemRefreshesInFlight.set(item.id, promise);
+    itemRefreshesInFlight.set(key, promise);
     return promise;
 }
 
@@ -4297,10 +4396,19 @@ async function checkLibraryForUpdates() {
     isSyncingLibrary = true;
     let updated = false;
 
+    // Pin the target collection and a snapshot of the item list to whatever
+    // was active when this sync started. Every write below goes through
+    // this pinned ref, never through "whatever's active right now" - so
+    // switching to a different library mid-sync can no longer redirect a
+    // personal item's save into a household's collection (or vice versa).
+    const libraryRef = getActiveLibraryCollectionRef();
+    const sourceKey = getLibrarySourceKey();
+    const itemsToSync = [...state.library];
+
     try {
-        for (let item of state.library) {
+        for (let item of itemsToSync) {
             if (!item.tmdbId) continue;
-            const result = await refreshItemFromTMDB(item);
+            const result = await refreshItemFromTMDB(item, libraryRef, sourceKey);
             if (result.changed) updated = true;
         }
 
@@ -4324,7 +4432,7 @@ async function checkLibraryForUpdates() {
 // periodic background sync above and by the details modal below, which
 // calls this the moment it opens so info is never stale even if the last
 // background pass hasn't run recently.
-async function refreshItemFromTMDBInternal(item) {
+async function refreshItemFromTMDBInternal(item, libraryRef) {
     if (!item.tmdbId) return { changed: false, failed: false };
     let changed = false;
     let failed = false;
@@ -4371,7 +4479,7 @@ async function refreshItemFromTMDBInternal(item) {
                         item.status = newStatus;
                         item.rating = newRating;
 
-                        await saveItem(item);
+                        await saveItem(item, libraryRef);
                         changed = true;
                     }
                 } else {
@@ -4491,7 +4599,7 @@ async function refreshItemFromTMDBInternal(item) {
                         item.numberOfEpisodes = newEpisodeCount;
                         item.nextEpisodeAirDate = newNextAirDate;
 
-                        await saveItem(item);
+                        await saveItem(item, libraryRef);
                         changed = true;
                     }
                 }
@@ -4510,7 +4618,7 @@ async function refreshItemFromTMDBInternal(item) {
                     item.watchProviders = availability.providers;
                     item.inCinemas = availability.inCinemas;
                     item.watchLink = availability.link;
-                    await saveItem(item);
+                    await saveItem(item, libraryRef);
                     changed = true;
                 }
             } catch (availErr) {
@@ -4800,9 +4908,11 @@ if (auth) {
         } else {
             hideVerifyScreen();
 
-            // User is logged out: Show Auth Screen, Hide Main App
+            // User is logged out: Show Auth Screen, Hide Main App & Picker
             authScreen.style.display = "flex";
             mainApp.style.display = "none";
+            const profileSelectScreen = document.getElementById("profileSelectScreen");
+            if (profileSelectScreen) profileSelectScreen.style.display = "none";
 
             // Clear local state
             if (typeof librarySubscription === "function") {
@@ -4825,9 +4935,11 @@ if (auth) {
 // in-app verification check (checkVerificationStatus) land in the same
 // place instead of duplicating this logic.
 async function proceedToApp(user, authScreen, mainApp) {
-            // Hide Auth Screen, Show Main App
+            // Hide Auth Screen. The picker screen (not the main app) comes
+            // next - selecting a tile there is what actually opens the app,
+            // unless a share/invite link resolves the destination for us.
             authScreen.style.display = "none";
-            mainApp.style.display = "block";
+            mainApp.style.display = "none";
 
             // Set UI Profile Details
             const displayName = user.displayName || user.email.split('@')[0];
@@ -4839,17 +4951,12 @@ async function proceedToApp(user, authScreen, mainApp) {
             const largeAvatar = document.getElementById("largeAvatar");
             if (largeAvatar) largeAvatar.textContent = initial;
 
-            // Always land on Home on load/refresh, regardless of whichever
-            // tab the user was last on.
             libraryLoaded = false;
-            showPage('home');
             updateNavIndicator(false);
 
-            // Handle a shared show/movie link, and a pending shared-watchlist
-            // invite link, immediately and in parallel with everything else
-            // below - neither needs the personal library loaded first, so
-            // there's no reason to make either wait on it.
-            const openedSharedItem = openSharedItemFromURL();
+            const urlParams = new URLSearchParams(window.location.search);
+            const hasShareLink = (urlParams.get('share_type') === 'tv' || urlParams.get('share_type') === 'movie')
+                && !!urlParams.get('share_id') && !isNaN(Number(urlParams.get('share_id')));
 
             try {
                 // Resolve any pending invite link first, fully (including
@@ -4859,8 +4966,8 @@ async function proceedToApp(user, authScreen, mainApp) {
                 const joinedHousehold = await joinHouseholdFromURL();
 
                 // The profile doc and the household list are independent
-                // reads - fetching them in parallel gets Home real data
-                // faster than one after the other.
+                // reads - fetching them in parallel gets data faster than
+                // one after the other.
                 const profilePromise = (async () => {
                     const userDoc = await db.collection("users").doc(user.uid).get();
                     if (userDoc.exists) {
@@ -4885,39 +4992,39 @@ async function proceedToApp(user, authScreen, mainApp) {
 
                 updateActiveProfileChip();
 
-                // joinHouseholdFromURL() already switches the active library
-                // source and loads it if an invite was consumed - only load
-                // here otherwise, to avoid loading the personal library just
-                // to immediately replace it with the joined household's.
-                if (!joinedHousehold) {
-                    await loadActiveLibrary();
+                if (joinedHousehold) {
+                    // enterLibrary() already ran (and already toasted)
+                    // inside joinHouseholdFromURL() - nothing left to do.
+                } else if (hasShareLink) {
+                    // A shared show/movie link always resolves into the
+                    // personal library, skipping the picker, so the
+                    // recipient lands straight on the item rather than
+                    // having to pick a profile first. Kicked off without
+                    // awaiting first (enterLibrary's synchronous prefix
+                    // already shows the app before its first await) so the
+                    // item's own TMDB fetch runs in parallel, not after,
+                    // the personal library load.
+                    const enterPromise = enterLibrary({ type: "personal" }, false);
+                    openSharedItemFromURL();
+                    await enterPromise;
+                } else {
+                    renderProfileSelectScreen();
+                    document.getElementById("profileSelectScreen").style.display = "flex";
                 }
-
-                // If this session was opened via a shared show/movie link,
-                // it was already handled above, in parallel with this fetch -
-                // skip the generic welcome toast so it doesn't talk over it.
-                if (!openedSharedItem) {
-                    showToast("Welcome back!", "success");
-                }
-
-                // Trigger Background Updates & Notifications
-                await checkLibraryForUpdates();
             } catch (err) {
                 console.error("Error fetching cloud data:", err);
-                showToast("Library sync failed.", "error");
-                // Stop showing the loading skeleton even though the fetch
-                // failed - otherwise Home/Library would be stuck looking
-                // like they're still loading forever instead of falling
-                // back to their normal (if inaccurately "empty") state.
-                libraryLoaded = true;
-                refreshActivePage();
+                showToast("Couldn't load your account data.", "error");
+                // Fall back to the picker screen even if households failed
+                // to load, rather than leaving the user on a blank screen.
+                renderProfileSelectScreen();
+                document.getElementById("profileSelectScreen").style.display = "flex";
             }
 }
 
 // Fetches whichever library is currently active (personal or a shared
 // household's) and attaches a real-time listener to it. Called on initial
-// sign-in, and again any time switchLibrarySource() changes which library
-// is active - so this is the one place that knows how to (re)populate
+// sign-in, and again any time enterLibrary() changes which library is
+// active - so this is the one place that knows how to (re)populate
 // state.library, rather than duplicating the fetch+subscribe dance at
 // every call site.
 async function loadActiveLibrary() {
