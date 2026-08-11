@@ -1937,40 +1937,75 @@ img {
     gap: 16px;
 }
 
-/* Tappable pill on Home showing which library is active (personal or a
-   shared household), opening the switcher modal. Sits with the flatter,
-   glass-chrome family (matches Trailer/Sign In/Join buttons) rather than
-   the --blue-gradient primary-action family, since this is navigation, not
-   a primary CTA. */
+/* Row on Home showing which library is active (personal or a shared
+   household) and linking back to the picker screen - styled as a small
+   version of the picker's own avatar tiles (same colors, same "who is
+   this" language) so the connection between the two is immediately
+   obvious rather than looking like an unrelated control. */
 .active-library-chip {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
     width: 100%;
     margin-top: 14px;
     padding: 10px 14px;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     background: var(--glass-sheen), var(--surface-2);
     border: 1px solid var(--glass-border-subtle);
-    color: var(--text);
-    font-size: 13px;
-    font-weight: 700;
+    box-shadow: var(--glass-shadow-sm);
 }
 
 .active-library-chip:active {
     transform: scale(0.98);
 }
 
-.active-library-chip span {
+.active-library-avatar {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--glass-sheen), var(--blue-gradient);
+    color: white;
+    font-weight: 800;
+    font-size: 15px;
+    box-shadow: 0 6px 14px rgba(0, 102, 204, 0.28), inset 0 1px 0 rgba(255,255,255,0.5);
+}
+
+.active-library-avatar.household {
+    background: var(--glass-sheen), var(--orange-gradient);
+    box-shadow: 0 6px 14px rgba(255, 149, 0, 0.28), inset 0 1px 0 rgba(255,255,255,0.5);
+}
+
+.active-library-text {
     flex: 1;
+    min-width: 0;
     text-align: left;
+}
+
+.active-library-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-muted);
+}
+
+.active-library-name {
+    font-size: 14px;
+    font-weight: 750;
+    color: var(--text);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-top: 1px;
 }
 
-.active-library-chip .icon-small:last-child {
-    opacity: 0.5;
+.active-library-chevron {
+    flex-shrink: 0;
+    color: var(--text-muted);
 }
 
 /* ---- Profile / shared-watchlist select screen ---- */
@@ -2168,12 +2203,18 @@ img {
     transform: scale(0.94);
 }
 
-.profile-select-signout {
-    margin-top: 36px;
-    font-size: 12.5px;
+.profile-select-delete-btn {
+    width: 100%;
+    height: 28px;
+    margin-top: 6px;
+    font-size: 11.5px;
     font-weight: 700;
-    color: var(--text-muted);
-    text-decoration: underline;
+    color: var(--danger);
+    background: transparent;
+}
+
+.profile-select-delete-btn:active {
+    opacity: 0.6;
 }
 
 /* ---- Create-watchlist panel ---- */
@@ -2832,8 +2873,6 @@ img {
         <p id="profileSelectSubtitle" class="profile-select-subtitle">Tap a library to open it.</p>
 
         <div id="profileSelectGrid" class="profile-select-grid"></div>
-
-        <button class="profile-select-signout" onclick="handleSignOut()">Sign Out</button>
     </div>
 
     <div id="createWatchlistPanel" class="profile-select-wrap" style="display:none;">
@@ -2964,9 +3003,12 @@ img {
             </div>
 
             <button class="active-library-chip" onclick="showProfileSelectScreen()">
-                <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                <span id="activeLibraryChip">Personal Library</span>
-                <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                <div class="active-library-avatar" id="activeLibraryAvatar">P</div>
+                <div class="active-library-text">
+                    <div class="active-library-label">Now Watching</div>
+                    <div class="active-library-name" id="activeLibraryChip">Personal Library</div>
+                </div>
+                <svg class="icon icon-small active-library-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
             </button>
 
             <div class="hero-account-actions">
@@ -3167,6 +3209,27 @@ img {
         <div class="confirm-actions">
             <button class="confirm-btn cancel" onclick="closeDeleteAccountModal()">Cancel</button>
             <button class="confirm-btn danger" id="confirmDeleteBtn" onclick="confirmDeleteAccount()">Delete</button>
+        </div>
+    </div>
+</div>
+
+<!-- Shared by both "Delete Watchlist" (owner) and "Leave Watchlist"
+     (member) - text/button label swapped in by openHouseholdActionModal()
+     depending on which one triggered it. -->
+<div id="householdActionModal" class="confirm-overlay" onclick="closeHouseholdActionModalOutside(event)">
+    <div class="confirm-card">
+        <div class="confirm-icon-badge">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                <path d="M10 11v6M14 11v6"/>
+            </svg>
+        </div>
+        <div class="confirm-title" id="householdActionTitle">Delete Watchlist?</div>
+        <p class="confirm-message" id="householdActionMessage"></p>
+        <div class="confirm-actions">
+            <button class="confirm-btn cancel" onclick="closeHouseholdActionModal()">Cancel</button>
+            <button class="confirm-btn danger" id="confirmHouseholdActionBtn" onclick="confirmHouseholdAction()">Delete</button>
         </div>
     </div>
 </div>
@@ -3715,11 +3778,22 @@ async function loadUserHouseholds() {
     }
 }
 
+// Total libraries a single account can have access to (personal always
+// counts as one), for now - keeps Firestore reads/listeners bounded and
+// keeps the picker itself from growing unwieldy. Enforced both when
+// creating a new shared watchlist and when accepting an invite to join
+// one someone else created.
+const MAX_LIBRARIES = 3;
+
 async function createHousehold(name) {
     if (!db || !auth || !auth.currentUser) return;
     const trimmed = (name || "").trim();
     if (!trimmed) {
         showToast("Give your shared watchlist a name.", "error");
+        return;
+    }
+    if (state.households.length >= MAX_LIBRARIES - 1) {
+        showToast(`You can have up to ${MAX_LIBRARIES} libraries. Delete one to add another.`, "error");
         return;
     }
     try {
@@ -3843,13 +3917,26 @@ async function joinHouseholdFromURL() {
         const householdData = householdDoc.data();
 
         // Already a member (e.g. reopened their own invite) - just enter
-        // it rather than erroring.
+        // it rather than erroring. Doesn't count against the cap since
+        // they're not gaining a new library.
         if (householdData.memberIds && householdData.memberIds.includes(auth.currentUser.uid)) {
             if (!state.households.some(h => h.id === householdId)) {
                 state.households.push({ id: householdId, ...householdData });
             }
             await enterLibrary({ type: "household", id: householdId }, `You're already in "${householdData.name}".`);
             return true;
+        }
+
+        // Checked against a fresh query rather than state.households -
+        // this can run before loadUserHouseholds() has populated that on
+        // a fresh sign-in, so relying on it here could let someone bypass
+        // the cap entirely via an invite link.
+        const currentHouseholdsSnap = await db.collection("households")
+            .where("memberIds", "array-contains", auth.currentUser.uid)
+            .get();
+        if (currentHouseholdsSnap.size >= MAX_LIBRARIES - 1) {
+            showToast(`You're already at the ${MAX_LIBRARIES}-library limit - delete or leave one to join another.`, "error");
+            return false;
         }
 
         const batch = db.batch();
@@ -3870,19 +3957,151 @@ async function joinHouseholdFromURL() {
 }
 
 /* =========================================================
+   DELETE / LEAVE A SHARED WATCHLIST
+   Deleting (owner only, per the Firestore rules) removes the household
+   doc and everything under it for everyone. Leaving (any member) just
+   removes that member's own uid, matching the "full edit rights" model -
+   both flow through the same confirm modal, with its text/button label
+   swapped depending on which one was triggered.
+========================================================= */
+let pendingHouseholdId = null;
+let pendingHouseholdName = "";
+let pendingHouseholdAction = null; // 'delete' | 'leave'
+
+function handleDeleteHousehold(id, name) {
+    openHouseholdActionModal(id, name, "delete");
+}
+
+function handleLeaveHousehold(id, name) {
+    openHouseholdActionModal(id, name, "leave");
+}
+
+function openHouseholdActionModal(id, name, action) {
+    pendingHouseholdId = id;
+    pendingHouseholdName = name;
+    pendingHouseholdAction = action;
+
+    const titleEl = document.getElementById("householdActionTitle");
+    const msgEl = document.getElementById("householdActionMessage");
+    const btnEl = document.getElementById("confirmHouseholdActionBtn");
+
+    if (action === "delete") {
+        titleEl.textContent = "Delete Watchlist?";
+        msgEl.textContent = `This permanently deletes "${name}" and everything in it for everyone in it. This cannot be undone.`;
+        btnEl.textContent = "Delete";
+    } else {
+        titleEl.textContent = "Leave Watchlist?";
+        msgEl.textContent = `You'll lose access to "${name}". Everyone still in it keeps the watchlist as-is.`;
+        btnEl.textContent = "Leave";
+    }
+
+    document.getElementById("householdActionModal").classList.add("open");
+}
+
+function closeHouseholdActionModal() {
+    document.getElementById("householdActionModal").classList.remove("open");
+    pendingHouseholdId = null;
+    pendingHouseholdAction = null;
+}
+
+function closeHouseholdActionModalOutside(event) {
+    if (event.target.id === "householdActionModal") closeHouseholdActionModal();
+}
+
+async function confirmHouseholdAction() {
+    if (!pendingHouseholdId || !pendingHouseholdAction || !db || !auth || !auth.currentUser) return;
+
+    const householdId = pendingHouseholdId;
+    const action = pendingHouseholdAction;
+    const name = pendingHouseholdName;
+    const btn = document.getElementById("confirmHouseholdActionBtn");
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = action === "delete" ? "Deleting..." : "Leaving...";
+    }
+
+    try {
+        if (action === "delete") {
+            await deleteHouseholdData(householdId);
+        } else {
+            await db.collection("households").doc(householdId).update({
+                memberIds: firebase.firestore.FieldValue.arrayRemove(auth.currentUser.uid)
+            });
+        }
+
+        state.households = state.households.filter(h => h.id !== householdId);
+        const wasActive = state.activeLibrarySource
+            && state.activeLibrarySource.type === "household"
+            && state.activeLibrarySource.id === householdId;
+
+        closeHouseholdActionModal();
+        showToast(action === "delete" ? `"${name}" deleted.` : `Left "${name}".`, "success");
+
+        if (wasActive) {
+            // The library the user was actively viewing just disappeared
+            // out from under them - drop back to their personal one
+            // automatically instead of leaving the app pointed at
+            // something that no longer exists.
+            await enterLibrary({ type: "personal" }, false);
+        } else {
+            renderProfileSelectScreen();
+        }
+    } catch (err) {
+        console.error(`Failed to ${action} shared watchlist:`, err);
+        showToast(`Couldn't ${action} that watchlist.`, "error");
+    } finally {
+        if (btn) btn.disabled = false;
+    }
+}
+
+// Firestore doesn't cascade-delete subcollections - the household's
+// library and archivedShows docs have to be cleared out explicitly before
+// (or the household doc becomes an orphan-owning dangling reference)
+// deleting the household doc itself. Batched in chunks of 400 (under
+// Firestore's 500-write batch limit) in case a shared library ever grows
+// large.
+async function deleteHouseholdData(householdId) {
+    const householdRef = db.collection("households").doc(householdId);
+
+    async function deleteSubcollection(name) {
+        const snap = await householdRef.collection(name).get();
+        const docs = snap.docs;
+        for (let i = 0; i < docs.length; i += 400) {
+            const batch = db.batch();
+            docs.slice(i, i + 400).forEach(d => batch.delete(d.ref));
+            await batch.commit();
+        }
+    }
+
+    await deleteSubcollection("library");
+    await deleteSubcollection("archivedShows");
+    await householdRef.delete();
+}
+
+/* =========================================================
    PROFILE / WATCHLIST SELECT SCREEN
 ========================================================= */
 
 // Small "Watching: X" chip on Home that links back to the select screen.
 function updateActiveProfileChip() {
     const chip = document.getElementById("activeLibraryChip");
+    const avatar = document.getElementById("activeLibraryAvatar");
     if (!chip) return;
     const source = state.activeLibrarySource || { type: "personal" };
     if (source.type === "household") {
         const household = state.households.find(h => h.id === source.id);
-        chip.textContent = household ? household.name : "Shared watchlist";
+        const name = household ? household.name : "Shared watchlist";
+        chip.textContent = name;
+        if (avatar) {
+            avatar.textContent = name.charAt(0).toUpperCase();
+            avatar.classList.add("household");
+        }
     } else {
         chip.textContent = "Personal Library";
+        if (avatar) {
+            avatar.textContent = (state.profiles && state.profiles[0] && state.profiles[0].initials) || "Y";
+            avatar.classList.remove("household");
+        }
     }
 }
 
@@ -3932,15 +4151,17 @@ function renderProfileSelectScreen() {
         manageBtn.textContent = profileManageMode ? "Done" : "Manage";
     }
 
+    const atCap = state.households.length >= MAX_LIBRARIES - 1;
+
     const subtitle = document.getElementById("profileSelectSubtitle");
     if (subtitle) {
         subtitle.textContent = profileManageMode
-            ? "Tap Invite to share a watchlist with your household."
-            : "Tap a library to open it.";
+            ? "Invite people in, or remove a shared watchlist."
+            : (atCap ? `You're using all ${MAX_LIBRARIES} of your libraries.` : "Tap a library to open it.");
     }
 
-    // Personal library tile - always present, never editable/shareable, so
-    // it's exempt from manage mode entirely.
+    // Personal library tile - always present, never editable/shareable/
+    // deletable, so it's exempt from manage mode entirely.
     let html = `
         <button class="profile-select-tile ${isPersonalActive ? 'active' : ''}" onclick="enterLibrary({type:'personal'})">
             <div class="profile-select-avatar">${(state.profiles && state.profiles[0] && state.profiles[0].initials) || "Y"}</div>
@@ -3953,12 +4174,14 @@ function renderProfileSelectScreen() {
         const isActive = activeSource.type === "household" && activeSource.id === h.id;
         const memberCount = (h.memberIds || []).length;
         const safeName = (h.name || "Shared Watchlist").replace(/'/g, "&#39;");
+        const isOwner = h.createdBy === (auth && auth.currentUser && auth.currentUser.uid);
 
         if (profileManageMode) {
             // In manage mode the tile itself no longer enters the library
             // (tapping the avatar area does nothing) - the whole card is
-            // just here to host a clear, full-width Invite button, so
-            // there's no ambiguity between "select this" and "share this".
+            // just here to host clear, full-width Invite/Delete or
+            // Invite/Leave actions, so there's no ambiguity between
+            // "select this" and "manage this".
             html += `
                 <div class="profile-select-tile profile-select-tile-managing">
                     <div class="profile-select-avatar household">${safeName.charAt(0).toUpperCase()}</div>
@@ -3968,6 +4191,10 @@ function renderProfileSelectScreen() {
                         <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M18 8a3 3 0 1 0-2.83-4H15a3 3 0 0 0 .05 3.1L8.91 10.9a3 3 0 1 0 0 2.2l6.14 3.8A3 3 0 1 0 18 16a2.99 2.99 0 0 0-.05 3.1"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="5" r="3"/><circle cx="18" cy="19" r="3"/></svg>
                         Invite
                     </button>
+                    ${isOwner
+                        ? `<button class="profile-select-delete-btn" onclick="handleDeleteHousehold('${h.id}', '${safeName}')">Delete Watchlist</button>`
+                        : `<button class="profile-select-delete-btn" onclick="handleLeaveHousehold('${h.id}', '${safeName}')">Leave Watchlist</button>`
+                    }
                 </div>
             `;
         } else {
@@ -3981,17 +4208,20 @@ function renderProfileSelectScreen() {
         }
     });
 
-    // "Add Watchlist" tile - always last, always available (even while
-    // managing) - a dashed-border tile in the same grid, same size as
-    // every other tile, rather than a separate input row bolted on below.
-    html += `
-        <button class="profile-select-tile profile-select-add-tile" onclick="showCreateWatchlistPanel()">
-            <div class="profile-select-avatar add">
-                <svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-            </div>
-            <div class="profile-select-name">Add Watchlist</div>
-        </button>
-    `;
+    // "Add Watchlist" tile - a dashed-border tile in the same grid, same
+    // size as every other tile, rather than a separate input row bolted
+    // on below. Hidden entirely once at the library cap rather than shown
+    // disabled, since there's nothing actionable for it to do at that point.
+    if (!atCap) {
+        html += `
+            <button class="profile-select-tile profile-select-add-tile" onclick="showCreateWatchlistPanel()">
+                <div class="profile-select-avatar add">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                </div>
+                <div class="profile-select-name">Add Watchlist</div>
+            </button>
+        `;
+    }
 
     grid.innerHTML = html;
 }
