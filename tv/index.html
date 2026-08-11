@@ -96,12 +96,17 @@
     --blue-light: #4792ff; 
     --blue-dark: #004c99;
     /* Canonical "primary" fill for every blue action button in the app
-       (Sign In, Add to Library, Mark Watched, empty-state CTAs, active
-       segmented pills, etc) - a subtle two-tone gradient instead of a
-       flat fill so primary buttons read as tinted glass like everything
-       else, not a flat color chip sitting next to translucent ones.
-       Always paired with --glass-sheen on top for the same reason. */
+       (Add to Library, Mark Watched, empty-state CTAs, active segmented
+       pills, etc) - a subtle two-tone gradient instead of a flat fill so
+       primary buttons read as tinted glass like everything else, not a
+       flat color chip sitting next to translucent ones. Always paired
+       with --glass-sheen on top for the same reason. */
     --blue-gradient: linear-gradient(135deg, var(--blue-light), var(--blue));
+    /* A separate, flatter blue (no two-tone gradient) used specifically
+       for Trailer / Sign In / Join / Sign Out, so that group of buttons
+       shares one consistent look distinct from the --blue-gradient
+       "primary" family used elsewhere. */
+    --flat-blue: #0088ff;
     /* Same "filled glass" recipe as blue, just in the other accent colors -
        used anywhere a warning/danger/success action needs the same solid,
        sheen-lit glass feel as a primary blue button. */
@@ -256,14 +261,14 @@ img {
     justify-content: center;
     gap: 10px;
     border-radius: var(--radius-sm);
-    background: var(--glass-sheen), var(--glass-chrome-fill);
-    backdrop-filter: var(--glass-chrome-blur);
-    -webkit-backdrop-filter: var(--glass-chrome-blur);
-    border: 1px solid var(--glass-chrome-border);
+    background: var(--glass-sheen), var(--surface);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border);
     color: var(--blue);
     font-size: 14px;
     font-weight: 700;
-    box-shadow: var(--glass-chrome-shadow);
+    box-shadow: var(--glass-shadow-sm);
 }
 
 .footer-browse-button:active {
@@ -667,7 +672,7 @@ img {
 
 /* Modern filled-pill segmented control, used on Discover/Library/Upcoming.
    Deliberately separate from .search-type-toggle/.search-type-btn so the
-   Sign In / Create Account tabs on the auth screen stay pixel-identical. */
+   Sign In / Join tabs on the auth screen stay pixel-identical. */
 .segmented-toggle {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1104,15 +1109,15 @@ img {
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    background: var(--glass-sheen), var(--glass-chrome-fill);
+    background: var(--glass-sheen), var(--surface);
     color: var(--text-muted);
-    border: 1px solid var(--glass-chrome-border);
+    border: 1px solid var(--glass-border);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    backdrop-filter: blur(30px) saturate(200%);
-    -webkit-backdrop-filter: blur(30px) saturate(200%);
-    box-shadow: var(--glass-chrome-shadow);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    box-shadow: var(--glass-shadow-sm);
     flex-shrink: 0;
     transition: transform 0.15s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
@@ -1150,7 +1155,11 @@ img {
     backdrop-filter: var(--glass-chrome-blur);
     -webkit-backdrop-filter: var(--glass-chrome-blur);
     border: 1px solid var(--glass-chrome-border);
-    border-radius: 999px;
+    /* Matches the same corner radius used by the rest of the app's
+       top-level surfaces (hero card, modal sheets, analytics card)
+       instead of a fully-rounded pill, so the nav bar reads as part of
+       the same rounded-rectangle family rather than a one-off shape. */
+    border-radius: var(--radius-2xl);
     box-shadow: var(--glass-chrome-shadow);
 }
 
@@ -1164,7 +1173,9 @@ img {
     left: 0;
     height: calc(100% - 14px);
     width: 0;
-    border-radius: 999px;
+    /* Nested to match the bar's new rounded-rectangle shape (7px inset
+       from a 28px outer radius reads as concentric around --radius-lg). */
+    border-radius: var(--radius-lg);
     background: rgba(255, 255, 255, 0.55);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -1279,12 +1290,12 @@ img {
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: var(--glass-sheen), var(--glass-chrome-fill);
+    background: var(--glass-sheen), var(--surface);
     color: var(--text);
-    backdrop-filter: var(--glass-chrome-blur);
-    -webkit-backdrop-filter: var(--glass-chrome-blur);
-    border: 1px solid var(--glass-chrome-border);
-    box-shadow: var(--glass-chrome-shadow);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow-sm);
     transition: transform 0.15s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
@@ -1299,6 +1310,113 @@ img {
 
 .modal-content {
     padding: 22px;
+}
+
+/* =========================================================
+   CONFIRMATION DIALOG (e.g. Delete Account)
+   A compact centered "alert" style dialog, distinct from the bottom-sheet
+   .modal used for show/episode details - matches the same glass language
+   (sheen, chrome shadow, radius scale) but reads as a focused decision
+   point rather than a browsing surface.
+========================================================= */
+.confirm-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.32);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 24px;
+}
+
+.confirm-overlay.open {
+    display: flex;
+}
+
+.confirm-card {
+    width: 100%;
+    max-width: 340px;
+    padding: 28px 24px 24px;
+    text-align: center;
+    background: var(--glass-sheen), rgba(248, 250, 252, 0.86);
+    backdrop-filter: blur(50px) saturate(220%);
+    -webkit-backdrop-filter: blur(50px) saturate(220%);
+    border-radius: var(--radius-2xl);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 1);
+    transform: scale(0.92);
+    opacity: 0;
+    transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.25s ease;
+}
+
+.confirm-overlay.open .confirm-card {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.confirm-icon-badge {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    background: var(--glass-sheen), var(--red-gradient);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px rgba(255, 59, 48, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.confirm-title {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    margin-bottom: 8px;
+}
+
+.confirm-message {
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    margin-bottom: 22px;
+}
+
+.confirm-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.confirm-btn {
+    flex: 1;
+    height: 44px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.confirm-btn.cancel {
+    background: var(--glass-sheen), var(--surface);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    color: var(--text);
+    box-shadow: var(--glass-shadow-sm);
+}
+
+.confirm-btn.cancel:active {
+    transform: scale(0.97);
+}
+
+.confirm-btn.danger {
+    background: var(--glass-sheen), var(--red-gradient);
+    color: white;
+    box-shadow: 0 6px 16px rgba(255, 59, 48, 0.3), inset 0 1px 0 rgba(255,255,255,0.5);
+}
+
+.confirm-btn.danger:active {
+    transform: scale(0.97);
 }
 
 .modal-title {
@@ -1485,11 +1603,14 @@ img {
     box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3), inset 0 1px 0 rgba(255,255,255,0.5);
 }
 
+/* Same filled-glass treatment as the other action buttons (sheen +
+   flat blue + white text + inset highlight). Sign In, Join, and Sign Out
+   all share this exact same look - see --flat-blue. */
 .action-button.trailer {
-    background: var(--glass-sheen), rgba(255, 255, 255, 0.55);
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    background: var(--glass-sheen), var(--flat-blue);
+    color: white;
+    border: none;
+    box-shadow: 0 6px 16px rgba(0, 136, 255, 0.3), inset 0 1px 0 rgba(255,255,255,0.5);
 }
 
 .action-button.warning {
@@ -1673,14 +1794,12 @@ img {
     overflow: hidden;
     text-overflow: ellipsis;
     border-radius: var(--radius-sm);
-    background: var(--glass-sheen), var(--glass-chrome-fill);
-    backdrop-filter: var(--glass-chrome-blur);
-    -webkit-backdrop-filter: var(--glass-chrome-blur);
-    border: 1px solid var(--glass-chrome-border);
-    color: var(--text-secondary);
+    background: var(--glass-sheen), var(--flat-blue);
+    border: none;
+    color: white;
     font-size: 13px;
     font-weight: 700;
-    box-shadow: var(--glass-chrome-shadow);
+    box-shadow: 0 6px 16px rgba(0, 136, 255, 0.3), inset 0 1px 0 rgba(255,255,255,0.5);
 }
 
 .hero-signout-btn:active {
@@ -1895,9 +2014,9 @@ img {
     border-radius: var(--radius-sm);
     font-size: 13px;
     font-weight: 700;
-    background: var(--glass-sheen), var(--blue-gradient);
+    background: var(--glass-sheen), var(--flat-blue);
     color: white;
-    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3), inset 0 1px 0 rgba(255,255,255,0.5);
+    box-shadow: 0 6px 16px rgba(0, 136, 255, 0.3), inset 0 1px 0 rgba(255,255,255,0.5);
     transition: transform 0.15s ease;
 }
 
@@ -2116,7 +2235,7 @@ img {
 
         <div class="search-type-toggle auth-mode-toggle">
             <button id="authTabSignIn" class="search-type-btn active" onclick="setAuthMode('signin')">Sign In</button>
-            <button id="authTabSignUp" class="search-type-btn" onclick="setAuthMode('signup')">Create Account</button>
+            <button id="authTabSignUp" class="search-type-btn" onclick="setAuthMode('signup')">Join</button>
         </div>
 
         <div class="auth-form">
@@ -2420,6 +2539,27 @@ img {
                     Mark Watched Up to Here
                 </button>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- =====================================================
+     DELETE ACCOUNT CONFIRMATION
+================================================     -->
+<div id="deleteAccountModal" class="confirm-overlay" onclick="closeDeleteAccountModalOutside(event)">
+    <div class="confirm-card">
+        <div class="confirm-icon-badge">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                <path d="M10 11v6M14 11v6"/>
+            </svg>
+        </div>
+        <div class="confirm-title">Delete Account?</div>
+        <p class="confirm-message">This permanently deletes your account and all of your library data. This cannot be undone.</p>
+        <div class="confirm-actions">
+            <button class="confirm-btn cancel" onclick="closeDeleteAccountModal()">Cancel</button>
+            <button class="confirm-btn danger" id="confirmDeleteBtn" onclick="confirmDeleteAccount()">Delete</button>
         </div>
     </div>
 </div>
@@ -2917,7 +3057,7 @@ function setAuthMode(mode) {
 
     const actionBtn = document.getElementById("authSignInBtn");
     if (actionBtn) {
-        actionBtn.textContent = mode === 'signup' ? 'Create Account' : 'Sign In';
+        actionBtn.textContent = mode === 'signup' ? 'Join' : 'Sign In';
         actionBtn.onclick = mode === 'signup' ? handleSignUp : handleSignIn;
     }
 
@@ -3062,7 +3202,7 @@ async function handleSignUp() {
     const signUpBtn = document.getElementById("authSignInBtn");
     if (signUpBtn) {
         signUpBtn.disabled = true;
-        signUpBtn.textContent = "Creating Account...";
+        signUpBtn.textContent = "Joining...";
     }
 
     try {
@@ -3111,7 +3251,7 @@ async function handleSignUp() {
     } finally {
         if (signUpBtn) {
             signUpBtn.disabled = false;
-            signUpBtn.textContent = "Create Account";
+            signUpBtn.textContent = "Join";
         }
     }
 }
@@ -3204,15 +3344,31 @@ async function deleteAllUserData(uid) {
     await db.collection("users").doc(uid).delete().catch(() => {});
 }
 
-async function handleDeleteAccount() {
+// Opens the themed confirmation dialog instead of a native browser
+// confirm() - the actual deletion only runs from confirmDeleteAccount()
+// below, once the person taps "Delete" inside it.
+function handleDeleteAccount() {
+    if (!auth || !auth.currentUser) return;
+    document.getElementById("deleteAccountModal").classList.add("open");
+}
+
+function closeDeleteAccountModal() {
+    document.getElementById("deleteAccountModal").classList.remove("open");
+}
+
+function closeDeleteAccountModalOutside(event) {
+    if (event.target.id === "deleteAccountModal") closeDeleteAccountModal();
+}
+
+async function confirmDeleteAccount() {
     if (!auth || !auth.currentUser) return;
 
-    const confirmed = confirm(
-        "This permanently deletes your account and all of your library data. This cannot be undone.\n\nAre you sure you want to continue?"
-    );
-    if (!confirmed) return;
-
     const user = auth.currentUser;
+    const btn = document.getElementById("confirmDeleteBtn");
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = "Deleting...";
+    }
 
     async function attemptDelete() {
         await deleteAllUserData(user.uid);
@@ -3221,24 +3377,31 @@ async function handleDeleteAccount() {
 
     try {
         await attemptDelete();
+        closeDeleteAccountModal();
         showToast("Your account has been deleted.", "success");
     } catch (err) {
         if (err.code === "auth/requires-recent-login") {
             const reauthed = await reauthenticateCurrentUser(user);
             if (!reauthed) {
                 showToast("Account deletion cancelled - please try again.", "error");
-                return;
-            }
-            try {
-                await attemptDelete();
-                showToast("Your account has been deleted.", "success");
-            } catch (err2) {
-                console.error("Account deletion failed after reauthentication:", err2);
-                showToast("Couldn't delete your account. Please try again.", "error");
+            } else {
+                try {
+                    await attemptDelete();
+                    closeDeleteAccountModal();
+                    showToast("Your account has been deleted.", "success");
+                } catch (err2) {
+                    console.error("Account deletion failed after reauthentication:", err2);
+                    showToast("Couldn't delete your account. Please try again.", "error");
+                }
             }
         } else {
             console.error("Account deletion failed:", err);
             showToast("Couldn't delete your account. Please try again.", "error");
+        }
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = "Delete";
         }
     }
 }
