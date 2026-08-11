@@ -4638,6 +4638,47 @@ async function reauthenticateCurrentUser(user) {
 // there) for shows that were removed but not permanently deleted. The
 // Privacy Notice promises "all associated library data" goes with the
 // account, so both collections have to go, not just the visible one.
+// Called before the account itself is deleted (still authenticated, so
+// these writes are still allowed). Without this, a deleted account's uid
+// would linger forever in every household's memberIds - and if they were
+// the sole remaining member or the owner of a household others still use,
+// that household would become permanently undeletable, since only its
+// createdBy uid can delete it and that uid can never sign in again.
+async function leaveHouseholdsBeforeAccountDeletion(uid) {
+    try {
+        const snap = await db.collection("households").where("memberIds", "array-contains", uid).get();
+        for (const doc of snap.docs) {
+            const data = doc.data();
+            const remainingMembers = (data.memberIds || []).filter(id => id !== uid);
+            try {
+                if (remainingMembers.length === 0) {
+                    // Last member leaving - nothing left for anyone else to
+                    // access, so delete the whole household (and its
+                    // subcollections) rather than leave an orphaned doc.
+                    await deleteHouseholdData(doc.id);
+                } else if (data.createdBy === uid) {
+                    // Owner leaving a household others are still using -
+                    // hand ownership to another member instead of leaving
+                    // it permanently undeletable (only createdBy can
+                    // delete it).
+                    await doc.ref.update({
+                        memberIds: firebase.firestore.FieldValue.arrayRemove(uid),
+                        createdBy: remainingMembers[0]
+                    });
+                } else {
+                    await doc.ref.update({
+                        memberIds: firebase.firestore.FieldValue.arrayRemove(uid)
+                    });
+                }
+            } catch (err) {
+                console.error(`Failed to clean up household ${doc.id} during account deletion:`, err);
+            }
+        }
+    } catch (err) {
+        console.error("Failed to load households during account deletion:", err);
+    }
+}
+
 async function deleteAllUserData(uid) {
     const BATCH_LIMIT = 400;
 
@@ -4651,6 +4692,7 @@ async function deleteAllUserData(uid) {
         }
     }
 
+    await leaveHouseholdsBeforeAccountDeletion(uid);
     await deleteCollection("library");
     await deleteCollection("archivedShows");
 
