@@ -783,6 +783,25 @@ img {
     grid-template-columns: repeat(3, 1fr);
 }
 
+/* Library's TV Shows/Movies/Upcoming switcher specifically (not Discover's
+   or the auth screen's, which reuse the same base .segmented-toggle) stays
+   pinned to the top of the viewport while scrolling. Upcoming can now hold
+   a long, scrollable stretch of Recently Released content above "Today" -
+   without this, switching away from Upcoming would mean scrolling all the
+   way back up past all of that first. Uses the same floating "glass
+   chrome" treatment as the bottom nav bar, since it's now a floating
+   control sitting above content rather than content itself. */
+.library-tab-switcher {
+    position: sticky;
+    top: 12px;
+    z-index: 40;
+    background: var(--glass-sheen), var(--glass-chrome-fill);
+    backdrop-filter: var(--glass-chrome-blur);
+    -webkit-backdrop-filter: var(--glass-chrome-blur);
+    border: 1px solid var(--glass-chrome-border);
+    box-shadow: var(--glass-chrome-shadow);
+}
+
 .segmented-btn {
     height: 40px;
     border-radius: 999px;
@@ -2593,7 +2612,7 @@ img {
      2. LIBRARY TAB (TV Shows + Movies + Upcoming, combined)
 ================================================     -->
 <main id="libraryPage" class="page">
-    <div class="segmented-toggle three-way">
+    <div class="segmented-toggle three-way library-tab-switcher">
         <button id="libraryTabTV" class="segmented-btn active" onclick="setLibraryView('tv')">TV Shows</button>
         <button id="libraryTabMovies" class="segmented-btn" onclick="setLibraryView('movies')">Movies</button>
         <button id="libraryTabUpcoming" class="segmented-btn" onclick="setLibraryView('upcoming')">Upcoming</button>
@@ -5388,8 +5407,17 @@ function landOnUpcomingToday() {
     requestAnimationFrame(() => {
         const anchor = document.getElementById("upcomingScrollAnchor");
         if (!anchor) return;
-        const y = anchor.getBoundingClientRect().top + window.scrollY;
-        window.scrollTo({ top: y, behavior: "auto" });
+
+        // The TV Shows/Movies/Upcoming switcher is sticky and floats over
+        // the top of the viewport once scrolled away from its natural
+        // position - landing exactly at the anchor would tuck "Today"
+        // straight up underneath it instead of leaving it visible just
+        // below, so this leaves room for the switcher's own height.
+        const switcher = document.querySelector(".library-tab-switcher");
+        const switcherClearance = switcher ? switcher.offsetHeight + 22 : 0;
+
+        const y = anchor.getBoundingClientRect().top + window.scrollY - switcherClearance;
+        window.scrollTo({ top: Math.max(0, y), behavior: "auto" });
     });
 }
 
