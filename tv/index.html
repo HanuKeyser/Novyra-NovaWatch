@@ -1095,31 +1095,81 @@ img {
     margin-top: 24px;
 }
 
-/* "Recently Released" sits above Today/Tomorrow/etc rather than below them,
-   but starts collapsed - it only opens up when the person scrolls upward
-   (see updateUpcomingRecentVisibility), the same direction they'd scroll to
-   reach it. pointer-events is off while collapsed so its cards can't be
-   tapped while invisible. */
+/* "Recently Released" (the past month, above Today/Tomorrow/etc) previously
+   only opened via a scroll-up gesture with no visible cue it existed at
+   all - not discoverable, and normal scrolling could flip it open/closed
+   unpredictably. Replaced with a plain, always-visible toggle row the
+   person can see and tap, same collapsed-by-default behavior otherwise. */
+.upcoming-recent-wrapper {
+    margin-bottom: 6px;
+}
+
+.upcoming-recent-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 13px 14px;
+    background: var(--surface-2);
+    border: 1px solid var(--glass-border-subtle);
+    border-radius: var(--radius-md);
+    transition: background 0.2s ease, transform 0.15s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.upcoming-recent-toggle:active {
+    transform: scale(0.98);
+}
+
+.upcoming-recent-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    font-weight: 750;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+.upcoming-recent-toggle-label .icon-small {
+    color: var(--blue);
+    flex-shrink: 0;
+}
+
+.upcoming-recent-count {
+    background: var(--surface-3);
+    border: 1px solid var(--glass-border-subtle);
+    color: var(--text-secondary);
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+}
+
+.upcoming-recent-chevron {
+    color: var(--text-muted);
+    flex-shrink: 0;
+    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.upcoming-recent-toggle.expanded .upcoming-recent-chevron {
+    transform: rotate(180deg);
+}
+
 .upcoming-recent-group {
     max-height: 0;
     opacity: 0;
     overflow: hidden;
     pointer-events: none;
-    transition: max-height 0.45s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;
+    transition: max-height 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease, margin-top 0.3s ease;
 }
 
-.upcoming-recent-group.revealed {
-    max-height: 4000px;
+.upcoming-recent-group.expanded {
+    max-height: 6000px;
     opacity: 1;
     pointer-events: auto;
-}
-
-.upcoming-recent-group + .upcoming-group .upcoming-group-title {
-    margin-top: 0;
-}
-
-.upcoming-recent-group.revealed + .upcoming-group .upcoming-group-title {
-    margin-top: 24px;
+    margin-top: 6px;
 }
 
 /* =========================================================
@@ -5350,9 +5400,9 @@ function groupUpcomingByTimeframe(items) {
 
 // TV episodes and movie releases are shown together in one combined,
 // date-sorted list (getUpcomingItems with no filter returns both types).
-// "Recently Released" (the past month) sits above Today/Tomorrow/etc in the
-// DOM, but starts collapsed - see updateUpcomingRecentVisibility(), which
-// opens it as the person scrolls up and closes it again on scroll down.
+// "Recently Released" (the past month) sits above Today/Tomorrow/etc as a
+// plain collapsible section - closed by default, opened with a visible tap
+// target (see toggleUpcomingRecent) rather than a hidden scroll gesture.
 function renderUpcomingTab() {
     const listContainer = document.getElementById("upcomingResultsList");
     if (!listContainer) return;
@@ -5369,9 +5419,18 @@ function renderUpcomingTab() {
 
     if (recentItems.length > 0) {
         html += `
-            <div id="upcomingRecentGroup" class="upcoming-group upcoming-recent-group">
-                <div class="upcoming-group-title">Recently Released</div>
-                ${recentItems.map(data => createUpcomingCard(data)).join("")}
+            <div class="upcoming-recent-wrapper">
+                <button id="upcomingRecentToggle" class="upcoming-recent-toggle" type="button" onclick="toggleUpcomingRecent()" aria-expanded="false" aria-controls="upcomingRecentGroup">
+                    <span class="upcoming-recent-toggle-label">
+                        <svg class="icon icon-small" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+                        Recently Released
+                        <span class="upcoming-recent-count">${recentItems.length}</span>
+                    </span>
+                    <svg class="icon icon-small upcoming-recent-chevron" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div id="upcomingRecentGroup" class="upcoming-recent-group">
+                    ${recentItems.map(data => createUpcomingCard(data)).join("")}
+                </div>
             </div>
         `;
     }
@@ -5387,36 +5446,21 @@ function renderUpcomingTab() {
     }
 
     listContainer.innerHTML = html;
-
-    // Every fresh render starts collapsed, and scroll-direction tracking
-    // restarts from wherever the page happens to be right now so the very
-    // next scroll event compares against a real position instead of a
-    // stale one from before the tab was (re)rendered.
-    lastUpcomingScrollY = window.scrollY;
 }
 
-// Reveals "Recently Released" while the person scrolls up and collapses it
-// again on scroll down - only listens while the Upcoming sub-tab is
-// actually the one showing, so scrolling elsewhere in the app doesn't touch
-// it. Registered once; see the bottom of the file.
-let lastUpcomingScrollY = 0;
-function updateUpcomingRecentVisibility() {
-    if (currentLibraryView !== 'upcoming') return;
-    const libraryPageEl = document.getElementById("libraryPage");
-    if (!libraryPageEl || !libraryPageEl.classList.contains("active")) return;
+// Simple open/closed toggle for the "Recently Released" section - no scroll
+// tracking involved, so it can't be triggered by accident and stays exactly
+// where the person left it until they tap it again.
+function toggleUpcomingRecent() {
+    const toggleBtn = document.getElementById("upcomingRecentToggle");
+    const group = document.getElementById("upcomingRecentGroup");
+    if (!toggleBtn || !group) return;
 
-    const recentGroup = document.getElementById("upcomingRecentGroup");
-    if (!recentGroup) return;
-
-    const currentY = window.scrollY;
-    if (currentY < lastUpcomingScrollY) {
-        recentGroup.classList.add("revealed");
-    } else if (currentY > lastUpcomingScrollY) {
-        recentGroup.classList.remove("revealed");
-    }
-    lastUpcomingScrollY = currentY;
+    const expanded = !group.classList.contains("expanded");
+    group.classList.toggle("expanded", expanded);
+    toggleBtn.classList.toggle("expanded", expanded);
+    toggleBtn.setAttribute("aria-expanded", expanded ? "true" : "false");
 }
-window.addEventListener("scroll", updateUpcomingRecentVisibility, { passive: true });
 
 /* =========================================================
    HOME TAB RENDER
