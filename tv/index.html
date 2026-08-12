@@ -2104,6 +2104,35 @@ img {
     visibility: visible;
 }
 
+/* Scoped to the region picker only - other .modal-sheet/.modal-content
+   instances (poster picker, etc.) keep their normal content-based sizing.
+   Without this, the sheet's height shrank to fit however many rows the
+   search left visible, which - since the sheet is bottom-anchored - meant
+   a narrow search result could leave a short sheet sitting right where the
+   on-screen keyboard also lives, getting fully covered by it. Fixing the
+   sheet's own height and making #regionOptionsList the only scrolling
+   region keeps the search box in a stable position and stops the whole
+   sheet from resizing as you type. */
+.region-picker-sheet {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.region-picker-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.region-picker-content .region-options-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
 .home-card {
     padding: 22px;
     background: var(--surface);
@@ -2899,7 +2928,7 @@ img {
      STREAMING REGION PICKER
 ================================================     -->
 <div id="regionPickerModal" class="modal" onclick="closeRegionPickerOutside(event)">
-    <div class="modal-sheet" style="max-height: 80vh;">
+    <div class="modal-sheet region-picker-sheet" style="height: 80vh; max-height: 80vh;">
         <div class="modal-header-nav">
             <button class="close-button" onclick="closeRegionPicker()" aria-label="Close">
                 <svg class="icon" viewBox="0 0 24 24">
@@ -2909,7 +2938,7 @@ img {
             </button>
         </div>
 
-        <div class="modal-content" style="padding-top: 60px;">
+        <div class="modal-content region-picker-content" style="padding-top: 60px;">
             <h2 class="poster-picker-title">Streaming Region</h2>
             <div class="search-box" style="margin-bottom: 16px;">
                 <svg class="icon search-icon" viewBox="0 0 24 24">
@@ -7088,8 +7117,19 @@ async function markWatchedUpToCurrentEpisode() {
 // (which only checks item.id) and silently write a partial, incomplete doc
 // into the user's Firestore library — which then syncs back down as a
 // "phantom" entry the user never meant to add.
+//
+// Matches by id OR tmdbId rather than tmdbId alone - currentItem for a real
+// (non-preview) item almost always comes straight from getItem(), which
+// already returns the exact state.library object, so its .id trivially
+// matches. That makes id a reliable independent signal if tmdbId is ever
+// missing, mismatched, or NaN on a particular item (NaN !== NaN in JS, so a
+// bad tmdbId fails silently and permanently for just that one item, not
+// everything - hard to spot without this fallback). A preview's id (e.g.
+// "preview-tv-123") can never collide with a real library item's id, so
+// this doesn't weaken the guard above.
 function isCurrentItemInLibrary() {
-    return !!currentItem && !currentItem.isPreview && state.library.some(s => s.tmdbId === currentItem.tmdbId);
+    if (!currentItem || currentItem.isPreview) return false;
+    return state.library.some(s => s.id === currentItem.id || (currentItem.tmdbId && s.tmdbId === currentItem.tmdbId));
 }
 
 async function toggleMovieWatched(id) {
