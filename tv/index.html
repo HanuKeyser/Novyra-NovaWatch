@@ -1095,79 +1095,6 @@ img {
     margin-top: 24px;
 }
 
-/* "Recently Released" (the past month, above Today/Tomorrow/etc) is driven
-   purely by scroll (see updateUpcomingRecentVisibility) - scroll up to
-   reveal it, scroll down to hide it again. The collapse applies to the
-   whole wrapper (bar + list together), so nothing - not even the row
-   itself - is on screen until it's actually revealed. */
-.upcoming-recent-wrapper {
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    pointer-events: none;
-    margin-bottom: 0;
-    transition: max-height 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease, margin-bottom 0.3s ease;
-}
-
-.upcoming-recent-wrapper.expanded {
-    max-height: 6000px;
-    opacity: 1;
-    pointer-events: auto;
-    margin-bottom: 6px;
-}
-
-.upcoming-recent-toggle {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 13px 14px;
-    background: var(--surface-2);
-    border: 1px solid var(--glass-border-subtle);
-    border-radius: var(--radius-md);
-}
-
-.upcoming-recent-toggle-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12.5px;
-    font-weight: 750;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-}
-
-.upcoming-recent-toggle-label .icon-small {
-    color: var(--blue);
-    flex-shrink: 0;
-}
-
-.upcoming-recent-count {
-    background: var(--surface-3);
-    border: 1px solid var(--glass-border-subtle);
-    color: var(--text-secondary);
-    font-size: 10.5px;
-    font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 999px;
-}
-
-.upcoming-recent-chevron {
-    color: var(--text-muted);
-    flex-shrink: 0;
-    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.upcoming-recent-toggle.expanded .upcoming-recent-chevron {
-    transform: rotate(180deg);
-}
-
-.upcoming-recent-group {
-    margin-top: 6px;
-}
-
 /* =========================================================
    CONTINUE WATCHING (HOME) — swipeable "up next" rows, styled
    to match the Discover/search result list cards, but surfacing
@@ -5396,11 +5323,10 @@ function groupUpcomingByTimeframe(items) {
 
 // TV episodes and movie releases are shown together in one combined,
 // date-sorted list (getUpcomingItems with no filter returns both types).
-// "Recently Released" (the past month) sits above Today/Tomorrow/etc as a
-// collapsible section - closed by default. It's a real scroll mechanic
-// again (see updateUpcomingRecentVisibility): scrolling up reveals it,
-// scrolling down hides it. Tapping the row still works too, as a fallback
-// and for accessibility.
+// "Recently Released" (the past month) is rendered exactly like Today/
+// Tomorrow/This Week/Later - a plain group appended after them, in normal
+// document flow. It's revealed the same way the rest of the list is: by
+// scrolling. No collapse, no separate scroll mechanic, nothing to toggle.
 function renderUpcomingTab() {
     const listContainer = document.getElementById("upcomingResultsList");
     if (!listContainer) return;
@@ -5415,24 +5341,6 @@ function renderUpcomingTab() {
 
     let html = "";
 
-    if (recentItems.length > 0) {
-        html += `
-            <div id="upcomingRecentWrapper" class="upcoming-recent-wrapper">
-                <div id="upcomingRecentToggle" class="upcoming-recent-toggle" aria-expanded="false" aria-controls="upcomingRecentGroup">
-                    <span class="upcoming-recent-toggle-label">
-                        <svg class="icon icon-small" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
-                        Recently Released
-                        <span class="upcoming-recent-count">${recentItems.length}</span>
-                    </span>
-                    <svg class="icon icon-small upcoming-recent-chevron" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
-                </div>
-                <div id="upcomingRecentGroup" class="upcoming-recent-group">
-                    ${recentItems.map(data => createUpcomingCard(data)).join("")}
-                </div>
-            </div>
-        `;
-    }
-
     if (items.length > 0) {
         const groups = groupUpcomingByTimeframe(items);
         html += groups.map(group => `
@@ -5443,63 +5351,17 @@ function renderUpcomingTab() {
         `).join("");
     }
 
-    listContainer.innerHTML = html;
-
-    // Every fresh render starts collapsed, and the scroll-distance tracker
-    // below restarts from wherever the page happens to be right now.
-    upcomingRecentScrollAnchor = window.scrollY;
-}
-
-// Toggles the whole "Recently Released" block - bar and list together -
-// via the wrapper. Nothing about it, including the bar itself, is on
-// screen while collapsed. Driven only by scroll (see below).
-function setUpcomingRecentExpanded(expanded) {
-    const wrapper = document.getElementById("upcomingRecentWrapper");
-    const toggleBtn = document.getElementById("upcomingRecentToggle");
-    if (!wrapper || !toggleBtn) return;
-
-    wrapper.classList.toggle("expanded", expanded);
-    toggleBtn.classList.toggle("expanded", expanded);
-    toggleBtn.setAttribute("aria-expanded", expanded ? "true" : "false");
-}
-
-// The earlier version compared scrollY to the previous scroll event every
-// single frame, so a single pixel of jitter (or momentum scrolling's
-// stream of tiny events) could flip it open and shut. This version tracks
-// distance instead of direction-per-frame: it needs UPCOMING_RECENT_SCROLL_THRESHOLD
-// px of continuous, uninterrupted movement the "right" way before it
-// toggles, and any reversal before that resets the count. That's what
-// makes it feel deliberate instead of twitchy.
-const UPCOMING_RECENT_SCROLL_THRESHOLD = 48;
-let upcomingRecentScrollAnchor = 0;
-
-function updateUpcomingRecentVisibility() {
-    if (currentLibraryView !== 'upcoming') return;
-    const libraryPageEl = document.getElementById("libraryPage");
-    if (!libraryPageEl || !libraryPageEl.classList.contains("active")) return;
-
-    const wrapper = document.getElementById("upcomingRecentWrapper");
-    if (!wrapper) return;
-
-    const currentY = window.scrollY;
-    const isExpanded = wrapper.classList.contains("expanded");
-    const traveled = currentY - upcomingRecentScrollAnchor; // + down, - up
-
-    if (!isExpanded && traveled <= -UPCOMING_RECENT_SCROLL_THRESHOLD) {
-        setUpcomingRecentExpanded(true);
-        upcomingRecentScrollAnchor = currentY;
-    } else if (isExpanded && traveled >= UPCOMING_RECENT_SCROLL_THRESHOLD) {
-        setUpcomingRecentExpanded(false);
-        upcomingRecentScrollAnchor = currentY;
-    } else if ((!isExpanded && traveled > 0) || (isExpanded && traveled < 0)) {
-        // Moved the "wrong" way before crossing the threshold - restart the
-        // count from here instead of letting stale distance carry over.
-        upcomingRecentScrollAnchor = currentY;
+    if (recentItems.length > 0) {
+        html += `
+            <div class="upcoming-group">
+                <div class="upcoming-group-title">Recently Released</div>
+                ${recentItems.map(data => createUpcomingCard(data)).join("")}
+            </div>
+        `;
     }
-    // Otherwise: still accumulating distance in the right direction - leave
-    // the anchor alone so `traveled` keeps growing toward the threshold.
+
+    listContainer.innerHTML = html;
 }
-window.addEventListener("scroll", updateUpcomingRecentVisibility, { passive: true });
 
 /* =========================================================
    HOME TAB RENDER
