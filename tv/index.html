@@ -1095,6 +1095,33 @@ img {
     margin-top: 24px;
 }
 
+/* "Recently Released" sits above Today/Tomorrow/etc rather than below them,
+   but starts collapsed - it only opens up when the person scrolls upward
+   (see updateUpcomingRecentVisibility), the same direction they'd scroll to
+   reach it. pointer-events is off while collapsed so its cards can't be
+   tapped while invisible. */
+.upcoming-recent-group {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transition: max-height 0.45s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;
+}
+
+.upcoming-recent-group.revealed {
+    max-height: 4000px;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.upcoming-recent-group + .upcoming-group .upcoming-group-title {
+    margin-top: 0;
+}
+
+.upcoming-recent-group.revealed + .upcoming-group .upcoming-group-title {
+    margin-top: 24px;
+}
+
 /* =========================================================
    CONTINUE WATCHING (HOME) — swipeable "up next" rows, styled
    to match the Discover/search result list cards, but surfacing
@@ -2578,10 +2605,6 @@ img {
     </div>
 
     <div style="margin-top: 20px;">
-        <div class="segmented-toggle" id="discoverModeToggle">
-            <button id="discoverModeTrending" class="segmented-btn active" onclick="setDiscoverMode('trending')">Trending</button>
-            <button id="discoverModeRecent" class="segmented-btn" onclick="setDiscoverMode('recent')">Recent Releases</button>
-        </div>
         <div class="section-header">
             <div id="searchResultsHeading" class="section-title" style="font-size: 16px; color: var(--text-secondary);">Trending Shows</div>
         </div>
@@ -3076,7 +3099,7 @@ function clearSearch(inputId) {
     if (!input) return;
     input.value = "";
     input.parentElement.classList.remove("has-text");
-    if (inputId === "onlineSearchInput") fetchDiscoverList();
+    if (inputId === "onlineSearchInput") fetchTrending();
     if (inputId === "tvLibrarySearchInput") renderTVLibrarySection();
     if (inputId === "movieLibrarySearchInput") renderMovieLibrarySection();
 }
@@ -4367,7 +4390,11 @@ if (auth) {
             state.library = [];
             libraryLoaded = false;
             document.getElementById("homeName").textContent = "Guest";
-            document.getElementById("homeEmailSubtitle").textContent = "Please sign in";
+            const homeEmailSubtitleEl = document.getElementById("homeEmailSubtitle");
+            if (homeEmailSubtitleEl) {
+                homeEmailSubtitleEl.style.display = "";
+                homeEmailSubtitleEl.textContent = "Please sign in";
+            }
         }
     });
 }
@@ -4387,7 +4414,11 @@ async function proceedToApp(user, authScreen, mainApp) {
             const initial = displayName.charAt(0).toUpperCase();
             
             document.getElementById("homeName").textContent = displayName;
-            document.getElementById("homeEmailSubtitle").textContent = user.email;
+            // Previously showed the raw account email here as a subtitle under
+            // the username - hidden now so the email itself is never on
+            // screen, only the username above it.
+            const homeEmailSubtitleEl = document.getElementById("homeEmailSubtitle");
+            if (homeEmailSubtitleEl) homeEmailSubtitleEl.style.display = "none";
             
             const largeAvatar = document.getElementById("largeAvatar");
             if (largeAvatar) largeAvatar.textContent = initial;
@@ -4545,39 +4576,6 @@ function setSearchType(type) {
     if (query) {
         performTMDBSearch(query);
     } else {
-        fetchDiscoverList();
-    }
-}
-
-// Discover's default list can show either what's trending this week or
-// what's been recently released, without losing the TV/Movies split above
-// it. currentDiscoverMode just remembers which of the two is active so
-// every place that used to unconditionally reach for fetchTrending() (tab
-// switches, clearing the search box, first load) keeps showing whichever
-// one the person picked instead of silently reverting to Trending.
-let currentDiscoverMode = 'trending';
-
-function setDiscoverMode(mode) {
-    currentDiscoverMode = mode;
-    document.getElementById("discoverModeTrending").classList.toggle("active", mode === 'trending');
-    document.getElementById("discoverModeRecent").classList.toggle("active", mode === 'recent');
-
-    // A mode switch is about the default list, not the search results, so
-    // drop any in-progress search rather than leaving it showing search
-    // results under a now-mismatched Trending/Recent toggle state.
-    const searchInput = document.getElementById("onlineSearchInput");
-    if (searchInput && searchInput.value) {
-        searchInput.value = "";
-        searchInput.parentElement.classList.remove("has-text");
-    }
-
-    fetchDiscoverList();
-}
-
-function fetchDiscoverList() {
-    if (currentDiscoverMode === 'recent') {
-        fetchRecentReleases();
-    } else {
         fetchTrending();
     }
 }
@@ -4591,7 +4589,7 @@ function initSearchPage() {
         const query = e.target.value.trim();
 
         if (!query) {
-            fetchDiscoverList();
+            fetchTrending();
             return;
         }
 
@@ -4614,7 +4612,7 @@ function initSearchPage() {
         });
     }
 
-    fetchDiscoverList();
+    fetchTrending();
 }
 
 // Rebuilding a categorized poster grid on every single keystroke can feel
@@ -4644,37 +4642,6 @@ async function fetchTrending() {
     } catch (error) {
         console.error("Error fetching trending media:", error);
         listContainer.innerHTML = emptyState("Unable to load trending items", "Please check your network connection.");
-    }
-}
-
-// Same list UI as Trending, sourced from TMDB's discover endpoint instead:
-// sorted by release/air date descending and capped at today, so it reads
-// as "what's newly out" rather than "what's popular this week".
-async function fetchRecentReleases() {
-    const listContainer = document.getElementById("searchResultsList");
-    const heading = document.getElementById("searchResultsHeading");
-
-    const mediaLabel = currentSearchType === 'movie' ? 'Movies' : 'TV Shows';
-    if (heading) heading.textContent = `Recently Released ${mediaLabel}`;
-    listContainer.innerHTML = skeletonRows();
-
-    // Reuses the app's existing local-calendar "today" (see getLocalTodayParts,
-    // used by isReleased/daysUntil) rather than new Date().toISOString(),
-    // which would report UTC and could cut off up to a day early/late
-    // depending on the viewer's timezone.
-    const t = getLocalTodayParts();
-    const today = `${t.y}-${String(t.m + 1).padStart(2, '0')}-${String(t.d).padStart(2, '0')}`;
-    const endpoint = currentSearchType === 'movie'
-        ? `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&sort_by=primary_release_date.desc&primary_release_date.lte=${today}`
-        : `https://api.themoviedb.org/3/discover/tv?api_key=${TMDB_API_KEY}&sort_by=first_air_date.desc&first_air_date.lte=${today}`;
-
-    try {
-        const response = await fetch(endpoint);
-        const data = await response.json();
-        renderSearchResults(data.results || []);
-    } catch (error) {
-        console.error("Error fetching recent releases:", error);
-        listContainer.innerHTML = emptyState("Unable to load recent releases", "Please check your network connection.");
     }
 }
 
@@ -5292,7 +5259,7 @@ function showPage(page, subType = null, focusSearch = false) {
             setSearchType(subType);
         } else {
             const query = document.getElementById("onlineSearchInput").value.trim();
-            if (!query) fetchDiscoverList();
+            if (!query) fetchTrending();
         }
 
         // Only auto-focus when the person actually tapped their way to
@@ -5383,10 +5350,9 @@ function groupUpcomingByTimeframe(items) {
 
 // TV episodes and movie releases are shown together in one combined,
 // date-sorted list (getUpcomingItems with no filter returns both types).
-// The upcoming groups render exactly as before; a "Recently Released"
-// group for the past month is appended after them, so nothing about the
-// existing Today/Tomorrow/This Week/Later view changes - scrolling past it
-// just reveals more.
+// "Recently Released" (the past month) sits above Today/Tomorrow/etc in the
+// DOM, but starts collapsed - see updateUpcomingRecentVisibility(), which
+// opens it as the person scrolls up and closes it again on scroll down.
 function renderUpcomingTab() {
     const listContainer = document.getElementById("upcomingResultsList");
     if (!listContainer) return;
@@ -5401,6 +5367,15 @@ function renderUpcomingTab() {
 
     let html = "";
 
+    if (recentItems.length > 0) {
+        html += `
+            <div id="upcomingRecentGroup" class="upcoming-group upcoming-recent-group">
+                <div class="upcoming-group-title">Recently Released</div>
+                ${recentItems.map(data => createUpcomingCard(data)).join("")}
+            </div>
+        `;
+    }
+
     if (items.length > 0) {
         const groups = groupUpcomingByTimeframe(items);
         html += groups.map(group => `
@@ -5411,17 +5386,37 @@ function renderUpcomingTab() {
         `).join("");
     }
 
-    if (recentItems.length > 0) {
-        html += `
-            <div class="upcoming-group">
-                <div class="upcoming-group-title">Recently Released</div>
-                ${recentItems.map(data => createUpcomingCard(data)).join("")}
-            </div>
-        `;
-    }
-
     listContainer.innerHTML = html;
+
+    // Every fresh render starts collapsed, and scroll-direction tracking
+    // restarts from wherever the page happens to be right now so the very
+    // next scroll event compares against a real position instead of a
+    // stale one from before the tab was (re)rendered.
+    lastUpcomingScrollY = window.scrollY;
 }
+
+// Reveals "Recently Released" while the person scrolls up and collapses it
+// again on scroll down - only listens while the Upcoming sub-tab is
+// actually the one showing, so scrolling elsewhere in the app doesn't touch
+// it. Registered once; see the bottom of the file.
+let lastUpcomingScrollY = 0;
+function updateUpcomingRecentVisibility() {
+    if (currentLibraryView !== 'upcoming') return;
+    const libraryPageEl = document.getElementById("libraryPage");
+    if (!libraryPageEl || !libraryPageEl.classList.contains("active")) return;
+
+    const recentGroup = document.getElementById("upcomingRecentGroup");
+    if (!recentGroup) return;
+
+    const currentY = window.scrollY;
+    if (currentY < lastUpcomingScrollY) {
+        recentGroup.classList.add("revealed");
+    } else if (currentY > lastUpcomingScrollY) {
+        recentGroup.classList.remove("revealed");
+    }
+    lastUpcomingScrollY = currentY;
+}
+window.addEventListener("scroll", updateUpcomingRecentVisibility, { passive: true });
 
 /* =========================================================
    HOME TAB RENDER
@@ -6056,9 +6051,15 @@ function updateHomeUI() {
 
     const homeEmailSub = document.getElementById("homeEmailSubtitle");
     if (homeEmailSub) {
-        homeEmailSub.textContent = (auth && auth.currentUser) 
-            ? auth.currentUser.email 
-            : "Guest Account";
+        // Only the username (homeName above) is shown for a signed-in
+        // account now - the email itself is never rendered. The subtitle
+        // line stays in use for the guest/logged-out state.
+        if (auth && auth.currentUser) {
+            homeEmailSub.style.display = "none";
+        } else {
+            homeEmailSub.style.display = "";
+            homeEmailSub.textContent = "Guest Account";
+        }
     }
 
     const largeAvatarEl = document.getElementById("largeAvatar");
