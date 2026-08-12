@@ -2054,6 +2054,56 @@ img {
     transform: scale(0.96);
 }
 
+/* The region control itself is just .hero-pill-btn with a max-width/ellipsis
+   so a long country name (e.g. "United Arab Emirates") can't blow out the
+   hero card's layout - the actual picker is a bottom sheet below, styled
+   like every other list-choice surface in the app (see .region-option-row),
+   not a native <select> whose open dropdown the app has no control over. */
+.hero-pill-btn.region-btn {
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.region-options-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.region-option-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 15px 4px;
+    font-size: 15px;
+    font-weight: 650;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+}
+
+.region-option-row:last-child {
+    border-bottom: none;
+}
+
+.region-option-row:active {
+    background: var(--surface-2);
+}
+
+.region-option-check {
+    width: 20px;
+    height: 20px;
+    color: var(--flat-blue);
+    flex-shrink: 0;
+    visibility: hidden;
+}
+
+.region-option-row.selected .region-option-check {
+    visibility: visible;
+}
+
 .home-card {
     padding: 22px;
     background: var(--surface);
@@ -2667,6 +2717,14 @@ img {
                 </div>
                 <button class="hero-pill-btn" id="notificationBtn" onclick="requestNotificationPermission()">Enable</button>
             </div>
+
+            <div class="hero-notify-row">
+                <div>
+                    <div class="hero-notify-title">Streaming region</div>
+                    <div class="hero-notify-sub">Sets which country's "where to watch" info you see.</div>
+                </div>
+                <button class="hero-pill-btn region-btn" id="regionPillBtn" onclick="openRegionPicker()">Region</button>
+            </div>
         </div>
 
         <!-- Viewing Stats -->
@@ -2838,6 +2896,37 @@ img {
 </div>
 
 <!-- =====================================================
+     STREAMING REGION PICKER
+================================================     -->
+<div id="regionPickerModal" class="modal" onclick="closeRegionPickerOutside(event)">
+    <div class="modal-sheet" style="max-height: 80vh;">
+        <div class="modal-header-nav">
+            <button class="close-button" onclick="closeRegionPicker()" aria-label="Close">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M6 6l12 12"/>
+                    <path d="M18 6L6 18"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="modal-content" style="padding-top: 60px;">
+            <h2 class="poster-picker-title">Streaming Region</h2>
+            <div class="search-box" style="margin-bottom: 16px;">
+                <svg class="icon search-icon" viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="7"/>
+                    <path d="M20 20l-4-4"/>
+                </svg>
+                <input id="regionSearchInput" type="search" placeholder="Search countries..." autocomplete="off">
+                <button class="search-clear-btn" type="button" onclick="clearSearch('regionSearchInput')" aria-label="Clear search">
+                    <svg class="icon icon-small" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div id="regionOptionsList" class="region-options-list"></div>
+        </div>
+    </div>
+</div>
+
+<!-- =====================================================
      DELETE ACCOUNT CONFIRMATION
 ================================================     -->
 <div id="deleteAccountModal" class="confirm-overlay" onclick="closeDeleteAccountModalOutside(event)">
@@ -2936,8 +3025,21 @@ let state = {
             initials: "G"
         }
     ],
-    activeProfileId: "profile-guest"
+    activeProfileId: "profile-guest",
+    // ISO 3166-1 country code (e.g. "ZA") used for TMDB/JustWatch "where to
+    // watch" lookups. null until detectDefaultRegion() runs on first sign-in
+    // or an existing profile doc is loaded - see proceedToApp().
+    region: null
 };
+
+// In-memory only (never written to Firestore) - Firebase Auth already
+// tracks this authoritatively per account via user.metadata.creationTime,
+// so there's nothing to duplicate/backfill. Set on every sign-in in
+// proceedToApp(). Used to gate what counts toward a yearly "Wrapped"-style
+// recap: the first week after an account is created is excluded, since
+// that's when most new users bulk-add a backlog of shows/movies they'd
+// already watched long before joining, not real-time viewing.
+let accountCreatedAt = null;
 
 // True once the signed-in user's library has been fetched at least once
 // this session - lets Home/Library tell "genuinely empty" apart from
@@ -3075,10 +3177,11 @@ function clearSearch(inputId) {
     if (inputId === "onlineSearchInput") fetchTrending();
     if (inputId === "tvLibrarySearchInput") renderTVLibrarySection();
     if (inputId === "movieLibrarySearchInput") renderMovieLibrarySection();
+    if (inputId === "regionSearchInput") filterRegionOptions("");
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const searchInputs = ['onlineSearchInput', 'tvLibrarySearchInput', 'movieLibrarySearchInput'];
+    const searchInputs = ['onlineSearchInput', 'tvLibrarySearchInput', 'movieLibrarySearchInput', 'regionSearchInput'];
     
     searchInputs.forEach(id => {
         const input = document.getElementById(id);
@@ -3094,9 +3197,19 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    // Filters the region picker's rows as you type - separate from the
+    // has-text toggle above, which only handles the clear button's visibility.
+    const regionSearchInput = document.getElementById("regionSearchInput");
+    if (regionSearchInput) {
+        regionSearchInput.addEventListener("input", (e) => {
+            filterRegionOptions(e.target.value);
+        });
+    }
+
     initSearchPage();
     setAuthMode('signin');
     checkNotificationPermissionState();
+    populateRegionOptions();
     checkTodaysReleases();
 
     // Catches the moment something crosses into "released today" for
@@ -3327,7 +3440,8 @@ async function saveUserProfile() {
             .doc(auth.currentUser.uid)
             .set({
                 profiles: state.profiles,
-                activeProfileId: state.activeProfileId
+                activeProfileId: state.activeProfileId,
+                region: state.region
             }, { merge: true });
     } catch (err) {
         console.error("Firestore user profile save FAILED", err);
@@ -3956,6 +4070,7 @@ async function refreshItemFromTMDBInternal(item) {
                                     still: ep.still_path ? `https://image.tmdb.org/t/p/w300${ep.still_path}` : '',
                                     runtime: ep.runtime ? `${ep.runtime} min` : "45 min",
                                     watched: false,
+                                    watchedAt: null,
                                     releaseDate: ep.air_date ? new Date(ep.air_date).toISOString() : new Date().toISOString()
                                 });
                             });
@@ -3963,9 +4078,13 @@ async function refreshItemFromTMDBInternal(item) {
                     });
 
                     // Merge against the existing episode list: keep each episode's
-                    // watched flag, but pick up any TMDB edit (renamed episode, fixed
-                    // synopsis/still/air date/runtime) and flag genuinely new episodes
-                    // for a notification.
+                    // watched flag (and the date it was watched on - see
+                    // setEpisodeWatched), but pick up any TMDB edit (renamed
+                    // episode, fixed synopsis/still/air date/runtime) and flag
+                    // genuinely new episodes for a notification. This runs on
+                    // every periodic background sync, so skipping the watchedAt
+                    // carryover here would quietly erase every per-episode watch
+                    // date shortly after it was first set.
                     let hasNewContent = false;
                     let episodesChanged = false;
                     if (item.episodes && item.episodes.length > 0) {
@@ -3976,6 +4095,7 @@ async function refreshItemFromTMDBInternal(item) {
                             if (epMap.has(newEp.id)) {
                                 const existing = epMap.get(newEp.id);
                                 newEp.watched = existing.watched;
+                                newEp.watchedAt = existing.watchedAt || null;
                                 if (
                                     existing.title !== newEp.title ||
                                     existing.overview !== newEp.overview ||
@@ -4077,8 +4197,240 @@ async function refreshItemFromTMDBInternal(item) {
 
 /* =========================================================
    WATCH ON (STREAMING AVAILABILITY & CINEMA STATUS)
+
+   Where-to-watch data is region-specific - the same title can have a
+   completely different set of providers (or none at all) depending on
+   the country TMDB/JustWatch are asked about. This used to be a single
+   hardcoded priority list (ZA, then US, then GB) applied to every user
+   regardless of where they actually are, which meant anyone outside
+   those three countries could silently see another country's catalog.
+
+   That priority-list approach had a second, worse problem even after
+   being made per-user: when TMDB has no data at all for someone's own
+   region, falling through to the next region in the list doesn't mean
+   "no info" - it means showing that OTHER country's providers (or, for
+   cinema release dates, literally whichever country happened to be
+   first in TMDB's response) as if it were the user's own. That's
+   exactly the bug reported: streaming services that aren't actually
+   available in the person's own country. getUserRegion() below is
+   deliberately a single lookup, not a priority chain - if there's
+   nothing for the user's own region, the honest result is nothing
+   shown, not another country's answer.
+
+   Each signed-in user has their own state.region (an ISO 3166-1
+   country code), auto-detected once from the browser's locale and
+   editable any time from the "Streaming region" control on Home - see
+   detectDefaultRegion(), selectRegion(), and the region-detection
+   calls inside proceedToApp().
 ========================================================= */
-const WATCH_REGION_PRIORITY = ['ZA', 'US', 'GB'];
+
+// The full ISO 3166-1 list of populated countries/territories (sovereign
+// states plus commonly-recognized territories with their own streaming
+// catalogs, e.g. Hong Kong, Puerto Rico, Taiwan) - not everyone here will
+// have TMDB/JustWatch provider data for every title, but that's now
+// handled honestly: getUserRegion() only ever shows a region's own real
+// data or nothing at all, never another country's data standing in for it
+// (see the comment block above), so there's no harm in listing a region
+// even where coverage is thin.
+const SUPPORTED_REGIONS = [
+    'AD', 'AE', 'AF', 'AG', 'AI', 'AL', 'AM', 'AO', 'AR', 'AS', 'AT', 'AU',
+    'AW', 'AZ', 'BA', 'BB', 'BD', 'BE', 'BF', 'BG', 'BH', 'BI', 'BJ', 'BM',
+    'BN', 'BO', 'BR', 'BS', 'BT', 'BW', 'BY', 'BZ', 'CA', 'CD', 'CF', 'CG',
+    'CH', 'CI', 'CK', 'CL', 'CM', 'CN', 'CO', 'CR', 'CU', 'CV', 'CW', 'CY',
+    'CZ', 'DE', 'DJ', 'DK', 'DM', 'DO', 'DZ', 'EC', 'EE', 'EG', 'ER', 'ES',
+    'ET', 'FI', 'FJ', 'FM', 'FO', 'FR', 'GA', 'GB', 'GD', 'GE', 'GF', 'GG',
+    'GH', 'GI', 'GL', 'GM', 'GN', 'GP', 'GQ', 'GR', 'GT', 'GU', 'GW', 'GY',
+    'HK', 'HN', 'HR', 'HT', 'HU', 'ID', 'IE', 'IL', 'IM', 'IN', 'IQ', 'IR',
+    'IS', 'IT', 'JE', 'JM', 'JO', 'JP', 'KE', 'KG', 'KH', 'KI', 'KM', 'KN',
+    'KP', 'KR', 'KW', 'KY', 'KZ', 'LA', 'LB', 'LC', 'LI', 'LK', 'LR', 'LS',
+    'LT', 'LU', 'LV', 'LY', 'MA', 'MC', 'MD', 'ME', 'MF', 'MG', 'MH', 'MK',
+    'ML', 'MM', 'MN', 'MO', 'MP', 'MQ', 'MR', 'MS', 'MT', 'MU', 'MV', 'MW',
+    'MX', 'MY', 'MZ', 'NA', 'NC', 'NE', 'NF', 'NG', 'NI', 'NL', 'NO', 'NP',
+    'NR', 'NU', 'NZ', 'OM', 'PA', 'PE', 'PF', 'PG', 'PH', 'PK', 'PL', 'PM',
+    'PR', 'PS', 'PT', 'PW', 'PY', 'QA', 'RE', 'RO', 'RS', 'RU', 'RW', 'SA',
+    'SB', 'SC', 'SD', 'SE', 'SG', 'SI', 'SK', 'SL', 'SM', 'SN', 'SO', 'SR',
+    'SS', 'ST', 'SV', 'SX', 'SY', 'SZ', 'TC', 'TD', 'TG', 'TH', 'TJ', 'TL',
+    'TM', 'TN', 'TO', 'TR', 'TT', 'TV', 'TW', 'TZ', 'UA', 'UG', 'US', 'UY',
+    'UZ', 'VA', 'VC', 'VE', 'VG', 'VI', 'VN', 'VU', 'WS', 'XK', 'YE', 'YT',
+    'ZA', 'ZM', 'ZW'
+];
+
+const REGION_NAMES = {
+    AD: 'Andorra', AE: 'United Arab Emirates', AF: 'Afghanistan',
+    AG: 'Antigua and Barbuda', AI: 'Anguilla', AL: 'Albania', AM: 'Armenia',
+    AO: 'Angola', AR: 'Argentina', AS: 'American Samoa', AT: 'Austria',
+    AU: 'Australia', AW: 'Aruba', AZ: 'Azerbaijan',
+    BA: 'Bosnia and Herzegovina', BB: 'Barbados', BD: 'Bangladesh',
+    BE: 'Belgium', BF: 'Burkina Faso', BG: 'Bulgaria', BH: 'Bahrain',
+    BI: 'Burundi', BJ: 'Benin', BM: 'Bermuda', BN: 'Brunei', BO: 'Bolivia',
+    BR: 'Brazil', BS: 'Bahamas', BT: 'Bhutan', BW: 'Botswana', BY: 'Belarus',
+    BZ: 'Belize', CA: 'Canada', CD: 'DR Congo',
+    CF: 'Central African Republic', CG: 'Congo', CH: 'Switzerland',
+    CI: 'Ivory Coast', CK: 'Cook Islands', CL: 'Chile', CM: 'Cameroon',
+    CN: 'China', CO: 'Colombia', CR: 'Costa Rica', CU: 'Cuba',
+    CV: 'Cape Verde', CW: 'Curacao', CY: 'Cyprus', CZ: 'Czech Republic',
+    DE: 'Germany', DJ: 'Djibouti', DK: 'Denmark', DM: 'Dominica',
+    DO: 'Dominican Republic', DZ: 'Algeria', EC: 'Ecuador', EE: 'Estonia',
+    EG: 'Egypt', ER: 'Eritrea', ES: 'Spain', ET: 'Ethiopia', FI: 'Finland',
+    FJ: 'Fiji', FM: 'Micronesia', FO: 'Faroe Islands', FR: 'France',
+    GA: 'Gabon', GB: 'United Kingdom', GD: 'Grenada', GE: 'Georgia',
+    GF: 'French Guiana', GG: 'Guernsey', GH: 'Ghana', GI: 'Gibraltar',
+    GL: 'Greenland', GM: 'Gambia', GN: 'Guinea', GP: 'Guadeloupe',
+    GQ: 'Equatorial Guinea', GR: 'Greece', GT: 'Guatemala', GU: 'Guam',
+    GW: 'Guinea-Bissau', GY: 'Guyana', HK: 'Hong Kong', HN: 'Honduras',
+    HR: 'Croatia', HT: 'Haiti', HU: 'Hungary', ID: 'Indonesia',
+    IE: 'Ireland', IL: 'Israel', IM: 'Isle of Man', IN: 'India', IQ: 'Iraq',
+    IR: 'Iran', IS: 'Iceland', IT: 'Italy', JE: 'Jersey', JM: 'Jamaica',
+    JO: 'Jordan', JP: 'Japan', KE: 'Kenya', KG: 'Kyrgyzstan', KH: 'Cambodia',
+    KI: 'Kiribati', KM: 'Comoros', KN: 'Saint Kitts and Nevis',
+    KP: 'North Korea', KR: 'South Korea', KW: 'Kuwait', KY: 'Cayman Islands',
+    KZ: 'Kazakhstan', LA: 'Laos', LB: 'Lebanon', LC: 'Saint Lucia',
+    LI: 'Liechtenstein', LK: 'Sri Lanka', LR: 'Liberia', LS: 'Lesotho',
+    LT: 'Lithuania', LU: 'Luxembourg', LV: 'Latvia', LY: 'Libya',
+    MA: 'Morocco', MC: 'Monaco', MD: 'Moldova', ME: 'Montenegro',
+    MF: 'Saint Martin', MG: 'Madagascar', MH: 'Marshall Islands',
+    MK: 'North Macedonia', ML: 'Mali', MM: 'Myanmar', MN: 'Mongolia',
+    MO: 'Macau', MP: 'Northern Mariana Islands', MQ: 'Martinique',
+    MR: 'Mauritania', MS: 'Montserrat', MT: 'Malta', MU: 'Mauritius',
+    MV: 'Maldives', MW: 'Malawi', MX: 'Mexico', MY: 'Malaysia',
+    MZ: 'Mozambique', NA: 'Namibia', NC: 'New Caledonia', NE: 'Niger',
+    NF: 'Norfolk Island', NG: 'Nigeria', NI: 'Nicaragua', NL: 'Netherlands',
+    NO: 'Norway', NP: 'Nepal', NR: 'Nauru', NU: 'Niue', NZ: 'New Zealand',
+    OM: 'Oman', PA: 'Panama', PE: 'Peru', PF: 'French Polynesia',
+    PG: 'Papua New Guinea', PH: 'Philippines', PK: 'Pakistan', PL: 'Poland',
+    PM: 'Saint Pierre and Miquelon', PR: 'Puerto Rico', PS: 'Palestine',
+    PT: 'Portugal', PW: 'Palau', PY: 'Paraguay', QA: 'Qatar', RE: 'Reunion',
+    RO: 'Romania', RS: 'Serbia', RU: 'Russia', RW: 'Rwanda',
+    SA: 'Saudi Arabia', SB: 'Solomon Islands', SC: 'Seychelles', SD: 'Sudan',
+    SE: 'Sweden', SG: 'Singapore', SI: 'Slovenia', SK: 'Slovakia',
+    SL: 'Sierra Leone', SM: 'San Marino', SN: 'Senegal', SO: 'Somalia',
+    SR: 'Suriname', SS: 'South Sudan', ST: 'Sao Tome and Principe',
+    SV: 'El Salvador', SX: 'Sint Maarten', SY: 'Syria', SZ: 'Eswatini',
+    TC: 'Turks and Caicos Islands', TD: 'Chad', TG: 'Togo', TH: 'Thailand',
+    TJ: 'Tajikistan', TL: 'Timor-Leste', TM: 'Turkmenistan', TN: 'Tunisia',
+    TO: 'Tonga', TR: 'Turkey', TT: 'Trinidad and Tobago', TV: 'Tuvalu',
+    TW: 'Taiwan', TZ: 'Tanzania', UA: 'Ukraine', UG: 'Uganda',
+    US: 'United States', UY: 'Uruguay', UZ: 'Uzbekistan', VA: 'Vatican City',
+    VC: 'Saint Vincent and the Grenadines', VE: 'Venezuela',
+    VG: 'British Virgin Islands', VI: 'U.S. Virgin Islands', VN: 'Vietnam',
+    VU: 'Vanuatu', WS: 'Samoa', XK: 'Kosovo', YE: 'Yemen', YT: 'Mayotte',
+    ZA: 'South Africa', ZM: 'Zambia', ZW: 'Zimbabwe'
+};
+
+// Ultimate fallback when the browser's locale can't be read at all (very
+// old/locked-down browsers) rather than a completely unlocalized default.
+const FALLBACK_REGION = 'ZA';
+
+// Best-effort guess from the browser's own locale (e.g. "en-ZA" -> "ZA").
+// This is only ever a starting point - it can easily be wrong (a device
+// left on "en-US" while physically in another country is common), which
+// is exactly why it's stored as an editable, persisted preference rather
+// than re-detected and silently overridden every session.
+function detectDefaultRegion() {
+    try {
+        const locales = (navigator.languages && navigator.languages.length)
+            ? navigator.languages
+            : [navigator.language].filter(Boolean);
+
+        for (const locale of locales) {
+            const parts = String(locale).split('-');
+            if (parts.length > 1) {
+                const region = parts[1].toUpperCase();
+                if (SUPPORTED_REGIONS.includes(region)) return region;
+            }
+        }
+    } catch (e) {
+        // Ignore - fall through to the static default below.
+    }
+    return FALLBACK_REGION;
+}
+
+// The single region every TMDB "watch/providers" and cinema-release lookup
+// uses. Deliberately not a priority list - see the comment block above for
+// why falling back to a different country's data was the actual bug.
+function getUserRegion() {
+    return (state.region || FALLBACK_REGION).toUpperCase();
+}
+
+// Builds the picker's row list once on DOMContentLoaded, same as the poster
+// picker's grid - the option set itself never changes per-session, only
+// which row is marked .selected (see syncRegionUI).
+function populateRegionOptions() {
+    const list = document.getElementById("regionOptionsList");
+    if (!list) return;
+
+    const sortedCodes = [...SUPPORTED_REGIONS].sort((a, b) =>
+        REGION_NAMES[a].localeCompare(REGION_NAMES[b])
+    );
+
+    list.innerHTML = sortedCodes.map(code => `
+        <div class="region-option-row" data-region-code="${code}" data-region-name="${REGION_NAMES[code]}" onclick="selectRegion('${code}')">
+            <span>${REGION_NAMES[code]}</span>
+            <svg class="icon icon-small region-option-check" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>
+        </div>
+    `).join('');
+}
+
+// All 231 rows already exist in the DOM from populateRegionOptions - typing
+// a query just toggles which are visible rather than re-rendering the list.
+function filterRegionOptions(query) {
+    const normalized = query.trim().toLowerCase();
+    document.querySelectorAll("#regionOptionsList .region-option-row").forEach(row => {
+        const name = (row.dataset.regionName || "").toLowerCase();
+        row.style.display = name.includes(normalized) ? "" : "none";
+    });
+}
+
+// Keeps the pill button's label and the picker's checkmark in sync with
+// state.region - called once proceedToApp() has resolved a value (detected,
+// loaded, or defaulted).
+function syncRegionUI() {
+    if (!state.region) return;
+
+    const pillBtn = document.getElementById("regionPillBtn");
+    if (pillBtn) pillBtn.textContent = REGION_NAMES[state.region] || state.region;
+
+    document.querySelectorAll("#regionOptionsList .region-option-row").forEach(row => {
+        row.classList.toggle("selected", row.dataset.regionCode === state.region);
+    });
+}
+
+function openRegionPicker() {
+    // Always open to the full, unfiltered list rather than wherever a
+    // previous search was left - avoids "why can't I see all countries"
+    // confusion from a forgotten filter.
+    const searchInput = document.getElementById("regionSearchInput");
+    if (searchInput) {
+        searchInput.value = "";
+        searchInput.parentElement.classList.remove("has-text");
+    }
+    filterRegionOptions("");
+    document.getElementById("regionPickerModal").classList.add("open");
+}
+
+function closeRegionPicker() {
+    document.getElementById("regionPickerModal").classList.remove("open");
+}
+
+function closeRegionPickerOutside(event) {
+    if (event.target.id === "regionPickerModal") closeRegionPicker();
+}
+
+// Fired by tapping a row in the picker. A manual choice always wins over
+// auto-detection from here on for this account.
+async function selectRegion(newRegion) {
+    if (!SUPPORTED_REGIONS.includes(newRegion)) return;
+    state.region = newRegion;
+    syncRegionUI();
+    closeRegionPicker();
+    await saveUserProfile();
+    showToast(`Streaming region set to ${REGION_NAMES[newRegion]}.`, "success");
+    // Deliberately not force-refreshing every library item's stored watch
+    // providers here - that's a TMDB call per item, which doesn't scale to
+    // a large library. Existing items pick up the new region on their next
+    // regular background sync (see checkLibraryForUpdates); new searches
+    // and newly-added items use it immediately.
+}
 
 async function fetchWatchAvailability(tmdbId, type) {
     const availability = { providers: [], inCinemas: false, link: '' };
@@ -4091,13 +4443,10 @@ async function fetchWatchAvailability(tmdbId, type) {
         const data = await res.json();
         const byRegion = data.results || {};
 
-        let regionData = null;
-        for (const region of WATCH_REGION_PRIORITY) {
-            if (byRegion[region]) {
-                regionData = byRegion[region];
-                break;
-            }
-        }
+        // Only the user's own region - see the comment block above
+        // getUserRegion() for why substituting a different country's data
+        // here was the actual bug being fixed.
+        const regionData = byRegion[getUserRegion()] || null;
 
         let hasDigitalAvailability = false;
 
@@ -4149,13 +4498,11 @@ async function checkNowInCinemas(tmdbId, hasDigitalAvailability) {
         const data = await res.json();
         const entries = data.results || [];
 
-        let regionEntry = null;
-        for (const region of WATCH_REGION_PRIORITY) {
-            regionEntry = entries.find(e => e.iso_3166_1 === region);
-            if (regionEntry) break;
-        }
-
-        const dates = regionEntry ? regionEntry.release_dates : (entries[0] ? entries[0].release_dates : []);
+        // Only the user's own region - the old entries[0] fallback meant
+        // "in cinemas" could be based on literally whichever country
+        // happened to be first in TMDB's response, unrelated to the user.
+        const regionEntry = entries.find(e => e.iso_3166_1 === getUserRegion()) || null;
+        const dates = regionEntry ? regionEntry.release_dates : [];
         const nowTime = now().getTime();
 
         // TMDB release_dates "type": 1 Premiere, 2 Theatrical (limited), 3 Theatrical, 4 Digital, 5 Physical, 6 TV
@@ -4396,6 +4743,14 @@ async function proceedToApp(user, authScreen, mainApp) {
             const largeAvatar = document.getElementById("largeAvatar");
             if (largeAvatar) largeAvatar.textContent = initial;
 
+            // Firebase Auth already tracks this per-account, authoritatively -
+            // no Firestore field to keep in sync, no backfill needed for
+            // existing users. See the accountCreatedAt declaration above for
+            // what this gates.
+            accountCreatedAt = (user.metadata && user.metadata.creationTime)
+                ? new Date(user.metadata.creationTime).toISOString()
+                : null;
+
             // Always land on Home on load/refresh, regardless of whichever
             // tab the user was last on.
             libraryLoaded = false;
@@ -4422,13 +4777,24 @@ async function proceedToApp(user, authScreen, mainApp) {
                         if (userData) {
                             state = { ...state, ...userData };
                         }
+                        // Existing account from before the region field
+                        // existed - detect once now and persist it, rather
+                        // than falling back to the default priority list on
+                        // every single lookup for the rest of this account's
+                        // life.
+                        if (!state.region) {
+                            state.region = detectDefaultRegion();
+                            await saveUserProfile();
+                        }
                     } else {
                         if (user.displayName && state.profiles && state.profiles[0]) {
                             state.profiles[0].name = user.displayName;
                             state.profiles[0].initials = initial;
                         }
+                        state.region = detectDefaultRegion();
                         await saveUserProfile();
                     }
+                    syncRegionUI();
                 })();
 
                 const libraryPromise = (async () => {
@@ -4721,7 +5087,8 @@ async function openSearchResultDetails(tmdbId, type) {
                 status: movieData.status || '',
                 rating: (typeof movieData.vote_average === 'number' && movieData.vote_average > 0) ? movieData.vote_average.toFixed(1) : '',
                 isPreview: true,
-                watched: false
+                watched: false,
+                lastWatchedAt: null
             };
 
             updateModalContent();
@@ -4789,6 +5156,7 @@ async function openSearchResultDetails(tmdbId, type) {
                             still: ep.still_path ? `https://image.tmdb.org/t/p/w300${ep.still_path}` : '',
                             runtime: ep.runtime ? `${ep.runtime} min` : "45 min",
                             watched: false,
+                            watchedAt: null,
                             releaseDate: ep.air_date ? new Date(ep.air_date).toISOString() : new Date().toISOString()
                         });
                     });
@@ -4914,6 +5282,7 @@ async function importMediaData(id, type, buttonElement) {
                                 still: ep.still_path ? `https://image.tmdb.org/t/p/w300${ep.still_path}` : '',
                                 runtime: ep.runtime ? `${ep.runtime} min` : "45 min",
                                 watched: false,
+                                watchedAt: null,
                                 releaseDate: ep.air_date ? new Date(ep.air_date).toISOString() : new Date().toISOString()
                             });
                         });
@@ -4921,14 +5290,19 @@ async function importMediaData(id, type, buttonElement) {
                 });
             }
 
-            // Carry watched flags over from the archived copy, matched by
-            // each episode's stable "sXeY" id - the freshly-fetched list
-            // may include newer episodes the archive never saw, which is
-            // fine, they just stay unwatched like any other new episode.
+            // Carry watched flags (and the date each was watched on - see
+            // setEpisodeWatched) over from the archived copy, matched by each
+            // episode's stable "sXeY" id - the freshly-fetched list may
+            // include newer episodes the archive never saw, which is fine,
+            // they just stay unwatched like any other new episode.
             if (archivedShow && Array.isArray(archivedShow.episodes)) {
-                const watchedMap = new Map(archivedShow.episodes.map(ep => [ep.id, ep.watched]));
+                const watchedMap = new Map(archivedShow.episodes.map(ep => [ep.id, { watched: ep.watched, watchedAt: ep.watchedAt || null }]));
                 episodes.forEach(ep => {
-                    if (watchedMap.get(ep.id)) ep.watched = true;
+                    const archived = watchedMap.get(ep.id);
+                    if (archived && archived.watched) {
+                        ep.watched = true;
+                        ep.watchedAt = archived.watchedAt;
+                    }
                 });
             }
 
@@ -5858,7 +6232,7 @@ async function markContinueItemWatched(type, itemId, epId) {
         item.lastWatchedAt = new Date().toISOString();
     } else if (item.episodes) {
         const ep = item.episodes.find(e => e.id === epId);
-        if (ep) ep.watched = true;
+        if (ep) setEpisodeWatched(ep, true);
     }
 
     await saveItem(item);
@@ -6564,6 +6938,18 @@ function closePosterPickerOutside(event) {
     if (event.target.id === "posterPickerModal") closePosterPicker();
 }
 
+// Every place in the app that flips an episode's watched state goes through
+// this, so the per-episode watch date stays consistent everywhere rather
+// than being set inline four different ways. The show-level lastWatchedAt
+// field (used by movies too) only ever reflects the single most recent
+// action across a whole show, so it can't answer "when was THIS episode
+// watched" - that's what this timestamp is for, and it's what a future
+// yearly recap would read from.
+function setEpisodeWatched(ep, watched) {
+    ep.watched = watched;
+    ep.watchedAt = watched ? new Date().toISOString() : null;
+}
+
 async function toggleEntireSeasonWatched(seasonNumber) {
     if (!currentItem || !currentItem.episodes) return;
     if (!isCurrentItemInLibrary()) {
@@ -6583,7 +6969,7 @@ async function toggleEntireSeasonWatched(seasonNumber) {
     // Only released episodes are ever touched - unaired ones always stay unwatched.
     const anyUnwatched = releasedEps.some(ep => !ep.watched);
     releasedEps.forEach(ep => {
-        ep.watched = anyUnwatched;
+        setEpisodeWatched(ep, anyUnwatched);
     });
 
     showToast(`Season ${seasonNumber} marked as ${anyUnwatched ? 'Watched' : 'Unwatched'}`, "success");
@@ -6660,7 +7046,7 @@ async function toggleCurrentEpisodeWatched() {
         showToast("This episode hasn't been released yet.", "error");
         return;
     }
-    currentEpisode.watched = !currentEpisode.watched;
+    setEpisodeWatched(currentEpisode, !currentEpisode.watched);
     await saveItem(currentItem);
     closeEpisodeModal();
     updateModalContent();
@@ -6682,7 +7068,7 @@ async function markWatchedUpToCurrentEpisode() {
         if (ep.watched || !isReleased(ep.releaseDate)) return;
         const isUpToHere = ep.season < currentEpisode.season || (ep.season === currentEpisode.season && ep.number <= currentEpisode.number);
         if (isUpToHere) {
-            ep.watched = true;
+            setEpisodeWatched(ep, true);
             count++;
         }
     });
@@ -6731,7 +7117,7 @@ async function markNextEpisodeWatched(id) {
     }
     const nextEp = getNextUnwatchedEpisode(currentItem);
     if (nextEp) {
-        nextEp.watched = true;
+        setEpisodeWatched(nextEp, true);
         await saveItem(currentItem);
         updateModalContent();
         refreshActivePage();
