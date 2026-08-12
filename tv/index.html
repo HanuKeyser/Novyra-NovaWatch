@@ -4481,6 +4481,9 @@ async function fetchWatchAvailability(tmdbId, type) {
     try {
         const res = await fetch(`https://api.themoviedb.org/3/${mediaType}/${tmdbId}/watch/providers?api_key=${TMDB_API_KEY}`);
         const data = await res.json();
+        if (!res.ok) {
+            console.warn(`TMDB watch/providers request failed (${res.status}):`, data?.status_message || data);
+        }
         const byRegion = data.results || {};
 
         // Only the user's own region - see the comment block above
@@ -4536,6 +4539,9 @@ async function checkNowInCinemas(tmdbId, hasDigitalAvailability) {
     try {
         const res = await fetch(`https://api.themoviedb.org/3/movie/${tmdbId}/release_dates?api_key=${TMDB_API_KEY}`);
         const data = await res.json();
+        if (!res.ok) {
+            console.warn(`TMDB release_dates request failed (${res.status}):`, data?.status_message || data);
+        }
         const entries = data.results || [];
 
         // Only the user's own region - the old entries[0] fallback meant
@@ -5017,6 +5023,13 @@ async function fetchTrending() {
     try {
         const response = await fetch(endpoint);
         const data = await response.json();
+
+        if (!response.ok) {
+            console.warn(`TMDB trending request failed (${response.status}):`, data?.status_message || data);
+            listContainer.innerHTML = emptyState("Couldn't Load Trending", "There was a problem reaching TMDB. Check your connection and try again.");
+            return;
+        }
+
         renderSearchResults(data.results || []);
     } catch (error) {
         console.error("Error fetching trending media:", error);
@@ -5038,7 +5051,13 @@ async function performTMDBSearch(query) {
     try {
         const response = await fetch(endpoint);
         const data = await response.json();
-        
+
+        if (!response.ok) {
+            console.warn(`TMDB search request failed (${response.status}):`, data?.status_message || data);
+            listContainer.innerHTML = emptyState("Couldn't Load Results", "There was a problem reaching TMDB. Check your connection and try again.");
+            return;
+        }
+
         if (!data.results || data.results.length === 0) {
             listContainer.innerHTML = emptyState("No Items Found", `No results matching "${escapeHTML(query)}".`);
             return;
@@ -5113,6 +5132,13 @@ async function openSearchResultDetails(tmdbId, type) {
             const movieRes = await fetch(`https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${TMDB_API_KEY}`);
             const movieData = await movieRes.json();
 
+            // TMDB returns 200 with a {success:false, status_message:...}
+            // body for things like an invalid/expired API key - res.ok alone
+            // wouldn't catch that, so check the data shape itself too.
+            if (!movieRes.ok || !movieData || !movieData.id) {
+                throw new Error(`TMDB movie lookup failed: ${movieData?.status_message || movieRes.status}`);
+            }
+
             currentItem = {
                 id: `preview-movie-${movieData.id}`,
                 tmdbId: movieData.id,
@@ -5143,6 +5169,11 @@ async function openSearchResultDetails(tmdbId, type) {
         // from appearing at all until every single one had returned.
         const showRes = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${TMDB_API_KEY}`);
         const showData = await showRes.json();
+
+        if (!showRes.ok || !showData || !showData.id) {
+            throw new Error(`TMDB show lookup failed: ${showData?.status_message || showRes.status}`);
+        }
+
         const previewId = `preview-tv-${showData.id}`;
 
         currentItem = {
@@ -5216,7 +5247,7 @@ async function openSearchResultDetails(tmdbId, type) {
 
     } catch (err) {
         console.error("Error opening preview details:", err);
-        showToast("Unable to load details.", "error");
+        showToast(err?.message?.startsWith("TMDB") ? err.message : "Unable to load details.", "error");
     }
 }
 
@@ -5235,6 +5266,10 @@ async function importMediaData(id, type, buttonElement) {
             const availabilityPromise = fetchWatchAvailability(id, 'movie');
             const movieRes = await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_API_KEY}`);
             const movieData = await movieRes.json();
+
+            if (!movieRes.ok || !movieData || !movieData.id) {
+                throw new Error(`TMDB movie lookup failed: ${movieData?.status_message || movieRes.status}`);
+            }
 
             const slug = `movie-${movieData.id}`;
             if (state.library.some(s => s.id === slug || s.tmdbId === movieData.id)) {
@@ -5278,6 +5313,10 @@ async function importMediaData(id, type, buttonElement) {
             const availabilityPromise = fetchWatchAvailability(id, 'tv');
             const showRes = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${TMDB_API_KEY}`);
             const showData = await showRes.json();
+
+            if (!showRes.ok || !showData || !showData.id || !showData.name) {
+                throw new Error(`TMDB show lookup failed: ${showData?.status_message || showRes.status}`);
+            }
 
             const slug = "tv-" + showData.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
             if (state.library.some(s => s.id === slug || s.tmdbId === showData.id)) {
@@ -5398,7 +5437,7 @@ async function importMediaData(id, type, buttonElement) {
         }
     } catch (error) {
         console.error("Error adding media:", error);
-        showToast("Failed to add item.", "error");
+        showToast(error?.message?.startsWith("TMDB") ? error.message : "Failed to add item.", "error");
         if (buttonElement) {
             buttonElement.disabled = false;
             buttonElement.textContent = "Add to Library";
@@ -6381,6 +6420,12 @@ async function playTrailer(tmdbId, type) {
         const res = await fetch(endpoint);
         const data = await res.json();
 
+        if (!res.ok) {
+            console.warn(`TMDB videos request failed (${res.status}):`, data?.status_message || data);
+            showToast("Could not load trailer.", "error");
+            return;
+        }
+
         const trailer = (data.results || []).find(v => v.site === "YouTube" && v.type === "Trailer");
 
         if (trailer) {
@@ -6834,6 +6879,12 @@ async function fetchItemImages(tmdbId, type) {
             : `https://api.themoviedb.org/3/tv/${tmdbId}/images?api_key=${TMDB_API_KEY}&include_image_language=en,null`;
         const res = await fetch(endpoint);
         const data = await res.json();
+
+        if (!res.ok) {
+            console.warn(`TMDB images request failed (${res.status}):`, data?.status_message || data);
+            return { posters: [], backdrops: [], failed: true };
+        }
+
         return {
             posters: (data.posters || []).map(img => ({
                 thumb: `https://image.tmdb.org/t/p/w185${img.file_path}`,
@@ -6842,11 +6893,12 @@ async function fetchItemImages(tmdbId, type) {
             backdrops: (data.backdrops || []).map(img => ({
                 thumb: `https://image.tmdb.org/t/p/w300${img.file_path}`,
                 full: `https://image.tmdb.org/t/p/w780${img.file_path}`
-            }))
+            })),
+            failed: false
         };
     } catch (err) {
         console.error("Failed to fetch alternate images:", err);
-        return { posters: [], backdrops: [] };
+        return { posters: [], backdrops: [], failed: true };
     }
 }
 
@@ -6908,7 +6960,9 @@ function renderPosterPickerGrid() {
     grid.className = `poster-picker-grid ${posterPickerTab === 'backdrop' ? 'backdrop-mode' : 'poster-mode'}`;
 
     if (!images.length) {
-        grid.innerHTML = emptyState("No Images Found", `TMDB doesn't have any alternate ${posterPickerTab}s for this title.`);
+        grid.innerHTML = posterPickerImages.failed
+            ? emptyState("Couldn't Load Images", "There was a problem reaching TMDB. Check your connection and try again.")
+            : emptyState("No Images Found", `TMDB doesn't have any alternate ${posterPickerTab}s for this title.`);
         return;
     }
 
