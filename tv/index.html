@@ -1091,7 +1091,11 @@ img {
     margin: 0 0 12px;
 }
 
-.upcoming-group + .upcoming-group .upcoming-group-title {
+/* General-sibling (~), not adjacent (+): the scroll anchor div now sits
+   between Recently Released and the first upcoming group, so the two
+   groups aren't literally adjacent siblings anymore - this still needs to
+   reach across that anchor to apply the gap. */
+.upcoming-group ~ .upcoming-group .upcoming-group-title {
     margin-top: 24px;
 }
 
@@ -5294,7 +5298,10 @@ function setLibraryView(view) {
 
     if (view === 'tv') renderTVLibrarySection();
     if (view === 'movies') renderMovieLibrarySection();
-    if (view === 'upcoming') renderUpcomingTab();
+    if (view === 'upcoming') {
+        renderUpcomingTab();
+        landOnUpcomingToday();
+    }
 }
 
 /* =========================================================
@@ -5323,10 +5330,11 @@ function groupUpcomingByTimeframe(items) {
 
 // TV episodes and movie releases are shown together in one combined,
 // date-sorted list (getUpcomingItems with no filter returns both types).
-// "Recently Released" (the past month) is rendered exactly like Today/
-// Tomorrow/This Week/Later - a plain group appended after them, in normal
-// document flow. It's revealed the same way the rest of the list is: by
-// scrolling. No collapse, no separate scroll mechanic, nothing to toggle.
+// "Recently Released" (the past month) always sits at the very top of the
+// list, above Today/Tomorrow/etc - but the tab lands scrolled past it by
+// default (see landOnUpcomingToday), so it stays out of view until the
+// person actually scrolls up to it. Everything below that is plain,
+// ordinary scrolling - no collapse, no custom mechanic.
 function renderUpcomingTab() {
     const listContainer = document.getElementById("upcomingResultsList");
     if (!listContainer) return;
@@ -5341,16 +5349,6 @@ function renderUpcomingTab() {
 
     let html = "";
 
-    if (items.length > 0) {
-        const groups = groupUpcomingByTimeframe(items);
-        html += groups.map(group => `
-            <div class="upcoming-group">
-                <div class="upcoming-group-title">${group.label}</div>
-                ${group.items.map(data => createUpcomingCard(data)).join("")}
-            </div>
-        `).join("");
-    }
-
     if (recentItems.length > 0) {
         html += `
             <div class="upcoming-group">
@@ -5360,7 +5358,39 @@ function renderUpcomingTab() {
         `;
     }
 
+    if (items.length > 0) {
+        // Marks where the upcoming list begins. Only meaningful when there's
+        // also Recently Released content above it to land past - see
+        // landOnUpcomingToday(), which scrolls here by default.
+        if (recentItems.length > 0) {
+            html += `<div id="upcomingScrollAnchor"></div>`;
+        }
+
+        const groups = groupUpcomingByTimeframe(items);
+        html += groups.map(group => `
+            <div class="upcoming-group">
+                <div class="upcoming-group-title">${group.label}</div>
+                ${group.items.map(data => createUpcomingCard(data)).join("")}
+            </div>
+        `).join("");
+    }
+
     listContainer.innerHTML = html;
+}
+
+// Scrolls to the first upcoming group by default, leaving Recently Released
+// (above it) out of view until the person scrolls up on their own. Called
+// only when the person actually switches to the Upcoming sub-tab (see
+// setLibraryView) - never from a background data refresh of an already-open
+// tab, so it can't yank the scroll position out from under someone who has
+// already scrolled up to see Recently Released.
+function landOnUpcomingToday() {
+    requestAnimationFrame(() => {
+        const anchor = document.getElementById("upcomingScrollAnchor");
+        if (!anchor) return;
+        const y = anchor.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({ top: y, behavior: "auto" });
+    });
 }
 
 /* =========================================================
