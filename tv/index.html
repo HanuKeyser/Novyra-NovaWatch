@@ -5315,8 +5315,17 @@ function setLibraryView(view) {
     document.getElementById("libraryViewMovies").style.display = view === 'movies' ? 'block' : 'none';
     document.getElementById("libraryViewUpcoming").style.display = view === 'upcoming' ? 'block' : 'none';
 
-    if (view === 'tv') renderTVLibrarySection();
-    if (view === 'movies') renderMovieLibrarySection();
+    if (view === 'tv') {
+        renderTVLibrarySection();
+        // Otherwise switching in from wherever the person left Movies or
+        // Upcoming scrolled would land TV Shows at that same scroll
+        // position instead of its own top.
+        window.scrollTo({ top: 0, behavior: "auto" });
+    }
+    if (view === 'movies') {
+        renderMovieLibrarySection();
+        window.scrollTo({ top: 0, behavior: "auto" });
+    }
     if (view === 'upcoming') {
         renderUpcomingTab();
         landOnUpcomingToday();
