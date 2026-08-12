@@ -319,8 +319,13 @@ img {
 .stat {
     padding: 16px 10px;
     text-align: center;
-    background: var(--surface-2);
-    border: 1px solid var(--glass-border-subtle);
+    /* Was --surface-2 (36% white) on a --surface (58% white) card, so the
+       square barely separated from the card it sits in. A brighter, more
+       opaque fill plus a firmer border and its own small shadow makes each
+       stat read as a distinct tile instead of blending into the card. */
+    background: var(--glass-sheen), rgba(255, 255, 255, 0.85);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow-sm);
     border-radius: var(--radius-md);
     display: flex;
     flex-direction: column;
@@ -1457,6 +1462,25 @@ img {
     transform: scale(0.9);
 }
 
+/* "Done" action sitting next to the circular close button in a modal
+   header - used by the poster/backdrop picker so a poster and a backdrop
+   can both be picked (across tabs) before anything is saved and the sheet
+   closes, instead of every tap saving+closing immediately. */
+.header-done-btn {
+    height: 38px;
+    padding: 0 18px;
+    border-radius: 999px;
+    background: var(--glass-sheen), var(--blue-gradient);
+    color: white;
+    font-size: 13.5px;
+    font-weight: 700;
+    box-shadow: 0 8px 18px rgba(0, 102, 204, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.header-done-btn:active {
+    transform: scale(0.94);
+}
+
 .modal-hero-title-container {
     position: relative;
     z-index: 2;
@@ -2554,6 +2578,10 @@ img {
     </div>
 
     <div style="margin-top: 20px;">
+        <div class="segmented-toggle" id="discoverModeToggle">
+            <button id="discoverModeTrending" class="segmented-btn active" onclick="setDiscoverMode('trending')">Trending</button>
+            <button id="discoverModeRecent" class="segmented-btn" onclick="setDiscoverMode('recent')">Recent Releases</button>
+        </div>
         <div class="section-header">
             <div id="searchResultsHeading" class="section-title" style="font-size: 16px; color: var(--text-secondary);">Trending Shows</div>
         </div>
@@ -2793,6 +2821,7 @@ img {
 <div id="posterPickerModal" class="modal" onclick="closePosterPickerOutside(event)">
     <div class="modal-sheet" style="max-height: 80vh;">
         <div class="modal-header-nav">
+            <button class="header-done-btn" onclick="confirmPosterPickerChanges()">Done</button>
             <button class="close-button" onclick="closePosterPicker()" aria-label="Close">
                 <svg class="icon" viewBox="0 0 24 24">
                     <path d="M6 6l12 12"/>
@@ -3047,7 +3076,7 @@ function clearSearch(inputId) {
     if (!input) return;
     input.value = "";
     input.parentElement.classList.remove("has-text");
-    if (inputId === "onlineSearchInput") fetchTrending();
+    if (inputId === "onlineSearchInput") fetchDiscoverList();
     if (inputId === "tvLibrarySearchInput") renderTVLibrarySection();
     if (inputId === "movieLibrarySearchInput") renderMovieLibrarySection();
 }
@@ -4516,6 +4545,39 @@ function setSearchType(type) {
     if (query) {
         performTMDBSearch(query);
     } else {
+        fetchDiscoverList();
+    }
+}
+
+// Discover's default list can show either what's trending this week or
+// what's been recently released, without losing the TV/Movies split above
+// it. currentDiscoverMode just remembers which of the two is active so
+// every place that used to unconditionally reach for fetchTrending() (tab
+// switches, clearing the search box, first load) keeps showing whichever
+// one the person picked instead of silently reverting to Trending.
+let currentDiscoverMode = 'trending';
+
+function setDiscoverMode(mode) {
+    currentDiscoverMode = mode;
+    document.getElementById("discoverModeTrending").classList.toggle("active", mode === 'trending');
+    document.getElementById("discoverModeRecent").classList.toggle("active", mode === 'recent');
+
+    // A mode switch is about the default list, not the search results, so
+    // drop any in-progress search rather than leaving it showing search
+    // results under a now-mismatched Trending/Recent toggle state.
+    const searchInput = document.getElementById("onlineSearchInput");
+    if (searchInput && searchInput.value) {
+        searchInput.value = "";
+        searchInput.parentElement.classList.remove("has-text");
+    }
+
+    fetchDiscoverList();
+}
+
+function fetchDiscoverList() {
+    if (currentDiscoverMode === 'recent') {
+        fetchRecentReleases();
+    } else {
         fetchTrending();
     }
 }
@@ -4529,7 +4591,7 @@ function initSearchPage() {
         const query = e.target.value.trim();
 
         if (!query) {
-            fetchTrending();
+            fetchDiscoverList();
             return;
         }
 
@@ -4552,7 +4614,7 @@ function initSearchPage() {
         });
     }
 
-    fetchTrending();
+    fetchDiscoverList();
 }
 
 // Rebuilding a categorized poster grid on every single keystroke can feel
@@ -4582,6 +4644,37 @@ async function fetchTrending() {
     } catch (error) {
         console.error("Error fetching trending media:", error);
         listContainer.innerHTML = emptyState("Unable to load trending items", "Please check your network connection.");
+    }
+}
+
+// Same list UI as Trending, sourced from TMDB's discover endpoint instead:
+// sorted by release/air date descending and capped at today, so it reads
+// as "what's newly out" rather than "what's popular this week".
+async function fetchRecentReleases() {
+    const listContainer = document.getElementById("searchResultsList");
+    const heading = document.getElementById("searchResultsHeading");
+
+    const mediaLabel = currentSearchType === 'movie' ? 'Movies' : 'TV Shows';
+    if (heading) heading.textContent = `Recently Released ${mediaLabel}`;
+    listContainer.innerHTML = skeletonRows();
+
+    // Reuses the app's existing local-calendar "today" (see getLocalTodayParts,
+    // used by isReleased/daysUntil) rather than new Date().toISOString(),
+    // which would report UTC and could cut off up to a day early/late
+    // depending on the viewer's timezone.
+    const t = getLocalTodayParts();
+    const today = `${t.y}-${String(t.m + 1).padStart(2, '0')}-${String(t.d).padStart(2, '0')}`;
+    const endpoint = currentSearchType === 'movie'
+        ? `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&sort_by=primary_release_date.desc&primary_release_date.lte=${today}`
+        : `https://api.themoviedb.org/3/discover/tv?api_key=${TMDB_API_KEY}&sort_by=first_air_date.desc&first_air_date.lte=${today}`;
+
+    try {
+        const response = await fetch(endpoint);
+        const data = await response.json();
+        renderSearchResults(data.results || []);
+    } catch (error) {
+        console.error("Error fetching recent releases:", error);
+        listContainer.innerHTML = emptyState("Unable to load recent releases", "Please check your network connection.");
     }
 }
 
@@ -5049,6 +5142,43 @@ function getUpcomingItems(filterType = null) {
     return results.sort((a, b) => a.date - b.date);
 }
 
+// Mirror of getUpcomingItems() for the other direction in time: movies and
+// episodes from the library that have already released, within the last
+// `daysBack` days. Powers the "Recently Released" section at the bottom of
+// the Upcoming tab, sorted most-recent-first so scrolling down continues
+// naturally from "Later" into what just came out.
+function getRecentlyReleasedItems(filterType = null, daysBack = 30) {
+    const results = [];
+
+    state.library.forEach(item => {
+        if (item.type === 'movie' && (!filterType || filterType === 'movie')) {
+            if (item.releaseDate && isReleased(item.releaseDate) && daysUntil(item.releaseDate) >= -daysBack) {
+                results.push({
+                    item: item,
+                    type: 'movie',
+                    title: item.title,
+                    subtitle: 'Movie Release',
+                    date: new Date(item.releaseDate)
+                });
+            }
+        } else if (item.episodes && (!filterType || filterType === 'tv')) {
+            item.episodes
+                .filter(episode => episode.releaseDate && isReleased(episode.releaseDate) && daysUntil(episode.releaseDate) >= -daysBack)
+                .forEach(episode => {
+                    results.push({
+                        item: item,
+                        type: 'tv',
+                        title: item.title,
+                        subtitle: `S${episode.season} E${episode.number} - ${episode.title}`,
+                        date: new Date(episode.releaseDate)
+                    });
+                });
+        }
+    });
+
+    return results.sort((a, b) => b.date - a.date);
+}
+
 function getTVProgress(show) {
     if (show.type === 'movie') {
         return {
@@ -5162,7 +5292,7 @@ function showPage(page, subType = null, focusSearch = false) {
             setSearchType(subType);
         } else {
             const query = document.getElementById("onlineSearchInput").value.trim();
-            if (!query) fetchTrending();
+            if (!query) fetchDiscoverList();
         }
 
         // Only auto-focus when the person actually tapped their way to
@@ -5253,25 +5383,44 @@ function groupUpcomingByTimeframe(items) {
 
 // TV episodes and movie releases are shown together in one combined,
 // date-sorted list (getUpcomingItems with no filter returns both types).
+// The upcoming groups render exactly as before; a "Recently Released"
+// group for the past month is appended after them, so nothing about the
+// existing Today/Tomorrow/This Week/Later view changes - scrolling past it
+// just reveals more.
 function renderUpcomingTab() {
     const listContainer = document.getElementById("upcomingResultsList");
     if (!listContainer) return;
 
     const items = getUpcomingItems();
+    const recentItems = getRecentlyReleasedItems();
 
-    if (!items || items.length === 0) {
+    if ((!items || items.length === 0) && (!recentItems || recentItems.length === 0)) {
         listContainer.innerHTML = emptyState("No Upcoming Releases", "No upcoming episodes or movies scheduled in your library.");
         return;
     }
 
-    const groups = groupUpcomingByTimeframe(items);
+    let html = "";
 
-    listContainer.innerHTML = groups.map(group => `
-        <div class="upcoming-group">
-            <div class="upcoming-group-title">${group.label}</div>
-            ${group.items.map(data => createUpcomingCard(data)).join("")}
-        </div>
-    `).join("");
+    if (items.length > 0) {
+        const groups = groupUpcomingByTimeframe(items);
+        html += groups.map(group => `
+            <div class="upcoming-group">
+                <div class="upcoming-group-title">${group.label}</div>
+                ${group.items.map(data => createUpcomingCard(data)).join("")}
+            </div>
+        `).join("");
+    }
+
+    if (recentItems.length > 0) {
+        html += `
+            <div class="upcoming-group">
+                <div class="upcoming-group-title">Recently Released</div>
+                ${recentItems.map(data => createUpcomingCard(data)).join("")}
+            </div>
+        `;
+    }
+
+    listContainer.innerHTML = html;
 }
 
 /* =========================================================
@@ -6369,6 +6518,12 @@ function handleCardClick(event, itemId) {
 // "primary" image the app shows by default. include_image_language pulls
 // in the language-neutral and English-labeled sets, which covers the vast
 // majority of what's actually available without fetching every language.
+// Thumb sizes are only for the picker grid itself - each cell only ever
+// renders at ~110px (poster, 3-col) or ~170px (backdrop, 2-col), so pulling
+// full w500/w780 images for every candidate was shipping far more pixels
+// than the grid could ever show and made the picker feel slow to fill in.
+// `full` stays at the original, higher-res size and is what actually gets
+// saved onto the item / shown everywhere else in the app once picked.
 async function fetchItemImages(tmdbId, type) {
     try {
         const endpoint = type === 'movie'
@@ -6377,8 +6532,14 @@ async function fetchItemImages(tmdbId, type) {
         const res = await fetch(endpoint);
         const data = await res.json();
         return {
-            posters: (data.posters || []).map(img => `https://image.tmdb.org/t/p/w500${img.file_path}`),
-            backdrops: (data.backdrops || []).map(img => `https://image.tmdb.org/t/p/w780${img.file_path}`)
+            posters: (data.posters || []).map(img => ({
+                thumb: `https://image.tmdb.org/t/p/w185${img.file_path}`,
+                full: `https://image.tmdb.org/t/p/w500${img.file_path}`
+            })),
+            backdrops: (data.backdrops || []).map(img => ({
+                thumb: `https://image.tmdb.org/t/p/w300${img.file_path}`,
+                full: `https://image.tmdb.org/t/p/w780${img.file_path}`
+            }))
         };
     } catch (err) {
         console.error("Failed to fetch alternate images:", err);
@@ -6390,6 +6551,13 @@ let posterPickerItemId = null;
 let posterPickerType = null;
 let posterPickerTab = 'poster';
 let posterPickerImages = { posters: [], backdrops: [] };
+// Picking an image no longer saves+closes immediately - it just updates
+// these two pending values so the person can switch to the other tab and
+// pick a backdrop too before anything is written. Whatever's still pending
+// (unset = "no change from what's already saved") is applied together when
+// they tap Done, so one visit to the picker can update both.
+let pendingPosterUrl = null;
+let pendingBackdropUrl = null;
 
 async function openChangePosterPicker(itemId, type) {
     const item = getItem(itemId);
@@ -6398,6 +6566,8 @@ async function openChangePosterPicker(itemId, type) {
     posterPickerItemId = itemId;
     posterPickerType = type;
     posterPickerTab = 'poster';
+    pendingPosterUrl = item.poster || null;
+    pendingBackdropUrl = item.backdrop || null;
 
     document.getElementById("posterPickerTabPoster").classList.add("active");
     document.getElementById("posterPickerTabBackdrop").classList.remove("active");
@@ -6430,7 +6600,7 @@ function renderPosterPickerGrid() {
     if (!grid || !item) return;
 
     const images = posterPickerTab === 'poster' ? posterPickerImages.posters : posterPickerImages.backdrops;
-    const currentUrl = posterPickerTab === 'poster' ? item.poster : item.backdrop;
+    const currentUrl = posterPickerTab === 'poster' ? pendingPosterUrl : pendingBackdropUrl;
 
     grid.className = `poster-picker-grid ${posterPickerTab === 'backdrop' ? 'backdrop-mode' : 'poster-mode'}`;
 
@@ -6439,22 +6609,47 @@ function renderPosterPickerGrid() {
         return;
     }
 
-    grid.innerHTML = images.map(url => `
-        <div class="poster-picker-item ${url === currentUrl ? 'selected' : ''}" onclick="selectPickerImage('${url}')">
-            <img src="${url}" loading="lazy" alt="">
+    grid.innerHTML = images.map(img => `
+        <div class="poster-picker-item ${img.full === currentUrl ? 'selected' : ''}" onclick="selectPickerImage('${img.full}')">
+            <img src="${img.thumb}" loading="lazy" decoding="async" alt="">
         </div>
     `).join("");
 }
 
-async function selectPickerImage(url) {
-    const item = getItem(posterPickerItemId);
-    if (!item) return;
-
+// Just records the choice and re-renders the grid to move the selection
+// highlight - it deliberately does not save or close, so the person can
+// switch tabs (Poster <-> Backdrop) and pick the other one too before
+// anything is written. See confirmPosterPickerChanges() for the actual save.
+function selectPickerImage(url) {
     if (posterPickerTab === 'poster') {
-        item.poster = url;
-        item.customPoster = true;
+        pendingPosterUrl = url;
     } else {
-        item.backdrop = url;
+        pendingBackdropUrl = url;
+    }
+    renderPosterPickerGrid();
+}
+
+async function confirmPosterPickerChanges() {
+    const item = getItem(posterPickerItemId);
+    if (!item) {
+        closePosterPicker();
+        return;
+    }
+
+    const posterChanged = pendingPosterUrl && pendingPosterUrl !== item.poster;
+    const backdropChanged = pendingBackdropUrl && pendingBackdropUrl !== item.backdrop;
+
+    if (!posterChanged && !backdropChanged) {
+        closePosterPicker();
+        return;
+    }
+
+    if (posterChanged) {
+        item.poster = pendingPosterUrl;
+        item.customPoster = true;
+    }
+    if (backdropChanged) {
+        item.backdrop = pendingBackdropUrl;
         item.customBackdrop = true;
     }
 
@@ -6462,12 +6657,18 @@ async function selectPickerImage(url) {
     refreshActivePage();
     if (currentItem && currentItem.id === item.id) updateModalContent();
     closePosterPicker();
-    showToast(`${posterPickerTab === 'poster' ? 'Poster' : 'Backdrop'} updated.`, "success");
+
+    const message = posterChanged && backdropChanged
+        ? "Poster and backdrop updated."
+        : `${posterChanged ? "Poster" : "Backdrop"} updated.`;
+    showToast(message, "success");
 }
 
 function closePosterPicker() {
     document.getElementById("posterPickerModal").classList.remove("open");
     posterPickerItemId = null;
+    pendingPosterUrl = null;
+    pendingBackdropUrl = null;
 }
 
 function closePosterPickerOutside(event) {
