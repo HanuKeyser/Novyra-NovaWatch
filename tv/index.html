@@ -783,25 +783,6 @@ img {
     grid-template-columns: repeat(3, 1fr);
 }
 
-/* Library's TV Shows/Movies/Upcoming switcher specifically (not Discover's
-   or the auth screen's, which reuse the same base .segmented-toggle) stays
-   pinned to the top of the viewport while scrolling. Upcoming can now hold
-   a long, scrollable stretch of Recently Released content above "Today" -
-   without this, switching away from Upcoming would mean scrolling all the
-   way back up past all of that first. Uses the same floating "glass
-   chrome" treatment as the bottom nav bar, since it's now a floating
-   control sitting above content rather than content itself. */
-.library-tab-switcher {
-    position: sticky;
-    top: 12px;
-    z-index: 40;
-    background: var(--glass-sheen), var(--glass-chrome-fill);
-    backdrop-filter: var(--glass-chrome-blur);
-    -webkit-backdrop-filter: var(--glass-chrome-blur);
-    border: 1px solid var(--glass-chrome-border);
-    box-shadow: var(--glass-chrome-shadow);
-}
-
 .segmented-btn {
     height: 40px;
     border-radius: 999px;
@@ -1110,11 +1091,7 @@ img {
     margin: 0 0 12px;
 }
 
-/* General-sibling (~), not adjacent (+): the scroll anchor div now sits
-   between Recently Released and the first upcoming group, so the two
-   groups aren't literally adjacent siblings anymore - this still needs to
-   reach across that anchor to apply the gap. */
-.upcoming-group ~ .upcoming-group .upcoming-group-title {
+.upcoming-group + .upcoming-group .upcoming-group-title {
     margin-top: 24px;
 }
 
@@ -2612,7 +2589,7 @@ img {
      2. LIBRARY TAB (TV Shows + Movies + Upcoming, combined)
 ================================================     -->
 <main id="libraryPage" class="page">
-    <div class="segmented-toggle three-way library-tab-switcher">
+    <div class="segmented-toggle three-way">
         <button id="libraryTabTV" class="segmented-btn active" onclick="setLibraryView('tv')">TV Shows</button>
         <button id="libraryTabMovies" class="segmented-btn" onclick="setLibraryView('movies')">Movies</button>
         <button id="libraryTabUpcoming" class="segmented-btn" onclick="setLibraryView('upcoming')">Upcoming</button>
@@ -5105,43 +5082,6 @@ function getUpcomingItems(filterType = null) {
     return results.sort((a, b) => a.date - b.date);
 }
 
-// Mirror of getUpcomingItems() for the other direction in time: movies and
-// episodes from the library that have already released, within the last
-// `daysBack` days. Powers the "Recently Released" section at the bottom of
-// the Upcoming tab, sorted most-recent-first so scrolling down continues
-// naturally from "Later" into what just came out.
-function getRecentlyReleasedItems(filterType = null, daysBack = 30) {
-    const results = [];
-
-    state.library.forEach(item => {
-        if (item.type === 'movie' && (!filterType || filterType === 'movie')) {
-            if (item.releaseDate && isReleased(item.releaseDate) && daysUntil(item.releaseDate) >= -daysBack) {
-                results.push({
-                    item: item,
-                    type: 'movie',
-                    title: item.title,
-                    subtitle: 'Movie Release',
-                    date: new Date(item.releaseDate)
-                });
-            }
-        } else if (item.episodes && (!filterType || filterType === 'tv')) {
-            item.episodes
-                .filter(episode => episode.releaseDate && isReleased(episode.releaseDate) && daysUntil(episode.releaseDate) >= -daysBack)
-                .forEach(episode => {
-                    results.push({
-                        item: item,
-                        type: 'tv',
-                        title: item.title,
-                        subtitle: `S${episode.season} E${episode.number} - ${episode.title}`,
-                        date: new Date(episode.releaseDate)
-                    });
-                });
-        }
-    });
-
-    return results.sort((a, b) => b.date - a.date);
-}
-
 function getTVProgress(show) {
     if (show.type === 'movie') {
         return {
@@ -5315,21 +5255,9 @@ function setLibraryView(view) {
     document.getElementById("libraryViewMovies").style.display = view === 'movies' ? 'block' : 'none';
     document.getElementById("libraryViewUpcoming").style.display = view === 'upcoming' ? 'block' : 'none';
 
-    if (view === 'tv') {
-        renderTVLibrarySection();
-        // Otherwise switching in from wherever the person left Movies or
-        // Upcoming scrolled would land TV Shows at that same scroll
-        // position instead of its own top.
-        window.scrollTo({ top: 0, behavior: "auto" });
-    }
-    if (view === 'movies') {
-        renderMovieLibrarySection();
-        window.scrollTo({ top: 0, behavior: "auto" });
-    }
-    if (view === 'upcoming') {
-        renderUpcomingTab();
-        landOnUpcomingToday();
-    }
+    if (view === 'tv') renderTVLibrarySection();
+    if (view === 'movies') renderMovieLibrarySection();
+    if (view === 'upcoming') renderUpcomingTab();
 }
 
 /* =========================================================
@@ -5358,76 +5286,24 @@ function groupUpcomingByTimeframe(items) {
 
 // TV episodes and movie releases are shown together in one combined,
 // date-sorted list (getUpcomingItems with no filter returns both types).
-// "Recently Released" (the past month) always sits at the very top of the
-// list, above Today/Tomorrow/etc - but the tab lands scrolled past it by
-// default (see landOnUpcomingToday), so it stays out of view until the
-// person actually scrolls up to it. Everything below that is plain,
-// ordinary scrolling - no collapse, no custom mechanic.
 function renderUpcomingTab() {
     const listContainer = document.getElementById("upcomingResultsList");
     if (!listContainer) return;
 
     const items = getUpcomingItems();
-    const recentItems = getRecentlyReleasedItems();
 
-    if ((!items || items.length === 0) && (!recentItems || recentItems.length === 0)) {
+    if (!items || items.length === 0) {
         listContainer.innerHTML = emptyState("No Upcoming Releases", "No upcoming episodes or movies scheduled in your library.");
         return;
     }
 
-    let html = "";
-
-    if (recentItems.length > 0) {
-        html += `
-            <div class="upcoming-group">
-                <div class="upcoming-group-title">Recently Released</div>
-                ${recentItems.map(data => createUpcomingCard(data)).join("")}
-            </div>
-        `;
-    }
-
-    if (items.length > 0) {
-        // Marks where the upcoming list begins. Only meaningful when there's
-        // also Recently Released content above it to land past - see
-        // landOnUpcomingToday(), which scrolls here by default.
-        if (recentItems.length > 0) {
-            html += `<div id="upcomingScrollAnchor"></div>`;
-        }
-
-        const groups = groupUpcomingByTimeframe(items);
-        html += groups.map(group => `
-            <div class="upcoming-group">
-                <div class="upcoming-group-title">${group.label}</div>
-                ${group.items.map(data => createUpcomingCard(data)).join("")}
-            </div>
-        `).join("");
-    }
-
-    listContainer.innerHTML = html;
-}
-
-// Scrolls to the first upcoming group by default, leaving Recently Released
-// (above it) out of view until the person scrolls up on their own. Called
-// only when the person actually switches to the Upcoming sub-tab (see
-// setLibraryView) - never from a background data refresh of an already-open
-// tab, so it can't yank the scroll position out from under someone who has
-// already scrolled up to see Recently Released.
-function landOnUpcomingToday() {
-    requestAnimationFrame(() => {
-        const anchor = document.getElementById("upcomingScrollAnchor");
-        if (!anchor) return;
-
-        // The TV Shows/Movies/Upcoming switcher is sticky and floats over
-        // the top of the viewport once scrolled away from its natural
-        // position - landing exactly at the anchor would tuck "Today"
-        // straight up underneath it instead of leaving it visible just
-        // below, so this leaves room for the switcher's own height.
-        const switcher = document.querySelector(".library-tab-switcher");
-        const switcherClearance = switcher ? switcher.offsetHeight + 22 : 0;
-
-        const y = anchor.getBoundingClientRect().top + window.scrollY - switcherClearance;
-        window.scrollTo({ top: Math.max(0, y), behavior: "auto" });
-    });
+    const groups = groupUpcomingByTimeframe(items);
+    listContainer.innerHTML = groups.map(group => `
+        <div class="upcoming-group">
+            <div class="upcoming-group-title">${group.label}</div>
+            ${group.items.map(data => createUpcomingCard(data)).join("")}
+        </div>
+    `).join("");
 }
 
 /* =========================================================
