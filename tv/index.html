@@ -203,7 +203,18 @@ img {
 /* =========================================================
    APP CONTAINER
 ========================================================= */
+/* Hidden by default, same as #authScreen - controlled via JS.
+   #authScreen already had this, but .app didn't, so on every fresh page
+   load (any full navigation to index.html, not just in-app tab switches)
+   the main app UI rendered first - visible by default with whatever stale
+   or empty content was on screen - and only got hidden once
+   onAuthStateChanged resolved and either swapped in the auth screen or
+   confirmed a signed-in session. That gap is exactly the flash reported:
+   main app shows, then it swaps to sign-in. Neither screen shows now
+   until proceedToApp() or the logged-out branch in onAuthStateChanged
+   explicitly reveals the right one. */
 .app {
+    display: none;
     width: 100%;
     max-width: 600px;
     min-height: 100vh;
