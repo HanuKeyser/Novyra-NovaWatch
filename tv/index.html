@@ -1427,6 +1427,19 @@ img {
     position: relative;
 }
 
+/* Same-origin sub-pages (NovaWrapped, etc.) loaded inside a full-screen
+   iframe instead of a top-level navigation - see #pageOverlayModal. The
+   iframe owns its own scrolling, so the wrapping .modal-sheet is set to
+   overflow: hidden inline where this is used, to avoid a double
+   scrollbar. */
+.page-overlay-frame {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+    background: transparent;
+}
+
 .modal-backdrop-header {
     width: 100%;
     height: 240px;
@@ -3097,6 +3110,28 @@ img {
 </div>
 
 <!-- =====================================================
+     PAGE OVERLAY (NovaWrapped, etc.)
+     Loads a same-origin sub-page inside an iframe instead of navigating
+     the whole tab away from the app - see openPageOverlay(). The address
+     bar still updates via pushState so the URL, sharing, and the browser
+     back button all behave correctly; the app itself never unmounts, so
+     nothing re-runs the sign-in flow or resets state when you come back.
+================================================     -->
+<div id="pageOverlayModal" class="modal">
+    <div class="modal-sheet" style="overflow: hidden;">
+        <div class="modal-header-nav">
+            <button class="close-button" onclick="closePageOverlay()" aria-label="Close">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M6 6l12 12"/>
+                    <path d="M18 6L6 18"/>
+                </svg>
+            </button>
+        </div>
+        <iframe id="pageOverlayFrame" class="page-overlay-frame" title="NovaWatch"></iframe>
+    </div>
+</div>
+
+<!-- =====================================================
      DELETE ACCOUNT CONFIRMATION
 ================================================     -->
 <div id="deleteAccountModal" class="confirm-overlay" onclick="closeDeleteAccountModalOutside(event)">
@@ -4074,12 +4109,56 @@ function closeSettingsOutside(event) {
     if (event.target.id === "settingsModal") closeSettingsSheet();
 }
 
-// Wrapped is its own page now (not a modal) - it needs its own Firebase
-// session and Firestore reads, same-tab navigation so the signed-in
-// session carries over via Firebase Auth's local persistence.
+// NovaWrapped is its own page (its own Firebase session/Firestore reads,
+// its own release-date gate) but it's loaded inside an iframe overlay
+// rather than a top-level navigation - see openPageOverlay() below. That
+// way the app itself is never unmounted: coming back doesn't re-run the
+// sign-in flow, reset the active tab, or show any "welcome back" loading
+// state, because the app was never actually torn down.
 function goToWrapped() {
-    window.location.href = `${NOVAWATCH_APP_URL}nova-wrapped/`;
+    openPageOverlay("nova-wrapped/");
 }
+
+// Loads a same-origin sub-page inside the full-screen iframe overlay and
+// reflects it in the address bar via pushState, so the URL is still
+// shareable/bookmarkable and the browser back button works normally -
+// see the popstate listener below for the other half of that.
+function openPageOverlay(path) {
+    document.getElementById("pageOverlayFrame").src = path;
+    document.getElementById("pageOverlayModal").classList.add("open");
+    lockBodyScroll();
+    history.pushState({ novawatchOverlay: path }, "", `${NOVAWATCH_APP_URL}${path}`);
+}
+
+// fromPopstate is true when this is called in response to the browser's
+// back button (history already moved) - in that case there's nothing
+// left to pop, so calling history.back() again would skip an extra entry.
+function closePageOverlay(fromPopstate = false) {
+    document.getElementById("pageOverlayModal").classList.remove("open");
+    document.getElementById("pageOverlayFrame").src = "about:blank";
+    unlockBodyScroll();
+    if (!fromPopstate) {
+        history.back();
+    }
+}
+
+window.addEventListener("popstate", (event) => {
+    const overlayModal = document.getElementById("pageOverlayModal");
+    const isOpen = overlayModal.classList.contains("open");
+
+    if (event.state && event.state.novawatchOverlay) {
+        // Forward/re-entered a pushed overlay state (e.g. the forward
+        // button) - reopen without pushing a new entry, since this one's
+        // already in the history stack.
+        if (!isOpen) {
+            document.getElementById("pageOverlayFrame").src = event.state.novawatchOverlay;
+            overlayModal.classList.add("open");
+            lockBodyScroll();
+        }
+    } else if (isOpen) {
+        closePageOverlay(true);
+    }
+});
 
 // Opens the themed confirmation dialog instead of a native browser
 // confirm() - the actual deletion only runs from confirmDeleteAccount()
