@@ -1963,8 +1963,8 @@ img {
    HOME HERO
 ========================================================= */
 .hero-card {
-    padding: 26px 24px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(224,238,255,0.78) 100%);
+    padding: 24px 24px 26px;
+    background: linear-gradient(150deg, rgba(255,255,255,0.92) 0%, rgba(224,238,255,0.8) 100%);
     backdrop-filter: blur(40px) saturate(200%);
     -webkit-backdrop-filter: blur(40px) saturate(200%);
     border: 1px solid rgba(0, 102, 204, 0.2);
@@ -1974,7 +1974,7 @@ img {
 
 .hero-top {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: 12px;
 }
@@ -1985,6 +1985,34 @@ img {
     gap: 16px;
 }
 
+/* Wraps the avatar so the status dot can be pinned to its corner without
+   disturbing the flex layout around it. */
+.avatar-wrap {
+    position: relative;
+    flex-shrink: 0;
+}
+
+/* Small "signed in" indicator, bottom-right of the avatar - a familiar
+   premium-app cue (Discord/Slack-style presence dot) that also just
+   quietly confirms the account is active. Hidden for the guest state via
+   the .show toggle in updateHomeUI(). */
+.avatar-status-dot {
+    position: absolute;
+    bottom: -1px;
+    right: -1px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: var(--green-gradient);
+    border: 2.5px solid #fdfdfe;
+    box-shadow: 0 2px 6px rgba(52, 199, 89, 0.55);
+    display: none;
+}
+
+.avatar-status-dot.show {
+    display: block;
+}
+
 /* Opens the Settings sheet - same filled-glass "primary action" recipe
    as .hero-pill-btn/.analytics-icon-badge (sheen + blue-gradient + white
    icon) rather than a plain translucent circle, so it reads as an
@@ -1992,20 +2020,26 @@ img {
    close/back button repurposed. */
 .settings-entry-btn {
     flex-shrink: 0;
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
     background: var(--glass-sheen), var(--blue-gradient);
     color: white;
+    border: 2px solid rgba(255, 255, 255, 0.6);
     box-shadow: 0 8px 20px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.5);
     transition: transform 0.15s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
+.settings-entry-btn .icon {
+    width: 20px;
+    height: 20px;
+}
+
 .settings-entry-btn:active {
-    transform: scale(0.9) rotate(25deg);
+    transform: scale(0.9) rotate(30deg);
 }
 
 /* =========================================================
@@ -2224,24 +2258,37 @@ img {
 }
 
 .large-avatar {
-    width: 60px;
-    height: 60px;
+    width: 62px;
+    height: 62px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: var(--radius-lg);
-    background: linear-gradient(135deg, var(--blue-light), var(--blue));
+    /* A third, lighter stop plus a soft inner shadow along the bottom
+       edge gives the fill some actual depth (light catching the top,
+       falling off toward the bottom) instead of a flat two-tone chip. */
+    background: linear-gradient(150deg, #6babff 0%, var(--blue-light) 45%, var(--blue) 100%);
     color: white;
-    font-size: 22px;
+    font-size: 23px;
     font-weight: 800;
-    box-shadow: 0 8px 20px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.4);
+    letter-spacing: -0.5px;
+    border: 2px solid rgba(255, 255, 255, 0.65);
+    box-shadow: 0 10px 22px rgba(0, 102, 204, 0.4), inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -8px 12px rgba(0, 76, 153, 0.25);
     flex-shrink: 0;
 }
 
+.home-greeting {
+    font-size: 11px;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--blue);
+}
+
 .home-name {
-    font-size: 19px;
+    font-size: 20px;
     font-weight: 800;
-    letter-spacing: -0.3px;
+    letter-spacing: -0.4px;
     margin-top: 1px;
 }
 
@@ -2803,8 +2850,12 @@ img {
         <div class="hero-card">
             <div class="hero-top">
                 <div class="hero-profile">
-                    <div class="large-avatar" id="largeAvatar">G</div>
+                    <div class="avatar-wrap">
+                        <div class="large-avatar" id="largeAvatar">G</div>
+                        <div class="avatar-status-dot" id="avatarStatusDot"></div>
+                    </div>
                     <div>
+                        <div class="home-greeting" id="homeGreeting">Welcome</div>
                         <div class="home-name" id="homeName">Guest</div>
                         <div class="home-subtitle" id="homeEmailSubtitle">Guest Account</div>
                     </div>
@@ -3442,6 +3493,17 @@ document.addEventListener("DOMContentLoaded", () => {
 ========================================================= */
 function now() {
     return new Date();
+}
+
+// Local time, not UTC - this is purely a warm "how the day is going" cue
+// on Home, not tied to any tracked/stored data (unlike the UTC-based
+// release-date logic below), so using the device's own clock is correct.
+function getTimeOfDayGreeting() {
+    const hour = new Date().getHours();
+    if (hour < 5) return "Good Night";
+    if (hour < 12) return "Good Morning";
+    if (hour < 18) return "Good Afternoon";
+    return "Good Evening";
 }
 
 // TMDB only ever gives us a calendar date (e.g. "2026-08-15"), never a real
@@ -6677,6 +6739,13 @@ function updateHomeUI() {
     }
 
     const initial = displayName.charAt(0).toUpperCase() || "G";
+    const isSignedIn = !!(auth && auth.currentUser);
+
+    const greetingEl = document.getElementById("homeGreeting");
+    if (greetingEl) greetingEl.textContent = isSignedIn ? getTimeOfDayGreeting() : "Welcome";
+
+    const statusDotEl = document.getElementById("avatarStatusDot");
+    if (statusDotEl) statusDotEl.classList.toggle("show", isSignedIn);
 
     const homeNameEl = document.getElementById("homeName");
     if (homeNameEl) homeNameEl.textContent = displayName;
