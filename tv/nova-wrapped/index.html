@@ -417,8 +417,8 @@ button {
 </head>
 <body>
 <div class="wrap">
-    <div class="top-row">
-        <a class="back-link" href="https://www.novyra.co.za/tv/">
+    <div class="top-row" id="topRow">
+        <a class="back-link" href="https://www.novyra.co.za/tv/" target="_top">
             <svg class="icon" width="14" height="14" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
             NovaWatch
         </a>
@@ -428,6 +428,20 @@ button {
 </div>
 
 <script>
+/* =========================================================
+   EMBEDDED-IN-APP CHECK
+   When this page is loaded inside the main app's page overlay (see
+   openPageOverlay() in index.html), the overlay chrome already supplies
+   its own close button - showing this page's own "NovaWatch" back-link
+   on top of that would be redundant, and tapping it would just navigate
+   the iframe itself rather than closing the overlay. Visiting this page
+   directly (not embedded) keeps the back-link as normal.
+========================================================= */
+if (window.self !== window.top) {
+    const topRowEl = document.getElementById("topRow");
+    if (topRowEl) topRowEl.style.display = "none";
+}
+
 /* =========================================================
    RELEASE GATE
    Wrapped unlocks 1 January 2027, 00:00 UTC. Before that, this page
@@ -517,7 +531,7 @@ function renderSignedOut() {
         <div class="state-card">
             <div class="state-title">Sign In to See Your Wrapped</div>
             <p class="state-sub">NovaWrapped is tied to your NovaWatch account. Sign in through the app, then come back here.</p>
-            <a class="state-cta" href="https://www.novyra.co.za/tv/">Open NovaWatch</a>
+            <a class="state-cta" href="https://www.novyra.co.za/tv/" target="_top">Open NovaWatch</a>
         </div>
     `;
 }
