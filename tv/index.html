@@ -1397,7 +1397,7 @@ img {
     inset: 0;
     z-index: 200;
     display: none;
-    align-items: flex-end;
+    align-items: stretch;
     background: rgba(0, 0, 0, 0.26);
     backdrop-filter: blur(26px);
     -webkit-backdrop-filter: blur(26px);
@@ -1409,21 +1409,22 @@ img {
 
 .modal-sheet {
     width: 100%;
-    max-width: 600px;
-    max-height: 92vh;
-    margin: 0 auto;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    margin: 0;
     overflow-y: auto;
-    /* Soft top-lit sheen (light "entering" from the drag-handle edge of the
-       sheet) layered over the base fill, instead of a flat tint - no hard
-       border (kept borderless per earlier request), just a bright inset
-       top edge + a two-layer elevation shadow for depth. */
+    /* Soft top-lit sheen (light "entering" from the top edge) layered over
+       the base fill, instead of a flat tint - same glass surface as
+       before, just now filling the whole screen edge-to-edge rather than
+       being a bottom-anchored card, so no rounded corners or drop shadow
+       (nothing for either to read against once it's full-bleed). */
     background: linear-gradient(165deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 32%), rgba(248, 250, 252, 0.68);
     backdrop-filter: blur(70px) saturate(230%);
     -webkit-backdrop-filter: blur(70px) saturate(230%);
-    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+    border-radius: 0;
     border: none;
     position: relative;
-    box-shadow: 0 -6px 16px rgba(0, 0, 0, 0.05), 0 -28px 64px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
 .modal-backdrop-header {
@@ -1435,7 +1436,6 @@ img {
     display: flex;
     align-items: flex-end;
     padding: 20px;
-    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
 }
 
 .modal-backdrop-overlay {
@@ -1972,106 +1972,134 @@ img {
     gap: 16px;
 }
 
-/* Opens the Settings sheet (account actions, notifications, streaming
-   region) - same circular glass treatment as .close-button so it reads
-   as part of the same control language, just living on the hero card
-   instead of a modal header. */
+/* Opens the Settings sheet - same filled-glass "primary action" recipe
+   as .hero-pill-btn/.analytics-icon-badge (sheen + blue-gradient + white
+   icon) rather than a plain translucent circle, so it reads as an
+   intentional on-brand control sitting on the hero card, not a generic
+   close/back button repurposed. */
 .settings-entry-btn {
     flex-shrink: 0;
-    width: 38px;
-    height: 38px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: var(--glass-sheen), var(--surface);
-    color: var(--text-secondary);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow-sm);
+    background: var(--glass-sheen), var(--blue-gradient);
+    color: white;
+    box-shadow: 0 8px 20px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.5);
     transition: transform 0.15s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .settings-entry-btn:active {
-    transform: scale(0.9) rotate(20deg);
+    transform: scale(0.9) rotate(25deg);
 }
 
-.hero-signout-btn {
-    flex: 1;
-    height: 40px;
-    padding: 0 8px;
+/* =========================================================
+   SETTINGS SHEET
+   A dedicated "page" now (see .modal-sheet full-screen change) rather
+   than a couple of rows crammed onto Home - profile header up top,
+   then grouped, icon-led rows so it reads like a real settings screen
+   instead of a flat list of controls.
+========================================================= */
+.settings-profile-row {
     display: flex;
     align-items: center;
-    justify-content: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    border-radius: var(--radius-sm);
-    background: var(--glass-sheen), var(--flat-blue);
-    border: none;
-    color: white;
-    font-size: 13px;
-    font-weight: 700;
-    box-shadow: 0 6px 16px rgba(0, 136, 255, 0.3), inset 0 1px 0 rgba(255,255,255,0.5);
+    gap: 16px;
+    margin: 20px 0 28px;
 }
 
-.hero-signout-btn:active {
-    transform: scale(0.96);
+.settings-section {
+    margin-bottom: 24px;
 }
 
-.hero-account-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 16px;
+.settings-section-title {
+    font-size: 15px;
+    letter-spacing: -0.2px;
 }
 
-/* Same filled-glass "danger" treatment as .action-button.danger (the
-   Remove button in the details modal) - sheen + red gradient + white
-   text - so this reads as the same kind of destructive action everywhere
-   it appears, not a separate, lower-emphasis style. */
-.hero-delete-link {
-    flex: 1;
-    height: 40px;
-    padding: 0 8px;
+.settings-card {
+    padding: 6px 18px;
+}
+
+.settings-row {
     display: flex;
     align-items: center;
-    justify-content: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    border-radius: var(--radius-sm);
-    background: var(--glass-sheen), var(--red-gradient);
-    color: white;
-    font-size: 13px;
-    font-weight: 700;
-    box-shadow: 0 6px 16px rgba(255, 59, 48, 0.3), inset 0 1px 0 rgba(255,255,255,0.5);
-}
-
-.hero-delete-link:active {
-    transform: scale(0.96);
-}
-
-.hero-notify-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     gap: 14px;
-    margin-top: 20px;
-    padding-top: 18px;
-    border-top: 1px solid rgba(0, 102, 204, 0.14);
+    padding: 14px 0;
 }
 
-.hero-notify-title {
-    font-size: 13.5px;
-    font-weight: 750;
+.settings-row + .settings-row {
+    border-top: 1px solid var(--glass-border-subtle);
 }
 
-.hero-notify-sub {
+.settings-row-icon {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-xs);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255,255,255,0.4);
+}
+
+.settings-row-icon .icon {
+    width: 18px;
+    height: 18px;
+}
+
+.settings-row-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.settings-row-title {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.settings-row-sub {
     font-size: 11.5px;
     color: var(--text-secondary);
     margin-top: 2px;
     line-height: 1.4;
+}
+
+/* Sign Out / Delete Account as full-width tappable list rows (icon +
+   label + chevron), the familiar "Settings app" pattern, instead of two
+   side-by-side pill buttons squeezed into the hero card. */
+.settings-card-list {
+    padding: 4px 4px;
+}
+
+.settings-action-row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px;
+    text-align: left;
+    background: transparent;
+    border-radius: var(--radius-md);
+}
+
+.settings-action-row:active {
+    background: var(--surface-2);
+}
+
+.settings-action-row + .settings-action-row {
+    border-top: 1px solid var(--glass-border-subtle);
+}
+
+.settings-action-row.danger .settings-row-title {
+    color: var(--danger);
+}
+
+.settings-row-chevron {
+    flex-shrink: 0;
+    color: var(--text-muted);
 }
 
 .hero-pill-btn {
@@ -2141,14 +2169,11 @@ img {
 }
 
 /* Scoped to the region picker only - other .modal-sheet/.modal-content
-   instances (poster picker, etc.) keep their normal content-based sizing.
-   Without this, the sheet's height shrank to fit however many rows the
-   search left visible, which - since the sheet is bottom-anchored - meant
-   a narrow search result could leave a short sheet sitting right where the
-   on-screen keyboard also lives, getting fully covered by it. Fixing the
-   sheet's own height and making #regionOptionsList the only scrolling
-   region keeps the search box in a stable position and stops the whole
-   sheet from resizing as you type. */
+   instances (poster picker, etc.) keep their normal content-based
+   scrolling. This still fixes the sheet as a flex column with
+   #regionOptionsList as the only scrolling region, so the search box
+   stays pinned at a stable position instead of scrolling away with the
+   list as you type. */
 .region-picker-sheet {
     display: flex;
     flex-direction: column;
@@ -2624,7 +2649,7 @@ img {
         <div class="auth-footer-row">
             <button class="auth-forgot-link" onclick="handleForgotPassword()">Forgot password?</button>
             <span class="auth-footer-sep">|</span>
-            <a href="https://www.novyra.co.za/tv/privacy.html" target="_blank" rel="noopener" class="auth-forgot-link">Privacy &amp; Terms</a>
+            <a href="https://www.novyra.co.za/tv/privacy-terms/" target="_blank" rel="noopener" class="auth-forgot-link">Privacy &amp; Terms</a>
         </div>
     </div>
 </div>
@@ -2889,7 +2914,7 @@ img {
      EPISODE DETAILS MODAL
 ================================================     -->
 <div id="episodeDetailsModal" class="modal" onclick="closeEpisodeModalOutside(event)">
-    <div class="modal-sheet" style="max-height: 80vh;">
+    <div class="modal-sheet">
         <div class="modal-header-nav">
             <button class="close-button" onclick="closeEpisodeModal()" aria-label="Close">
                 <svg class="icon" viewBox="0 0 24 24">
@@ -2926,7 +2951,7 @@ img {
      Opened by long-pressing a poster in the Library grid.
 ================================================     -->
 <div id="posterPickerModal" class="modal" onclick="closePosterPickerOutside(event)">
-    <div class="modal-sheet" style="max-height: 80vh;">
+    <div class="modal-sheet">
         <div class="modal-header-nav">
             <button class="header-done-btn" onclick="confirmPosterPickerChanges()">Done</button>
             <button class="close-button" onclick="closePosterPicker()" aria-label="Close">
@@ -2954,7 +2979,7 @@ img {
      on Home's hero card instead of permanently occupying Home space.
 ================================================     -->
 <div id="settingsModal" class="modal" onclick="closeSettingsOutside(event)">
-    <div class="modal-sheet" style="max-height: 85vh;">
+    <div class="modal-sheet">
         <div class="modal-header-nav">
             <button class="close-button" onclick="closeSettingsSheet()" aria-label="Close">
                 <svg class="icon" viewBox="0 0 24 24">
@@ -2967,25 +2992,74 @@ img {
         <div class="modal-content" style="padding-top: 60px;">
             <h2 class="poster-picker-title">Settings</h2>
 
-            <div class="hero-account-actions" style="margin-top: 16px;">
-                <button class="hero-signout-btn" onclick="handleSignOut()">Sign Out</button>
-                <button class="hero-delete-link" onclick="handleDeleteAccount()">Delete Account</button>
+            <div class="settings-profile-row">
+                <div class="large-avatar" id="settingsAvatar">G</div>
+                <div>
+                    <div class="home-name" id="settingsName">Guest</div>
+                    <div class="home-subtitle" id="settingsEmailSubtitle">Guest Account</div>
+                </div>
             </div>
 
-            <div class="hero-notify-row">
-                <div>
-                    <div class="hero-notify-title">Stay in the loop</div>
-                    <div class="hero-notify-sub">Get alerts for new episodes & releases.</div>
+            <div class="settings-section">
+                <div class="section-header"><div class="section-title settings-section-title">Preferences</div></div>
+                <div class="analytics-card settings-card">
+                    <div class="settings-row">
+                        <div class="settings-row-icon" style="background: var(--blue-gradient);">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        </div>
+                        <div class="settings-row-text">
+                            <div class="settings-row-title">Stay in the loop</div>
+                            <div class="settings-row-sub">Get alerts for new episodes & releases.</div>
+                        </div>
+                        <button class="hero-pill-btn" id="notificationBtn" onclick="requestNotificationPermission()">Enable</button>
+                    </div>
+
+                    <div class="settings-row">
+                        <div class="settings-row-icon" style="background: var(--green-gradient);">
+                            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                        </div>
+                        <div class="settings-row-text">
+                            <div class="settings-row-title">Streaming region</div>
+                            <div class="settings-row-sub">Sets which country's "where to watch" info you see.</div>
+                        </div>
+                        <button class="hero-pill-btn region-btn" id="regionPillBtn" onclick="openRegionPicker()">Region</button>
+                    </div>
+
+                    <div class="settings-row">
+                        <div class="settings-row-icon" style="background: var(--blue-gradient);">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M12 2l2.5 6.5L21 11l-6.5 2.5L12 20l-2.5-6.5L3 11l6.5-2.5L12 2z"/></svg>
+                        </div>
+                        <div class="settings-row-text">
+                            <div class="settings-row-title">NovaWrapped</div>
+                            <div class="settings-row-sub">Releases January 1, 2027.</div>
+                        </div>
+                        <button class="hero-pill-btn" onclick="goToWrapped()">Coming Soon</button>
+                    </div>
                 </div>
-                <button class="hero-pill-btn" id="notificationBtn" onclick="requestNotificationPermission()">Enable</button>
             </div>
 
-            <div class="hero-notify-row">
-                <div>
-                    <div class="hero-notify-title">Streaming region</div>
-                    <div class="hero-notify-sub">Sets which country's "where to watch" info you see.</div>
+            <div class="settings-section">
+                <div class="section-header"><div class="section-title settings-section-title">Account</div></div>
+                <div class="analytics-card settings-card settings-card-list">
+                    <button class="settings-action-row" onclick="handleSignOut()">
+                        <div class="settings-row-icon" style="background: var(--flat-blue);">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        </div>
+                        <div class="settings-row-text">
+                            <div class="settings-row-title">Sign Out</div>
+                        </div>
+                        <svg class="icon icon-small settings-row-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                    </button>
+                    <button class="settings-action-row danger" onclick="handleDeleteAccount()">
+                        <div class="settings-row-icon" style="background: var(--red-gradient);">
+                            <svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                        </div>
+                        <div class="settings-row-text">
+                            <div class="settings-row-title">Delete Account</div>
+                        </div>
+                        <svg class="icon icon-small settings-row-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                    </button>
                 </div>
-                <button class="hero-pill-btn region-btn" id="regionPillBtn" onclick="openRegionPicker()">Region</button>
             </div>
         </div>
     </div>
@@ -2995,7 +3069,7 @@ img {
      STREAMING REGION PICKER
 ================================================     -->
 <div id="regionPickerModal" class="modal" onclick="closeRegionPickerOutside(event)">
-    <div class="modal-sheet region-picker-sheet" style="height: 80vh; max-height: 80vh;">
+    <div class="modal-sheet region-picker-sheet">
         <div class="modal-header-nav">
             <button class="close-button" onclick="closeRegionPicker()" aria-label="Close">
                 <svg class="icon" viewBox="0 0 24 24">
@@ -3127,15 +3201,6 @@ let state = {
     // or an existing profile doc is loaded - see proceedToApp().
     region: null
 };
-
-// In-memory only (never written to Firestore) - Firebase Auth already
-// tracks this authoritatively per account via user.metadata.creationTime,
-// so there's nothing to duplicate/backfill. Set on every sign-in in
-// proceedToApp(). Used to gate what counts toward a yearly "Wrapped"-style
-// recap: the first week after an account is created is excluded, since
-// that's when most new users bulk-add a backlog of shows/movies they'd
-// already watched long before joining, not real-time viewing.
-let accountCreatedAt = null;
 
 // True once the signed-in user's library has been fetched at least once
 // this session - lets Home/Library tell "genuinely empty" apart from
@@ -3539,7 +3604,7 @@ async function saveItem(item) {
 
 async function saveUserProfile() {
     try {
-        if (!auth || !auth.currentUser || !db) return;
+        if (!auth || !auth.currentUser || !db) return false;
         await db.collection("users")
             .doc(auth.currentUser.uid)
             .set({
@@ -3547,8 +3612,10 @@ async function saveUserProfile() {
                 activeProfileId: state.activeProfileId,
                 region: state.region
             }, { merge: true });
+        return true;
     } catch (err) {
         console.error("Firestore user profile save FAILED", err);
+        return false;
     }
 }
 
@@ -4005,6 +4072,13 @@ function closeSettingsSheet() {
 
 function closeSettingsOutside(event) {
     if (event.target.id === "settingsModal") closeSettingsSheet();
+}
+
+// Wrapped is its own page now (not a modal) - it needs its own Firebase
+// session and Firestore reads, same-tab navigation so the signed-in
+// session carries over via Firebase Auth's local persistence.
+function goToWrapped() {
+    window.location.href = `${NOVAWATCH_APP_URL}nova-wrapped/`;
 }
 
 // Opens the themed confirmation dialog instead of a native browser
@@ -4578,10 +4652,22 @@ function closeRegionPickerOutside(event) {
 // auto-detection from here on for this account.
 async function selectRegion(newRegion) {
     if (!SUPPORTED_REGIONS.includes(newRegion)) return;
+    const previousRegion = state.region;
     state.region = newRegion;
     syncRegionUI();
     closeRegionPicker();
-    await saveUserProfile();
+
+    const saved = await saveUserProfile();
+    if (!saved) {
+        // Roll back so the UI doesn't keep showing a region that never
+        // actually made it to Firestore - it'd revert on the next reload
+        // anyway, so better to be upfront about it now.
+        state.region = previousRegion;
+        syncRegionUI();
+        showToast("Couldn't save region - check your connection and try again.", "error");
+        return;
+    }
+
     showToast(`Streaming region set to ${REGION_NAMES[newRegion]}.`, "success");
     // Deliberately not force-refreshing every library item's stored watch
     // providers here - that's a TMDB call per item, which doesn't scale to
@@ -4879,6 +4965,13 @@ if (auth) {
                 homeEmailSubtitleEl.style.display = "";
                 homeEmailSubtitleEl.textContent = "Please sign in";
             }
+            const settingsNameEl = document.getElementById("settingsName");
+            if (settingsNameEl) settingsNameEl.textContent = "Guest";
+            const settingsEmailSubtitleEl = document.getElementById("settingsEmailSubtitle");
+            if (settingsEmailSubtitleEl) {
+                settingsEmailSubtitleEl.style.display = "";
+                settingsEmailSubtitleEl.textContent = "Please sign in";
+            }
         }
     });
 }
@@ -4907,13 +5000,12 @@ async function proceedToApp(user, authScreen, mainApp) {
             const largeAvatar = document.getElementById("largeAvatar");
             if (largeAvatar) largeAvatar.textContent = initial;
 
-            // Firebase Auth already tracks this per-account, authoritatively -
-            // no Firestore field to keep in sync, no backfill needed for
-            // existing users. See the accountCreatedAt declaration above for
-            // what this gates.
-            accountCreatedAt = (user.metadata && user.metadata.creationTime)
-                ? new Date(user.metadata.creationTime).toISOString()
-                : null;
+            const settingsNameEl = document.getElementById("settingsName");
+            if (settingsNameEl) settingsNameEl.textContent = displayName;
+            const settingsEmailSubtitleEl = document.getElementById("settingsEmailSubtitle");
+            if (settingsEmailSubtitleEl) settingsEmailSubtitleEl.style.display = "none";
+            const settingsAvatarEl = document.getElementById("settingsAvatar");
+            if (settingsAvatarEl) settingsAvatarEl.textContent = initial;
 
             // Always land on Home on load/refresh, regardless of whichever
             // tab the user was last on.
@@ -6525,6 +6617,24 @@ function updateHomeUI() {
 
     const largeAvatarEl = document.getElementById("largeAvatar");
     if (largeAvatarEl) largeAvatarEl.textContent = initial;
+
+    // Settings sheet shows the same identity - mirrored rather than shared
+    // markup since it's a separate part of the DOM.
+    const settingsNameEl = document.getElementById("settingsName");
+    if (settingsNameEl) settingsNameEl.textContent = displayName;
+
+    const settingsEmailSub = document.getElementById("settingsEmailSubtitle");
+    if (settingsEmailSub) {
+        if (auth && auth.currentUser) {
+            settingsEmailSub.style.display = "none";
+        } else {
+            settingsEmailSub.style.display = "";
+            settingsEmailSub.textContent = "Guest Account";
+        }
+    }
+
+    const settingsAvatarEl = document.getElementById("settingsAvatar");
+    if (settingsAvatarEl) settingsAvatarEl.textContent = initial;
 }
 
 /* =========================================================
@@ -7412,8 +7522,16 @@ async function markShowStoppedById(id) {
     const item = state.library.find(i => i.id === id);
     if (!item) return;
     item.isStopped = true;
-    await saveItem(item);
     refreshActivePage();
+
+    const saved = await saveItem(item);
+    if (!saved) {
+        item.isStopped = false;
+        refreshActivePage();
+        showToast(`Couldn't save - "${item.title}" wasn't marked as Stopped Watching.`, "error");
+        return;
+    }
+
     showToast(`Marked "${item.title}" as Stopped Watching.`, "success");
 }
 
@@ -7438,10 +7556,13 @@ async function removeLibraryItem(item) {
                 await db.collection("users").doc(uid).collection("archivedShows").doc(item.id).set(item);
             }
             await db.collection("users").doc(uid).collection("library").doc(item.id).delete();
+            return true;
         } catch (err) {
             console.error("Failed to remove item:", err);
+            return false;
         }
     }
+    return false;
 }
 
 async function removeLibraryItemById(id) {
@@ -7451,12 +7572,23 @@ async function removeLibraryItemById(id) {
 
     state.library.splice(idx, 1);
     refreshActivePage();
+
+    const removed = await removeLibraryItem(removedItem);
+
+    if (!removed) {
+        // Put it back where it was rather than leaving the UI showing the
+        // library as if the removal worked when Firestore never actually
+        // confirmed it - a reload would've brought it back anyway.
+        state.library.splice(idx, 0, removedItem);
+        refreshActivePage();
+        showToast(`Couldn't remove "${removedItem.title}" - check your connection and try again.`, "error");
+        return;
+    }
+
     const message = removedItem.type !== 'movie'
         ? `Removed "${removedItem.title}" - your watch history is saved if you add it back.`
         : `Removed "${removedItem.title}" from your library.`;
     showToast(message, "success");
-
-    await removeLibraryItem(removedItem);
 }
 
 async function removeCurrentItem() {
@@ -7473,7 +7605,13 @@ async function removeCurrentItem() {
     closeModal();
     refreshActivePage();
 
-    await removeLibraryItem(removedItem);
+    const removed = await removeLibraryItem(removedItem);
+
+    if (!removed) {
+        state.library.splice(removedIndex, 0, removedItem);
+        refreshActivePage();
+        showToast(`Couldn't remove "${removedItem.title}" - check your connection and try again.`, "error");
+    }
 }
 
 // A quick, always-visible way to remove any card straight from a library
