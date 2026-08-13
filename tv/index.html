@@ -2776,7 +2776,7 @@ img {
 
     <div style="margin-top: 20px;">
         <div class="section-header">
-            <div id="searchResultsHeading" class="section-title" style="font-size: 16px; color: var(--text-secondary);">Trending Shows</div>
+            <div id="searchResultsHeading" class="section-title" style="font-size: 16px; color: var(--text-secondary);">For You</div>
         </div>
         <div id="searchResultsList" class="search-results-grid"></div>
     </div>
@@ -3433,7 +3433,7 @@ function clearSearch(inputId) {
     if (!input) return;
     input.value = "";
     input.parentElement.classList.remove("has-text");
-    if (inputId === "onlineSearchInput") fetchTrending();
+    if (inputId === "onlineSearchInput") fetchForYou();
     if (inputId === "tvLibrarySearchInput") renderTVLibrarySection();
     if (inputId === "movieLibrarySearchInput") renderMovieLibrarySection();
     if (inputId === "regionSearchInput") filterRegionOptions("");
@@ -5324,7 +5324,7 @@ function setSearchType(type) {
     if (query) {
         performTMDBSearch(query);
     } else {
-        fetchTrending();
+        fetchForYou();
     }
 }
 
@@ -5337,7 +5337,7 @@ function initSearchPage() {
         const query = e.target.value.trim();
 
         if (!query) {
-            fetchTrending();
+            fetchForYou();
             return;
         }
 
@@ -5360,7 +5360,7 @@ function initSearchPage() {
         });
     }
 
-    fetchTrending();
+    fetchForYou();
 }
 
 // Rebuilding a categorized poster grid on every single keystroke can feel
@@ -5369,6 +5369,22 @@ function initSearchPage() {
 function debounceLibraryFilter(key, renderFn) {
     clearTimeout(libSearchDebounceTimers[key]);
     libSearchDebounceTimers[key] = setTimeout(renderFn, 120);
+}
+
+// Picks the library items most worth seeding recommendations from: highest
+// TMDB rating first (a proxy for "titles the person actually likes"), most
+// recently added as the tiebreaker. Capped at 5 seeds to keep this to a
+// handful of parallel requests rather than one per library item.
+function getForYouSeeds(type) {
+    return state.library
+        .filter(item => item.type === type && item.tmdbId)
+        .sort((a, b) => {
+            const ratingA = parseFloat(a.rating) || 0;
+            const ratingB = parseFloat(b.rating) || 0;
+            if (ratingB !== ratingA) return ratingB - ratingA;
+            return new Date(b.addedAt || 0) - new Date(a.addedAt || 0);
+        })
+        .slice(0, 5);
 }
 
 async function fetchTrending() {
@@ -5397,6 +5413,72 @@ async function fetchTrending() {
     } catch (error) {
         console.error("Error fetching trending media:", error);
         listContainer.innerHTML = emptyState("Unable to load trending items", "Please check your network connection.");
+    }
+}
+
+// Discover's default (no search query) view. Seeds TMDB's per-title
+// /recommendations endpoint from a handful of the person's own
+// highest-rated/most-recent library items, merges and ranks the results by
+// how many seeds recommended them (then by TMDB popularity), and drops
+// anything already in the library. Falls back to plain Trending when the
+// library has nothing of this type yet to seed from.
+async function fetchForYou() {
+    const listContainer = document.getElementById("searchResultsList");
+    const heading = document.getElementById("searchResultsHeading");
+    const mediaLabel = currentSearchType === 'movie' ? 'Movies' : 'TV Shows';
+
+    const seeds = getForYouSeeds(currentSearchType);
+    if (seeds.length === 0) {
+        return fetchTrending();
+    }
+
+    if (heading) heading.textContent = `For You`;
+    listContainer.innerHTML = skeletonRows();
+
+    const endpointFor = (tmdbId) => currentSearchType === 'movie'
+        ? `https://api.themoviedb.org/3/movie/${tmdbId}/recommendations?api_key=${TMDB_API_KEY}`
+        : `https://api.themoviedb.org/3/tv/${tmdbId}/recommendations?api_key=${TMDB_API_KEY}`;
+
+    try {
+        const responses = await Promise.all(
+            seeds.map(seed =>
+                fetch(endpointFor(seed.tmdbId))
+                    .then(res => res.ok ? res.json() : { results: [] })
+                    .catch(() => ({ results: [] }))
+            )
+        );
+
+        const libraryTmdbIds = new Set(state.library.map(item => item.tmdbId));
+        const scored = new Map();
+
+        for (const data of responses) {
+            for (const item of (data.results || [])) {
+                if (libraryTmdbIds.has(item.id)) continue;
+                if (scored.has(item.id)) {
+                    scored.get(item.id).hits += 1;
+                } else {
+                    scored.set(item.id, { item, hits: 1 });
+                }
+            }
+        }
+
+        const ranked = [...scored.values()]
+            .sort((a, b) => {
+                if (b.hits !== a.hits) return b.hits - a.hits;
+                return (b.item.vote_average || 0) - (a.item.vote_average || 0);
+            })
+            .map(entry => entry.item)
+            .slice(0, 20);
+
+        if (ranked.length === 0) {
+            listContainer.innerHTML = emptyState("Nothing New to Suggest Yet", `Add a few more ${mediaLabel.toLowerCase()} you like and check back for personalized picks.`);
+            return;
+        }
+
+        renderSearchResults(ranked);
+    } catch (error) {
+        console.error("Error fetching For You recommendations:", error);
+        listContainer.innerHTML = emptyState("Unable to Load Recommendations", "Please check your network connection.");
     }
 }
 
@@ -6013,7 +6095,7 @@ function showPage(page, subType = null, focusSearch = false) {
             setSearchType(subType);
         } else {
             const query = document.getElementById("onlineSearchInput").value.trim();
-            if (!query) fetchTrending();
+            if (!query) fetchForYou();
         }
 
         // Only auto-focus when the person actually tapped their way to
