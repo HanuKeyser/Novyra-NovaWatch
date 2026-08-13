@@ -1972,6 +1972,31 @@ img {
     gap: 16px;
 }
 
+/* Opens the Settings sheet (account actions, notifications, streaming
+   region) - same circular glass treatment as .close-button so it reads
+   as part of the same control language, just living on the hero card
+   instead of a modal header. */
+.settings-entry-btn {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--glass-sheen), var(--surface);
+    color: var(--text-secondary);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow-sm);
+    transition: transform 0.15s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.settings-entry-btn:active {
+    transform: scale(0.9) rotate(20deg);
+}
+
 .hero-signout-btn {
     flex: 1;
     height: 40px;
@@ -2733,7 +2758,10 @@ img {
 <main id="homePage" class="page active">
     <div class="tab-content-wrapper">
         
-        <!-- Hero Card -->
+        <!-- Hero Card - just identity + an entry point into Settings now;
+             account actions and preferences live in the Settings sheet
+             (see #settingsModal) instead of permanently taking up Home
+             space. -->
         <div class="hero-card">
             <div class="hero-top">
                 <div class="hero-profile">
@@ -2743,27 +2771,12 @@ img {
                         <div class="home-subtitle" id="homeEmailSubtitle">Guest Account</div>
                     </div>
                 </div>
-            </div>
-
-            <div class="hero-account-actions">
-                <button class="hero-signout-btn" onclick="handleSignOut()">Sign Out</button>
-                <button class="hero-delete-link" onclick="handleDeleteAccount()">Delete Account</button>
-            </div>
-
-            <div class="hero-notify-row">
-                <div>
-                    <div class="hero-notify-title">Stay in the loop</div>
-                    <div class="hero-notify-sub">Get alerts for new episodes & releases.</div>
-                </div>
-                <button class="hero-pill-btn" id="notificationBtn" onclick="requestNotificationPermission()">Enable</button>
-            </div>
-
-            <div class="hero-notify-row">
-                <div>
-                    <div class="hero-notify-title">Streaming region</div>
-                    <div class="hero-notify-sub">Sets which country's "where to watch" info you see.</div>
-                </div>
-                <button class="hero-pill-btn region-btn" id="regionPillBtn" onclick="openRegionPicker()">Region</button>
+                <button class="settings-entry-btn" onclick="openSettingsSheet()" aria-label="Settings">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                </button>
             </div>
         </div>
 
@@ -2931,6 +2944,49 @@ img {
                 <button id="posterPickerTabBackdrop" class="segmented-btn" onclick="setPosterPickerTab('backdrop')">Backdrop</button>
             </div>
             <div id="posterPickerGrid" class="poster-picker-grid"></div>
+        </div>
+    </div>
+</div>
+
+<!-- =====================================================
+     SETTINGS SHEET
+     Account actions & preferences, reached by tapping the gear icon
+     on Home's hero card instead of permanently occupying Home space.
+================================================     -->
+<div id="settingsModal" class="modal" onclick="closeSettingsOutside(event)">
+    <div class="modal-sheet" style="max-height: 85vh;">
+        <div class="modal-header-nav">
+            <button class="close-button" onclick="closeSettingsSheet()" aria-label="Close">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M6 6l12 12"/>
+                    <path d="M18 6L6 18"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="modal-content" style="padding-top: 60px;">
+            <h2 class="poster-picker-title">Settings</h2>
+
+            <div class="hero-account-actions" style="margin-top: 16px;">
+                <button class="hero-signout-btn" onclick="handleSignOut()">Sign Out</button>
+                <button class="hero-delete-link" onclick="handleDeleteAccount()">Delete Account</button>
+            </div>
+
+            <div class="hero-notify-row">
+                <div>
+                    <div class="hero-notify-title">Stay in the loop</div>
+                    <div class="hero-notify-sub">Get alerts for new episodes & releases.</div>
+                </div>
+                <button class="hero-pill-btn" id="notificationBtn" onclick="requestNotificationPermission()">Enable</button>
+            </div>
+
+            <div class="hero-notify-row">
+                <div>
+                    <div class="hero-notify-title">Streaming region</div>
+                    <div class="hero-notify-sub">Sets which country's "where to watch" info you see.</div>
+                </div>
+                <button class="hero-pill-btn region-btn" id="regionPillBtn" onclick="openRegionPicker()">Region</button>
+            </div>
         </div>
     </div>
 </div>
@@ -3446,10 +3502,16 @@ function setLastLibraryCheck(date) {
 /* =========================================================
    FIREBASE CLOUD SYNC & AUTHENTICATION
 ========================================================= */
+// Returns true only if the write actually reached Firestore - callers that
+// show a "Saved"/"Updated" toast should check this rather than assuming
+// success just because saveItem() didn't throw past them. Previously this
+// swallowed every failure (offline, permission error, etc.) into a
+// console.error only, so callers like the poster/backdrop picker were
+// showing a success toast even when nothing was actually saved.
 async function saveItem(item) {
     try {
         if (!auth || !auth.currentUser || !db || !item || !item.id) {
-            return;
+            return false;
         }
 
         // Belt-and-suspenders: a shared/searched item opened before being
@@ -3460,7 +3522,7 @@ async function saveItem(item) {
         // silently write a placeholder doc into someone's library.
         if (item.isPreview || item.id.startsWith('preview-')) {
             console.warn(`Refused to save preview item "${item.id}" - it isn't in the library yet.`);
-            return;
+            return false;
         }
 
         await db.collection("users")
@@ -3468,8 +3530,10 @@ async function saveItem(item) {
             .collection("library")
             .doc(item.id)
             .set(item, { merge: true });
+        return true;
     } catch (err) {
         console.error(`Firestore save item ${item.id} FAILED`, err);
+        return false;
     }
 }
 
@@ -3893,16 +3957,68 @@ async function deleteAllUserData(uid) {
     await db.collection("users").doc(uid).delete().catch(() => {});
 }
 
+/* =========================================================
+   BODY SCROLL LOCK (while any modal/sheet is open)
+   A counter rather than a plain boolean, because modals can nest -
+   the episode-details sheet opens on top of the show-details modal,
+   and closing the inner one shouldn't unlock scroll while the outer
+   one is still open. Saves/restores scroll position via body's
+   top offset rather than plain `overflow: hidden`, since iOS Safari
+   is notorious for letting background touch-scroll leak through a
+   fixed-position overlay unless the body itself is also pinned.
+========================================================= */
+let bodyScrollLockCount = 0;
+let savedScrollY = 0;
+
+function lockBodyScroll() {
+    if (bodyScrollLockCount === 0) {
+        savedScrollY = window.scrollY;
+        document.body.style.position = "fixed";
+        document.body.style.top = `-${savedScrollY}px`;
+        document.body.style.width = "100%";
+    }
+    bodyScrollLockCount++;
+}
+
+function unlockBodyScroll() {
+    bodyScrollLockCount = Math.max(0, bodyScrollLockCount - 1);
+    if (bodyScrollLockCount === 0) {
+        document.body.style.position = "";
+        document.body.style.top = "";
+        document.body.style.width = "";
+        window.scrollTo(0, savedScrollY);
+    }
+}
+
+// Settings sheet - account actions (Sign Out / Delete Account) and
+// preferences (notifications, streaming region), reached from the gear
+// icon on Home's hero card rather than sitting permanently on Home.
+function openSettingsSheet() {
+    document.getElementById("settingsModal").classList.add("open");
+    lockBodyScroll();
+}
+
+function closeSettingsSheet() {
+    document.getElementById("settingsModal").classList.remove("open");
+    unlockBodyScroll();
+}
+
+function closeSettingsOutside(event) {
+    if (event.target.id === "settingsModal") closeSettingsSheet();
+}
+
 // Opens the themed confirmation dialog instead of a native browser
 // confirm() - the actual deletion only runs from confirmDeleteAccount()
 // below, once the person taps "Delete" inside it.
 function handleDeleteAccount() {
     if (!auth || !auth.currentUser) return;
     document.getElementById("deleteAccountModal").classList.add("open");
+    lockBodyScroll();
 }
 
 function closeDeleteAccountModal() {
     document.getElementById("deleteAccountModal").classList.remove("open");
+    unlockBodyScroll();
 }
 
 function closeDeleteAccountModalOutside(event) {
@@ -4446,10 +4562,12 @@ function openRegionPicker() {
     }
     filterRegionOptions("");
     document.getElementById("regionPickerModal").classList.add("open");
+    lockBodyScroll();
 }
 
 function closeRegionPicker() {
     document.getElementById("regionPickerModal").classList.remove("open");
+    unlockBodyScroll();
 }
 
 function closeRegionPickerOutside(event) {
@@ -5159,6 +5277,7 @@ async function openSearchResultDetails(tmdbId, type) {
 
             updateModalContent();
             document.getElementById("detailsModal").classList.add("open");
+            lockBodyScroll();
             loadWatchAvailability(currentItem);
             return;
         }
@@ -5201,6 +5320,7 @@ async function openSearchResultDetails(tmdbId, type) {
         selectedSeason = 1;
         updateModalContent();
         document.getElementById("detailsModal").classList.add("open");
+        lockBodyScroll();
         loadWatchAvailability(currentItem);
 
         let episodes = [];
@@ -6531,6 +6651,7 @@ function openDetails(itemId) {
 
     updateModalContent();
     document.getElementById("detailsModal").classList.add("open");
+    lockBodyScroll();
     loadWatchAvailability(currentItem);
 
     // Cached data renders immediately above; quietly pull the latest TMDB
@@ -6566,6 +6687,7 @@ async function refreshOpenItemFromTMDB(item) {
 
 function closeModal() {
     document.getElementById("detailsModal").classList.remove("open");
+    unlockBodyScroll();
     currentItem = null;
     refreshActivePage();
 }
@@ -6913,6 +7035,13 @@ let posterPickerImages = { posters: [], backdrops: [] };
 // they tap Done, so one visit to the picker can update both.
 let pendingPosterUrl = null;
 let pendingBackdropUrl = null;
+// Whether the person actually tapped an image in this session, separate
+// from pendingPosterUrl/pendingBackdropUrl's value. Without this, tapping
+// the image that's already the current poster/backdrop (e.g. to "lock it
+// in" against future auto-updates) compared equal to the existing value
+// and silently did nothing - customPoster/customBackdrop never got set.
+let posterPicked = false;
+let backdropPicked = false;
 
 async function openChangePosterPicker(itemId, type) {
     const item = getItem(itemId);
@@ -6923,6 +7052,8 @@ async function openChangePosterPicker(itemId, type) {
     posterPickerTab = 'poster';
     pendingPosterUrl = item.poster || null;
     pendingBackdropUrl = item.backdrop || null;
+    posterPicked = false;
+    backdropPicked = false;
 
     document.getElementById("posterPickerTabPoster").classList.add("active");
     document.getElementById("posterPickerTabBackdrop").classList.remove("active");
@@ -6931,6 +7062,7 @@ async function openChangePosterPicker(itemId, type) {
     grid.className = "poster-picker-grid";
     grid.innerHTML = skeletonGrid();
     document.getElementById("posterPickerModal").classList.add("open");
+    lockBodyScroll();
 
     posterPickerImages = await fetchItemImages(item.tmdbId, type);
 
@@ -6980,8 +7112,10 @@ function renderPosterPickerGrid() {
 function selectPickerImage(url) {
     if (posterPickerTab === 'poster') {
         pendingPosterUrl = url;
+        posterPicked = true;
     } else {
         pendingBackdropUrl = url;
+        backdropPicked = true;
     }
     renderPosterPickerGrid();
 }
@@ -6993,13 +7127,25 @@ async function confirmPosterPickerChanges() {
         return;
     }
 
-    const posterChanged = pendingPosterUrl && pendingPosterUrl !== item.poster;
-    const backdropChanged = pendingBackdropUrl && pendingBackdropUrl !== item.backdrop;
+    // posterPicked/backdropPicked (not just a URL comparison) is what
+    // decides whether there's anything to save - see the flag declarations
+    // above for why: tapping the already-current image needs to count as
+    // "lock this one in" even though the URL itself didn't change.
+    const posterChanged = pendingPosterUrl && posterPicked;
+    const backdropChanged = pendingBackdropUrl && backdropPicked;
 
     if (!posterChanged && !backdropChanged) {
         closePosterPicker();
         return;
     }
+
+    // Keep the previous values on hand so a failed save can be rolled back
+    // locally rather than leaving the in-memory item out of sync with what
+    // actually made it to Firestore.
+    const previousPoster = item.poster;
+    const previousCustomPoster = item.customPoster;
+    const previousBackdrop = item.backdrop;
+    const previousCustomBackdrop = item.customBackdrop;
 
     if (posterChanged) {
         item.poster = pendingPosterUrl;
@@ -7010,7 +7156,22 @@ async function confirmPosterPickerChanges() {
         item.customBackdrop = true;
     }
 
-    await saveItem(item);
+    const saved = await saveItem(item);
+
+    if (!saved) {
+        // Roll back the in-memory change so the app doesn't show a poster/
+        // backdrop it never actually managed to save, then say so honestly
+        // instead of the unconditional "updated" toast this used to show
+        // regardless of whether the Firestore write succeeded.
+        item.poster = previousPoster;
+        item.customPoster = previousCustomPoster;
+        item.backdrop = previousBackdrop;
+        item.customBackdrop = previousCustomBackdrop;
+        closePosterPicker();
+        showToast("Couldn't save - check your connection and try again.", "error");
+        return;
+    }
+
     refreshActivePage();
     if (currentItem && currentItem.id === item.id) updateModalContent();
     closePosterPicker();
@@ -7023,6 +7184,7 @@ async function confirmPosterPickerChanges() {
 
 function closePosterPicker() {
     document.getElementById("posterPickerModal").classList.remove("open");
+    unlockBodyScroll();
     posterPickerItemId = null;
     pendingPosterUrl = null;
     pendingBackdropUrl = null;
@@ -7119,10 +7281,12 @@ function openEpisodeDetails(epId) {
     upToHereBtn.style.display = hasEarlierUnwatched ? "flex" : "none";
 
     document.getElementById("episodeDetailsModal").classList.add("open");
+    lockBodyScroll();
 }
 
 function closeEpisodeModal() {
     document.getElementById("episodeDetailsModal").classList.remove("open");
+    unlockBodyScroll();
     currentEpisode = null;
 }
 
