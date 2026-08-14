@@ -1418,6 +1418,38 @@ img {
     -webkit-backdrop-filter: blur(26px);
 }
 
+/* Content-sized variant for modals whose content doesn't need (and
+   shouldn't force) a full-screen takeover - an episode with a short
+   description, a movie with a short description, the avatar grid, the
+   achievements list. Centered card instead of edge-to-edge, height
+   determined by content up to a cap, scrollable within itself if content
+   ever exceeds that cap - same glass-card treatment as .confirm-card
+   rather than the flat full-bleed fill .modal-sheet normally gets. */
+.modal.modal-compact {
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.modal-sheet.modal-sheet-compact {
+    width: 100%;
+    max-width: 460px;
+    height: auto;
+    max-height: 85vh;
+    border-radius: var(--radius-2xl);
+    background: var(--glass-sheen), rgba(248, 250, 252, 0.86);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.modal-sheet-compact .modal-backdrop-header {
+    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+}
+
+html[data-theme="dark"] .modal-sheet-compact {
+    background: var(--glass-sheen), rgba(28, 28, 30, 0.92);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
 .modal.open {
     display: flex;
 }
@@ -1621,6 +1653,10 @@ img {
 .rewatch-icon-badge {
     background: var(--glass-sheen), var(--blue-gradient);
     box-shadow: 0 8px 20px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.appearance-icon-tile {
+    background: linear-gradient(135deg, #48484a, #1c1c1e);
 }
 
 .confirm-title {
@@ -2402,6 +2438,9 @@ img {
     justify-content: center;
     color: white;
     position: relative;
+    padding: 0;
+    overflow: hidden;
+    background: var(--surface-2);
     box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.3);
     transition: transform 0.15s ease;
 }
@@ -2425,6 +2464,7 @@ img {
     align-items: center;
     justify-content: center;
     border-radius: var(--radius-lg);
+    overflow: hidden;
     /* A third, lighter stop plus a soft inner shadow along the bottom
        edge gives the fill some actual depth (light catching the top,
        falling off toward the bottom) instead of a flat two-tone chip. */
@@ -2932,6 +2972,14 @@ html[data-theme="dark"] #authScreen .search-type-btn.active {
     box-shadow: 0 4px 12px rgba(10, 132, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
+html[data-theme="dark"] .appearance-icon-tile {
+    background: linear-gradient(135deg, #d1d1d6, #8e8e93);
+}
+
+html[data-theme="dark"] .appearance-icon-tile .appearance-icon {
+    color: #1c1c1e;
+}
+
 html[data-theme="dark"] .auth-overlay-card {
     background: rgba(28, 28, 30, 0.85);
     box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -3281,8 +3329,8 @@ html[data-theme="dark"] .skeleton {
 <!-- =====================================================
      EPISODE DETAILS MODAL
 ================================================     -->
-<div id="episodeDetailsModal" class="modal" onclick="closeEpisodeModalOutside(event)">
-    <div class="modal-sheet">
+<div id="episodeDetailsModal" class="modal modal-compact" onclick="closeEpisodeModalOutside(event)">
+    <div class="modal-sheet modal-sheet-compact">
         <div class="modal-header-nav">
             <button class="close-button" onclick="closeEpisodeModal()" aria-label="Close">
                 <svg class="icon" viewBox="0 0 24 24">
@@ -3350,8 +3398,8 @@ html[data-theme="dark"] .skeleton {
      AVATAR_OPTIONS for why (Firebase Storage, needed for uploads, isn't
      on the free Spark plan).
 ================================================     -->
-<div id="avatarPickerModal" class="modal" onclick="closeAvatarPickerOutside(event)">
-    <div class="modal-sheet">
+<div id="avatarPickerModal" class="modal modal-compact" onclick="closeAvatarPickerOutside(event)">
+    <div class="modal-sheet modal-sheet-compact">
         <div class="modal-header-nav">
             <button class="close-button" onclick="closeAvatarPicker()" aria-label="Close">
                 <svg class="icon" viewBox="0 0 24 24">
@@ -3374,8 +3422,8 @@ html[data-theme="dark"] .skeleton {
      computeAchievementStats() - rather than tracked as its own synced
      record, so this costs nothing extra against Firestore's free quota.
 ================================================     -->
-<div id="achievementsModal" class="modal" onclick="closeAchievementsModalOutside(event)">
-    <div class="modal-sheet">
+<div id="achievementsModal" class="modal modal-compact" onclick="closeAchievementsModalOutside(event)">
+    <div class="modal-sheet modal-sheet-compact">
         <div class="modal-header-nav">
             <button class="close-button" onclick="closeAchievementsModal()" aria-label="Close">
                 <svg class="icon" viewBox="0 0 24 24">
@@ -3454,8 +3502,8 @@ html[data-theme="dark"] .skeleton {
                 <div class="section-header"><div class="section-title settings-section-title">Preferences</div></div>
                 <div class="analytics-card settings-card">
                     <div class="settings-row">
-                        <div class="settings-row-icon" style="background: linear-gradient(135deg, #48484a, #1c1c1e);">
-                            <svg class="icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                        <div class="settings-row-icon appearance-icon-tile">
+                            <svg class="icon appearance-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                         </div>
                         <div class="settings-row-text">
                             <div class="settings-row-title">Appearance</div>
@@ -3762,23 +3810,23 @@ function syncThemeToggleUI() {
 
 /* =========================================================
    AVATAR PICKER
-   A curated, illustrated set rather than a photo upload - letting someone
-   upload their own image needs Cloud Storage, which Firebase removed from
-   the free Spark plan (as of Feb 2026, it requires Blaze). This keeps the
-   feature entirely on Firestore: just one small string field
-   (profiles[0].avatarId) synced through the existing saveUserProfile(),
-   no new storage/billing dependency. Icons are inline SVG rather than
-   image files for the same reason - nothing to host.
+   A curated set of hosted images rather than a photo upload - letting
+   someone upload their own image needs Cloud Storage, which Firebase
+   removed from the free Spark plan (as of Feb 2026, it requires Blaze).
+   This keeps the feature entirely on Firestore: just one small string
+   field (profiles[0].avatarId) synced through the existing
+   saveUserProfile(), no new storage/billing dependency of its own - these
+   images are served from novyra.co.za directly, same as the app icon.
 ========================================================= */
 const AVATAR_OPTIONS = [
-    { id: 'clapper', gradient: 'linear-gradient(150deg, #6babff 0%, #4792ff 45%, #0066cc 100%)', icon: '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M2 7l4-4h3l-4 4H2z"/><path d="M11 7l4-4h3l-4 4h-3z"/><line x1="2" y1="12" x2="22" y2="12"/>' },
-    { id: 'monitor', gradient: 'linear-gradient(150deg, #4ee08a 0%, #34d472 45%, #1fa851 100%)', icon: '<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>' },
-    { id: 'star', gradient: 'linear-gradient(150deg, #ffd166 0%, #ffb15c 45%, #ff9500 100%)', icon: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>' },
-    { id: 'heart', gradient: 'linear-gradient(150deg, #ff8a80 0%, #ff6961 45%, #ff3b30 100%)', icon: '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>' },
-    { id: 'headphones', gradient: 'linear-gradient(150deg, #5ee6dc 0%, #2dd4c4 45%, #14b8a6 100%)', icon: '<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>' },
-    { id: 'zap', gradient: 'linear-gradient(150deg, #b88cff 0%, #9d5cff 45%, #7c3aed 100%)', icon: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>' },
-    { id: 'eye', gradient: 'linear-gradient(150deg, #8b98ad 0%, #5a6b85 45%, #3d4a61 100%)', icon: '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>' },
-    { id: 'smile', gradient: 'linear-gradient(150deg, #ff9ecb 0%, #ff6fab 45%, #ee4d8f 100%)', icon: '<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>' }
+    { id: 'avatar-1', src: 'https://www.novyra.co.za/Avatar_1.png' },
+    { id: 'avatar-2', src: 'https://www.novyra.co.za/Avatar_2.png' },
+    { id: 'avatar-3', src: 'https://www.novyra.co.za/Avatar_3.png' },
+    { id: 'avatar-4', src: 'https://www.novyra.co.za/Avatar_4.png' },
+    { id: 'avatar-5', src: 'https://www.novyra.co.za/Avatar_5.png' },
+    { id: 'avatar-6', src: 'https://www.novyra.co.za/Avatar_6.png' },
+    { id: 'avatar-7', src: 'https://www.novyra.co.za/Avatar_7.png' },
+    { id: 'avatar-8', src: 'https://www.novyra.co.za/Avatar_8.png' }
 ];
 
 function getSelectedAvatar() {
@@ -3794,8 +3842,8 @@ function renderAvatarInto(el, initial) {
     if (!el) return;
     const avatar = getSelectedAvatar();
     if (avatar) {
-        el.style.background = avatar.gradient;
-        el.innerHTML = `<svg class="icon icon-large" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${avatar.icon}</svg>`;
+        el.style.background = '';
+        el.innerHTML = `<img src="${avatar.src}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">`;
     } else {
         el.style.background = '';
         el.textContent = initial;
@@ -3807,8 +3855,8 @@ function renderAvatarPickerGrid() {
     if (!grid) return;
     const currentId = state.profiles && state.profiles[0] ? state.profiles[0].avatarId : null;
     grid.innerHTML = AVATAR_OPTIONS.map(avatar => `
-        <button class="avatar-picker-option ${avatar.id === currentId ? 'selected' : ''}" style="background: ${avatar.gradient};" onclick="selectAvatar('${avatar.id}')" aria-label="Select avatar">
-            <svg class="icon icon-large" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${avatar.icon}</svg>
+        <button class="avatar-picker-option ${avatar.id === currentId ? 'selected' : ''}" onclick="selectAvatar('${avatar.id}')" aria-label="Select avatar">
+            <img src="${avatar.src}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">
         </button>
     `).join('');
 }
@@ -3957,16 +4005,14 @@ let achievementsCheckTimer = null;
 
 function checkAchievements() {
     if (!state.profiles || !state.profiles[0]) return;
-    const profile = state.profiles[0];
-    if (!profile.unlockedAchievements) profile.unlockedAchievements = [];
-
-    const allActiveUnlocked = ACHIEVEMENTS.every(ach => profile.unlockedAchievements.includes(ach.id));
-    if (allActiveUnlocked) return;
-
     clearTimeout(achievementsCheckTimer);
     achievementsCheckTimer = setTimeout(runAchievementsCheck, 400);
 }
 
+// Bidirectional: an achievement can be revoked, not just earned. If someone
+// accidentally logs a rewatch (unlocking "First Rewatch") and then removes
+// it, the achievement should stop being true, same as it never happened -
+// achievements reflect current state, not a one-way ratchet.
 function runAchievementsCheck() {
     if (!state.profiles || !state.profiles[0]) return;
     const profile = state.profiles[0];
@@ -3974,16 +4020,25 @@ function runAchievementsCheck() {
     const stats = computeAchievementStats();
 
     const newlyUnlocked = [];
+    let changed = false;
     ACHIEVEMENTS.forEach(ach => {
-        if (profile.unlockedAchievements.includes(ach.id)) return;
-        if (ach.tier === 'premium' && !state.isPremiumUser) return;
-        if (ach.check(stats)) {
+        const isUnlocked = profile.unlockedAchievements.includes(ach.id);
+        const meetsCondition = ach.check(stats);
+
+        if (!isUnlocked && meetsCondition) {
+            if (ach.tier === 'premium' && !state.isPremiumUser) return;
             profile.unlockedAchievements.push(ach.id);
             newlyUnlocked.push(ach);
+            changed = true;
+        } else if (isUnlocked && !meetsCondition) {
+            // Revoked quietly, no toast - losing an achievement isn't a
+            // moment worth interrupting someone for, unlike earning one.
+            profile.unlockedAchievements = profile.unlockedAchievements.filter(id => id !== ach.id);
+            changed = true;
         }
     });
 
-    if (newlyUnlocked.length > 0) {
+    if (changed) {
         saveUserProfile();
         newlyUnlocked.forEach(ach => showToast(`Achievement Unlocked: ${ach.title}`, 'success'));
     }
@@ -5249,7 +5304,7 @@ async function refreshItemFromTMDBInternal(item) {
                                     number: ep.episode_number,
                                     title: ep.name || `Episode ${ep.episode_number}`,
                                     overview: ep.overview || '',
-                                    still: ep.still_path ? `https://image.tmdb.org/t/p/w300${ep.still_path}` : '',
+                                    still: ep.still_path ? `https://image.tmdb.org/t/p/w780${ep.still_path}` : '',
                                     runtime: ep.runtime ? `${ep.runtime} min` : "45 min",
                                     watched: false,
                                     watchedAt: null,
@@ -6480,7 +6535,7 @@ async function openSearchResultDetails(tmdbId, type) {
                             number: ep.episode_number,
                             title: ep.name || `Episode ${ep.episode_number}`,
                             overview: ep.overview || '',
-                            still: ep.still_path ? `https://image.tmdb.org/t/p/w300${ep.still_path}` : '',
+                            still: ep.still_path ? `https://image.tmdb.org/t/p/w780${ep.still_path}` : '',
                             runtime: ep.runtime ? `${ep.runtime} min` : "45 min",
                             watched: false,
                             watchedAt: null,
@@ -6614,7 +6669,7 @@ async function importMediaData(id, type, buttonElement) {
                                 number: ep.episode_number,
                                 title: ep.name || `Episode ${ep.episode_number}`,
                                 overview: ep.overview || '',
-                                still: ep.still_path ? `https://image.tmdb.org/t/p/w300${ep.still_path}` : '',
+                                still: ep.still_path ? `https://image.tmdb.org/t/p/w780${ep.still_path}` : '',
                                 runtime: ep.runtime ? `${ep.runtime} min` : "45 min",
                                 watched: false,
                                 watchedAt: null,
@@ -7872,6 +7927,17 @@ function closeModalOutside(event) {
 
 function updateModalContent() {
     if (!currentItem) return;
+
+    // Movies never have more content than a poster/backdrop, meta, and a
+    // description - never enough to justify forcing the full screen, so
+    // they get the same compact/content-sized card treatment as the
+    // episode modal. TV shows keep the full-screen treatment since their
+    // episode list can run long regardless of the show's own description
+    // length.
+    const detailsModalEl = document.getElementById("detailsModal");
+    const detailsSheetEl = detailsModalEl.querySelector(".modal-sheet");
+    detailsModalEl.classList.toggle("modal-compact", currentItem.type === 'movie');
+    detailsSheetEl.classList.toggle("modal-sheet-compact", currentItem.type === 'movie');
 
     const backdropHeader = document.getElementById("modalBackdropHeader");
     const backdropUrl = currentItem.backdrop || currentItem.poster;
