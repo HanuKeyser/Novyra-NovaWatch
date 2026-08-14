@@ -2911,6 +2911,7 @@ html[data-theme="dark"] .modal-backdrop-overlay {
 
 html[data-theme="dark"] .confirm-card {
     background: var(--glass-sheen), rgba(28, 28, 30, 0.92);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 html[data-theme="dark"] .rewatch-icon-badge {
@@ -2923,9 +2924,23 @@ html[data-theme="dark"] .hero-card {
     box-shadow: 0 20px 48px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
+html[data-theme="dark"] .search-type-btn.active {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme="dark"] #authScreen .search-type-btn.active {
+    box-shadow: 0 4px 12px rgba(10, 132, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+html[data-theme="dark"] .auth-overlay-card {
+    background: rgba(28, 28, 30, 0.85);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
 html[data-theme="dark"] .continue-card {
     background: var(--glass-sheen), rgba(255, 255, 255, 0.06);
     border-color: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
 html[data-theme="dark"] .stat {
@@ -3803,12 +3818,12 @@ function openAvatarPicker() {
     renderAvatarPickerGrid();
     if (modal.classList.contains('open')) return;
     modal.classList.add('open');
-    lockBodyScroll();
+    lockBodyScroll('avatarPickerModal');
 }
 
 function closeAvatarPicker() {
     document.getElementById('avatarPickerModal').classList.remove('open');
-    unlockBodyScroll();
+    unlockBodyScroll('avatarPickerModal');
 }
 
 function closeAvatarPickerOutside(event) {
@@ -4008,12 +4023,12 @@ function openAchievementsModal() {
     renderAchievementsList();
     if (modal.classList.contains('open')) return;
     modal.classList.add('open');
-    lockBodyScroll();
+    lockBodyScroll('achievementsModal');
 }
 
 function closeAchievementsModal() {
     document.getElementById('achievementsModal').classList.remove('open');
-    unlockBodyScroll();
+    unlockBodyScroll('achievementsModal');
 }
 
 function closeAchievementsModalOutside(event) {
@@ -4897,8 +4912,23 @@ async function deleteAllUserData(uid) {
 ========================================================= */
 let bodyScrollLockCount = 0;
 let savedScrollY = 0;
+// Every modal that currently holds a lock, keyed by its element id. This is
+// the actual fix for the recurring "scroll stops working" bug: previously
+// each open function had to remember to check classList.contains('open')
+// itself before calling lockBodyScroll(), and several places (found across
+// two separate bug-fix passes) didn't - each such miss meant one unmatched
+// extra lock that nothing would ever balance back out. Keying the lock by
+// modal id here makes a duplicate lock call for the same modal a no-op
+// automatically, regardless of whether the call site remembered to guard
+// itself - so a future modal that forgets the check can't reintroduce this
+// bug class.
+let activeScrollLocks = new Set();
 
-function lockBodyScroll() {
+function lockBodyScroll(modalId) {
+    if (modalId) {
+        if (activeScrollLocks.has(modalId)) return;
+        activeScrollLocks.add(modalId);
+    }
     if (bodyScrollLockCount === 0) {
         savedScrollY = window.scrollY;
         document.body.style.position = "fixed";
@@ -4908,7 +4938,11 @@ function lockBodyScroll() {
     bodyScrollLockCount++;
 }
 
-function unlockBodyScroll() {
+function unlockBodyScroll(modalId) {
+    if (modalId) {
+        if (!activeScrollLocks.has(modalId)) return;
+        activeScrollLocks.delete(modalId);
+    }
     bodyScrollLockCount = Math.max(0, bodyScrollLockCount - 1);
     if (bodyScrollLockCount === 0) {
         document.body.style.position = "";
@@ -4925,12 +4959,12 @@ function openSettingsSheet() {
     const modal = document.getElementById("settingsModal");
     if (modal.classList.contains("open")) return;
     modal.classList.add("open");
-    lockBodyScroll();
+    lockBodyScroll("settingsModal");
 }
 
 function closeSettingsSheet() {
     document.getElementById("settingsModal").classList.remove("open");
-    unlockBodyScroll();
+    unlockBodyScroll("settingsModal");
 }
 
 function closeSettingsOutside(event) {
@@ -4963,7 +4997,7 @@ function openPageOverlay(path) {
     history.pushState({ novawatchOverlay: path }, "", `${NOVAWATCH_APP_URL}${path}`);
     if (modal.classList.contains("open")) return;
     modal.classList.add("open");
-    lockBodyScroll();
+    lockBodyScroll("pageOverlayModal");
 }
 
 // fromPopstate is true when this is called in response to the browser's
@@ -4972,7 +5006,7 @@ function openPageOverlay(path) {
 function closePageOverlay(fromPopstate = false) {
     document.getElementById("pageOverlayModal").classList.remove("open");
     document.getElementById("pageOverlayFrame").src = "about:blank";
-    unlockBodyScroll();
+    unlockBodyScroll("pageOverlayModal");
     if (!fromPopstate) {
         history.back();
     }
@@ -4989,7 +5023,7 @@ window.addEventListener("popstate", (event) => {
         if (!isOpen) {
             document.getElementById("pageOverlayFrame").src = event.state.novawatchOverlay;
             overlayModal.classList.add("open");
-            lockBodyScroll();
+            lockBodyScroll("pageOverlayModal");
         }
     } else if (isOpen) {
         closePageOverlay(true);
@@ -5004,12 +5038,12 @@ function handleDeleteAccount() {
     const modal = document.getElementById("deleteAccountModal");
     if (modal.classList.contains("open")) return;
     modal.classList.add("open");
-    lockBodyScroll();
+    lockBodyScroll("deleteAccountModal");
 }
 
 function closeDeleteAccountModal() {
     document.getElementById("deleteAccountModal").classList.remove("open");
-    unlockBodyScroll();
+    unlockBodyScroll("deleteAccountModal");
 }
 
 function closeDeleteAccountModalOutside(event) {
@@ -5558,12 +5592,12 @@ function openRegionPicker() {
     filterRegionOptions("");
     if (modal.classList.contains("open")) return;
     modal.classList.add("open");
-    lockBodyScroll();
+    lockBodyScroll("regionPickerModal");
 }
 
 function closeRegionPicker() {
     document.getElementById("regionPickerModal").classList.remove("open");
-    unlockBodyScroll();
+    unlockBodyScroll("regionPickerModal");
 }
 
 function closeRegionPickerOutside(event) {
@@ -6375,7 +6409,7 @@ async function openSearchResultDetails(tmdbId, type) {
             const detailsModalMovie = document.getElementById("detailsModal");
             if (!detailsModalMovie.classList.contains("open")) {
                 detailsModalMovie.classList.add("open");
-                lockBodyScroll();
+                lockBodyScroll("detailsModal");
             }
             loadWatchAvailability(currentItem);
             return;
@@ -6421,7 +6455,7 @@ async function openSearchResultDetails(tmdbId, type) {
         const detailsModalTV = document.getElementById("detailsModal");
         if (!detailsModalTV.classList.contains("open")) {
             detailsModalTV.classList.add("open");
-            lockBodyScroll();
+            lockBodyScroll("detailsModal");
         }
         loadWatchAvailability(currentItem);
 
@@ -7788,7 +7822,7 @@ function openDetails(itemId) {
     const detailsModal = document.getElementById("detailsModal");
     if (!detailsModal.classList.contains("open")) {
         detailsModal.classList.add("open");
-        lockBodyScroll();
+        lockBodyScroll("detailsModal");
     }
     loadWatchAvailability(currentItem);
 
@@ -7825,7 +7859,7 @@ async function refreshOpenItemFromTMDB(item) {
 
 function closeModal() {
     document.getElementById("detailsModal").classList.remove("open");
-    unlockBodyScroll();
+    unlockBodyScroll("detailsModal");
     currentItem = null;
     refreshActivePage();
 }
@@ -8217,7 +8251,7 @@ async function openChangePosterPicker(itemId, type) {
     const posterModal = document.getElementById("posterPickerModal");
     if (!posterModal.classList.contains("open")) {
         posterModal.classList.add("open");
-        lockBodyScroll();
+        lockBodyScroll("posterPickerModal");
     }
 
     posterPickerImages = await fetchItemImages(item.tmdbId, type);
@@ -8340,7 +8374,7 @@ async function confirmPosterPickerChanges() {
 
 function closePosterPicker() {
     document.getElementById("posterPickerModal").classList.remove("open");
-    unlockBodyScroll();
+    unlockBodyScroll("posterPickerModal");
     posterPickerItemId = null;
     pendingPosterUrl = null;
     pendingBackdropUrl = null;
@@ -8437,7 +8471,7 @@ function openEpisodeDetails(epId) {
     const episodeModal = document.getElementById("episodeDetailsModal");
     if (episodeModal.classList.contains("open")) return;
     episodeModal.classList.add("open");
-    lockBodyScroll();
+    lockBodyScroll("episodeDetailsModal");
 }
 
 // Rebuilds just the episode modal's meta line (season/runtime/date and the
@@ -8464,7 +8498,7 @@ function refreshEpisodeModalMeta() {
 
 function closeEpisodeModal() {
     document.getElementById("episodeDetailsModal").classList.remove("open");
-    unlockBodyScroll();
+    unlockBodyScroll("episodeDetailsModal");
     currentEpisode = null;
 }
 
@@ -8589,7 +8623,7 @@ function openMovieRewatchPopup() {
     const modal = document.getElementById("rewatchCountModal");
     if (modal.classList.contains("open")) return;
     modal.classList.add("open");
-    lockBodyScroll();
+    lockBodyScroll("rewatchCountModal");
 }
 
 function openRewatchPopup(epId) {
@@ -8603,7 +8637,7 @@ function openRewatchPopup(epId) {
     const modal = document.getElementById("rewatchCountModal");
     if (modal.classList.contains("open")) return;
     modal.classList.add("open");
-    lockBodyScroll();
+    lockBodyScroll("rewatchCountModal");
 }
 
 function openSeasonRewatchPopup(seasonNumber) {
@@ -8619,7 +8653,7 @@ function openSeasonRewatchPopup(seasonNumber) {
     const modal = document.getElementById("rewatchCountModal");
     if (modal.classList.contains("open")) return;
     modal.classList.add("open");
-    lockBodyScroll();
+    lockBodyScroll("rewatchCountModal");
 }
 
 function renderRewatchPopup() {
@@ -8657,7 +8691,7 @@ function renderRewatchPopup() {
 
 function closeRewatchPopup() {
     document.getElementById("rewatchCountModal").classList.remove("open");
-    unlockBodyScroll();
+    unlockBodyScroll("rewatchCountModal");
     rewatchPopupMode = null;
     rewatchPopupEpId = null;
     rewatchPopupSeasonNumber = null;
