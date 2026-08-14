@@ -1422,6 +1422,16 @@ img {
     display: flex;
 }
 
+/* These two are always opened FROM the Settings sheet, which is also a
+   plain .modal (z-index 200) - without this, stacking among same-z-index
+   fixed elements falls back to DOM order, and both happen to sit earlier
+   in the markup than #settingsModal, so they'd render invisibly behind
+   it instead of on top. */
+#avatarPickerModal,
+#achievementsModal {
+    z-index: 250;
+}
+
 .modal-sheet {
     width: 100%;
     height: 100%;
@@ -2342,6 +2352,9 @@ img {
 .avatar-edit-wrap {
     position: relative;
     flex-shrink: 0;
+    background: none;
+    padding: 0;
+    display: block;
 }
 
 .avatar-edit-wrap:active .large-avatar {
@@ -2897,6 +2910,7 @@ html[data-theme="dark"] .hero-card {
 
 html[data-theme="dark"] .continue-card {
     background: var(--glass-sheen), rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.14);
 }
 
 html[data-theme="dark"] .stat {
@@ -3769,8 +3783,10 @@ function renderAvatarPickerGrid() {
 }
 
 function openAvatarPicker() {
+    const modal = document.getElementById('avatarPickerModal');
     renderAvatarPickerGrid();
-    document.getElementById('avatarPickerModal').classList.add('open');
+    if (modal.classList.contains('open')) return;
+    modal.classList.add('open');
     lockBodyScroll();
 }
 
@@ -3802,14 +3818,23 @@ async function selectAvatar(avatarId) {
    Only the small unlockedAchievements ID array on the profile is written,
    so a milestone doesn't re-trigger its unlock toast on every reload.
 
-   tier: 'free' | 'premium'. state.isPremiumUser gates premium ones - see
-   its definition on `state` for why it's hardcoded false for now.
+   Premium achievements are pulled out for now (not shown, not checked) -
+   kept in PREMIUM_ACHIEVEMENTS below rather than deleted, so they're a
+   one-line change (append them back into ACHIEVEMENTS) once premium is
+   actually ready to launch.
 ========================================================= */
 const ACHIEVEMENTS = [
     { id: 'movies_10', tier: 'free', title: '10 Movies Watched', description: 'Watch 10 movies.', check: (s) => s.moviesWatched >= 10 },
     { id: 'shows_10', tier: 'free', title: '10 Shows Completed', description: 'Finish watching 10 TV shows.', check: (s) => s.showsCompleted >= 10 },
     { id: 'streak_7', tier: 'free', title: '7-Day Streak', description: 'Watch something 7 days in a row.', check: (s) => s.longestStreak >= 7 },
-    { id: 'first_rewatch', tier: 'free', title: 'First Rewatch', description: 'Log your first rewatch.', check: (s) => s.totalRewatches >= 1 },
+    { id: 'first_rewatch', tier: 'free', title: 'First Rewatch', description: 'Log your first rewatch.', check: (s) => s.totalRewatches >= 1 }
+];
+
+// Not currently active - see comment block above. Untouched otherwise so
+// re-enabling later is just `ACHIEVEMENTS.push(...PREMIUM_ACHIEVEMENTS)`
+// (or folding this list back into ACHIEVEMENTS directly) once
+// state.isPremiumUser is backed by real subscription status.
+const PREMIUM_ACHIEVEMENTS = [
     { id: 'movies_50', tier: 'premium', title: '50 Movies Watched', description: 'Watch 50 movies.', check: (s) => s.moviesWatched >= 50 },
     { id: 'movies_100', tier: 'premium', title: '100 Movies Watched', description: 'Watch 100 movies.', check: (s) => s.moviesWatched >= 100 },
     { id: 'movies_500', tier: 'premium', title: '500 Movies Watched', description: 'Watch 500 movies.', check: (s) => s.moviesWatched >= 500 },
@@ -3941,8 +3966,10 @@ function renderAchievementsList() {
 }
 
 function openAchievementsModal() {
+    const modal = document.getElementById('achievementsModal');
     renderAchievementsList();
-    document.getElementById('achievementsModal').classList.add('open');
+    if (modal.classList.contains('open')) return;
+    modal.classList.add('open');
     lockBodyScroll();
 }
 
@@ -4539,13 +4566,16 @@ async function handleForgotPassword() {
     }
 
     const emailInput = document.getElementById("authEmail");
-    let email = emailInput ? emailInput.value.trim() : "";
+    const email = emailInput ? emailInput.value.trim() : "";
 
-    // If they haven't typed an email into the form yet, ask for one rather
-    // than silently failing — this is the only path to recover an account.
+    // Deliberately no window.prompt() fallback here - native browser
+    // dialogs (prompt/alert/confirm) are unreliable and often silently do
+    // nothing inside an installed standalone PWA on mobile, which is this
+    // app's primary context. Asking in-app instead is the reliable path.
     if (!email) {
-        email = (prompt("Enter the email address for your account:") || "").trim();
-        if (!email) return;
+        showToast("Enter your email address above first.", "error");
+        if (emailInput) emailInput.focus();
+        return;
     }
 
     try {
