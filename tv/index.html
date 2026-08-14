@@ -2285,12 +2285,14 @@ html[data-theme="dark"] .modal-sheet-compact {
 .hero-pill-btn {
     flex-shrink: 0;
     height: 40px;
+    min-width: 112px;
     padding: 0 18px;
     border-radius: 999px;
     background: var(--glass-sheen), var(--blue-gradient);
     color: white;
     font-size: 13px;
     font-weight: 700;
+    text-align: center;
     box-shadow: 0 8px 20px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.5);
 }
 
@@ -2471,13 +2473,20 @@ html[data-theme="dark"] .avatar-edit-badge {
     overflow: hidden;
     /* A third, lighter stop plus a soft inner shadow along the bottom
        edge gives the fill some actual depth (light catching the top,
-       falling off toward the bottom) instead of a flat two-tone chip. */
+       falling off toward the bottom) instead of a flat two-tone chip.
+       Only actually visible for the initials fallback now - real avatar
+       images cover it entirely (overflow: hidden clips to the rounded
+       corners either way). */
     background: linear-gradient(150deg, #6babff 0%, var(--blue-light) 45%, var(--blue) 100%);
     color: white;
     font-size: 23px;
     font-weight: 800;
     letter-spacing: -0.5px;
-    box-shadow: 0 10px 22px rgba(0, 102, 204, 0.4), inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -8px 12px rgba(0, 76, 153, 0.25);
+    /* Neutral shadow instead of the previous blue-tinted glow - that blue
+       glow was tuned to complement the initials' blue gradient, but reads
+       as a stray colored halo behind a real avatar photo, which is the
+       common case now. */
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255,255,255,0.4);
     flex-shrink: 0;
 }
 
@@ -3336,6 +3345,13 @@ html[data-theme="dark"] .skeleton {
 <div id="episodeDetailsModal" class="modal modal-compact" onclick="closeEpisodeModalOutside(event)">
     <div class="modal-sheet modal-sheet-compact">
         <div class="modal-header-nav">
+            <button class="close-button" onclick="shareCurrentEpisode()" aria-label="Share">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M12 16V4"/>
+                    <path d="M7 9l5-5 5 5"/>
+                    <path d="M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/>
+                </svg>
+            </button>
             <button class="close-button" onclick="closeEpisodeModal()" aria-label="Close">
                 <svg class="icon" viewBox="0 0 24 24">
                     <path d="M6 6l12 12"/>
@@ -3551,7 +3567,12 @@ html[data-theme="dark"] .skeleton {
                         </div>
                         <svg class="icon icon-small settings-row-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
                     </div>
+                </div>
+            </div>
 
+            <div class="settings-section">
+                <div class="section-header"><div class="section-title settings-section-title">NovaWatch</div></div>
+                <div class="analytics-card settings-card">
                     <div class="settings-row">
                         <div class="settings-row-icon" style="background: #fff; padding: 6px;">
                             <img src="https://www.novyra.co.za/NovaWatch_Logo.png" alt="NovaWatch" style="width: 100%; height: 100%; object-fit: contain; border-radius: inherit;">
@@ -3648,14 +3669,6 @@ html[data-theme="dark"] .skeleton {
 ================================================     -->
 <div id="pageOverlayModal" class="modal">
     <div class="modal-sheet" style="overflow: hidden;">
-        <div class="modal-header-nav">
-            <button class="close-button" onclick="closePageOverlay()" aria-label="Close">
-                <svg class="icon" viewBox="0 0 24 24">
-                    <path d="M6 6l12 12"/>
-                    <path d="M18 6L6 18"/>
-                </svg>
-            </button>
-        </div>
         <iframe id="pageOverlayFrame" class="page-overlay-frame" title="NovaWatch"></iframe>
     </div>
 </div>
@@ -4395,6 +4408,18 @@ function daysUntil(date) {
 function isReleased(date) {
     if (!date) return true;
     return daysUntil(date) <= 0;
+}
+
+// TMDB gives date-only strings (e.g. "2026-08-14"), which JS would
+// otherwise parse as UTC midnight. Pinning to 08:00 UTC instead gives
+// NovaWatch's periodic background sync a buffer window to have actually
+// pulled fresh episode/show/movie info from TMDB before anything here
+// gets treated as released, rather than the exact instant the calendar
+// day rolls over (when TMDB's own data for that release may not be
+// fully populated yet).
+function tmdbDateToISO(dateStr) {
+    if (!dateStr) return null;
+    return new Date(`${dateStr}T08:00:00Z`).toISOString();
 }
 
 function formatDate(date) {
@@ -5279,7 +5304,7 @@ async function refreshItemFromTMDBInternal(item) {
                     const newBackdrop = item.customBackdrop ? item.backdrop : (movieData.backdrop_path ? `https://image.tmdb.org/t/p/w780${movieData.backdrop_path}` : item.backdrop);
                     const newDescription = movieData.overview || item.description;
                     const newRuntime = movieData.runtime ? `${movieData.runtime} min` : item.runtime;
-                    const newReleaseDate = movieData.release_date ? new Date(movieData.release_date).toISOString() : item.releaseDate;
+                    const newReleaseDate = movieData.release_date ? tmdbDateToISO(movieData.release_date) : item.releaseDate;
                     const newStatus = movieData.status || item.status || '';
                     const newRating = (typeof movieData.vote_average === 'number' && movieData.vote_average > 0)
                         ? movieData.vote_average.toFixed(1)
@@ -5337,7 +5362,7 @@ async function refreshItemFromTMDBInternal(item) {
                                     runtime: ep.runtime ? `${ep.runtime} min` : "45 min",
                                     watched: false,
                                     watchedAt: null,
-                                    releaseDate: ep.air_date ? new Date(ep.air_date).toISOString() : new Date().toISOString()
+                                    releaseDate: ep.air_date ? tmdbDateToISO(ep.air_date) : new Date().toISOString()
                                 });
                             });
                         }
@@ -5395,7 +5420,7 @@ async function refreshItemFromTMDBInternal(item) {
                     const newPoster = item.customPoster ? item.poster : (showData.poster_path ? `https://image.tmdb.org/t/p/w500${showData.poster_path}` : item.poster);
                     const newBackdrop = item.customBackdrop ? item.backdrop : (showData.backdrop_path ? `https://image.tmdb.org/t/p/w780${showData.backdrop_path}` : item.backdrop);
                     const newDescription = showData.overview || item.description;
-                    const newReleaseDate = showData.first_air_date ? new Date(showData.first_air_date).toISOString() : item.releaseDate;
+                    const newReleaseDate = showData.first_air_date ? tmdbDateToISO(showData.first_air_date) : item.releaseDate;
                     const newStatus = showData.status || item.status || '';
                     const newRating = (typeof showData.vote_average === 'number' && showData.vote_average > 0)
                         ? showData.vote_average.toFixed(1)
@@ -5403,7 +5428,7 @@ async function refreshItemFromTMDBInternal(item) {
                     const newSeasonCount = (typeof showData.number_of_seasons === 'number') ? showData.number_of_seasons : item.numberOfSeasons;
                     const newEpisodeCount = (typeof showData.number_of_episodes === 'number') ? showData.number_of_episodes : item.numberOfEpisodes;
                     const newNextAirDate = (showData.next_episode_to_air && showData.next_episode_to_air.air_date)
-                        ? new Date(showData.next_episode_to_air.air_date).toISOString()
+                        ? tmdbDateToISO(showData.next_episode_to_air.air_date)
                         : null;
 
                     const metadataChanged = (
@@ -6482,7 +6507,7 @@ async function openSearchResultDetails(tmdbId, type) {
                 backdrop: movieData.backdrop_path ? `https://image.tmdb.org/t/p/w780${movieData.backdrop_path}` : "",
                 description: movieData.overview || "No description available.",
                 runtime: movieData.runtime ? `${movieData.runtime} min` : "120 min",
-                releaseDate: movieData.release_date ? new Date(movieData.release_date).toISOString() : new Date().toISOString(),
+                releaseDate: movieData.release_date ? tmdbDateToISO(movieData.release_date) : new Date().toISOString(),
                 status: movieData.status || '',
                 rating: (typeof movieData.vote_average === 'number' && movieData.vote_average > 0) ? movieData.vote_average.toFixed(1) : '',
                 isPreview: true,
@@ -6522,12 +6547,12 @@ async function openSearchResultDetails(tmdbId, type) {
             poster: showData.poster_path ? `https://image.tmdb.org/t/p/w500${showData.poster_path}` : "",
             backdrop: showData.backdrop_path ? `https://image.tmdb.org/t/p/w780${showData.backdrop_path}` : "",
             description: showData.overview || "No description available.",
-            releaseDate: showData.first_air_date ? new Date(showData.first_air_date).toISOString() : null,
+            releaseDate: showData.first_air_date ? tmdbDateToISO(showData.first_air_date) : null,
             status: showData.status || '',
             rating: (typeof showData.vote_average === 'number' && showData.vote_average > 0) ? showData.vote_average.toFixed(1) : '',
             numberOfSeasons: (typeof showData.number_of_seasons === 'number') ? showData.number_of_seasons : null,
             numberOfEpisodes: (typeof showData.number_of_episodes === 'number') ? showData.number_of_episodes : null,
-            nextEpisodeAirDate: (showData.next_episode_to_air && showData.next_episode_to_air.air_date) ? new Date(showData.next_episode_to_air.air_date).toISOString() : null,
+            nextEpisodeAirDate: (showData.next_episode_to_air && showData.next_episode_to_air.air_date) ? tmdbDateToISO(showData.next_episode_to_air.air_date) : null,
             isFinished: false,
             isStopped: false,
             isPreview: true,
@@ -6569,7 +6594,7 @@ async function openSearchResultDetails(tmdbId, type) {
                             runtime: ep.runtime ? `${ep.runtime} min` : "45 min",
                             watched: false,
                             watchedAt: null,
-                            releaseDate: ep.air_date ? new Date(ep.air_date).toISOString() : new Date().toISOString()
+                            releaseDate: ep.air_date ? tmdbDateToISO(ep.air_date) : new Date().toISOString()
                         });
                     });
                 }
@@ -6630,7 +6655,7 @@ async function importMediaData(id, type, buttonElement) {
                 backdrop: movieData.backdrop_path ? `https://image.tmdb.org/t/p/w780${movieData.backdrop_path}` : "",
                 description: movieData.overview || "No description available.",
                 runtime: movieData.runtime ? `${movieData.runtime} min` : "120 min",
-                releaseDate: movieData.release_date ? new Date(movieData.release_date).toISOString() : new Date().toISOString(),
+                releaseDate: movieData.release_date ? tmdbDateToISO(movieData.release_date) : new Date().toISOString(),
                 status: movieData.status || '',
                 rating: (typeof movieData.vote_average === 'number' && movieData.vote_average > 0) ? movieData.vote_average.toFixed(1) : '',
                 watched: false,
@@ -6703,7 +6728,7 @@ async function importMediaData(id, type, buttonElement) {
                                 runtime: ep.runtime ? `${ep.runtime} min` : "45 min",
                                 watched: false,
                                 watchedAt: null,
-                                releaseDate: ep.air_date ? new Date(ep.air_date).toISOString() : new Date().toISOString()
+                                releaseDate: ep.air_date ? tmdbDateToISO(ep.air_date) : new Date().toISOString()
                             });
                         });
                     }
@@ -6740,12 +6765,12 @@ async function importMediaData(id, type, buttonElement) {
                 poster: showData.poster_path ? `https://image.tmdb.org/t/p/w500${showData.poster_path}` : "",
                 backdrop: showData.backdrop_path ? `https://image.tmdb.org/t/p/w780${showData.backdrop_path}` : "",
                 description: showData.overview || "No description available.",
-                releaseDate: showData.first_air_date ? new Date(showData.first_air_date).toISOString() : null,
+                releaseDate: showData.first_air_date ? tmdbDateToISO(showData.first_air_date) : null,
                 status: showData.status || '',
                 rating: (typeof showData.vote_average === 'number' && showData.vote_average > 0) ? showData.vote_average.toFixed(1) : '',
                 numberOfSeasons: (typeof showData.number_of_seasons === 'number') ? showData.number_of_seasons : null,
                 numberOfEpisodes: (typeof showData.number_of_episodes === 'number') ? showData.number_of_episodes : null,
-                nextEpisodeAirDate: (showData.next_episode_to_air && showData.next_episode_to_air.air_date) ? new Date(showData.next_episode_to_air.air_date).toISOString() : null,
+                nextEpisodeAirDate: (showData.next_episode_to_air && showData.next_episode_to_air.air_date) ? tmdbDateToISO(showData.next_episode_to_air.air_date) : null,
                 isFinished: false,
                 isStopped: archivedShow ? !!archivedShow.isStopped : false,
                 addedAt: new Date().toISOString(),
@@ -7837,25 +7862,74 @@ async function addModalItemToLibrary() {
 // shareable link to the clipboard on desktop/unsupported browsers. The
 // share always points back to NovaWatch itself (not TMDB) - it's the app
 // being shared from.
-// Reads a shared item link (?share_type=tv|movie&share_id=12345) from the
-// URL, if present, and opens that item's details modal directly - this is
-// what makes a shared link actually take the recipient to the specific
-// show/movie instead of just the app's home screen. Returns true if a
-// shared item was found and opened, so the caller can skip anything (like
-// a generic "Welcome back!" toast) that would otherwise talk over it.
+// Reads a shared item link from the URL, if present, and opens the right
+// thing directly - this is what makes a shared link actually take the
+// recipient to the specific show/movie/episode instead of just the app's
+// home screen. Two shapes:
+//   ?share_type=tv|movie&share_id=<tmdbId>              - a show or movie
+//   ?share_type=episode&share_id=<showTmdbId>&share_ep=sXeY - one episode
+// Returns true if a shared item was found and opened, so the caller can
+// skip anything (like a generic "Welcome back!" toast) that would
+// otherwise talk over it.
 function openSharedItemFromURL() {
     const params = new URLSearchParams(window.location.search);
     const type = params.get('share_type');
     const id = params.get('share_id');
+    const epId = params.get('share_ep');
 
-    if ((type !== 'tv' && type !== 'movie') || !id || isNaN(Number(id))) return false;
+    const isEpisodeShare = type === 'episode' && id && !isNaN(Number(id)) && epId && /^s\d+e\d+$/.test(epId);
+    const isItemShare = (type === 'tv' || type === 'movie') && id && !isNaN(Number(id));
+    if (!isEpisodeShare && !isItemShare) return false;
 
     // Strip the params so refreshing or navigating within the app doesn't
     // keep reopening the same shared item.
     window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
 
-    openSearchResultDetails(Number(id), type);
+    if (isEpisodeShare) {
+        openSharedEpisode(Number(id), epId);
+    } else {
+        openSearchResultDetails(Number(id), type);
+    }
     return true;
+}
+
+// A shared episode link opens its parent show first (same preview/library
+// path as a normal show link), then once the show's episode list has
+// actually loaded, opens that specific episode's modal on top of it - a
+// single episode isn't independently addressable without its show's
+// context, so this is really "open the show, then drill in."
+async function openSharedEpisode(showTmdbId, epId) {
+    await openSearchResultDetails(showTmdbId, 'tv');
+    if (!currentItem || currentItem.tmdbId !== showTmdbId) return;
+
+    const episode = (currentItem.episodes || []).find(e => e.id === epId);
+    if (episode) {
+        selectedSeason = episode.season;
+        updateModalContent();
+        openEpisodeDetails(epId);
+        return;
+    }
+
+    // Preview shows fetch their episode list progressively in the
+    // background (see openSearchResultDetails) - if it's not there yet,
+    // wait for it rather than silently failing to open the episode.
+    let attempts = 0;
+    const waitForEpisode = setInterval(() => {
+        attempts++;
+        if (!currentItem || currentItem.tmdbId !== showTmdbId) {
+            clearInterval(waitForEpisode);
+            return;
+        }
+        const ep = (currentItem.episodes || []).find(e => e.id === epId);
+        if (ep) {
+            clearInterval(waitForEpisode);
+            selectedSeason = ep.season;
+            updateModalContent();
+            openEpisodeDetails(epId);
+        } else if (attempts > 20 || !currentItem.episodesLoading) {
+            clearInterval(waitForEpisode);
+        }
+    }, 300);
 }
 
 async function shareCurrentItem() {
@@ -7868,6 +7942,41 @@ async function shareCurrentItem() {
     const shareData = {
         title: `${currentItem.title} - NovaWatch`,
         text: `I'm tracking the ${kind} "${currentItem.title}" on NovaWatch - check it out!`,
+        url: deepLink
+    };
+
+    if (navigator.share) {
+        try {
+            await navigator.share(shareData);
+        } catch (err) {
+            if (err.name !== 'AbortError') console.error("Share failed:", err);
+        }
+        return;
+    }
+
+    if (navigator.clipboard) {
+        try {
+            await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
+            showToast("Link copied to clipboard!", "success");
+        } catch (err) {
+            console.error("Clipboard write failed:", err);
+            showToast("Unable to share.", "error");
+        }
+        return;
+    }
+
+    showToast("Sharing isn't supported on this device.", "error");
+}
+
+async function shareCurrentEpisode() {
+    if (!currentItem || !currentEpisode || !currentItem.tmdbId) return;
+
+    const deepLink = `${NOVAWATCH_APP_URL}?share_type=episode&share_id=${currentItem.tmdbId}&share_ep=${currentEpisode.id}`;
+    const episodeLabel = `S${currentEpisode.season} E${currentEpisode.number}`;
+
+    const shareData = {
+        title: `${currentItem.title} ${episodeLabel} - NovaWatch`,
+        text: `I'm tracking "${currentItem.title}" (${episodeLabel}: ${currentEpisode.title}) on NovaWatch - check it out!`,
         url: deepLink
     };
 
