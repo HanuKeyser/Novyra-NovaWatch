@@ -2414,8 +2414,12 @@ html[data-theme="dark"] .modal-sheet-compact {
     align-items: center;
     justify-content: center;
     color: white;
-    border: 2px solid var(--surface);
-    box-shadow: 0 4px 10px rgba(0, 102, 204, 0.35);
+    border: 2px solid #F0F2F6;
+    box-shadow: 0 3px 8px rgba(0, 102, 204, 0.3);
+}
+
+html[data-theme="dark"] .avatar-edit-badge {
+    border-color: #000000;
 }
 
 .avatar-edit-badge .icon-small {
@@ -3516,17 +3520,6 @@ html[data-theme="dark"] .skeleton {
                     </div>
 
                     <div class="settings-row">
-                        <div class="settings-row-icon" style="background: var(--blue-gradient);">
-                            <svg class="icon" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                        </div>
-                        <div class="settings-row-text">
-                            <div class="settings-row-title">Stay in the loop</div>
-                            <div class="settings-row-sub">Get alerts for new episodes & releases.</div>
-                        </div>
-                        <button class="hero-pill-btn" id="notificationBtn" onclick="requestNotificationPermission()">Enable</button>
-                    </div>
-
-                    <div class="settings-row">
                         <div class="settings-row-icon" style="background: var(--green-gradient);">
                             <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
                         </div>
@@ -3538,14 +3531,14 @@ html[data-theme="dark"] .skeleton {
                     </div>
 
                     <div class="settings-row">
-                        <div class="settings-row-icon" style="background: #fff; padding: 6px;">
-                            <img src="https://www.novyra.co.za/NovaWatch_Logo.png" alt="NovaWatch" style="width: 100%; height: 100%; object-fit: contain; border-radius: inherit;">
+                        <div class="settings-row-icon" style="background: var(--blue-gradient);">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                         </div>
                         <div class="settings-row-text">
-                            <div class="settings-row-title">NovaWrapped</div>
-                            <div class="settings-row-sub">Releases January 1, 2027.</div>
+                            <div class="settings-row-title">Stay in the loop</div>
+                            <div class="settings-row-sub">Get alerts for new episodes & releases.</div>
                         </div>
-                        <button class="hero-pill-btn" onclick="goToWrapped()">Coming Soon</button>
+                        <button class="hero-pill-btn" id="notificationBtn" onclick="requestNotificationPermission()">Enable</button>
                     </div>
 
                     <div class="settings-row" style="cursor: pointer;" onclick="openAchievementsModal()">
@@ -3557,6 +3550,17 @@ html[data-theme="dark"] .skeleton {
                             <div class="settings-row-sub" id="achievementsRowSub">0 unlocked</div>
                         </div>
                         <svg class="icon icon-small settings-row-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                    </div>
+
+                    <div class="settings-row">
+                        <div class="settings-row-icon" style="background: #fff; padding: 6px;">
+                            <img src="https://www.novyra.co.za/NovaWatch_Logo.png" alt="NovaWatch" style="width: 100%; height: 100%; object-fit: contain; border-radius: inherit;">
+                        </div>
+                        <div class="settings-row-text">
+                            <div class="settings-row-title">NovaWrapped</div>
+                            <div class="settings-row-sub">Releases January 1, 2027.</div>
+                        </div>
+                        <button class="hero-pill-btn" onclick="goToWrapped()">Coming Soon</button>
                     </div>
                 </div>
             </div>
@@ -4048,7 +4052,25 @@ function runAchievementsCheck() {
     if (changed) {
         saveUserProfile();
         newlyUnlocked.forEach(ach => showToast(`Achievement Unlocked: ${ach.title}`, 'success'));
+        // The Settings row's "N unlocked" count previously only refreshed
+        // when the Achievements modal itself was opened (inside
+        // renderAchievementsList) - so an achievement earned in the
+        // background (e.g. finishing a show) wouldn't show up in Settings
+        // until you'd opened Achievements at least once to force a
+        // re-render. Updating it here too means it's live immediately.
+        updateAchievementsRowSub();
     }
+}
+
+// Shared by runAchievementsCheck (background unlocks/revokes, modal not
+// necessarily open) and renderAchievementsList (modal open) so both stay
+// in sync from one place rather than duplicating this line.
+function updateAchievementsRowSub() {
+    const rowSub = document.getElementById('achievementsRowSub');
+    if (!rowSub) return;
+    const profile = state.profiles && state.profiles[0] ? state.profiles[0] : null;
+    const count = profile && profile.unlockedAchievements ? profile.unlockedAchievements.length : 0;
+    rowSub.textContent = `${count} unlocked`;
 }
 
 function renderAchievementsList() {
@@ -4076,8 +4098,7 @@ function renderAchievementsList() {
         `;
     }).join('');
 
-    const rowSub = document.getElementById('achievementsRowSub');
-    if (rowSub) rowSub.textContent = `${unlocked.length} unlocked`;
+    updateAchievementsRowSub();
 }
 
 function openAchievementsModal() {
