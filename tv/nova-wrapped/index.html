@@ -112,34 +112,33 @@ button {
     min-height: 100vh;
 }
 
-.top-row {
+.overlay-close-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 20;
+    width: 38px;
+    height: 38px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    margin-bottom: 22px;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--glass-sheen), var(--surface);
+    color: var(--text);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow-sm);
+    transition: transform 0.15s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-.back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    height: 36px;
-    padding: 0 16px;
-    border-radius: 999px;
-    background: var(--glass-sheen), var(--glass-chrome-fill);
-    backdrop-filter: var(--glass-chrome-blur);
-    -webkit-backdrop-filter: var(--glass-chrome-blur);
-    border: 1px solid var(--glass-chrome-border);
-    box-shadow: var(--glass-chrome-shadow);
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-size: 13px;
-    font-weight: 700;
-    transition: transform 0.15s ease;
+.overlay-close-button .icon {
+    width: 22px;
+    height: 22px;
 }
 
-.back-link:active {
-    transform: scale(0.96);
+.overlay-close-button:active {
+    transform: scale(0.9);
 }
 
 /* =========================================================
@@ -469,30 +468,28 @@ html[data-theme="dark"] .stat {
 </style>
 </head>
 <body>
+<button class="overlay-close-button" onclick="closeThisOverlay()" aria-label="Close">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 6l12 12"/>
+        <path d="M18 6L6 18"/>
+    </svg>
+</button>
 <div class="wrap">
-    <div class="top-row" id="topRow">
-        <a class="back-link" href="https://www.novyra.co.za/tv/" target="_top">
-            <svg class="icon" width="14" height="14" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
-            NovaWatch
-        </a>
-    </div>
-
     <div id="wrappedRoot"></div>
 </div>
 
 <script>
-/* =========================================================
-   EMBEDDED-IN-APP CHECK
-   When this page is loaded inside the main app's page overlay (see
-   openPageOverlay() in index.html), the overlay chrome already supplies
-   its own close button - showing this page's own "NovaWatch" back-link
-   on top of that would be redundant, and tapping it would just navigate
-   the iframe itself rather than closing the overlay. Visiting this page
-   directly (not embedded) keeps the back-link as normal.
-========================================================= */
-if (window.self !== window.top) {
-    const topRowEl = document.getElementById("topRow");
-    if (topRowEl) topRowEl.style.display = "none";
+// This page is normally loaded inside the main app's full-screen iframe
+// overlay - closing it there means asking the parent (same-origin) to
+// close that overlay, not navigating away. If it's ever opened directly
+// (not embedded), window.parent === window, so this falls back to just
+// sending them to the main app instead.
+function closeThisOverlay() {
+    if (window.parent && window.parent !== window && typeof window.parent.closePageOverlay === 'function') {
+        window.parent.closePageOverlay();
+    } else {
+        window.location.href = 'https://www.novyra.co.za/tv/';
+    }
 }
 
 /* =========================================================
