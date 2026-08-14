@@ -3829,6 +3829,13 @@ const AVATAR_OPTIONS = [
     { id: 'avatar-8', src: 'https://www.novyra.co.za/Avatar_8.png' }
 ];
 
+// Used to give each new profile a random starting look instead of
+// everyone beginning with plain initials - still fully changeable via the
+// picker afterward, this just picks where they start from.
+function randomAvatarId() {
+    return AVATAR_OPTIONS[Math.floor(Math.random() * AVATAR_OPTIONS.length)].id;
+}
+
 function getSelectedAvatar() {
     const id = state.profiles && state.profiles[0] ? state.profiles[0].avatarId : null;
     if (!id) return null;
@@ -4760,7 +4767,8 @@ async function handleSignUp() {
             state.profiles = [{
                 id: "profile-main",
                 name: username,
-                initials: username.charAt(0).toUpperCase()
+                initials: username.charAt(0).toUpperCase(),
+                avatarId: randomAvatarId()
             }];
         } else {
             state.profiles[0].name = username;
@@ -6105,7 +6113,8 @@ async function proceedToApp(user, authScreen, mainApp) {
                 state.library = dedupedLibrary;
                
                 if (!state.profiles || state.profiles.length === 0) {
-                    state.profiles = [{ id: "profile-main", name: displayName, initials: initial }];
+                    state.profiles = [{ id: "profile-main", name: displayName, initials: initial, avatarId: randomAvatarId() }];
+                    saveUserProfile();
                 }
                 
                 libraryLoaded = true;
