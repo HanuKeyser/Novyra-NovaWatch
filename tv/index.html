@@ -1487,6 +1487,27 @@ img {
     transform: scale(0.9);
 }
 
+.season-rewatch-button {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--glass-sheen), var(--surface);
+    color: var(--blue);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow-sm);
+    transition: transform 0.15s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.season-rewatch-button:active {
+    transform: scale(0.9);
+}
+
 /* "Done" action sitting next to the circular close button in a modal
    header - used by the poster/backdrop picker so a poster and a backdrop
    can both be picked (across tabs) before anything is saved and the sheet
@@ -1552,6 +1573,7 @@ img {
     transform: scale(0.92);
     opacity: 0;
     transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.25s ease;
+    position: relative;
 }
 
 .confirm-overlay.open .confirm-card {
@@ -1958,6 +1980,18 @@ img {
     font-size: 11px;
     line-height: 1.5;
     margin-top: 4px;
+}
+
+.rewatch-count-tap {
+    color: var(--blue-light);
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-color: rgba(71, 146, 255, 0.4);
+    text-underline-offset: 2px;
+}
+
+.rewatch-count-tap:active {
+    opacity: 0.6;
 }
 
 /* =========================================================
@@ -2632,6 +2666,23 @@ img {
     min-width: 0;
 }
 
+.toast-action {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    padding: 4px 2px;
+    margin: -4px -2px;
+    color: var(--blue-light);
+    font-size: 13.5px;
+    font-weight: 800;
+    letter-spacing: -0.1px;
+    cursor: pointer;
+}
+
+.toast-action:active {
+    opacity: 0.6;
+}
+
 .auth-field {
     width: 100%;
 }
@@ -3008,6 +3059,35 @@ img {
 </div>
 
 <!-- =====================================================
+     REWATCH COUNT POPUP
+     A compact centered popup (same pattern as Delete Account) for
+     adding/removing a rewatch - either for a single episode (tapped from
+     an episode row or the Episode Details Modal) or for an entire season
+     (tapped from the season-rewatch button next to the season tabs).
+================================================     -->
+<div id="rewatchCountModal" class="confirm-overlay" onclick="closeRewatchPopupOutside(event)">
+    <div class="confirm-card">
+        <button class="close-button" style="position: absolute; top: 12px; right: 12px;" onclick="closeRewatchPopup()" aria-label="Close">
+            <svg class="icon" viewBox="0 0 24 24">
+                <path d="M6 6l12 12"/>
+                <path d="M18 6L6 18"/>
+            </svg>
+        </button>
+        <div class="confirm-icon-badge" style="background: var(--glass-sheen), var(--blue-gradient); box-shadow: 0 8px 20px rgba(0, 102, 204, 0.35), inset 0 1px 0 rgba(255,255,255,0.5);">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        </div>
+        <div id="rewatchPopupTitle" class="confirm-title"></div>
+        <div id="rewatchPopupCount" style="font-size: 40px; font-weight: 800; color: var(--blue); line-height: 1.1;"></div>
+        <p class="confirm-message" style="margin-top: 2px;">Rewatches</p>
+        <div class="confirm-actions">
+            <button id="rewatchPopupRemoveBtn" class="confirm-btn cancel" onclick="removeRewatchFromPopup()">Remove Rewatch</button>
+            <button id="rewatchPopupAddBtn" class="confirm-btn" style="background: var(--glass-sheen), var(--blue-gradient); color: white; box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3), inset 0 1px 0 rgba(255,255,255,0.5);" onclick="addRewatchFromPopup()">Add Rewatch</button>
+        </div>
+        <button id="rewatchPopupClearBtn" style="display:none; margin-top: 14px; width: 100%; background: none; border: none; padding: 4px; color: var(--danger); font-size: 13px; font-weight: 700;" onclick="clearSeasonRewatchesFromPopup()">Clear Season Rewatches</button>
+    </div>
+</div>
+
+<!-- =====================================================
      CHANGE POSTER / BACKDROP PICKER
      Opened by long-pressing a poster in the Library grid.
 ================================================     -->
@@ -3218,6 +3298,7 @@ img {
 <div id="toast" class="toast">
     <div id="toastIcon" class="toast-icon" style="display: none;"></div>
     <span id="toastMessage"></span>
+    <button id="toastAction" class="toast-action" style="display:none;" onclick="handleToastAction(event)"></button>
 </div>
 
 <script>  
@@ -3309,6 +3390,7 @@ let libraryLoaded = false;
 
 let currentItem = null;
 let currentEpisode = null;
+let rewatchPopupEpId = null;
 let selectedSeason = 1;
 // Set right before a fresh modal open so the episode list scrolls straight
 // to the next-up episode once, without re-scrolling on every later
@@ -3400,7 +3482,9 @@ function escapeHTML(str) {
         .replace(/'/g, "&#039;");
 }
 
-function showToast(message, type = null) {
+let toastActionHandler = null;
+
+function showToast(message, type = null, action = null) {
     const toast = document.getElementById("toast");
     if (!toast) return;
     document.getElementById("toastMessage").textContent = message;
@@ -3421,11 +3505,36 @@ function showToast(message, type = null) {
         }
     }
 
+    const actionBtn = document.getElementById("toastAction");
+    if (actionBtn) {
+        if (action && action.label) {
+            actionBtn.textContent = action.label;
+            actionBtn.style.display = "block";
+            toastActionHandler = action.onClick;
+        } else {
+            actionBtn.style.display = "none";
+            toastActionHandler = null;
+        }
+    }
+
     toast.classList.add("show");
     clearTimeout(toastTimer);
+    // Give toasts with an undo action a beat longer, since there's an
+    // extra decision (tap Undo or let it stand) instead of just reading it.
     toastTimer = setTimeout(() => {
         toast.classList.remove("show");
-    }, 3000);
+        toastActionHandler = null;
+    }, action ? 4500 : 3000);
+}
+
+function handleToastAction(event) {
+    event.stopPropagation();
+    const toast = document.getElementById("toast");
+    const handler = toastActionHandler;
+    toastActionHandler = null;
+    clearTimeout(toastTimer);
+    if (toast) toast.classList.remove("show");
+    if (handler) handler();
 }
 
 function clearSearch(inputId) {
@@ -4189,6 +4298,12 @@ function closeSettingsOutside(event) {
 // way the app itself is never unmounted: coming back doesn't re-run the
 // sign-in flow, reset the active tab, or show any "welcome back" loading
 // state, because the app was never actually torn down.
+//
+// NOTE for whoever builds out nova-wrapped/'s watch-time calculation:
+// rewatches (rewatchCount on movies/episodes) should NOT be counted
+// toward Wrapped's totals - only the original watch. This is the
+// opposite of the Home tab's Viewing Analytics, which deliberately DOES
+// count rewatches (see renderHomeTab's totalMinutes calculation).
 function goToWrapped() {
     openPageOverlay("nova-wrapped/");
 }
@@ -4479,6 +4594,8 @@ async function refreshItemFromTMDBInternal(item) {
                                 const existing = epMap.get(newEp.id);
                                 newEp.watched = existing.watched;
                                 newEp.watchedAt = existing.watchedAt || null;
+                                newEp.rewatchCount = existing.rewatchCount || 0;
+                                newEp.rewatchedAt = existing.rewatchedAt || null;
                                 if (
                                     existing.title !== newEp.title ||
                                     existing.overview !== newEp.overview ||
@@ -5822,12 +5939,14 @@ async function importMediaData(id, type, buttonElement) {
             // include newer episodes the archive never saw, which is fine,
             // they just stay unwatched like any other new episode.
             if (archivedShow && Array.isArray(archivedShow.episodes)) {
-                const watchedMap = new Map(archivedShow.episodes.map(ep => [ep.id, { watched: ep.watched, watchedAt: ep.watchedAt || null }]));
+                const watchedMap = new Map(archivedShow.episodes.map(ep => [ep.id, { watched: ep.watched, watchedAt: ep.watchedAt || null, rewatchCount: ep.rewatchCount || 0, rewatchedAt: ep.rewatchedAt || null }]));
                 episodes.forEach(ep => {
                     const archived = watchedMap.get(ep.id);
                     if (archived && archived.watched) {
                         ep.watched = true;
                         ep.watchedAt = archived.watchedAt;
+                        ep.rewatchCount = archived.rewatchCount;
+                        ep.rewatchedAt = archived.rewatchedAt;
                     }
                 });
             }
@@ -6223,7 +6342,12 @@ function renderHomeTab() {
             if (item.watched) {
                 const match = (item.runtime || "").match(/(\d+)/);
                 const mins = match ? parseInt(match[1], 10) : 120;
-                totalMinutes += mins;
+                const rewatches = item.rewatchCount || 0;
+                // The original watch plus every logged rewatch each count
+                // their own pass at the runtime toward total watch time -
+                // rewatch time folds into this total rather than getting
+                // its own separate stat.
+                totalMinutes += mins * (1 + rewatches);
             }
         } else if (item.episodes) {
             let watchedEps = item.episodes.filter(ep => ep.watched);
@@ -6232,7 +6356,8 @@ function renderHomeTab() {
             watchedEps.forEach(ep => {
                 const match = (ep.runtime || "").match(/(\d+)/);
                 const mins = match ? parseInt(match[1], 10) : 45;
-                totalMinutes += mins;
+                const rewatches = ep.rewatchCount || 0;
+                totalMinutes += mins * (1 + rewatches);
             });
         }
     });
@@ -7085,10 +7210,15 @@ function updateModalContent() {
                 ? formatDate(currentItem.lastWatchedAt)
                 : 'Date unavailable';
             metaHTML += `<span>•</span><span style="color: var(--success); font-weight:700;">Watched ${escapeHTML(watchedDateStr)}</span>`;
+            if (isCurrentItemInLibrary()) {
+                metaHTML += `<span>•</span><span class="rewatch-count-tap" onclick="event.stopPropagation(); openMovieRewatchPopup()">Rewatched \u00d7${currentItem.rewatchCount || 0}</span>`;
+            }
         }
     } else {
         const prog = getTVProgress(currentItem);
         const statusHTML = currentItem.status ? `<span>•</span><span>${escapeHTML(currentItem.status)}</span>` : '';
+        const showRewatches = (currentItem.episodes || []).reduce((sum, ep) => sum + (ep.rewatchCount || 0), 0);
+        const rewatchHTML = showRewatches > 0 ? `<span>•</span><span style="color: var(--blue-light); font-weight:700;">${showRewatches} Rewatch${showRewatches === 1 ? '' : 'es'}</span>` : '';
         metaHTML = `
             <span>${currentItem.year || 'N/A'}</span>
             <span>•</span>
@@ -7097,6 +7227,7 @@ function updateModalContent() {
             <span>${prog.watched}/${prog.total} Episodes Watched (${prog.percentage}%)</span>
             ${statusHTML}
             ${ratingHTML}
+            ${rewatchHTML}
         `;
     }
 
@@ -7129,6 +7260,7 @@ function updateModalContent() {
     } else {
         const nextEp = getNextUnwatchedEpisode(currentItem);
         const nextLabel = nextEp ? `S${nextEp.season} E${nextEp.number}` : 'Up to Date';
+        const prog = getTVProgress(currentItem);
 
         actionsHTML = `
             <div class="modal-actions-row movie-actions-grid">
@@ -7185,6 +7317,9 @@ function renderEpisodesList(container) {
 
     const seasonEpisodes = currentItem.episodes.filter(ep => ep.season === selectedSeason);
     const nextEp = getNextUnwatchedEpisode(currentItem);
+    const seasonReleasedEpisodes = seasonEpisodes.filter(ep => isReleased(ep.releaseDate));
+    const seasonFullyWatched = seasonReleasedEpisodes.length > 0 && seasonReleasedEpisodes.every(ep => ep.watched);
+    const showSeasonRewatchButton = isCurrentItemInLibrary();
 
     let html = `
         <div class="season-selector-wrapper">
@@ -7202,6 +7337,11 @@ function renderEpisodesList(container) {
                     </button>
                 `).join("")}
             </div>
+            ${showSeasonRewatchButton ? `
+                <button class="season-rewatch-button" onclick="openSeasonRewatchPopup(${selectedSeason})" ${seasonFullyWatched ? '' : 'disabled'} style="${seasonFullyWatched ? '' : 'opacity: 0.4; pointer-events: none;'}" aria-label="Log a rewatch for this season" title="${seasonFullyWatched ? 'Log a rewatch for this season' : 'Finish watching the season to rewatch it'}">
+                    ${rewatchIconSVG()}
+                </button>
+            ` : ''}
         </div>
         <div class="episodes-list">
             ${seasonEpisodes.map(ep => {
@@ -7225,7 +7365,7 @@ function renderEpisodesList(container) {
                                     <div class="episode-title">${isUpNext ? '<span class="episode-up-next-badge">UP NEXT</span>' : ''}E${ep.number} • ${escapeHTML(ep.title)}</div>
                                     <div class="episode-overview">${escapeHTML(ep.overview)}</div>
                                     <div class="episode-meta">
-                                        ${ep.runtime || '45 min'} &bull; ${dateStr} &bull; <span style="color: ${watchedColor}; font-weight:700;">${watchedText}</span>
+                                        ${ep.runtime || '45 min'} &bull; ${dateStr} &bull; <span style="color: ${watchedColor}; font-weight:700;">${watchedText}</span>${ep.watched ? ` &bull; <span class="rewatch-count-tap" onclick="event.stopPropagation(); openRewatchPopup('${ep.id}')">Rewatched \u00d7${ep.rewatchCount || 0}</span>` : ''}
                                     </div>
                                 </div>
                             </div>
@@ -7556,6 +7696,10 @@ function closePosterPickerOutside(event) {
 function setEpisodeWatched(ep, watched) {
     ep.watched = watched;
     ep.watchedAt = watched ? new Date().toISOString() : null;
+    if (!watched) {
+        ep.rewatchCount = 0;
+        ep.rewatchedAt = null;
+    }
 }
 
 async function toggleEntireSeasonWatched(seasonNumber) {
@@ -7604,13 +7748,7 @@ function openEpisodeDetails(epId) {
         backdrop.style.backgroundColor = 'var(--surface-2)';
     }
     
-    document.getElementById("episodeModalMeta").innerHTML = `
-        <span>Season ${currentEpisode.season}</span>
-        <span>•</span>
-        <span>${currentEpisode.runtime || '45 min'}</span>
-        <span>•</span>
-        <span>${formatDate(currentEpisode.releaseDate)}</span>
-    `;
+    refreshEpisodeModalMeta();
     
     document.getElementById("episodeModalDescription").textContent = currentEpisode.overview || "No description available.";
     
@@ -7634,6 +7772,28 @@ function openEpisodeDetails(epId) {
 
     document.getElementById("episodeDetailsModal").classList.add("open");
     lockBodyScroll();
+}
+
+// Rebuilds just the episode modal's meta line (season/runtime/date and the
+// tappable rewatch indicator). Split out from openEpisodeDetails so the
+// rewatch popup can refresh the count behind it without re-running the
+// full open sequence - calling openEpisodeDetails again there was calling
+// lockBodyScroll() an extra, unmatched time per tap (openEpisodeDetails
+// always locks once), so a few taps of Add/Remove Rewatch would leave the
+// body scroll permanently locked after closing everything.
+function refreshEpisodeModalMeta() {
+    if (!currentEpisode) return;
+    document.getElementById("episodeModalMeta").innerHTML = `
+        <span>Season ${currentEpisode.season}</span>
+        <span>•</span>
+        <span>${currentEpisode.runtime || '45 min'}</span>
+        <span>•</span>
+        <span>${formatDate(currentEpisode.releaseDate)}</span>
+        ${(currentEpisode.watched && isCurrentItemInLibrary()) ? `
+            <span>•</span>
+            <span class="rewatch-count-tap" onclick="event.stopPropagation(); openRewatchPopup('${currentEpisode.id}')">Rewatched \u00d7${currentEpisode.rewatchCount || 0}</span>
+        ` : ''}
+    `;
 }
 
 function closeEpisodeModal() {
@@ -7713,6 +7873,203 @@ function isCurrentItemInLibrary() {
     return state.library.some(s => s.id === currentItem.id || (currentItem.tmdbId && s.tmdbId === currentItem.tmdbId));
 }
 
+// Small circular-arrows icon used on the Rewatch button, in the same
+// stroke-based style as the app's other inline action icons.
+function rewatchIconSVG() {
+    return `<svg class="icon icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>`;
+}
+
+// Rewatch Count popup - shared by movies, single episodes, and whole
+// seasons. currentEpisode (when set) is the same object reference as the
+// matching entry in currentItem.episodes, so mutating it and saving
+// currentItem persists it - but the popup can also be opened directly from
+// an episode row or the season-rewatch button without the Episode Details
+// Modal being open, so episode lookups go by id/season rather than
+// assuming currentEpisode is already pointing at the right one.
+let rewatchPopupMode = null; // 'movie' | 'episode' | 'season'
+let rewatchPopupSeasonNumber = null;
+
+function findEpisodeById(epId) {
+    if (!currentItem || !currentItem.episodes) return null;
+    return currentItem.episodes.find(e => e.id === epId) || null;
+}
+
+// A season's count is the minimum rewatchCount across its released
+// episodes - the number of full passes every episode in the season has
+// had. Since the season-rewatch button is only enabled once every
+// released episode is watched, this is well-defined whenever it's usable.
+function getSeasonReleasedEpisodes(seasonNumber) {
+    if (!currentItem || !currentItem.episodes) return [];
+    return currentItem.episodes.filter(ep => ep.season === seasonNumber && isReleased(ep.releaseDate));
+}
+
+function getSeasonRewatchCount(seasonNumber) {
+    const eps = getSeasonReleasedEpisodes(seasonNumber);
+    if (eps.length === 0) return 0;
+    return Math.min(...eps.map(ep => ep.rewatchCount || 0));
+}
+
+function openMovieRewatchPopup() {
+    if (!currentItem || currentItem.type !== 'movie') return;
+    if (!isCurrentItemInLibrary()) {
+        showToast("Add this to your library first.", "error");
+        return;
+    }
+    rewatchPopupMode = 'movie';
+    rewatchPopupEpId = null;
+    rewatchPopupSeasonNumber = null;
+    document.getElementById("rewatchPopupTitle").textContent = currentItem.title;
+    renderRewatchPopup();
+    document.getElementById("rewatchCountModal").classList.add("open");
+    lockBodyScroll();
+}
+
+function openRewatchPopup(epId) {
+    const episode = findEpisodeById(epId);
+    if (!episode) return;
+    rewatchPopupMode = 'episode';
+    rewatchPopupEpId = epId;
+    rewatchPopupSeasonNumber = null;
+    document.getElementById("rewatchPopupTitle").textContent = `E${episode.number}: ${episode.title}`;
+    renderRewatchPopup();
+    document.getElementById("rewatchCountModal").classList.add("open");
+    lockBodyScroll();
+}
+
+function openSeasonRewatchPopup(seasonNumber) {
+    if (!isCurrentItemInLibrary()) {
+        showToast("Add this to your library first.", "error");
+        return;
+    }
+    rewatchPopupMode = 'season';
+    rewatchPopupSeasonNumber = seasonNumber;
+    rewatchPopupEpId = null;
+    document.getElementById("rewatchPopupTitle").textContent = `Season ${seasonNumber}`;
+    renderRewatchPopup();
+    document.getElementById("rewatchCountModal").classList.add("open");
+    lockBodyScroll();
+}
+
+function renderRewatchPopup() {
+    let count = 0;
+    let canRemove = false;
+    const clearBtn = document.getElementById("rewatchPopupClearBtn");
+    if (rewatchPopupMode === 'movie') {
+        if (!currentItem) return;
+        count = currentItem.rewatchCount || 0;
+        canRemove = count > 0;
+        clearBtn.style.display = "none";
+    } else if (rewatchPopupMode === 'episode') {
+        const episode = findEpisodeById(rewatchPopupEpId);
+        if (!episode) return;
+        count = episode.rewatchCount || 0;
+        canRemove = count > 0;
+        clearBtn.style.display = "none";
+    } else if (rewatchPopupMode === 'season') {
+        count = getSeasonRewatchCount(rewatchPopupSeasonNumber);
+        // Remove should be enabled whenever ANY episode in the season still
+        // has a rewatch to take back, not just when every episode does -
+        // the displayed count is the minimum across episodes (full passes
+        // completed by all of them), so it can read 0 even while some
+        // individual episode still has rewatches left to remove.
+        canRemove = getSeasonReleasedEpisodes(rewatchPopupSeasonNumber).some(ep => (ep.rewatchCount || 0) > 0);
+        clearBtn.style.display = canRemove ? "block" : "none";
+    } else {
+        return;
+    }
+    document.getElementById("rewatchPopupCount").textContent = `\u00d7${count}`;
+    const removeBtn = document.getElementById("rewatchPopupRemoveBtn");
+    removeBtn.disabled = !canRemove;
+    removeBtn.style.opacity = canRemove ? "1" : "0.5";
+}
+
+function closeRewatchPopup() {
+    document.getElementById("rewatchCountModal").classList.remove("open");
+    unlockBodyScroll();
+    rewatchPopupMode = null;
+    rewatchPopupEpId = null;
+    rewatchPopupSeasonNumber = null;
+}
+
+function closeRewatchPopupOutside(event) {
+    if (event.target.id === "rewatchCountModal") closeRewatchPopup();
+}
+
+async function addRewatchFromPopup() {
+    if (!currentItem || !isCurrentItemInLibrary()) {
+        showToast("Add this to your library first.", "error");
+        return;
+    }
+    const now = new Date().toISOString();
+
+    if (rewatchPopupMode === 'movie') {
+        currentItem.rewatchCount = (currentItem.rewatchCount || 0) + 1;
+        currentItem.lastWatchedAt = now;
+    } else if (rewatchPopupMode === 'episode') {
+        const episode = findEpisodeById(rewatchPopupEpId);
+        if (!episode) return;
+        episode.rewatchCount = (episode.rewatchCount || 0) + 1;
+        episode.rewatchedAt = now;
+        if (currentEpisode && currentEpisode.id === episode.id) refreshEpisodeModalMeta();
+    } else if (rewatchPopupMode === 'season') {
+        getSeasonReleasedEpisodes(rewatchPopupSeasonNumber).forEach(ep => {
+            ep.rewatchCount = (ep.rewatchCount || 0) + 1;
+            ep.rewatchedAt = now;
+        });
+    } else {
+        return;
+    }
+
+    await saveItem(currentItem);
+    renderRewatchPopup();
+    updateModalContent();
+    refreshActivePage();
+}
+
+async function removeRewatchFromPopup() {
+    if (!currentItem) return;
+
+    if (rewatchPopupMode === 'movie') {
+        if (!currentItem.rewatchCount) return;
+        currentItem.rewatchCount = Math.max(0, currentItem.rewatchCount - 1);
+    } else if (rewatchPopupMode === 'episode') {
+        const episode = findEpisodeById(rewatchPopupEpId);
+        if (!episode || !episode.rewatchCount) return;
+        episode.rewatchCount = Math.max(0, episode.rewatchCount - 1);
+        if (episode.rewatchCount === 0) episode.rewatchedAt = null;
+        if (currentEpisode && currentEpisode.id === episode.id) refreshEpisodeModalMeta();
+    } else if (rewatchPopupMode === 'season') {
+        getSeasonReleasedEpisodes(rewatchPopupSeasonNumber).forEach(ep => {
+            if (!ep.rewatchCount) return;
+            ep.rewatchCount = Math.max(0, ep.rewatchCount - 1);
+            if (ep.rewatchCount === 0) ep.rewatchedAt = null;
+        });
+    } else {
+        return;
+    }
+
+    await saveItem(currentItem);
+    renderRewatchPopup();
+    updateModalContent();
+    refreshActivePage();
+}
+
+// Wipes rewatch data for every episode in the season at once, rather than
+// stepping the count down one at a time via Remove Rewatch. Season-mode
+// only - there's no equivalent for a single episode since Remove Rewatch
+// already gets there in as many taps as the count requires.
+async function clearSeasonRewatchesFromPopup() {
+    if (!currentItem || rewatchPopupMode !== 'season') return;
+    getSeasonReleasedEpisodes(rewatchPopupSeasonNumber).forEach(ep => {
+        ep.rewatchCount = 0;
+        ep.rewatchedAt = null;
+    });
+    await saveItem(currentItem);
+    renderRewatchPopup();
+    updateModalContent();
+    refreshActivePage();
+}
+
 async function toggleMovieWatched(id) {
     if (!currentItem || currentItem.type !== 'movie') return;
     if (!isCurrentItemInLibrary()) {
@@ -7725,6 +8082,7 @@ async function toggleMovieWatched(id) {
     }
     currentItem.watched = !currentItem.watched;
     currentItem.lastWatchedAt = currentItem.watched ? new Date().toISOString() : null;
+    if (!currentItem.watched) currentItem.rewatchCount = 0;
     await saveItem(currentItem);
     updateModalContent();
     refreshActivePage();
