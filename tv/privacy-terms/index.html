@@ -42,6 +42,7 @@
     --glass-border: rgba(255, 255, 255, 0.7);
     --glass-border-subtle: rgba(255, 255, 255, 0.38);
     --glass-shadow: 0 22px 46px rgba(0, 0, 0, 0.09), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    --glass-shadow-sm: 0 10px 28px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.85);
 
     --glass-chrome-fill: rgba(255, 255, 255, 0.52);
     --glass-chrome-blur: blur(60px) saturate(220%);
@@ -83,34 +84,33 @@ body {
     max-width: 620px;
 }
 
-.top-row {
+.overlay-close-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 20;
+    width: 38px;
+    height: 38px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    margin-bottom: 22px;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--glass-sheen), var(--surface);
+    color: var(--text);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow-sm);
+    transition: transform 0.15s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-.back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    height: 36px;
-    padding: 0 16px;
-    border-radius: 999px;
-    background: var(--glass-sheen), var(--glass-chrome-fill);
-    backdrop-filter: var(--glass-chrome-blur);
-    -webkit-backdrop-filter: var(--glass-chrome-blur);
-    border: 1px solid var(--glass-chrome-border);
-    box-shadow: var(--glass-chrome-shadow);
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-size: 13px;
-    font-weight: 700;
-    transition: transform 0.15s ease;
+.overlay-close-button .icon {
+    width: 22px;
+    height: 22px;
 }
 
-.back-link:active {
-    transform: scale(0.96);
+.overlay-close-button:active {
+    transform: scale(0.9);
 }
 
 .hero {
@@ -208,6 +208,7 @@ html[data-theme="dark"] {
     --glass-border: rgba(255, 255, 255, 0.14);
     --glass-border-subtle: rgba(255, 255, 255, 0.07);
     --glass-shadow: 0 22px 46px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+    --glass-shadow-sm: 0 10px 28px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 
     --glass-chrome-fill: rgba(44, 44, 48, 0.6);
     --glass-chrome-border: rgba(255, 255, 255, 0.16);
@@ -235,6 +236,12 @@ html[data-theme="dark"] .hero {
 </style>
 </head>
 <body>
+<button class="overlay-close-button" onclick="closeThisOverlay()" aria-label="Close">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 6l12 12"/>
+        <path d="M18 6L6 18"/>
+    </svg>
+</button>
 <div class="wrap">
     <div class="hero">
         <h1>Privacy Notice</h1>
@@ -328,5 +335,19 @@ html[data-theme="dark"] .hero {
         </section>
     </div>
 </div>
+<script>
+// This page is normally loaded inside the main app's full-screen iframe
+// overlay - closing it there means asking the parent (same-origin) to
+// close that overlay, not navigating away. If it's ever opened directly
+// (not embedded), window.parent === window, so this falls back to just
+// sending them to the main app instead.
+function closeThisOverlay() {
+    if (window.parent && window.parent !== window && typeof window.parent.closePageOverlay === 'function') {
+        window.parent.closePageOverlay();
+    } else {
+        window.location.href = 'https://www.novyra.co.za/tv/';
+    }
+}
+</script>
 </body>
 </html>
