@@ -112,3 +112,47 @@
     });
   }
 })();
+
+/* Fit display headings: if the longest word is wider than the heading's space, scale that heading down until it fits */
+(function () {
+  var SEL = "h1, h2, h3, .equation";
+  function avail(el) {
+    var cs = getComputedStyle(el), w = el.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    var p = el.parentElement;
+    if (p) { var ps = getComputedStyle(p); w = Math.min(w, p.clientWidth - parseFloat(ps.paddingLeft) - parseFloat(ps.paddingRight)); }
+    return w;
+  }
+  function fit() {
+    var els = document.querySelectorAll(SEL);
+    for (var i = 0; i < els.length; i++) {
+      var el = els[i];
+      if (el.style.fontSize) el.style.fontSize = "";
+      var cs = getComputedStyle(el);
+      if (cs.fontFamily.indexOf("Syne") < 0 || cs.display === "none") continue;
+      var words = [];
+      for (var k = 0; k < el.childNodes.length; k++) {
+        var n = el.childNodes[k];
+        if (n.nodeType === 1 && getComputedStyle(n).whiteSpace === "nowrap") words.push(n.textContent);
+        else words = words.concat((n.textContent || "").split(/\s+/));
+      }
+      words = words.filter(function (w) { return w && w.trim(); });
+      if (!words.length) continue;
+      var probe = document.createElement("span");
+      probe.setAttribute("aria-hidden", "true");
+      probe.style.cssText = "position:absolute;visibility:hidden;white-space:nowrap;left:0;top:0;pointer-events:none";
+      el.appendChild(probe);
+      var max = 0;
+      for (var j = 0; j < words.length; j++) { probe.textContent = words[j]; max = Math.max(max, probe.getBoundingClientRect().width); }
+      el.removeChild(probe);
+      var a = avail(el);
+      if (a > 0 && max > a) el.style.fontSize = (Math.floor(parseFloat(cs.fontSize) * a / max * 0.97 * 10) / 10) + "px";
+    }
+  }
+  var raf = 0;
+  function queue() { cancelAnimationFrame(raf); raf = requestAnimationFrame(fit); }
+  fit();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+  window.addEventListener("load", fit);
+  window.addEventListener("resize", queue);
+  window.addEventListener("orientationchange", queue);
+})();

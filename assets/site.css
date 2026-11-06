@@ -357,3 +357,15 @@ p{margin:0}
 
 .logo-grid.four{grid-template-columns:repeat(4,minmax(0,1fr))}
 @media (max-width:900px){.logo-grid.four{grid-template-columns:repeat(2,minmax(0,1fr))}.logo-grid.four .logo-card{min-height:190px;padding:22px 22px 40px}.logo-grid.four img{max-height:86px!important;margin-bottom:0!important}}
+
+/* Big display headings never run past their box: flex/grid children may shrink, and site.js fits the longest word */
+.cta>*,.feature>*,.case-hero>*,.contact-grid>*,.section-head>*,.svc-group>header>*{min-width:0}
+.tile h3{overflow-wrap:normal}
+.logo-grid.four .swatches{grid-template-columns:auto;justify-items:start}
+@media (max-width:640px){.logo-grid.four .swatches span{flex-direction:row;font-size:11px}}
+.nowrap{white-space:nowrap}
+@media (max-width:640px){.cta{padding:30px 22px}.cta h2{max-width:none}}
+.site-foot{padding-bottom:calc(40px + 72px + env(safe-area-inset-bottom,0px))}
+/* Phones held sideways: keep the big titles in proportion to the short screen */
+.hero h1{font-size:clamp(44px,min(10.5vw,18svh),148px)}
+.page-intro h1{font-size:clamp(40px,min(9vw,18svh),120px)}
