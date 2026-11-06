@@ -142,7 +142,7 @@
       probe.style.cssText = "position:absolute;visibility:hidden;white-space:nowrap;left:0;top:0;pointer-events:none";
       el.appendChild(probe);
       var max = 0;
-      for (var j = 0; j < words.length; j++) { probe.textContent = words[j]; max = Math.max(max, probe.getBoundingClientRect().width); }
+      for (var j = 0; j < words.length; j++) { probe.textContent = words[j]; max = Math.max(max, probe.offsetWidth + 1); }
       el.removeChild(probe);
       var a = avail(el);
       if (a > 0 && max > a) el.style.fontSize = (Math.floor(parseFloat(cs.fontSize) * a / max * 0.97 * 10) / 10) + "px";

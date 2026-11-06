@@ -14,7 +14,7 @@
   --f-display:"Syne","Arial Black",system-ui,sans-serif;
   --f-body:"Hanken Grotesk","Helvetica Neue",Arial,sans-serif;
   --radius:22px;
-  --max:1240px;
+  --max:1360px;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -27,7 +27,7 @@ a:hover{color:var(--text)}
 :focus-visible{outline:2px solid var(--spark-soft);outline-offset:3px;border-radius:6px}
 h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1}
 p{margin:0}
-.wrap{max-width:var(--max);margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.wrap{max-width:var(--max);margin:0 auto;padding-left:max(20px,min(3vw,40px),env(safe-area-inset-left,0px));padding-right:max(20px,min(3vw,40px),env(safe-area-inset-right,0px))}
 .eyebrow{font-size:13px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:var(--spark-soft)}
 .lead{font-size:clamp(18px,2vw,21px);color:var(--muted);max-width:60ch}
 .spark{display:inline-block;width:.62em;height:.62em;flex:none;background:radial-gradient(circle,var(--spark),var(--spark-soft));clip-path:polygon(50% 0,58% 42%,100% 50%,58% 58%,50% 100%,42% 58%,0 50%,42% 42%)}
@@ -369,3 +369,47 @@ p{margin:0}
 /* Phones held sideways: keep the big titles in proportion to the short screen */
 .hero h1{font-size:clamp(44px,min(10.5vw,18svh),148px)}
 .page-intro h1{font-size:clamp(40px,min(9vw,18svh),120px)}
+
+/* Wide screens: the whole layout grows with the screen, so the side margins stay about 5-7% at any width.
+   Designed at 1440px; one step every 60px up to 4K. */
+@media (min-width:1460px){html{zoom:1.027}}
+@media (min-width:1520px){html{zoom:1.069}}
+@media (min-width:1580px){html{zoom:1.111}}
+@media (min-width:1640px){html{zoom:1.153}}
+@media (min-width:1700px){html{zoom:1.195}}
+@media (min-width:1760px){html{zoom:1.238}}
+@media (min-width:1820px){html{zoom:1.28}}
+@media (min-width:1880px){html{zoom:1.322}}
+@media (min-width:1940px){html{zoom:1.364}}
+@media (min-width:2000px){html{zoom:1.406}}
+@media (min-width:2060px){html{zoom:1.449}}
+@media (min-width:2120px){html{zoom:1.491}}
+@media (min-width:2180px){html{zoom:1.533}}
+@media (min-width:2240px){html{zoom:1.575}}
+@media (min-width:2300px){html{zoom:1.617}}
+@media (min-width:2360px){html{zoom:1.66}}
+@media (min-width:2420px){html{zoom:1.702}}
+@media (min-width:2480px){html{zoom:1.744}}
+@media (min-width:2540px){html{zoom:1.786}}
+@media (min-width:2600px){html{zoom:1.828}}
+@media (min-width:2660px){html{zoom:1.871}}
+@media (min-width:2720px){html{zoom:1.913}}
+@media (min-width:2780px){html{zoom:1.955}}
+@media (min-width:2840px){html{zoom:1.997}}
+@media (min-width:2900px){html{zoom:2.039}}
+@media (min-width:2960px){html{zoom:2.082}}
+@media (min-width:3020px){html{zoom:2.124}}
+@media (min-width:3080px){html{zoom:2.166}}
+@media (min-width:3140px){html{zoom:2.208}}
+@media (min-width:3200px){html{zoom:2.25}}
+@media (min-width:3260px){html{zoom:2.293}}
+@media (min-width:3320px){html{zoom:2.335}}
+@media (min-width:3380px){html{zoom:2.377}}
+@media (min-width:3440px){html{zoom:2.419}}
+@media (min-width:3500px){html{zoom:2.461}}
+@media (min-width:3560px){html{zoom:2.504}}
+@media (min-width:3620px){html{zoom:2.546}}
+@media (min-width:3680px){html{zoom:2.588}}
+@media (min-width:3740px){html{zoom:2.63}}
+@media (min-width:3800px){html{zoom:2.672}}
+.pkg .price small.per{white-space:nowrap}
