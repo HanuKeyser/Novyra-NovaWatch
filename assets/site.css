@@ -14,7 +14,7 @@
   --f-display:"Syne","Arial Black",system-ui,sans-serif;
   --f-body:"Hanken Grotesk","Helvetica Neue",Arial,sans-serif;
   --radius:22px;
-  --max:1360px;
+  --max:1760px;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -27,7 +27,7 @@ a:hover{color:var(--text)}
 :focus-visible{outline:2px solid var(--spark-soft);outline-offset:3px;border-radius:6px}
 h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1}
 p{margin:0}
-.wrap{max-width:var(--max);margin:0 auto;padding-left:max(20px,min(3vw,40px),env(safe-area-inset-left,0px));padding-right:max(20px,min(3vw,40px),env(safe-area-inset-right,0px))}
+.wrap{max-width:var(--max);margin:0 auto;padding-left:max(20px,min(5vw,72px),env(safe-area-inset-left,0px));padding-right:max(20px,min(5vw,72px),env(safe-area-inset-right,0px))}
 .eyebrow{font-size:13px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:var(--spark-soft)}
 .lead{font-size:clamp(18px,2vw,21px);color:var(--muted);max-width:60ch}
 .spark{display:inline-block;width:.62em;height:.62em;flex:none;background:radial-gradient(circle,var(--spark),var(--spark-soft));clip-path:polygon(50% 0,58% 42%,100% 50%,58% 58%,50% 100%,42% 58%,0 50%,42% 42%)}
@@ -64,7 +64,7 @@ p{margin:0}
 /* Sections */
 .section{padding-block:clamp(56px,7vw,96px)}
 .section-head{display:flex;flex-direction:column;gap:16px;margin-bottom:clamp(28px,4vw,48px)}
-.section-head h2{font-size:clamp(38px,6vw,76px);font-weight:800;text-transform:uppercase;letter-spacing:-.01em}
+.section-head h2{font-size:clamp(34px,4.6vw,64px);font-weight:800;text-transform:uppercase;letter-spacing:-.01em}
 .band{border-block:1px solid var(--line);background:var(--ink-2)}
 
 /* Hero */
@@ -99,7 +99,7 @@ p{margin:0}
 .paper{background:var(--paper);color:var(--paper-ink);border-radius:var(--radius);padding:clamp(28px,5vw,56px);display:grid;place-items:center}
 .paper > img{width:min(100%,440px)}
 .feature-text{display:flex;flex-direction:column;gap:20px;min-width:0}
-.feature-text h2{font-size:clamp(36px,5vw,64px);font-weight:800;text-transform:uppercase}
+.feature-text h2{font-size:clamp(32px,4vw,54px);font-weight:800;text-transform:uppercase}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:14px;color:var(--muted)}
 
@@ -121,7 +121,7 @@ p{margin:0}
 
 /* CTA */
 .cta{border-radius:calc(var(--radius) + 8px);padding:clamp(36px,6vw,80px);background:radial-gradient(120% 140% at 85% 0%,var(--spark) 0%,#1d3a8a 38%,var(--ink-2) 75%);display:flex;flex-wrap:wrap;gap:28px;align-items:flex-end;justify-content:space-between}
-.cta h2{font-size:clamp(36px,6vw,72px);font-weight:800;text-transform:uppercase;max-width:14ch}
+.cta h2{font-size:clamp(32px,4.6vw,62px);font-weight:800;text-transform:uppercase;max-width:14ch}
 .cta p{color:#dbe4ff;margin-top:14px;max-width:46ch}
 
 /* Footer */
@@ -367,51 +367,9 @@ p{margin:0}
 @media (max-width:640px){.cta{padding:30px 22px}.cta h2{max-width:none}}
 .site-foot{padding-bottom:calc(40px + 72px + env(safe-area-inset-bottom,0px))}
 /* Phones held sideways: keep the big titles in proportion to the short screen */
-.hero h1{font-size:clamp(44px,min(10.5vw,18svh),148px)}
-.page-intro h1{font-size:clamp(40px,min(9vw,18svh),120px)}
+.hero h1{font-size:clamp(44px,min(8.4vw,16svh),124px)}
+.page-intro h1{font-size:clamp(40px,min(7vw,16svh),100px)}
 
-/* Wide screens: the whole layout grows with the screen, so the side margins stay about 5-7% at any width.
-   Designed at 1440px; one step every 60px up to 4K. */
-@media (min-width:1460px){html{zoom:1.027}}
-@media (min-width:1520px){html{zoom:1.069}}
-@media (min-width:1580px){html{zoom:1.111}}
-@media (min-width:1640px){html{zoom:1.153}}
-@media (min-width:1700px){html{zoom:1.195}}
-@media (min-width:1760px){html{zoom:1.238}}
-@media (min-width:1820px){html{zoom:1.28}}
-@media (min-width:1880px){html{zoom:1.322}}
-@media (min-width:1940px){html{zoom:1.364}}
-@media (min-width:2000px){html{zoom:1.406}}
-@media (min-width:2060px){html{zoom:1.449}}
-@media (min-width:2120px){html{zoom:1.491}}
-@media (min-width:2180px){html{zoom:1.533}}
-@media (min-width:2240px){html{zoom:1.575}}
-@media (min-width:2300px){html{zoom:1.617}}
-@media (min-width:2360px){html{zoom:1.66}}
-@media (min-width:2420px){html{zoom:1.702}}
-@media (min-width:2480px){html{zoom:1.744}}
-@media (min-width:2540px){html{zoom:1.786}}
-@media (min-width:2600px){html{zoom:1.828}}
-@media (min-width:2660px){html{zoom:1.871}}
-@media (min-width:2720px){html{zoom:1.913}}
-@media (min-width:2780px){html{zoom:1.955}}
-@media (min-width:2840px){html{zoom:1.997}}
-@media (min-width:2900px){html{zoom:2.039}}
-@media (min-width:2960px){html{zoom:2.082}}
-@media (min-width:3020px){html{zoom:2.124}}
-@media (min-width:3080px){html{zoom:2.166}}
-@media (min-width:3140px){html{zoom:2.208}}
-@media (min-width:3200px){html{zoom:2.25}}
-@media (min-width:3260px){html{zoom:2.293}}
-@media (min-width:3320px){html{zoom:2.335}}
-@media (min-width:3380px){html{zoom:2.377}}
-@media (min-width:3440px){html{zoom:2.419}}
-@media (min-width:3500px){html{zoom:2.461}}
-@media (min-width:3560px){html{zoom:2.504}}
-@media (min-width:3620px){html{zoom:2.546}}
-@media (min-width:3680px){html{zoom:2.588}}
-@media (min-width:3740px){html{zoom:2.63}}
-@media (min-width:3800px){html{zoom:2.672}}
 .pkg .price small.per{white-space:nowrap}
 
 /* Branded scrollbars (Chrome, Edge, Safari use the custom thumb; Firefox gets the matching colours) */
@@ -435,3 +393,28 @@ p{margin:0}
 .private-card figcaption strong{font:700 16px var(--f-body);color:var(--text)}
 .private-card figcaption span{font-size:14px;color:var(--muted)}
 .private-feature .private-grid{grid-template-columns:1fr}
+.cert-set{margin-top:clamp(36px,5vw,56px);display:flex;flex-direction:column;gap:20px}
+.cert-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 24px}
+.cert-head h3{font:800 clamp(22px,2.4vw,30px)/1.1 var(--f-display);text-transform:uppercase}
+.cert-head p{color:var(--muted);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.private-badge.inline{position:static;display:inline-block}
+.cert-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.cert-grid figure{margin:0;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:var(--paper)}
+.cert-grid img{display:block;width:100%;height:auto;aspect-ratio:1000/707;object-fit:cover}
+@media (max-width:900px){.cert-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Very large screens only (2240px and up): scale gently so the layout still fills the screen */
+@media (min-width:2240px){html{zoom:1.12}}
+@media (min-width:2400px){html{zoom:1.2}}
+@media (min-width:2560px){html{zoom:1.28}}
+@media (min-width:2720px){html{zoom:1.36}}
+@media (min-width:2880px){html{zoom:1.44}}
+@media (min-width:3040px){html{zoom:1.52}}
+@media (min-width:3200px){html{zoom:1.6}}
+@media (min-width:3360px){html{zoom:1.68}}
+@media (min-width:3520px){html{zoom:1.76}}
+@media (min-width:3680px){html{zoom:1.84}}
+@media (min-width:3840px){html{zoom:1.92}}
+.logo-grid:not(.four){grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:900px){.logo-grid:not(.four){grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.logo-grid:not(.four){grid-template-columns:1fr}}
