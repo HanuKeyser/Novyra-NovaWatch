@@ -423,3 +423,5 @@ p{margin:0}
 @supports not selector(::-webkit-scrollbar){html{scrollbar-color:var(--spark) var(--ink);scrollbar-width:thin}}
 .sig::-webkit-scrollbar-track{background:#eef1f7}
 .sig::-webkit-scrollbar-thumb{border-color:#eef1f7}
+.pkg .extra{margin-top:-6px;font:600 14px var(--f-body);color:var(--spark-soft)}
+.q-item .q-break{grid-column:1/-1;font:500 13px var(--f-body);color:var(--muted)}
