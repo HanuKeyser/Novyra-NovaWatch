@@ -42,7 +42,8 @@
       var on = window.scrollY > Math.max(400, window.innerHeight * 0.6);
       up.classList.toggle("show", on); up.tabIndex = on ? 0 : -1;
     };
-    showUp(); window.addEventListener("scroll", showUp, { passive: true });
+    var upRaf = 0;
+    showUp(); window.addEventListener("scroll", function () { if (!upRaf) upRaf = requestAnimationFrame(function () { upRaf = 0; showUp(); }); }, { passive: true });
     up.addEventListener("click", function () {
       window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
       var first = document.querySelector(".skip, .site-head a"); if (first) first.focus({ preventScroll: true });
@@ -72,16 +73,18 @@
     var w = 0, h = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
     var stars = [], streaks = [], mx = 0.7, my = 0.3;
 
+    /* Stars are stored as fractions of the canvas, so a resize (or a phone's address bar
+       showing and hiding) keeps them in place instead of scattering them again */
     function size() {
       var r = canvas.getBoundingClientRect();
+      if (Math.abs(r.width - w) < 1 && Math.abs(r.height - h) < 1) return;
       w = r.width; h = r.height;
-      canvas.width = w * dpr; canvas.height = h * dpr;
+      canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      stars = [];
       var n = Math.round((w * h) / 9000);
-      for (var i = 0; i < n; i++) stars.push({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 1.2 + 0.2, t: Math.random() * 6 });
-      streaks = [];
-      for (var j = 0; j < 26; j++) streaks.push({ o: j / 26, s: 0.4 + Math.random() * 0.8, a: 0.15 + Math.random() * 0.45 });
+      while (stars.length < n) stars.push({ x: Math.random(), y: Math.random(), r: Math.random() * 1.2 + 0.2, t: Math.random() * 6 });
+      if (stars.length > n) stars.length = n;
+      if (!streaks.length) for (var j = 0; j < 26; j++) streaks.push({ o: j / 26, s: 0.4 + Math.random() * 0.8, a: 0.15 + Math.random() * 0.45 });
     }
 
     function draw(time) {
@@ -98,7 +101,7 @@
         var s = stars[i];
         ctx.globalAlpha = 0.35 + 0.35 * Math.sin(t * 1.3 + s.t);
         ctx.fillStyle = "#dbe6ff";
-        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(s.x * w, s.y * h, s.r, 0, Math.PI * 2); ctx.fill();
       }
       /* streaks: arcs sweeping from bottom-left toward the light */
       ctx.lineCap = "round";
@@ -118,17 +121,29 @@
         ctx.stroke();
       }
       ctx.globalAlpha = 1;
-      if (!reduce) requestAnimationFrame(draw);
+      raf = 0; if (!reduce && running) raf = requestAnimationFrame(draw);
     }
 
+    /* Only animate while the hero is on screen and the tab is visible, so scrolling the rest of the page stays smooth */
+    var raf = 0, running = true, onScreen = true;
+    function play() {
+      var should = onScreen && !document.hidden;
+      if (should === running && (raf || !should)) return;
+      running = should;
+      if (running && !reduce && !raf) raf = requestAnimationFrame(draw);
+    }
+    if ("IntersectionObserver" in window) new IntersectionObserver(function (e) { onScreen = e[0].isIntersecting; play(); }).observe(canvas);
+    document.addEventListener("visibilitychange", play);
+
     size();
-    window.addEventListener("resize", function () { size(); if (reduce) draw(0); });
+    var rz = 0;
+    window.addEventListener("resize", function () { cancelAnimationFrame(rz); rz = requestAnimationFrame(function () { size(); if (reduce) draw(0); }); });
     canvas.parentElement.addEventListener("pointermove", function (e) {
       var r = canvas.getBoundingClientRect();
       mx += ((e.clientX - r.left) / r.width * 0.5 + 0.45 - mx) * 0.08;
       my += ((e.clientY - r.top) / r.height * 0.5 + 0.1 - my) * 0.08;
     });
-    reduce ? draw(0) : requestAnimationFrame(draw);
+    if (reduce) draw(0); else raf = requestAnimationFrame(draw);
   }
 
   /* Sparkle burst on button clicks */

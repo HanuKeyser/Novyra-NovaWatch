@@ -272,7 +272,7 @@ p{margin:0}
 .quote-bar .btn{min-height:46px;padding:0 20px}
 @media (max-width:1060px){
   .has-quote .quote-bar.show{display:flex}
-  .has-quote.bar-on{--fab-b:86px}
+  .has-quote.bar-on{--fab-lift:-68px}
   .quote{position:static}
 }
 
@@ -422,11 +422,11 @@ p{margin:0}
 
 /* Floating buttons: WhatsApp circle with a back-to-top circle above it, same size and style on every device */
 :root{--fab:54px;--fab-b:18px}
-.wa-float{width:var(--fab);height:var(--fab);min-height:0;padding:0;gap:0;justify-content:center;bottom:calc(var(--fab-b) + env(safe-area-inset-bottom,0px));transition:bottom .25s ease,transform .2s ease}
+.wa-float{width:var(--fab);height:var(--fab);min-height:0;padding:0;gap:0;justify-content:center;bottom:calc(var(--fab-b) + env(safe-area-inset-bottom,0px));translate:0 var(--fab-lift,0px);transition:translate .35s cubic-bezier(.2,.7,.2,1),transform .2s ease}
 .wa-float span{display:none}
 .wa-float svg{width:26px;height:26px}
-.to-top{position:fixed;z-index:40;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(var(--fab-b) + var(--fab) + 12px + env(safe-area-inset-bottom,0px));width:var(--fab);height:var(--fab);display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:999px;background:var(--spark);color:#fff;cursor:pointer;box-shadow:0 10px 30px -8px rgba(0,0,0,.6);opacity:0;visibility:hidden;transform:translateY(10px);transition:opacity .25s ease,transform .25s ease,visibility 0s linear .25s,bottom .25s ease}
-.to-top.show{opacity:1;visibility:visible;transform:none;transition:opacity .25s ease,transform .25s ease,visibility 0s,bottom .25s ease}
+.to-top{position:fixed;z-index:40;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(var(--fab-b) + var(--fab) + 12px + env(safe-area-inset-bottom,0px));width:var(--fab);height:var(--fab);display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:999px;background:var(--spark);color:#fff;cursor:pointer;box-shadow:0 10px 30px -8px rgba(0,0,0,.6);opacity:0;visibility:hidden;transform:translateY(10px);translate:0 var(--fab-lift,0px);transition:opacity .25s ease,transform .25s ease,visibility 0s linear .25s,translate .35s cubic-bezier(.2,.7,.2,1)}
+.to-top.show{opacity:1;visibility:visible;transform:none;transition:opacity .25s ease,transform .25s ease,visibility 0s,translate .35s cubic-bezier(.2,.7,.2,1)}
 .to-top svg{width:24px;height:24px}
 .wa-float:hover,.to-top.show:hover{transform:translateY(-2px)}
 .wa-float:focus-visible,.to-top:focus-visible{outline-offset:4px;border-radius:999px}
@@ -451,3 +451,28 @@ p{margin:0}
 .news-body h3{font:800 20px/1.15 var(--f-display);text-transform:uppercase}
 .news-body p{color:var(--muted);font-size:15px}
 [hidden]{display:none!important}
+
+/* Smooth motion pass */
+/* Mobile menu slides and fades open instead of popping in */
+@media (max-width:860px){
+  .nav:not(.open){display:flex}
+  .nav{opacity:0;visibility:hidden;transform:translateY(-8px);transition:opacity .22s ease,transform .22s cubic-bezier(.2,.7,.2,1),visibility 0s linear .22s}
+  .nav.open{opacity:1;visibility:visible;transform:none;transition:opacity .22s ease,transform .26s cubic-bezier(.2,.7,.2,1),visibility 0s}
+}
+/* Quote bar slides up from the bottom */
+@media (max-width:1060px){
+  .has-quote .quote-bar{display:flex;transform:translateY(105%);visibility:hidden;transition:transform .35s cubic-bezier(.2,.7,.2,1),visibility 0s linear .35s}
+  .has-quote .quote-bar.show{transform:none;visibility:visible;transition:transform .35s cubic-bezier(.2,.7,.2,1),visibility 0s}
+}
+/* Hint the browser about things that move constantly or often */
+.marquee-track{will-change:transform;backface-visibility:hidden}
+.hero canvas{contain:strict}
+.wa-float,.to-top{will-change:transform}
+/* Card hovers lift smoothly on all cards, not just buttons */
+.pkg:hover{transform:translateY(-2px)}
+.news-post{transition:transform .25s ease,border-color .25s ease}
+.news-post:hover{transform:translateY(-3px);border-color:#3a4370}
+@media (prefers-reduced-motion:reduce){
+  .nav,.nav.open,.has-quote .quote-bar,.has-quote .quote-bar.show{transition:none}
+  .pkg:hover,.news-post:hover{transform:none}
+}
