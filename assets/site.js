@@ -59,6 +59,23 @@
       if (!isNaN(at) && at <= now) { post.hidden = false; shown++; } else post.remove();
     });
     if (shown) feed.hidden = false;
+    /* Masonry: each card spans as many 8px rows as its height needs, so mixed landscape, portrait and 9:16 posts pack neatly */
+    var grid = feed.querySelector(".news-grid");
+    var pack = function () {
+      if (!grid || feed.hidden) return;
+      var cs = getComputedStyle(grid), row = parseFloat(cs.gridAutoRows), gap = parseFloat(cs.rowGap) || 0;
+      grid.querySelectorAll(".news-post").forEach(function (c) {
+        if (isNaN(row)) { c.style.gridRowEnd = ""; return; }
+        c.style.gridRowEnd = "auto";
+        c.style.gridRowEnd = "span " + Math.max(1, Math.ceil((c.getBoundingClientRect().height + gap) / (row + gap)));
+      });
+    };
+    var packSoon = function () { cancelAnimationFrame(pack.r); pack.r = requestAnimationFrame(pack); };
+    pack();
+    window.addEventListener("resize", packSoon);
+    window.addEventListener("load", packSoon);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(packSoon);
+    feed.querySelectorAll("img").forEach(function (im) { if (!im.complete) im.addEventListener("load", packSoon); });
     /* Video posts play (muted, looping) while on screen, unless the visitor prefers less motion */
     var vids = feed.querySelectorAll("video");
     if (vids.length && !reduce && "IntersectionObserver" in window) {
