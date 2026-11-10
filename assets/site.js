@@ -59,6 +59,12 @@
       if (!isNaN(at) && at <= now) { post.hidden = false; shown++; } else post.remove();
     });
     if (shown) feed.hidden = false;
+    /* Video posts play (muted, looping) while on screen, unless the visitor prefers less motion */
+    var vids = feed.querySelectorAll("video");
+    if (vids.length && !reduce && "IntersectionObserver" in window) {
+      var vo = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.preload = "auto"; var pr = e.target.play(); if (pr && pr.catch) pr.catch(function () {}); } else e.target.pause(); }); }, { threshold: 0.35 });
+      vids.forEach(function (v) { vo.observe(v); });
+    }
   }
 
   /* In-page links (like the Work page blocks) glide to their section and keep the address in step */
