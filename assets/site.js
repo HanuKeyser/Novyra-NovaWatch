@@ -61,6 +61,20 @@
     if (shown) feed.hidden = false;
   }
 
+  /* In-page links (like the Work page blocks) glide to their section and keep the address in step */
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest('a[href^="#"]');
+    if (!a || a.getAttribute("href").length < 2) return;
+    var t = document.getElementById(a.getAttribute("href").slice(1));
+    if (!t) return;
+    e.preventDefault();
+    t.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    if (history.replaceState) history.replaceState(null, "", "#" + t.id);
+    var h = t.querySelector("h2, h3") || t;
+    if (!h.hasAttribute("tabindex")) h.setAttribute("tabindex", "-1");
+    h.focus({ preventScroll: true });
+  });
+
   /* Footer year */
   document.querySelectorAll("[data-year]").forEach(function (el) {
     el.textContent = new Date().getFullYear();
