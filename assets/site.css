@@ -431,3 +431,10 @@ p{margin:0}
 .wa-float:hover,.to-top.show:hover{transform:translateY(-2px)}
 .wa-float:focus-visible,.to-top:focus-visible{outline-offset:4px;border-radius:999px}
 @media (prefers-reduced-motion:reduce){.wa-float,.to-top,.to-top.show{transition:none;transform:none}}
+
+/* Same intro on every inner page: heading size, glow word and the name equation match */
+.page-intro h1 .glow{color:transparent;background:linear-gradient(100deg,var(--spark) 10%,var(--spark-soft) 60%,#fff 95%);-webkit-background-clip:text;background-clip:text}
+.page-intro .equation:not(.small){font-size:clamp(38px,min(6vw,14svh),88px)}
+/* Privacy text lines up with the page heading instead of floating in the middle */
+.wrap.prose{max-width:var(--max)}
+.wrap.prose>*{max-width:68ch}
