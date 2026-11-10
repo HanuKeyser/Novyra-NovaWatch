@@ -31,6 +31,24 @@
     window.addEventListener("resize", function () { if (getComputedStyle(btn).display === "none") setMenu(false); });
   }
 
+  /* Back to top: a round button above the WhatsApp button, shown once the page has been scrolled */
+  var wa = document.querySelector(".wa-float");
+  if (wa) {
+    var up = document.createElement("button");
+    up.type = "button"; up.className = "to-top"; up.setAttribute("aria-label", "Back to top"); up.tabIndex = -1;
+    up.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
+    wa.parentNode.insertBefore(up, wa);
+    var showUp = function () {
+      var on = window.scrollY > Math.max(400, window.innerHeight * 0.6);
+      up.classList.toggle("show", on); up.tabIndex = on ? 0 : -1;
+    };
+    showUp(); window.addEventListener("scroll", showUp, { passive: true });
+    up.addEventListener("click", function () {
+      window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+      var first = document.querySelector(".skip, .site-head a"); if (first) first.focus({ preventScroll: true });
+    });
+  }
+
   /* Footer year */
   document.querySelectorAll("[data-year]").forEach(function (el) {
     el.textContent = new Date().getFullYear();

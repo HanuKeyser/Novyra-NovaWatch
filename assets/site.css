@@ -272,7 +272,7 @@ p{margin:0}
 .quote-bar .btn{min-height:46px;padding:0 20px}
 @media (max-width:1060px){
   .has-quote .quote-bar.show{display:flex}
-  .has-quote.bar-on .wa-float{bottom:calc(86px + env(safe-area-inset-bottom,0px))}
+  .has-quote.bar-on{--fab-b:86px}
   .quote{position:static}
 }
 
@@ -325,6 +325,7 @@ p{margin:0}
 @view-transition{navigation:auto}
 .site-head{view-transition-name:site-head}
 .wa-float{view-transition-name:wa-float}
+.to-top{view-transition-name:to-top}
 ::view-transition-old(root){animation:vt-out .16s ease both}
 ::view-transition-new(root){animation:vt-in .32s cubic-bezier(.2,.7,.2,1) both}
 @keyframes vt-out{to{opacity:0}}
@@ -418,3 +419,15 @@ p{margin:0}
 .logo-grid:not(.four){grid-template-columns:repeat(3,minmax(0,1fr))}
 @media (max-width:900px){.logo-grid:not(.four){grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:520px){.logo-grid:not(.four){grid-template-columns:1fr}}
+
+/* Floating buttons: WhatsApp circle with a back-to-top circle above it, same size and style on every device */
+:root{--fab:54px;--fab-b:18px}
+.wa-float{width:var(--fab);height:var(--fab);min-height:0;padding:0;gap:0;justify-content:center;bottom:calc(var(--fab-b) + env(safe-area-inset-bottom,0px));transition:bottom .25s ease,transform .2s ease}
+.wa-float span{display:none}
+.wa-float svg{width:26px;height:26px}
+.to-top{position:fixed;z-index:40;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(var(--fab-b) + var(--fab) + 12px + env(safe-area-inset-bottom,0px));width:var(--fab);height:var(--fab);display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:999px;background:var(--spark);color:#fff;cursor:pointer;box-shadow:0 10px 30px -8px rgba(0,0,0,.6);opacity:0;visibility:hidden;transform:translateY(10px);transition:opacity .25s ease,transform .25s ease,visibility 0s linear .25s,bottom .25s ease}
+.to-top.show{opacity:1;visibility:visible;transform:none;transition:opacity .25s ease,transform .25s ease,visibility 0s,bottom .25s ease}
+.to-top svg{width:24px;height:24px}
+.wa-float:hover,.to-top.show:hover{transform:translateY(-2px)}
+.wa-float:focus-visible,.to-top:focus-visible{outline-offset:4px;border-radius:999px}
+@media (prefers-reduced-motion:reduce){.wa-float,.to-top,.to-top.show{transition:none;transform:none}}
