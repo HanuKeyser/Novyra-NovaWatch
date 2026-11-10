@@ -425,3 +425,13 @@ p{margin:0}
 .sig::-webkit-scrollbar-thumb{border-color:#eef1f7}
 .pkg .extra{margin-top:-6px;font:600 14px var(--f-body);color:var(--spark-soft)}
 .q-item .q-break{grid-column:1/-1;font:500 13px var(--f-body);color:var(--muted)}
+/* Private work: previews are pre-blurred images */
+.private-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:16px}
+.private-card{margin:0;background:var(--ink-2);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column}
+.private-img{position:relative;background:var(--paper)}
+.private-img img{display:block;width:100%;height:auto;aspect-ratio:1299/709;object-fit:cover}
+.private-badge{position:absolute;top:12px;left:12px;background:rgba(7,8,14,.78);color:#fff;padding:6px 12px;border-radius:99px;font:700 11px var(--f-body);letter-spacing:.16em;text-transform:uppercase}
+.private-card figcaption{padding:16px 18px 18px;display:flex;flex-direction:column;gap:4px}
+.private-card figcaption strong{font:700 16px var(--f-body);color:var(--text)}
+.private-card figcaption span{font-size:14px;color:var(--muted)}
+.private-feature .private-grid{grid-template-columns:1fr}
