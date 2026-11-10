@@ -440,15 +440,25 @@ p{margin:0}
 .wrap.prose>*{max-width:68ch}
 
 /* News feed: posts appear on their posting date */
-.news-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
-@media (max-width:1100px){.news-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.news-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:18px}
+@media (max-width:1279px){.news-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:1060px){.news-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:800px){.news-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}}
-@media (max-width:480px){.news-grid{grid-template-columns:minmax(0,1fr)}}
+/* Phones: compact rows (post on the left, text on the right) so the feed stays easy to scroll */
+@media (max-width:560px){
+  .news-grid{grid-template-columns:minmax(0,1fr);gap:12px}
+  .news-grid .news-post{flex-direction:row;align-items:stretch}
+  .news-grid .news-post img,.news-grid .news-post video{width:38%;flex:none;height:auto;align-self:flex-start}
+  .news-grid .news-body{padding:14px 16px;gap:6px;min-width:0}
+  .news-grid .news-body time{font-size:11px;letter-spacing:.16em}
+  .news-grid .news-body h3{font-size:16px}
+  .news-grid .news-body p{font-size:14px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+}
 .news-post{margin:0;display:flex;flex-direction:column;background:var(--ink-2);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
 .news-post img,.news-post video{display:block;width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;background:var(--ink-3)}
 .news-body{padding:20px 22px 24px;display:flex;flex-direction:column;gap:8px}
 .news-body time{font-size:13px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--spark-soft)}
-.news-body h3{font:800 20px/1.15 var(--f-display);text-transform:uppercase}
+.news-body h3{font:800 clamp(17px,1.3vw,20px)/1.15 var(--f-display);text-transform:uppercase}
 .news-body p{color:var(--muted);font-size:15px}
 [hidden]{display:none!important}
 
