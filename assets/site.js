@@ -49,6 +49,17 @@
     });
   }
 
+  /* News feed: each post shows from its posting date and time (South African time), newest first */
+  var feed = document.querySelector(".news-feed");
+  if (feed) {
+    var now = Date.now(), shown = 0;
+    feed.querySelectorAll(".news-post[data-release]").forEach(function (post) {
+      var at = Date.parse(post.getAttribute("data-release"));
+      if (!isNaN(at) && at <= now) { post.hidden = false; shown++; } else post.remove();
+    });
+    if (shown) feed.hidden = false;
+  }
+
   /* Footer year */
   document.querySelectorAll("[data-year]").forEach(function (el) {
     el.textContent = new Date().getFullYear();
