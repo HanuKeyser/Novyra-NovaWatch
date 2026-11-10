@@ -413,3 +413,13 @@ p{margin:0}
 @media (min-width:3740px){html{zoom:2.63}}
 @media (min-width:3800px){html{zoom:2.672}}
 .pkg .price small.per{white-space:nowrap}
+
+/* Branded scrollbars (Chrome, Edge, Safari use the custom thumb; Firefox gets the matching colours) */
+::-webkit-scrollbar{width:12px;height:10px}
+::-webkit-scrollbar-track{background:var(--ink)}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--spark),#1d3a8a);border-radius:99px;border:3px solid var(--ink)}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,var(--spark-soft),var(--spark))}
+::-webkit-scrollbar-corner{background:var(--ink)}
+@supports not selector(::-webkit-scrollbar){html{scrollbar-color:var(--spark) var(--ink);scrollbar-width:thin}}
+.sig::-webkit-scrollbar-track{background:#eef1f7}
+.sig::-webkit-scrollbar-thumb{border-color:#eef1f7}

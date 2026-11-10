@@ -12,11 +12,23 @@
   var btn = document.querySelector(".menu-btn");
   var nav = document.getElementById("site-nav");
   if (btn && nav) {
-    btn.addEventListener("click", function () {
-      var open = nav.classList.toggle("open");
+    var setMenu = function (open) {
+      nav.classList.toggle("open", open);
       btn.setAttribute("aria-expanded", open ? "true" : "false");
       btn.textContent = open ? "Close" : "Menu";
+    };
+    btn.addEventListener("click", function () { setMenu(!nav.classList.contains("open")); });
+    /* While the menu is open, keep keyboard focus inside it; Escape closes it */
+    document.addEventListener("keydown", function (e) {
+      if (!nav.classList.contains("open")) return;
+      if (e.key === "Escape") { setMenu(false); btn.focus(); return; }
+      if (e.key !== "Tab") return;
+      var links = nav.querySelectorAll("a"), first = btn, last = links[links.length - 1];
+      if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      else if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
     });
+    /* Close the menu if the screen gets wide enough to show the full nav */
+    window.addEventListener("resize", function () { if (getComputedStyle(btn).display === "none") setMenu(false); });
   }
 
   /* Footer year */
