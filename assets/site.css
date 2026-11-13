@@ -520,3 +520,5 @@ p{margin:0}
 .work-jump strong{font-size:clamp(20px,2vw,30px);overflow-wrap:normal}
 @media (max-width:980px){.work-jumps{grid-template-columns:minmax(0,1fr);gap:10px}.work-jump{padding:18px 64px 20px 20px}.wj-arrow{top:50%;right:18px;margin-top:-17px}}
 section.section[id]{scroll-margin-top:76px}
+
+.foot-links{display:flex;flex-wrap:wrap;gap:20px}
