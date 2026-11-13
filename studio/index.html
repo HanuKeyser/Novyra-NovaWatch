@@ -720,6 +720,19 @@ a.back:hover{text-decoration:underline}
 .cbox .who .av{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex:none}
 .cbox .who .client{font-weight:700}
 .chk.switch{justify-self:start;width:max-content}
+.btn.linked svg{color:var(--spark)}
+.mailbar.cr{border-color:#f6d27a;background:linear-gradient(135deg,#fffbeb,#fffdf5)} .mailbar.cr .mi{background:#d97706;font:800 18px var(--body)}
+.mailbar.ok{border-color:#9fdcb5;background:linear-gradient(135deg,#effaf3,#f7fdf9)} .mailbar.ok .mi{background:var(--good);font:800 16px var(--body)}
+.mailbar.cr,.mailbar.ok{grid-template-columns:auto minmax(0,1fr)}
+.linkbox{display:flex;gap:8px;align-items:center;max-width:760px}
+.linkbox input{flex:1;min-width:0;font:600 14px var(--body);color:var(--soft);background:#fff}
+.lstate{display:grid;gap:3px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:#fff;max-width:760px}
+.lstate span{color:var(--muted);font-size:13px}
+.lstate.ok{border-color:#9fdcb5;background:#effaf3} .lstate.ok b{color:var(--good)}
+.lstate.warn{border-color:#f6d27a;background:#fffbeb} .lstate.warn b{color:var(--warn)}
+.ticks{margin:0;padding:0;list-style:none;display:grid;gap:8px;max-width:760px}
+.ticks li{position:relative;padding-left:26px;color:var(--muted)}
+.ticks li::before{content:"✓";position:absolute;left:0;top:0;width:18px;height:18px;border-radius:50%;background:#eaf1ff;color:var(--soft);font:800 11px/18px var(--body);text-align:center}
 </style></head><body>
 
 <header class="appbar">
@@ -842,7 +855,7 @@ function signOff(short) { const g = { ...SIGN_DEFAULT, ...(OWNER.sign || {}) }; 
   return L.join('\n'); }
 function paintAvatar() { const a = $('.appbar .avatar'); if (!a) return; a.textContent = userInitials(OWNER); a.style.background = OWNER.color || AV_COLORS[0]; a.title = `${OWNER.name} · Your details`; a.setAttribute('aria-label', `${OWNER.name}, your details`); }
 const DEFAULT_BANK = { bank: 'Discovery Bank', accountType: 'Savings account', accountNumber: '12687680212' };
-let db = null, state = { quotes: [], invoices: [], clients: [], prices: null, bank: null, meta: null, profile: null, plans: [], expenses: [], loaded: { q: false, i: false, c: false, p: false, b: false, m: false, u: false, pl: false, ex: false } };
+let db = null, state = { quotes: [], invoices: [], clients: [], prices: null, bank: null, meta: null, profile: null, plans: [], expenses: [], shares: [], loaded: { q: false, i: false, c: false, p: false, b: false, m: false, u: false, pl: false, ex: false, sh: false } };
 let view = { tab: 'home', filter: 'all', edit: null, q: '' };
 
 const initials = n => String(n || '').replace(/\(.*?\)/g, '').split(/[\s-]+/).filter(w => /^[A-Za-z0-9]/.test(w) && !/^(pty|ltd|cc|the|and|of)$/i.test(w)).slice(0, 2).map(w => w[0].toUpperCase()).join('') || '?';
@@ -852,6 +865,7 @@ const firstName = s => String(s || '').trim().split(/\s+/)[0] || '';
 const listAnd = a => a.length <= 1 ? (a[0] || '') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1];
 const ICON_SEARCH = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>';
 const ICON_WA = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7.5-.1 1.5-.6 1.8-1.2s.2-1.1.1-1.2l-.4-.2z"/></svg>';
+const ICON_LINK = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>';
 const ICON_MAIL = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>';
 
 /* clients: any number of contact people; older records with one contact still work */
@@ -878,7 +892,7 @@ const toList = d => recipients(d).map(p => p.email);
 const waNum = ph => { let n = String(ph || '').replace(/[^\d+]/g, ''); if (n.startsWith('+')) n = n.slice(1); else if (n.startsWith('00')) n = n.slice(2); else if (n.startsWith('0')) n = '27' + n.slice(1); return n.length >= 10 ? n : ''; };
 const waPeople = d => { const own = contactsOf(d.client).filter(p => waNum(p.phone)); if (own.length) return own; const rec = d.clientId ? state.clients.find(x => x.id === d.clientId) : state.clients.find(x => norm(x.business) === norm(d.client && d.client.business)); return rec ? contactsOf(rec).filter(p => waNum(p.phone)) : []; };
 function waText(d, Q, p) { const hi = p && firstName(p.name) ? `Hi ${firstName(p.name)},` : 'Hi,';
-  const body = Q ? `${hi} here is ${(d.rev || 1) > 1 ? 'the updated' : 'your'} Novyra quote ${qRef(d)} (PDF attached). To go ahead, just reply here.` : `${hi} here is Novyra invoice INV-${d.number} (PDF attached). Please use INV-${d.number} as the payment reference.`;
+  const body = Q ? `${hi} here is ${(d.rev || 1) > 1 ? 'the updated' : 'your'} Novyra quote ${qRef(d)}${d.shareId ? `. You can view, download and accept it here: ${shareUrl(d)}` : ' (PDF attached). To go ahead, just reply here.'}` : `${hi} here is Novyra invoice INV-${d.number} (PDF attached). Please use INV-${d.number} as the payment reference.`;
   return `${body}\n\n${signOff(true)}`; }
 const waHref = (d, Q, p) => `https://wa.me/${waNum(p.phone)}?text=${encodeURIComponent(waText(d, Q, p))}`;
 const docsFor = c => {
@@ -968,7 +982,7 @@ const Q_TERMS = ['Jobs under R1,000 are paid upfront. Jobs of R1,000 and more ne
   "Final files are sent once payment is complete, and the final design is yours once it's paid in full.",
   "Printing, domain names, hosting and paid ads are not included; they are quoted separately at the supplier's rates.",
   "This quote is valid for 30 days, or only as long as the printer's quote if printing is included and that is shorter. If it is updated, the latest version you accept applies.",
-  'To accept, confirm in writing by email or WhatsApp. Novyra is not VAT registered, so no VAT is charged.'];
+  'To accept, use the online link if you received one, or confirm in writing by email or WhatsApp. Novyra is not VAT registered, so no VAT is charged.'];
 const I_TERMS = ['Payment is due on approval of the final work (the invoice date), by EFT only, using the invoice number as the payment reference.',
   "Final files are sent once this invoice is paid in full, and the final design is yours once it's paid in full.",
   'Novyra is not VAT registered, so no VAT is charged.'];
@@ -1118,7 +1132,7 @@ function boot() {
     const fail = e => { clearTimeout(timer); state.failed = true; $('#main').innerHTML = `<div class="notice bad">Your records couldn’t be loaded right now (${esc(e && e.code || 'connection')}). They are still saved. Reload the page to try again.</div>`; };
     const col = (name, key, sort) => db.collection(name).onSnapshot(s => { state[name] = s.docs.map(x => ({ id: x.id, ...x.data() })); if (sort) state[name].sort(sort); done(key); }, fail);
     col('quotes', 'q'); col('invoices', 'i'); col('clients', 'c', (a, b) => norm(a.business).localeCompare(norm(b.business)));
-    col('plans', 'pl'); col('expenses', 'ex', (a, b) => (b.date || '').localeCompare(a.date || ''));
+    col('plans', 'pl'); col('shares', 'sh'); col('expenses', 'ex', (a, b) => (b.date || '').localeCompare(a.date || ''));
     db.doc('settings/prices').onSnapshot(s => { state.prices = s.exists ? s.data() : null; done('p'); }, fail);
     db.doc('settings/bank').onSnapshot(s => { state.bank = s.exists ? s.data() : null; done('b'); }, fail);
     db.doc('settings/meta').onSnapshot(s => { state.meta = s.exists ? s.data() : null; done('m'); }, fail);
@@ -1189,7 +1203,7 @@ function leaveDialog(target) {
 
 function render() {
   if (!db || state.failed || !Object.values(state.loaded).every(Boolean)) return;
-  runPlans();
+  runPlans(); applyShares();
   const main = $('#main');
   if (view.open) {
     const list = view.open.kind === 'quote' ? state.quotes : state.invoices;
@@ -1282,6 +1296,7 @@ function searchResults(q) {
 function homeHTML() {
   const hr = new Date().getHours(), hello = hr < 12 ? 'Good Morning' : hr < 18 ? 'Good Afternoon' : 'Good Evening';
   const items = [];
+  state.quotes.filter(q => q.changeRequest && q.status === 'Open').forEach(q => items.push({ h: `quote-${q.id}`, tone: 'warn', t: `${q.changeRequest.name} asked for changes on ${qRef(q)}`, s: `${q.client && q.client.business || 'No client'} · ${q.changeRequest.note ? '“' + q.changeRequest.note.slice(0, 80) + '”' : 'update it and save a new revision'}`, d: (q.changeRequest.at || '').slice(0, 10) }));
   state.quotes.filter(q => quoteStatus(q) === 'Expired').forEach(q => items.push({ h: `quote-${q.id}`, tone: 'warn', t: `${qRef(q)} has expired`, s: `${q.client && q.client.business || 'No client'} · follow up, renew it or mark what they decided`, d: q.validUntil }));
   state.invoices.filter(v => invoiceStatus(v) === 'Overdue').forEach(v => items.push({ h: `invoice-${v.id}`, tone: 'bad', t: `INV-${v.number} is overdue`, s: `${v.client && v.client.business || 'No client'} · ${money(calc(v).due)} still owed`, d: v.dueDate }));
   state.quotes.filter(q => q.status === 'Draft').forEach(q => items.push({ h: `quote-${q.id}`, tone: 'info', t: `${qRef(q)} hasn’t been sent`, s: `${q.client && q.client.business || 'No client'} · draft, ${money(calc(q).total)}`, d: q.date }));
@@ -1394,6 +1409,77 @@ function priceEditHTML() {
       <td><input data-p="${i}" data-k="details" value="${esc(p.details)}" aria-label="Details"></td><td><input data-p="${i}" data-k="unit" value="${esc(p.unit)}" aria-label="Unit"></td>
       <td><input data-p="${i}" data-k="price" type="number" min="0" step="10" value="${p.price}" style="text-align:right" aria-label="Price"></td><td><button class="btn small ghost danger" data-del-price="${i}" aria-label="Remove ${esc(p.item)}">Remove</button></td></tr>`).join('')}
     </tbody></table></div>`;
+}
+/* ---------- online quote links ---------- */
+const SHARE_BASE = 'https://www.novyra.co.za/quote/#';
+const shareUrl = q => q.shareId ? SHARE_BASE + q.shareId : '';
+const newToken = () => { const a = new Uint8Array(18); crypto.getRandomValues(a); return btoa(String.fromCharCode(...a)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); };
+function sharePayload(q, prev) {
+  const c = calc(q), st = quoteStatus(q), sameRev = prev && prev.rev === (q.rev || 1);
+  const vts = window.firebase && firebase.firestore && firebase.firestore.Timestamp ? firebase.firestore.Timestamp.fromDate(new Date(q.validUntil + 'T23:59:59+02:00')) : q.validUntil;
+  return { quoteId: q.id, ref: qRef(q), rev: q.rev || 1, business: (q.client && q.client.business) || '', people: contactsOf(q.client).map(p => p.name).filter(Boolean),
+    total: c.total, dueNow: c.deposit, dueLabel: nowLabel(c), monthly: c.monthlyBase, balance: c.balance, validUntil: q.validUntil, validTs: vts,
+    status: st === 'Draft' ? 'Draft' : st, pages: pagesHTML(q, 'quote').join(''), pdfName: pdfName(q, 'quote'),
+    from: { name: OWNER.name, title: OWNER.title || '', email: OWNER.email, phone: OWNER.phone }, updatedAt: new Date().toISOString(),
+    response: sameRev && prev.response ? prev.response : null, applied: sameRev ? !!prev.applied : false };
+}
+async function syncShare(q) {
+  if (!q.shareId || !db) return;
+  const prev = state.shares.find(x => x.id === q.shareId);
+  let data = sharePayload(q, prev);
+  if (prev && prev.response && data.response && ['Accepted', 'Changes requested'].includes(prev.status) && q.status === 'Open') data.status = prev.status === 'Accepted' ? 'Accepted' : 'Changes requested';
+  try { await db.collection('shares').doc(q.shareId).set(data); } catch (e) { console.warn('share sync', e); }
+}
+let shareBusy = false;
+async function applyShares() {
+  if (shareBusy || !db) return; shareBusy = true;
+  try {
+    for (const sh of state.shares.filter(x => x.response && !x.applied && ['Accepted', 'Changes requested'].includes(x.status))) {
+      const q = state.quotes.find(x => x.id === sh.quoteId); if (!q) continue;
+      const r = sh.response || {}, now = new Date().toISOString(), upd = clone(q);
+      upd.history = upd.history || [];
+      if (sh.status === 'Accepted' && ['Open', 'Draft'].includes(q.status) && (q.rev || 1) === sh.rev) {
+        upd.status = 'Accepted'; upd.decidedAt = r.at || now; upd.acceptedOnline = { name: r.name, at: r.at || now, note: r.note || '' }; delete upd.changeRequest;
+        upd.history.push({ at: now, rev: upd.rev || 1, title: `Accepted online by ${r.name} (${qRef(upd)})`, note: r.note || '', total: calc(upd).total, changes: [`Accepted on ${fmtWhen(r.at || now)}`] });
+      } else if (sh.status === 'Changes requested') {
+        upd.changeRequest = { name: r.name, at: r.at || now, note: r.note || '' };
+        upd.history.push({ at: now, rev: upd.rev || 1, title: `${r.name} asked for changes online`, note: r.note || '', changes: [] });
+      } else continue;
+      upd.updatedAt = now;
+      await save('quotes', upd);
+      Object.assign(q, upd);
+      await db.collection('shares').doc(sh.id).set(JSON.parse(JSON.stringify({ ...sh, id: undefined, applied: true }))); sh.applied = true;
+      toast(sh.status === 'Accepted' ? `${r.name} accepted ${qRef(upd)} online` : `${r.name} asked for changes on ${qRef(upd)}`);
+    }
+  } catch (e) { console.warn('apply shares', e); }
+  shareBusy = false;
+}
+function linkDialog() {
+  const E = view.edit, d = E.draft, sh = state.shares.find(x => x.id === d.shareId), url = shareUrl(d);
+  const st = sh ? sh.status : '', r = sh && sh.response;
+  const stateLine = !sh ? '' : st === 'Accepted' ? `<div class="lstate ok"><b>Accepted online</b><span>${esc(r.name)} · ${fmtWhen(r.at)}</span></div>`
+    : st === 'Changes requested' ? `<div class="lstate warn"><b>Changes requested</b><span>${esc(r.name)} · ${fmtWhen(r.at)}${r.note ? ` · “${esc(r.note)}”` : ''}</span></div>`
+    : `<div class="lstate"><b>Waiting for the client</b><span>They can view, download and accept ${esc(qRef(d))} until ${fmtDate(d.validUntil)}.</span></div>`;
+  const body = !sh ? `<p class="lead">Create a private link for <b>${esc(qRef(d))}</b>. ${esc(cl(d))} can open it on any phone or computer, read the quote, download the PDF and accept it with one click. You see it here straight away.</p>
+      <ul class="ticks"><li>Only someone with the link can open it, and it isn’t listed anywhere.</li><li>Saving a new revision updates the link, and the client has to accept the new version.</li><li>You can turn the link off at any time.</li></ul>
+      ${d.status === 'Draft' ? '<p class="sub">Creating the link marks this quote as sent.</p>' : ''}`
+    : `${stateLine}<div class="linkbox"><input id="lk-url" value="${esc(url)}" readonly><button class="btn primary" data-lk-copy>Copy link</button></div>
+      <div class="actions"><a class="btn" href="${esc(url)}" target="_blank" rel="noopener">Open the client page</a>${toList(d).length ? `<a class="btn" data-lk-mail href="${esc(mailHref(d, true))}" target="_blank" rel="noopener">${ICON_MAIL}Email the link</a>` : ''}${waPeople(d).length ? `<button class="btn wa" data-lk-wa>${ICON_WA}WhatsApp the link</button>` : ''}</div>`;
+  openModal(dlg('Client link', body, `${sh ? '<button class="btn ghost danger" data-lk-off style="margin-right:auto">Turn off link</button>' : ''}<button class="btn ghost" data-close>Back</button>${sh ? '' : '<button class="btn primary" data-lk-make>Create link</button>'}`, 'small'), m => {
+    const mk = $('[data-lk-make]', m); if (mk) mk.addEventListener('click', async () => { mk.disabled = true; const now = new Date().toISOString();
+      d.shareId = newToken();
+      if (d.status === 'Draft') { d.status = 'Open'; d.sentAt = now; d.history.push({ at: now, rev: d.rev || 1, title: `Sent to the client (${qRef(d)})`, total: calc(d).total, changes: [] }); }
+      d.history.push({ at: now, rev: d.rev || 1, title: 'Client link created', changes: [] });
+      const payload = sharePayload(d, null);
+      try { await db.collection('shares').doc(d.shareId).set(payload); } catch { mk.disabled = false; d.shareId = null; toast('The link couldn’t be created. Check your connection.'); return; }
+      if (!state.shares.some(x => x.id === d.shareId)) state.shares.push({ id: d.shareId, ...payload });
+      await persist('Link created'); linkDialog(); });
+    const cp = $('[data-lk-copy]', m); if (cp) cp.addEventListener('click', async () => { const i = $('#lk-url', m); try { await navigator.clipboard.writeText(i.value); toast('Link copied'); } catch { i.select(); toast('Press Cmd+C to copy'); } });
+    const wb = $('[data-lk-wa]', m); if (wb) wb.addEventListener('click', () => { closeModal(); act('wa'); });
+    const ml = $('[data-lk-mail]', m); if (ml) ml.addEventListener('click', () => { d.history.push({ at: new Date().toISOString(), title: `Link emailed to ${listAnd(toList(d))}`, changes: [] }); setTimeout(() => persist(), 60); });
+    const off = $('[data-lk-off]', m); if (off) off.addEventListener('click', async () => { try { await db.collection('shares').doc(d.shareId).delete(); } catch { toast('Not turned off. Check your connection.'); return; }
+      d.history.push({ at: new Date().toISOString(), rev: d.rev || 1, title: 'Client link turned off', changes: [] }); d.shareId = null; await persist('Link turned off'); });
+  });
 }
 let planBusy = false;
 async function runPlans() {
@@ -1959,7 +2045,7 @@ function renderEditor(main) {
   let actions = '';
   if (Q) {
     if (!locked) actions += `<button class="btn ${dirty ? 'primary' : ''}" data-act="save" ${dirty ? '' : 'disabled'}>${d.status === 'Draft' ? 'Save draft' : `Save as Rev ${(d.rev || 1) + 1}`}</button>`;
-    actions += emailBtn + waBtn + `<button class="btn" data-act="pdf">Download PDF</button>`;
+    actions += emailBtn + waBtn + (['Draft', 'Open'].includes(st) || d.shareId ? `<button class="btn ${d.shareId ? 'linked' : ''}" data-act="link" ${dirty ? 'disabled title="Save your changes first"' : ''}>${ICON_LINK}${d.shareId ? 'Client link' : 'Create client link'}</button>` : '') + `<button class="btn" data-act="pdf">Download PDF</button>`;
     if (d.status === 'Draft') actions += `<button class="btn" data-act="sent">Mark as sent</button>`;
     if (st === 'Expired') actions += `<button class="btn" data-act="renew">Renew at today's prices</button>`;
     if (['Open', 'Expired'].includes(st)) actions += `<button class="btn" data-act="accept">Client accepted</button><button class="btn" data-act="decline">Client declined</button>`;
@@ -1979,13 +2065,15 @@ function renderEditor(main) {
   const mailBar = E.mailed ? `<div class="mailbar ${viaWa ? 'wa' : ''}" role="status"><span class="mi">${viaWa ? ICON_WA : ICON_MAIL}</span><div><b>${viaWa ? `WhatsApp is opening with a message to ${esc(E.mailed.name)}.` : viaFin ? `Mail is opening with the ${E.mailed.via === 'receipt' ? 'receipt' : 'payment reminder'} to ${esc(E.mailed.email)}.` : `Mail is opening with the email to ${esc(listAnd(emails))}.`}</b><span class="sub">Drag ${esc(viaFin ? E.mailed.file : pdfName(d, E.kind))} from your Downloads folder into the ${viaWa ? 'chat' : 'email'}, then press Send.</span></div>
       <div class="actions">${Q && d.status === 'Draft' ? `<button class="btn small primary" data-act="mail-sent">I sent it · mark as sent</button>` : `<button class="btn small primary" data-act="mail-sent">I sent it</button>`}${viaFin ? `<a class="btn small" href="${esc(E.mailed.href)}">Mail didn’t open? Try again</a>` : viaWa ? `<a class="btn small" href="${esc(E.mailed.href)}" target="_blank" rel="noopener">WhatsApp didn’t open? Try again</a>` : `<a class="btn small" href="${esc(mailHref(d, Q))}">Mail didn’t open? Try again</a><button class="btn small" data-act="copy-mail">Copy the email</button>`}<button class="btn small ghost" data-act="mail-close" aria-label="Hide">×</button></div></div>` : '';
 
+  const crBar = Q && d.changeRequest && d.status === 'Open' ? `<div class="mailbar cr" role="status"><span class="mi">!</span><div><b>${esc(d.changeRequest.name)} asked for changes online.</b><span class="sub">${d.changeRequest.note ? '“' + esc(d.changeRequest.note) + '” · ' : ''}${fmtWhen(d.changeRequest.at)}. Make the changes and save a new revision; the link updates and they can accept the new version.</span></div></div>` : '';
+  const onlineBar = Q && d.acceptedOnline ? `<div class="mailbar ok" role="status"><span class="mi">✓</span><div><b>Accepted online by ${esc(d.acceptedOnline.name)}.</b><span class="sub">${fmtWhen(d.acceptedOnline.at)}${d.acceptedOnline.note ? ' · “' + esc(d.acceptedOnline.note) + '”' : ''}</span></div></div>` : '';
   const pages = pagesHTML(d, E.kind);
   main.innerHTML = `
     <div class="ed-head"><a href="#${Q ? 'quotes' : 'invoices'}" class="back">← All ${Q ? 'quotes' : 'invoices'}</a>
       <div class="ed-title"><h2 class="num">${esc(docNo(d, E.kind))}</h2><span class="pill ${pillClass(st)}">${st}</span>${dirty && !locked ? '<span class="unsaved">Unsaved changes</span>' : ''}</div>
       <p class="muted" style="margin:6px 0 0">${esc(statusNote)}</p>
       <dl class="meta"><div><dt>Type</dt><dd>${Q ? 'Quote' : 'Invoice'}</dd></div><div><dt>Customer</dt><dd>${esc(cl.business || '—')}</dd></div><div><dt>Reference</dt><dd class="num">${esc(reference)}</dd></div>${!Q && d.quoteRef ? `<div><dt>For quote</dt><dd><a href="#quote-${esc(d.quoteId)}">${esc(d.quoteRef)}</a></dd></div>` : ''}<div><dt>Prepared by</dt><dd>${esc(ownerOf(d))}</dd></div>${d.createdAt ? `<div><dt>Created</dt><dd>${fmtDate(d.createdAt.slice(0, 10))}</dd></div>` : ''}</dl></div>
-    ${mailBar}
+    ${mailBar}${crBar}${onlineBar}
     <div class="editor">
       <div class="form-col">
         <section class="panel"><h3>${Q ? 'Quote for' : 'Billed to'}</h3>
@@ -2068,7 +2156,9 @@ async function persist(note) {
   const prev = E.draft.updatedAt; E.draft.updatedAt = new Date().toISOString();
   try { await save(E.kind === 'quote' ? 'quotes' : 'invoices', E.draft); }
   catch { E.draft.updatedAt = prev; toast('Not saved. Check your connection and try again; your changes are still here.'); render(); return false; }
-  E.saved = clone(E.draft); closeModal(); render(); if (note) toast(note); return true;
+  E.saved = clone(E.draft); closeModal(); render(); if (note) toast(note);
+  if (E.kind === 'quote' && E.draft.shareId) syncShare(E.draft);
+  return true;
 }
 
 /* ---------- email text ---------- */
@@ -2079,7 +2169,7 @@ function emailDraft(d, Q) {
   if (Q) {
     const rev = (d.rev || 1) > 1;
     return { subject: `Novyra quote ${qRef(d)}${cl.business ? ' – ' + cl.business : ''}`,
-      body: `${hi}\n\n${rev ? `Please find attached the updated quote ${qRef(d)}. It replaces the earlier version.` : `Thank you for the opportunity. Please find attached quote ${qRef(d)}.`}\n\nTo go ahead, simply reply to this email. Let me know if you have any questions.\n\n${sign}` };
+      body: `${hi}\n\n${rev ? `Please find attached the updated quote ${qRef(d)}. It replaces the earlier version.` : `Thank you for the opportunity. Please find attached quote ${qRef(d)}.`}\n\n${d.shareId ? `You can view, download and accept it online here:\n${shareUrl(d)}\n\nOr simply reply to this email to go ahead.` : 'To go ahead, simply reply to this email.'} Let me know if you have any questions.\n\n${sign}` };
   }
   return { subject: `Novyra invoice INV-${d.number}${cl.business ? ' – ' + cl.business : ''}`,
     body: `${hi}\n\nPlease find attached invoice INV-${d.number}. Please use INV-${d.number} as the payment reference.\n\nThank you for choosing Novyra.\n\n${sign}` };
@@ -2126,6 +2216,7 @@ async function act(a) {
     if (ok) { d.history.push({ at: now, title: `PDF downloaded (${docNo(d, E.kind)})`, changes: [] }); await persist(); }
     return;
   }
+  if (a === 'link') return linkDialog();
   if (a === 'plan') { const pl = state.plans.find(x => x.quoteId === d.id); return planDialog(pl || null, pl ? null : d); }
   if (a === 'wa') {
     const ppl = waPeople(d);
@@ -2172,14 +2263,14 @@ async function confirmAct(cf) {
   const note = ($('#cf-note') || {}).value?.trim() || '';
   if (cf === 'rev') {
     const changes = describeChanges(E.saved, d);
-    d.rev = (d.rev || 1) + 1; d.status = 'Open';
+    d.rev = (d.rev || 1) + 1; d.status = 'Open'; delete d.changeRequest;
     d.history.push({ at: now, rev: d.rev, title: `Rev ${d.rev} saved`, total: calc(d).total, note, changes });
     return persist(`Saved as Rev ${d.rev}. Email the new version to the client.`);
   }
   if (cf === 'renew') {
     const before = clone(d);
     d.items.forEach(it => { const p = prices().find(x => x.item === it.item); if (p) { it.rate = p.price; it.unit = p.unit; if (p.details) it.details = p.details; } });
-    d.date = todayIso(); d.validUntil = addDays(d.date, 30); d.rev = (d.rev || 1) + 1; d.status = 'Open';
+    d.date = todayIso(); d.validUntil = addDays(d.date, 30); d.rev = (d.rev || 1) + 1; d.status = 'Open'; delete d.changeRequest;
     d.history.push({ at: now, rev: d.rev, title: `Renewed as Rev ${d.rev} at today's prices`, total: calc(d).total, changes: describeChanges(before, d) });
     return persist(`Renewed as Rev ${d.rev}. Email the new version to the client.`);
   }
