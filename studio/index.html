@@ -43,7 +43,7 @@ html.side-mini .appbar .brand .full{opacity:0} html.side-mini .appbar .brand .ma
 .ib.spin svg{animation:spin .6s ease}
 @keyframes spin{to{transform:rotate(360deg)}}
 .appbar .sep{width:1px;height:24px;background:var(--line);margin:0 6px}
-.avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-left:8px;flex:none;text-decoration:none;color:#fff;font:700 12.5px/1 var(--body);letter-spacing:0;text-indent:0;padding-top:2px;box-sizing:border-box;background:linear-gradient(135deg,#1f3a85,var(--spark));box-shadow:0 0 0 2px #fff,0 0 0 3.5px rgba(74,134,247,.35)}
+.avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-left:8px;flex:none;text-decoration:none;color:#fff;font:700 12.5px/1 var(--body);letter-spacing:0;text-indent:0;padding-top:2px;box-sizing:border-box;background:#2f63d6;box-shadow:0 0 0 2px #fff,0 0 0 3.5px var(--line2);transition:box-shadow .15s,background-color .2s}
 .avatar:hover{box-shadow:0 0 0 2px #fff,0 0 0 3.5px var(--spark)}
 .shell{display:grid;grid-template-columns:var(--side) minmax(0,1fr);min-height:calc(100vh - var(--bar));transition:grid-template-columns .25s var(--ease)}
 .side{position:sticky;top:var(--bar);height:calc(100vh - var(--bar));overflow-y:auto;background:#fff;border-right:1px solid var(--line);padding:18px 14px 16px max(14px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:2px;overflow-x:hidden}
@@ -60,11 +60,14 @@ html.side-mini .appbar .brand .full{opacity:0} html.side-mini .appbar .brand .ma
 .side a.it em{margin-left:auto;font:700 11px/1 var(--body);font-style:normal;padding:4px 8px;border-radius:999px;background:var(--ink3);color:var(--dim)}
 .side a.it em.hot{background:#fdecea;color:var(--bad)}
 .side a.it[aria-current="page"] em{background:#fff;color:var(--soft)}
-.side .sfoot{margin-top:auto;padding:14px 12px 4px;border-top:1px solid var(--line);font-size:12px;color:var(--dim);display:flex;justify-content:space-between;gap:8px}
-.side .sfoot a{color:var(--dim);text-decoration:none} .side .sfoot a:hover{color:var(--soft)}
+.side .sfoot{margin-top:auto;display:flex;align-items:center;gap:12px;padding:14px 0 2px 7px;border-top:1px solid var(--line);text-decoration:none;color:var(--text);white-space:nowrap}
+.side .sfoot .sm{width:30px;height:30px;flex:none;border-radius:9px;border:1px solid var(--line);background:#fff;display:grid;place-items:center;transition:border-color .15s}
+.side .sfoot .sm img{height:17px;width:auto;display:block}
+.side .sfoot .st{display:grid;line-height:1.3;min-width:0} .side .sfoot .st b{font-size:12.5px} .side .sfoot .st span{font-size:11.5px;color:var(--dim)}
+.side .sfoot:hover .sm{border-color:var(--spark)} .side .sfoot:hover .st span{color:var(--soft)}
 /* collapsed menu: nothing moves, labels fade out */
-.side a.it span,.side a.it em,.side .new span,.side .sfoot > *{transition:opacity .18s var(--ease)}
-html.side-mini .side a.it span,html.side-mini .side a.it em,html.side-mini .side .new span,html.side-mini .side .sfoot > *{opacity:0;pointer-events:none}
+.side a.it span,.side a.it em,.side .new span,.side .sfoot .st{transition:opacity .18s var(--ease)}
+html.side-mini .side a.it span,html.side-mini .side a.it em,html.side-mini .side .new span,html.side-mini .side .sfoot .st{opacity:0;pointer-events:none}
 html.side-mini .side h4{color:transparent} html.side-mini .side h4::after{opacity:1}
 .page{padding:28px max(28px,env(safe-area-inset-right,0px)) 48px 28px;min-width:0}
 #main{max-width:none;margin:0}
@@ -81,7 +84,7 @@ html.side-mini .side h4{color:transparent} html.side-mini .side h4::after{opacit
   html.nav-open .side{transform:none}
   html.nav-open .scrim{display:block;position:fixed;inset:var(--bar) 0 0 0;z-index:34;background:rgba(11,15,30,.28)}
   html.side-mini .side h4{color:var(--dim)} html.side-mini .side h4::after{opacity:0}
-  html.side-mini .side a.it span,html.side-mini .side a.it em,html.side-mini .side .new span,html.side-mini .side .sfoot > *{opacity:1;pointer-events:auto}
+  html.side-mini .side a.it span,html.side-mini .side a.it em,html.side-mini .side .new span,html.side-mini .side .sfoot .st{opacity:1;pointer-events:auto}
   .page{padding:20px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px))}
 }
 @media (max-width:560px){.ib.wide{display:none}.appbar .sep{display:none}.appbar{gap:0}.avatar{margin-left:6px}}
@@ -611,6 +614,52 @@ body:has(#modal:not([hidden])) .toast{bottom:calc(92px + env(safe-area-inset-bot
 @keyframes fade{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion:reduce){.shell,.appbar .brand,.appbar .brand img,.side,.side *,.overlay{transition:none !important}}
 .owner{line-height:1;padding-top:2px;letter-spacing:0;box-sizing:border-box}
+/* pages opened from lists use the full width, lined up with the page */
+.dialog .content{max-width:none !important;margin:0 !important;padding:28px max(28px,env(safe-area-inset-right,0px)) 32px 28px !important}
+.dialog header{padding:14px max(28px,env(safe-area-inset-right,0px)) 14px 28px !important}
+.dialog footer{padding:14px max(28px,env(safe-area-inset-right,0px)) max(14px,env(safe-area-inset-bottom,0px)) 28px !important}
+.dialog.small .content > *{max-width:760px}
+@media (max-width:900px){.dialog .content{padding:20px 16px 24px !important}.dialog header,.dialog footer{padding-inline:16px !important}}
+.cgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:20px;align-items:start}
+.ccol{display:grid;gap:20px;min-width:0}
+.cbox{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:14px;min-width:0}
+.cbox .sec-h{margin-bottom:0 !important}
+.cbox.fin{border-color:#c9d8f8;background:linear-gradient(180deg,#f7faff,#fff)}
+@media (max-width:1100px){.cgrid{grid-template-columns:minmax(0,1fr)}}
+.form-wrap{max-width:none}
+/* crop */
+.crop{display:grid;grid-template-columns:auto minmax(0,1fr);gap:32px;align-items:start}
+.crop-stage{position:relative;width:282px;height:282px;border-radius:20px;overflow:hidden;border:1px solid var(--line2);background:#fff;background-image:linear-gradient(45deg,#eef1f7 25%,transparent 25%),linear-gradient(-45deg,#eef1f7 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#eef1f7 75%),linear-gradient(-45deg,transparent 75%,#eef1f7 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0}
+.crop-stage canvas{display:block;cursor:grab;touch-action:none}
+.crop-stage canvas.grab{cursor:grabbing}
+.crop-stage::after{content:"";position:absolute;inset:0;border-radius:20px;box-shadow:inset 0 0 0 1px rgba(16,24,48,.06);pointer-events:none}
+.crop-hint{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);font:700 11px var(--body);padding:5px 10px;border-radius:999px;background:rgba(11,15,30,.72);color:#fff;pointer-events:none}
+.crop-side{display:grid;gap:20px;max-width:460px}
+.crop-side input[type=range]{width:100%;accent-color:var(--spark)}
+.seg{display:inline-flex;flex-wrap:wrap;gap:4px;padding:4px;border:1px solid var(--line);border-radius:12px;background:var(--ink)}
+.seg button{border:0;background:none;padding:8px 12px;border-radius:9px;font-weight:600;color:var(--muted);cursor:pointer}
+.seg button:hover{color:var(--text)} .seg button[aria-pressed="true"]{background:#fff;color:var(--soft);box-shadow:0 1px 3px rgba(16,24,48,.12)}
+.crop-prev{display:flex;align-items:center;gap:14px}
+.crop-prev .av{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;border:1px solid var(--line2);overflow:hidden}
+.crop-prev .av.big{width:64px;height:64px;border-radius:16px}
+.crop-prev .av img{width:100%;height:100%;object-fit:cover;display:block}
+@media (max-width:700px){.crop{grid-template-columns:1fr}.crop-stage{margin:0 auto}}
+.av.has-logo{padding:0 !important}
+.logo-box{padding:0;overflow:hidden}
+/* your details */
+.profile{display:grid;grid-template-columns:320px minmax(0,1fr);gap:20px;align-items:start}
+.prof-card{display:grid;justify-items:center;text-align:center;gap:16px;padding-block:28px}
+.big-av{width:104px;height:104px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding-top:3px;color:#fff;font:800 34px/1 var(--display);box-shadow:0 0 0 4px #fff,0 0 0 6px var(--line2),0 14px 30px rgba(16,24,48,.14);transition:background-color .2s}
+.prof-id{display:grid;gap:3px} .prof-id b{font:800 19px var(--display)} .prof-id span{color:var(--muted)}
+.prof-card .field{justify-items:center;width:100%}
+.swatches{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;max-width:240px}
+.sw{width:28px;height:28px;border-radius:50%;border:0;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);transition:transform .12s,box-shadow .15s}
+.sw:hover{transform:scale(1.08)} .sw[aria-pressed="true"]{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--text)}
+@media (max-width:900px){.profile{grid-template-columns:minmax(0,1fr)}}
+.profile > .panel,.settings > .panel{margin:0}
+.crop-side .seg{align-self:flex-start;width:max-content !important;max-width:100%;display:inline-flex}
+.logo-box:has(img){border-style:solid;border-color:var(--line)}
+.cbox .doclist a .sub{white-space:nowrap}
 </style></head><body>
 
 <header class="appbar">
@@ -623,7 +672,7 @@ body:has(#modal:not([hidden])) .toast{bottom:calc(92px + env(safe-area-inset-bot
   <a class="ib" href="#home" title="Home" aria-label="Home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg></a>
   <button class="ib" type="button" data-nav="menu" title="Menu" aria-label="Menu" aria-expanded="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
   <span class="sep" aria-hidden="true"></span>
-  <a class="avatar" href="#settings" title="Hanu Keyser · Settings" aria-label="Hanu Keyser, settings">HK</a>
+  <a class="avatar" href="#profile" title="Hanu Keyser · Your details" aria-label="Hanu Keyser, your details">HK</a>
 </header>
 <div class="shell">
   <nav class="side" id="side" aria-label="Menu"></nav>
@@ -714,9 +763,12 @@ const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(
 const norm = s => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
 const fileSafe = s => String(s || 'Client').replace(/[\\/:*?"<>|]/g, '').trim();
 
-const OWNER = { name: 'Hanu Keyser', email: 'hanu@keysers.cc', phone: '063 886 3779' };
+const OWNER = { name: 'Hanu Keyser', initials: 'HK', color: '#2f63d6', title: 'Founder', email: 'hanu@keysers.cc', phone: '063 886 3779' };
+const AV_COLORS = ['#2f63d6', '#4f46e5', '#7c3aed', '#c026d3', '#db2777', '#dc2626', '#ea580c', '#ca8a04', '#16a34a', '#0d9488', '#0284c7', '#0b0f1e'];
+const userInitials = u => String(u.initials || initials(u.name) || '?').toUpperCase().slice(0, 3);
+function paintAvatar() { const a = $('.appbar .avatar'); if (!a) return; a.textContent = userInitials(OWNER); a.style.background = OWNER.color || AV_COLORS[0]; a.title = `${OWNER.name} · Your details`; a.setAttribute('aria-label', `${OWNER.name}, your details`); }
 const DEFAULT_BANK = { bank: 'Discovery Bank', accountType: 'Savings account', accountNumber: '12687680212' };
-let db = null, state = { quotes: [], invoices: [], clients: [], prices: null, bank: null, meta: null, loaded: { q: false, i: false, c: false, p: false, b: false, m: false } };
+let db = null, state = { quotes: [], invoices: [], clients: [], prices: null, bank: null, meta: null, profile: null, loaded: { q: false, i: false, c: false, p: false, b: false, m: false, u: false } };
 let view = { tab: 'home', filter: 'all', edit: null, q: '' };
 
 const initials = n => String(n || '').replace(/\(.*?\)/g, '').split(/[\s-]+/).filter(w => /^[A-Za-z0-9]/.test(w) && !/^(pty|ltd|cc|the|and|of)$/i.test(w)).slice(0, 2).map(w => w[0].toUpperCase()).join('') || '?';
@@ -972,6 +1024,7 @@ function boot() {
     db.doc('settings/prices').onSnapshot(s => { state.prices = s.exists ? s.data() : null; done('p'); }, fail);
     db.doc('settings/bank').onSnapshot(s => { state.bank = s.exists ? s.data() : null; done('b'); }, fail);
     db.doc('settings/meta').onSnapshot(s => { state.meta = s.exists ? s.data() : null; done('m'); }, fail);
+    db.doc('settings/profile').onSnapshot(s => { state.profile = s.exists ? s.data() : null; if (state.profile) Object.assign(OWNER, state.profile); paintAvatar(); done('u'); }, fail);
   }).catch(() => { $('#main').innerHTML = `<div class="notice bad">Your workspace couldn’t be opened. Reload the page to try again.</div>`; });
 }
 
@@ -988,7 +1041,7 @@ function route() {
   const m = h.match(/^(quote|invoice)-([a-z0-9-]+)$/i);
   if (m) { view.tab = m[1] + 's'; view.open = { kind: m[1], id: m[2] }; }
   else {
-    const SUBS = { home: 'overview', clients: 'clients', prices: 'prices', settings: 'settings', bank: 'settings', search: 'search' };
+    const SUBS = { home: 'overview', clients: 'clients', prices: 'prices', settings: 'settings', bank: 'settings', search: 'search', profile: 'profile' };
     const t = h in SUBS ? 'home' : ['quotes', 'invoices'].includes(h) ? h : 'home', sub = SUBS[h] || 'overview';
     if (t !== view.tab || sub !== view.sub || view.open) { view.filter = 'all'; view.q = ''; }
     if (sub !== 'prices') view.editPrices = false;
@@ -1081,9 +1134,11 @@ const SUB_ICONS = {
   prices: '<path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/>',
   settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>' };
 function portalHTML() {
-  return ({ overview: homeHTML, clients: clientsHTML, prices: pricesHTML, settings: settingsHTML, search: searchHTML }[view.sub || 'overview'])();
+  return ({ overview: homeHTML, clients: clientsHTML, prices: pricesHTML, settings: settingsHTML, search: searchHTML, profile: profileHTML }[view.sub || 'overview'])();
 }
 const SIDE_ICONS = { ...SUB_ICONS,
+  profile: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.2-4 4.3-6 8-6s6.8 2 8 6"/>',
+  globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/>',
   quotes: '<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/>',
   invoices: '<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/>',
   plus: '<path d="M12 5v14M5 12h14"/>' };
@@ -1100,8 +1155,8 @@ function sideHTML() {
     ${it('overview', 'home', 'Overview')}
     <h4>Sales</h4>${it('quotes', 'quotes', 'Quotes', openQ)}${it('invoices', 'invoices', 'Invoices', late || owed, late)}
     <h4>Clients</h4>${it('clients', 'clients', 'Clients', ready ? state.clients.length : '')}
-    <h4>Business</h4>${it('prices', 'prices', 'Price list')}${it('settings', 'settings', 'Settings')}
-    <div class="sfoot"><span>Novyra Marketing</span><a href="https://www.novyra.co.za/" target="_blank" rel="noopener">novyra.co.za</a></div>`;
+    <h4>Business</h4>${it('prices', 'prices', 'Price list')}${it('profile', 'profile', 'Your details')}${it('settings', 'settings', 'Settings')}
+    <a class="sfoot" href="https://www.novyra.co.za/" target="_blank" rel="noopener" title="Novyra Marketing · novyra.co.za"><span class="sm"><img src="data:image/png;base64,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" alt=""></span><span class="st"><b>Novyra Marketing</b><span>novyra.co.za</span></span></a>`;
   const nb = $('[data-side-new]', side); nb.addEventListener('click', () => { if (ready) newQuoteDialog(); });
 }
 function searchHTML() {
@@ -1144,7 +1199,7 @@ function filterBtns(opts) { return `<div class="filters">${opts.map(o => `<butto
 function searchBox(ph) { return `<label class="search"><span class="vh">Search</span>${ICON_SEARCH}<input id="list-search" type="search" placeholder="${ph}" value="${esc(view.q)}" autocomplete="off"></label>`; }
 const matchQ = (...parts) => !view.q || parts.some(p => norm(p).includes(norm(view.q)));
 function ageCell(days, done) { if (days == null) return '<td class="r num age">—</td>'; return `<td class="r num age ${done ? 'done' : days > 30 ? 'old' : ''}">${days}d</td>`; }
-const ownerCell = d => `<td><span class="owner" title="Prepared by ${esc(ownerOf(d))}">${esc(initials(ownerOf(d)))}</span></td>`;
+const ownerCell = d => { const n = ownerOf(d), me = norm(n) === norm(OWNER.name) || n === 'Hanu Keyser'; return `<td><span class="owner" title="Prepared by ${esc(n)}" ${me ? `style="background:${esc(OWNER.color || AV_COLORS[0])}"` : ''}>${esc(me ? userInitials(OWNER) : initials(n))}</span></td>`; };
 const emptyBox = (h, p) => `<div class="empty"><h3>${h}</h3><p>${p}</p></div>`;
 function quotesHTML() {
   let qs = [...state.quotes].sort((a, b) => (b.number || 0) - (a.number || 0));
@@ -1238,6 +1293,23 @@ function priceEditHTML() {
       <td><input data-p="${i}" data-k="price" type="number" min="0" step="10" value="${p.price}" style="text-align:right" aria-label="Price"></td><td><button class="btn small ghost danger" data-del-price="${i}" aria-label="Remove ${esc(p.item)}">Remove</button></td></tr>`).join('')}
     </tbody></table></div>`;
 }
+function profileHTML() {
+  const u = { ...OWNER };
+  const sw = AV_COLORS.map(c => `<button type="button" class="sw" data-color="${c}" style="background:${c}" aria-label="Colour ${c}" aria-pressed="${c === u.color}"></button>`).join('');
+  return `<div class="head"><div><h2>Your details</h2><p>Printed on every quote and invoice as the person preparing it, and used for your profile picture.</p></div></div>
+    <div class="profile">
+      <section class="panel prof-card"><div class="big-av" id="pf-av" style="background:${esc(u.color)}">${esc(userInitials(u))}</div>
+        <div class="prof-id"><b id="pf-nm">${esc(u.name)}</b><span id="pf-tt">${esc(u.title || '')}</span><span class="sub">Novyra Marketing</span></div>
+        <div class="field"><span>Profile colour</span><div class="swatches">${sw}</div></div></section>
+      <section class="panel"><h3>About you</h3><div class="grid2">
+        <label class="field"><span>Full name</span><input id="pf-name" value="${esc(u.name)}" autocomplete="name"></label>
+        <label class="field"><span>Initials (shown in your profile picture)</span><input id="pf-init" value="${esc(userInitials(u))}" maxlength="3" autocomplete="off" style="text-transform:uppercase"></label>
+        <label class="field" style="grid-column:1/-1"><span>Job title</span><input id="pf-title" value="${esc(u.title || '')}" placeholder="For example: Founder & Designer"></label>
+        <label class="field"><span>Email</span><input id="pf-email" type="email" value="${esc(u.email)}" autocomplete="email"></label>
+        <label class="field"><span>Phone</span><input id="pf-phone" type="tel" value="${esc(u.phone)}" autocomplete="tel"></label></div>
+        <div class="actions" style="margin-top:16px"><button class="btn primary" data-save-profile>Save your details</button></div></section>
+    </div>`;
+}
 function settingsHTML() {
   const b = bank(), meta = state.meta || {};
   const pl = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
@@ -1280,6 +1352,20 @@ function bindList(main) {
   const dp = $('[data-done-prices]', main); if (dp) dp.addEventListener('click', e => { e.preventDefault(); view.editPrices = false; render(); scrollTo(0, 0); });
   if ($('.ps-wrap', main)) fitPreview();
   const bk = $('[data-backup]', main); if (bk) bk.addEventListener('click', backup);
+  const pfn = $('#pf-name', main);
+  if (pfn) {
+    let color = OWNER.color || AV_COLORS[0];
+    const live = () => { const ini = $('#pf-init', main).value.trim().toUpperCase() || initials(pfn.value); const av = $('#pf-av', main); av.textContent = ini || '?'; av.style.background = color; $('#pf-nm', main).textContent = pfn.value || 'Your name'; $('#pf-tt', main).textContent = $('#pf-title', main).value; };
+    ['#pf-name', '#pf-init', '#pf-title'].forEach(q => $(q, main).addEventListener('input', live));
+    $$('[data-color]', main).forEach(b => b.addEventListener('click', () => { color = b.dataset.color; $$('[data-color]', main).forEach(x => x.setAttribute('aria-pressed', x === b)); live(); }));
+    $('[data-save-profile]', main).addEventListener('click', async () => {
+      const v = { name: pfn.value.trim(), initials: $('#pf-init', main).value.trim().toUpperCase().slice(0, 3), title: $('#pf-title', main).value.trim(), email: $('#pf-email', main).value.trim(), phone: $('#pf-phone', main).value.trim(), color };
+      if (!v.name) { toast('Type your name.'); pfn.focus(); return; }
+      if (!v.initials) v.initials = initials(v.name).toUpperCase();
+      if (v.email && !/^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/.test(v.email)) { toast('That email address doesn’t look right.'); return; }
+      try { await db.doc('settings/profile').set(v); Object.assign(OWNER, v); paintAvatar(); toast('Your details are saved'); render(); } catch { toast('Not saved. Check your connection and try again.'); }
+    });
+  }
   const so = $('[data-signout]', main); if (so) so.addEventListener('click', () => window.STUDIO.signOut());
   const bs = $('#big-search', main);
   if (bs) { if (document.activeElement !== bs) { bs.focus(); bs.setSelectionRange(bs.value.length, bs.value.length); }
@@ -1293,7 +1379,7 @@ async function backup() {
   const downloads = await claude.use('downloads');
   if (!downloads) { toast('Downloads aren’t available in this view.'); return; }
   const strip = a => a.map(({ id, ...d }) => ({ id, ...d }));
-  const data = { app: 'Novyra Quotes & Invoices', made: new Date().toISOString(), clients: strip(state.clients), quotes: strip(state.quotes), invoices: strip(state.invoices), prices: state.prices, bank: state.bank };
+  const data = { app: 'Novyra Quotes & Invoices', made: new Date().toISOString(), clients: strip(state.clients), quotes: strip(state.quotes), invoices: strip(state.invoices), prices: state.prices, bank: state.bank, profile: state.profile };
   const name = `Novyra Backup ${todayIso()}.json`;
   try {
     await downloads.save({ filename: name, data: new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }) });
@@ -1309,6 +1395,7 @@ async function restoreDialog(file) {
   const extra = [];
   if (!state.prices && data.prices && Array.isArray(data.prices.items)) extra.push(['settings/prices', data.prices, 'your price list']);
   if (!state.bank && data.bank && data.bank.accountNumber) extra.push(['settings/bank', data.bank, 'your payment details']);
+  if (!state.profile && data.profile && data.profile.name) extra.push(['settings/profile', data.profile, 'your details']);
   const n = add.clients.length + add.quotes.length + add.invoices.length + extra.length;
   openModal(dlg('Restore from backup', `<p class="lead">Backup made <b>${esc(fmtWhen(data.made))}</b>.</p>
       ${n ? `<p>This puts back <b>${add.clients.length} client${add.clients.length === 1 ? '' : 's'}</b>, <b>${add.quotes.length} quote${add.quotes.length === 1 ? '' : 's'}</b> and <b>${add.invoices.length} invoice${add.invoices.length === 1 ? '' : 's'}</b>${extra.length ? ', plus ' + extra.map(x => x[2]).join(' and ') : ''} that are missing now.</p><p class="sub">Nothing you have now is changed or replaced; only missing records are added back.</p>`
@@ -1434,20 +1521,62 @@ function newQuoteDialog(preset) {
 /* add or edit a client, with one or more contact people */
 const logoOf = c => { if (!c) return ''; if (c.logo) return c.logo; const r = state.clients.find(o => (c.id && o.id === c.id) || norm(o.business) === norm(c.business)); return (r && r.logo) || ''; };
 const avHTML = c => { const l = logoOf(c); return l ? `<span class="av has-logo"><img src="${esc(l)}" alt=""></span>` : `<span class="av">${esc(initials((c && c.business) || ''))}</span>`; };
-function shrinkLogo(file) {
+function shrinkLogo(file, S = 640) {
   return new Promise((res, rej) => {
     if (!file || !/^image\//.test(file.type)) return rej(new Error('type'));
     const url = URL.createObjectURL(file), img = new Image();
-    img.onload = () => { const S = 192, k = Math.min(S / img.naturalWidth, S / img.naturalHeight, 1) || 1, w = Math.max(1, Math.round(img.naturalWidth * k)), h = Math.max(1, Math.round(img.naturalHeight * k));
+    img.onload = () => { const k = Math.min(S / img.naturalWidth, S / img.naturalHeight, 1) || 1, w = Math.max(1, Math.round(img.naturalWidth * k)), h = Math.max(1, Math.round(img.naturalHeight * k));
       const cv = document.createElement('canvas'); cv.width = w; cv.height = h; cv.getContext('2d').drawImage(img, 0, 0, w, h); URL.revokeObjectURL(url);
       let out = cv.toDataURL('image/webp', 0.9); if (!out.startsWith('data:image/webp')) out = cv.toDataURL('image/png'); res(out); };
     img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('read')); };
     img.src = url;
   });
 }
+function cropLogo(src, start, done, back) {
+  const img = new Image();
+  img.onload = () => {
+    const V = 280, OUT = 256, iw = img.naturalWidth, ih = img.naturalHeight;
+    const fit = Math.min(V / iw, V / ih), fill = Math.max(V / iw, V / ih);
+    let st = start ? { ...start } : { z: 1, x: 0, y: 0, bg: 'white', pad: 8 };
+    openModal(dlg('Crop and adjust logo', `<div class="crop">
+        <div class="crop-stage"><canvas id="crop-cv" width="${V * 2}" height="${V * 2}" style="width:${V}px;height:${V}px"></canvas><span class="crop-hint">Drag to move</span></div>
+        <div class="crop-side">
+          <label class="field"><span>Zoom</span><input type="range" id="crop-z" min="0.4" max="4" step="0.01" value="${st.z}"></label>
+          <div class="field"><span>Size</span><div class="seg"><button type="button" data-fitm="fit">Fit whole logo</button><button type="button" data-fitm="fill">Fill the square</button></div></div>
+          <div class="field"><span>Background</span><div class="seg"><button type="button" data-bg="white" aria-pressed="${st.bg === 'white'}">White</button><button type="button" data-bg="clear" aria-pressed="${st.bg === 'clear'}">Transparent</button><button type="button" data-bg="dark" aria-pressed="${st.bg === 'dark'}">Dark</button></div></div>
+          <div class="field"><span>Preview</span><div class="crop-prev"><span class="av has-logo" id="cp1"></span><span class="av has-logo big" id="cp2"></span><span class="sub">How it shows in lists and on the client card</span></div></div>
+        </div></div>`,
+      `<button class="btn ghost" data-crop-back>Back</button><button class="btn primary" data-crop-ok>Use this logo</button>`, 'wide'), m => {
+      const cv = $('#crop-cv', m), cx = cv.getContext('2d'), z = $('#crop-z', m);
+      const paint = (ctx, size) => { const k = size / V, sc = fit * st.z;
+        ctx.clearRect(0, 0, size, size);
+        if (st.bg === 'white') { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, size, size); } else if (st.bg === 'dark') { ctx.fillStyle = '#0b0f1e'; ctx.fillRect(0, 0, size, size); }
+        const w = iw * sc * k, h = ih * sc * k; ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, (size - w) / 2 + st.x * k, (size - h) / 2 + st.y * k, w, h); };
+      const out = () => { const c2 = document.createElement('canvas'); c2.width = c2.height = OUT; paint(c2.getContext('2d'), OUT); let u = c2.toDataURL('image/webp', 0.92); if (!u.startsWith('data:image/webp')) u = c2.toDataURL('image/png'); return u; };
+      const draw = () => { paint(cx, V * 2); if (st.bg === 'clear') { /* checker shows through css */ } const u = out(); $('#cp1', m).innerHTML = `<img src="${u}" alt="">`; $('#cp2', m).innerHTML = `<img src="${u}" alt="">`; $('#cp1', m).style.background = $('#cp2', m).style.background = st.bg === 'dark' ? '#0b0f1e' : '#fff'; };
+      let raf = 0; const soon = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); };
+      z.addEventListener('input', () => { st.z = Number(z.value); soon(); });
+      $$('[data-fitm]', m).forEach(b => b.addEventListener('click', () => { st.z = b.dataset.fitm === 'fit' ? 1 : fill / fit; st.x = st.y = 0; z.value = st.z; soon(); }));
+      $$('[data-bg]', m).forEach(b => b.addEventListener('click', () => { st.bg = b.dataset.bg; $$('[data-bg]', m).forEach(o => o.setAttribute('aria-pressed', o === b)); cv.classList.toggle('dark', st.bg === 'dark'); soon(); }));
+      let drag = null;
+      cv.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: e.clientY, sx: st.x, sy: st.y }; cv.setPointerCapture(e.pointerId); cv.classList.add('grab'); });
+      cv.addEventListener('pointermove', e => { if (!drag) return; st.x = drag.sx + e.clientX - drag.x; st.y = drag.sy + e.clientY - drag.y; soon(); });
+      const up = () => { drag = null; cv.classList.remove('grab'); }; cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+      cv.addEventListener('wheel', e => { e.preventDefault(); st.z = Math.min(4, Math.max(0.4, st.z * (e.deltaY < 0 ? 1.06 : 0.94))); z.value = st.z; soon(); }, { passive: false });
+      $('[data-crop-back]', m).addEventListener('click', back);
+      $('.x', m).onclick = e => { e.stopPropagation(); back(); };
+      $('[data-crop-ok]', m).addEventListener('click', () => done(out(), st));
+      cv.classList.toggle('dark', st.bg === 'dark'); draw();
+    });
+  };
+  img.onerror = () => { toast('That logo couldn’t be opened.'); back(); };
+  img.src = src;
+}
 function clientDialog(c, onSaved, onCancel) {
   const isNew = !c || !c.id;
   let x = { business: '', address: '', reg: '', notes: '', ...(c || {}) };
+  let fin = { name: '', email: '', phone: '', ...((c && c.finance) || {}) };
   let people = clone(contactsOf(c));
   if (!people.length) people = [{ name: '', role: '', email: '', phone: '' }];
   const docs = isNew ? { quotes: [], invoices: [] } : docsFor(x);
@@ -1455,20 +1584,28 @@ function clientDialog(c, onSaved, onCancel) {
   const personHTML = (p, i) => `<div class="pcard" data-pi="${i}"><div class="pcard-h"><span class="label">Contact person ${people.length > 1 ? i + 1 : ''}</span>${people.length > 1 ? `<button type="button" class="btn small ghost danger" data-del-person="${i}">Remove</button>` : ''}</div>
       <div class="grid2"><label class="field"><span>Name</span><input data-pf="name" value="${esc(p.name)}" placeholder="Full name"></label><label class="field"><span>Role (optional)</span><input data-pf="role" value="${esc(p.role)}" placeholder="e.g. Director"></label>
       <label class="field"><span>Email</span><input data-pf="email" type="email" value="${esc(p.email)}" placeholder="name@company.co.za"></label><label class="field"><span>Phone</span><input data-pf="phone" type="tel" value="${esc(p.phone)}"></label></div></div>`;
-  const body = () => `<div class="section logo-row"><div class="logo-box">${x.logo ? `<img src="${esc(x.logo)}" alt="Logo">` : `<span>${esc(initials(x.business) || '?')}</span>`}</div>
-      <div class="logo-txt"><b>Company logo</b><span class="sub">${x.logo ? 'Shown instead of the initials everywhere in the app.' : 'Optional. PNG, JPG or SVG. Shown instead of the initials.'}</span>
-      <div class="actions"><label class="btn small">${x.logo ? 'Change logo' : 'Upload logo'}<input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" data-logo hidden></label>${x.logo ? '<button type="button" class="btn small ghost danger" data-logo-del>Remove</button>' : ''}</div></div></div>
-    <div class="section"><label class="field"><span>Business name</span><input id="cl-business" value="${esc(x.business)}" ${isNew ? 'autofocus' : ''}></label></div>
-    <div class="section"><div class="sec-h"><span class="label">Contact people</span><span class="sub">Quotes are addressed and emailed to them</span></div><div class="pcards">${people.map(personHTML).join('')}</div>
-      <button type="button" class="btn small" data-add-person style="margin-top:10px">+ Add another contact person</button></div>
-    <div class="section grid2"><label class="field" style="grid-column:1/-1"><span>Address (optional)</span><textarea id="cl-address" rows="2">${esc(x.address)}</textarea></label>
-      <label class="field" style="grid-column:1/-1"><span>Registration or VAT no. (optional)</span><input id="cl-reg" value="${esc(x.reg)}"></label>
-      <label class="field" style="grid-column:1/-1"><span>Private notes (never printed)</span><textarea id="cl-notes" rows="2">${esc(x.notes)}</textarea></label></div>
-    ${isNew ? '' : `<div class="section"><div class="sec-h"><span class="label">Quotes and invoices</span></div>${list.length ? `<div class="doclist">${list.map(l => `<a href="#${l.h}" data-go><b class="num">${esc(l.n)}</b><span class="sub">${fmtDate(l.d)}</span><span class="num">${money(l.t)}</span><span class="pill ${pillClass(l.s)}">${l.s}</span></a>`).join('')}</div>` : '<p class="sub" style="margin:0">Nothing yet.</p>'}</div>`}`;
+  const body = () => `<div class="cgrid"><div class="ccol">
+    <section class="cbox"><div class="logo-row"><div class="logo-box">${x.logo ? `<img src="${esc(x.logo)}" alt="Logo">` : `<span>${esc(initials(x.business) || '?')}</span>`}</div>
+      <div class="logo-txt"><b>Company logo</b><span class="sub">${x.logo ? 'Shown instead of the initials everywhere in the app.' : 'Optional. PNG, JPG or SVG. You can crop it after uploading.'}</span>
+      <div class="actions"><label class="btn small">${x.logo ? 'Replace' : 'Upload logo'}<input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" data-logo hidden></label>${x.logo ? '<button type="button" class="btn small" data-logo-crop>Crop and adjust</button><button type="button" class="btn small ghost danger" data-logo-del>Remove</button>' : ''}</div></div></div></section>
+    <section class="cbox"><label class="field"><span>Business name</span><input id="cl-business" value="${esc(x.business)}" ${isNew ? 'autofocus' : ''}></label>
+      <label class="field"><span>Address (optional)</span><textarea id="cl-address" rows="2">${esc(x.address)}</textarea></label>
+      <label class="field"><span>Registration or VAT no. (optional)</span><input id="cl-reg" value="${esc(x.reg)}"></label>
+      <label class="field"><span>Private notes (never printed)</span><textarea id="cl-notes" rows="2">${esc(x.notes)}</textarea></label></section>
+    ${isNew ? '' : `<section class="cbox"><div class="sec-h"><span class="label">Quotes and invoices</span></div>${list.length ? `<div class="doclist">${list.map(l => `<a href="#${l.h}" data-go><b class="num">${esc(l.n)}</b><span class="sub">${fmtDate(l.d)}</span><span class="num">${money(l.t)}</span><span class="pill ${pillClass(l.s)}">${l.s}</span></a>`).join('')}</div>` : '<p class="sub" style="margin:0">Nothing yet.</p>'}</section>`}
+    </div><div class="ccol">
+    <section class="cbox"><div class="sec-h"><span class="label">Contact people</span><span class="sub">Quotes and invoices go to them</span></div><div class="pcards">${people.map(personHTML).join('')}</div>
+      <button type="button" class="btn small" data-add-person>+ Add another contact person</button></section>
+    <section class="cbox fin"><div class="sec-h"><span class="label">Finance contact</span><span class="sub">Required</span></div>
+      <p class="sub" style="margin:0">Payment reminders, receipts and statements go here. Quotes and invoices still go to the contact people.</p>
+      <div class="grid2"><label class="field"><span>Name</span><input data-fin="name" value="${esc(fin.name)}" placeholder="For example: Accounts"></label><label class="field"><span>Email</span><input data-fin="email" type="email" value="${esc(fin.email)}" placeholder="accounts@company.co.za"></label>
+      <label class="field"><span>Phone (optional)</span><input data-fin="phone" type="tel" value="${esc(fin.phone)}"></label><div class="field"><span>&nbsp;</span><button type="button" class="btn small" data-fin-copy>Same as contact person 1</button></div></div></section>
+    </div></div>`;
   const canRemove = !isNew && !list.length;
   const foot = `${canRemove ? '<button class="btn ghost danger" data-remove-client style="margin-right:auto">Remove client</button>' : ''}${isNew || onSaved ? '' : '<button class="btn" data-quote-client style="margin-right:auto">New quote for this client</button>'}<button class="btn ghost" data-cancel>Cancel</button><button class="btn primary" data-save-client>${isNew ? 'Save client' : 'Save changes'}</button>`;
   const readAll = m => {
     x.business = $('#cl-business', m).value.trim(); x.address = $('#cl-address', m).value.trim(); x.reg = $('#cl-reg', m).value.trim(); x.notes = $('#cl-notes', m).value.trim();
+    fin = Object.fromEntries($$('[data-fin]', m).map(i => [i.dataset.fin, i.value.trim()]));
     people = $$('.pcard', m).map(card => Object.fromEntries($$('[data-pf]', card).map(inp => [inp.dataset.pf, inp.value.trim()])));
   };
   const draw = () => openModal(dlg(isNew ? 'New client' : 'Client details', body(), foot, 'wide'), m => {
@@ -1479,8 +1616,10 @@ function clientDialog(c, onSaved, onCancel) {
     $('[data-add-person]', m).addEventListener('click', () => { readAll(m); people.push({ name: '', role: '', email: '', phone: '' }); draw(); const last = $$('#modal .pcard').pop(); if (last) { last.scrollIntoView({ block: 'nearest' }); $('input', last).focus(); } });
     $$('[data-del-person]', m).forEach(b => b.addEventListener('click', () => { readAll(m); people.splice(Number(b.dataset.delPerson), 1); draw(); }));
     const lf = $('[data-logo]', m); if (lf) lf.addEventListener('change', async () => { const f = lf.files[0]; if (!f) return; readAll(m);
-      try { x.logo = await shrinkLogo(f); draw(); toast('Logo added. Save to keep it.'); } catch { toast('That file couldn’t be used. Try a PNG or JPG.'); } });
-    const ld = $('[data-logo-del]', m); if (ld) ld.addEventListener('click', () => { readAll(m); x.logo = ''; draw(); });
+      try { const src = await shrinkLogo(f, 640); cropLogo(src, null, out => { x.logoSrc = src; x.logo = out; draw(); toast('Logo ready. Save the client to keep it.'); }, draw); } catch { toast('That file couldn’t be used. Try a PNG or JPG.'); } });
+    const lc = $('[data-logo-crop]', m); if (lc) lc.addEventListener('click', () => { readAll(m); cropLogo(x.logoSrc || x.logo, x.logoCrop || null, (out, crop) => { x.logo = out; x.logoCrop = crop; if (!x.logoSrc) x.logoSrc = x.logo; draw(); }, draw); });
+    const fc = $('[data-fin-copy]', m); if (fc) fc.addEventListener('click', () => { readAll(m); const p0 = people[0] || {}; fin = { name: p0.name || '', email: p0.email || '', phone: p0.phone || '' }; draw(); });
+    const ld = $('[data-logo-del]', m); if (ld) ld.addEventListener('click', () => { readAll(m); x.logo = ''; x.logoSrc = ''; x.logoCrop = null; draw(); });
     $('[data-save-client]', m).addEventListener('click', async e => {
       readAll(m);
       const ppl = people.filter(p => p.name || p.email || p.phone);
@@ -1490,9 +1629,11 @@ function clientDialog(c, onSaved, onCancel) {
       const bad = ppl.findIndex(p => p.email && !/^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/.test(p.email));
       if (bad >= 0) { toast('One of the email addresses doesn’t look right.'); $$('.pcard', m)[people.indexOf(ppl[bad])].querySelector('[data-pf=email]').focus(); return; }
       if (ppl.some(p => !p.name)) { toast('Give every contact person a name.'); return; }
+      if (!fin.name || !fin.email) { toast('Add the finance contact’s name and email. Payment reminders and receipts go to them.'); const f = $(fin.name ? '[data-fin=email]' : '[data-fin=name]', m); f.focus(); f.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
+      if (!/^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/.test(fin.email)) { toast('The finance email address doesn’t look right.'); $('[data-fin=email]', m).focus(); return; }
       const btn = e.currentTarget; btn.disabled = true;
       const now = new Date().toISOString(), id = x.id || uid();
-      const rec = { business: x.business, logo: x.logo || '', contacts: ppl, address: x.address, reg: x.reg, notes: x.notes, createdAt: x.createdAt || now, updatedAt: now, createdBy: x.createdBy || OWNER.name };
+      const rec = { business: x.business, logo: x.logo || '', logoSrc: x.logoSrc || '', logoCrop: x.logoCrop || null, finance: fin, contacts: ppl, address: x.address, reg: x.reg, notes: x.notes, createdAt: x.createdAt || now, updatedAt: now, createdBy: x.createdBy || OWNER.name };
       try { await db.collection('clients').doc(id).set(rec); }
       catch { btn.disabled = false; toast('Not saved. Check your connection and try again.'); return; }
       const saved = { id, ...rec };
@@ -1513,6 +1654,17 @@ function clientDialog(c, onSaved, onCancel) {
 }
 
 /* ---------- editor ---------- */
+const financeOf = d => { const r = (d.clientId && state.clients.find(x => x.id === d.clientId)) || state.clients.find(x => norm(x.business) === norm(d.client && d.client.business)); const f = r && r.finance; return f && f.email ? f : null; };
+function finDraft(d, kind) {
+  const f = financeOf(d) || {}, c = calc(d), cl = d.client || {}, hi = f.name && !/^accounts?$|^finance$/i.test(f.name.trim()) ? `Hi ${firstName(f.name)},` : 'Hi there,', sign = `Kind regards\n${OWNER.name}\nNovyra Marketing`;
+  const b = bank(), pay = `Bank: ${b.bank}\nAccount type: ${b.accountType}\nAccount number: ${b.accountNumber}\nReference: INV-${d.number}`;
+  if (kind === 'reminder') return { subject: `Payment reminder: INV-${d.number}${cl.business ? ' – ' + cl.business : ''}`,
+    body: `${hi}\n\nThis is a friendly reminder that ${money(c.due)} is still owing on invoice INV-${d.number}${d.dueDate ? `, due ${fmtDate(d.dueDate)}` : ''}.\n\n${pay}\n\nIf you have already paid, please ignore this email.\n\n${sign}` };
+  const last = (d.payments || []).slice(-1)[0] || {};
+  return { subject: `Payment received: INV-${d.number}${cl.business ? ' – ' + cl.business : ''}`,
+    body: `${hi}\n\nThank you, we received ${money(last.amount || 0)}${last.date ? ` on ${fmtDate(last.date)}` : ''} for invoice INV-${d.number}.\n\n${c.due > 0 ? `${money(c.due)} is still owing on this invoice.` : 'This invoice is now paid in full.'}\n\n${sign}` };
+}
+function finHref(d, kind) { const f = financeOf(d), m = finDraft(d, kind); return `mailto:${encodeURIComponent(f.email).replace(/%40/g, '@')}?subject=${encodeURIComponent(m.subject)}&body=${encodeURIComponent(m.body)}`; }
 function mailHref(d, Q) {
   const to = toList(d).join(','), m = emailDraft(d, Q);
   return `mailto:${to.split(',').map(e => encodeURIComponent(e).replace(/%40/g, '@')).join(',')}?subject=${encodeURIComponent(m.subject)}&body=${encodeURIComponent(m.body)}`;
@@ -1572,6 +1724,9 @@ function renderEditor(main) {
     if (!locked) actions += `<button class="btn ${dirty ? 'primary' : ''}" data-act="save" ${dirty ? '' : 'disabled'}>Save draft</button><button class="btn ${dirty ? '' : 'primary'}" data-act="send" ${dirty ? 'disabled title="Save your changes first"' : ''}>Issue invoice</button><button class="btn ghost danger" data-act="delete">Delete draft</button>`;
     else actions += emailBtn + `<button class="btn" data-act="pdf">Download PDF</button>`;
     if (d.status === 'Sent' && c.due > 0) actions += `<button class="btn" data-act="pay">Record payment</button>`;
+    if (d.status === 'Sent' && !dirty) { const f = financeOf(d);
+      if (c.due > 0) actions += f ? `<a class="btn" data-fin-mail="reminder" href="${esc(finHref(d, 'reminder'))}" target="_blank" rel="noopener">Payment reminder</a>` : `<button class="btn" data-act="no-finance">Payment reminder</button>`;
+      if ((d.payments || []).length) actions += f ? `<a class="btn" data-fin-mail="receipt" href="${esc(finHref(d, 'receipt'))}" target="_blank" rel="noopener">Send receipt</a>` : `<button class="btn" data-act="no-finance">Send receipt</button>`; }
     if (d.status === 'Sent') actions += `<button class="btn ghost danger" data-act="cancel">Cancel invoice</button>`;
   }
   const mailBar = E.mailed ? `<div class="mailbar" role="status"><span class="mi">${ICON_MAIL}</span><div><b>Mail is opening with the email to ${esc(listAnd(emails))}.</b><span class="sub">Drag ${esc(pdfName(d, E.kind))} from your Downloads folder into the email, then press Send.</span></div>
@@ -1646,6 +1801,7 @@ function bindEditor(main) {
   });
   $$('[data-remove]', main).forEach(b => b.addEventListener('click', () => { d.items.splice(Number(b.dataset.remove), 1); rerender(); }));
   $$('[data-act]', main).forEach(b => b.addEventListener('click', () => act(b.dataset.act)));
+  $$('[data-fin-mail]', main).forEach(a => a.addEventListener('click', () => { const f = financeOf(d); d.history.push({ at: new Date().toISOString(), title: `${a.dataset.finMail === 'reminder' ? 'Payment reminder' : 'Receipt'} opened in Mail to ${f.email}`, changes: [] }); setTimeout(() => persist(), 60); }));
   const mail = $('[data-mail]', main);
   if (mail) mail.addEventListener('click', () => {
     // the link itself opens Mail; at the same time save the PDF so it can be attached
@@ -1704,6 +1860,7 @@ const cl = d => (d.client && d.client.business) || 'The client';
 
 async function act(a) {
   const E = view.edit, d = E.draft, Q = E.kind === 'quote', now = new Date().toISOString();
+  if (a === 'no-finance') { const r = (d.clientId && state.clients.find(x => x.id === d.clientId)) || state.clients.find(x => norm(x.business) === norm(d.client && d.client.business)); toast('Add a finance contact for this client first.'); if (r) clientDialog(r, () => { closeModal(); render(); }, closeModal); return; }
   if (a === 'add-item') { d.items.push({ item: '', details: '', qty: 1, rate: 0, discount: 0 }); render(); const last = $$('.item').pop(); if (last) $('input', last).focus(); return; }
   if (a === 'save') {
     if (Q && d.status !== 'Draft') return confirmDialog('rev');
