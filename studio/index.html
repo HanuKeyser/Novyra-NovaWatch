@@ -29,7 +29,7 @@ h1,h2,h3{font-family:var(--display);font-weight:800;margin:0;text-wrap:balance;l
 /* app shell: white top bar, sidebar menu, page */
 :root{--side:252px;--bar:62px}
 html.side-mini{--side:76px}
-.appbar{position:sticky;top:0;z-index:30;height:var(--bar);display:flex;align-items:center;gap:4px;padding:0 max(28px,env(safe-area-inset-right,0px)) 0 0;background:rgba(255,255,255,.92);backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line)}
+.appbar{position:sticky;top:0;z-index:30;height:var(--bar);display:flex;align-items:center;gap:4px;padding:0 max(28px,env(safe-area-inset-right,0px)) 0 0;background:#fff;border-bottom:1px solid var(--line)}
 .appbar .brand{flex:0 0 var(--side);display:flex;align-items:center;padding-left:max(26px,env(safe-area-inset-left,0px));height:100%;border-right:1px solid var(--line);transition:flex-basis .2s;margin-right:11px}
 .appbar .brand .mark{display:none;height:30px}
 html.side-mini .appbar .brand{padding-left:0;justify-content:center}
@@ -704,7 +704,7 @@ const norm = s => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
 const fileSafe = s => String(s || 'Client').replace(/[\\/:*?"<>|]/g, '').trim();
 
 const OWNER = { name: 'Hanu Keyser', email: 'hanu@keysers.cc', phone: '063 886 3779' };
-const DEFAULT_BANK = { accountName: 'Novyra', bank: 'Discovery Bank', accountType: 'Savings account', accountNumber: '12687680212' };
+const DEFAULT_BANK = { bank: 'Discovery Bank', accountType: 'Savings account', accountNumber: '12687680212' };
 let db = null, state = { quotes: [], invoices: [], clients: [], prices: null, bank: null, meta: null, loaded: { q: false, i: false, c: false, p: false, b: false, m: false } };
 let view = { tab: 'home', filter: 'all', edit: null, q: '' };
 
@@ -868,7 +868,7 @@ function paperParts(doc, kind) {
       ${c.monthlyBase ? `<div><span>Then each month, in advance</span><span>${money(c.monthlyBase)}</span></div>` : ''}`;
   const tail = [`<div class="lower">
       <div class="pay"><div class="l">Payment details</div><dl>
-        <dt>Account name</dt><dd>${esc(bk.accountName)}</dd><dt>Bank</dt><dd>${esc(bk.bank)}</dd>
+        <dt>Bank</dt><dd>${esc(bk.bank)}</dd>
         ${bk.accountType ? `<dt>Account type</dt><dd>${esc(bk.accountType)}</dd>` : ''}
         <dt>Account number</dt><dd>${esc(bk.accountNumber) || '—'}</dd><dt>Payment reference</dt><dd>${esc(reference)}</dd></dl>
         <small>${Q ? 'Payment by EFT only.' : 'Please pay by EFT and use the payment reference.'}</small></div>
@@ -997,8 +997,15 @@ addEventListener('hashchange', route);
     else if (k === 'forward') history.forward();
     else if (k === 'close') H.classList.remove('nav-open');
     else if (k === 'refresh') {
-      if (view.edit && isDirty()) { toast('Save your changes first, then refresh.'); return; }
-      b.classList.remove('spin'); void b.offsetWidth; b.classList.add('spin'); setTimeout(() => location.reload(), 250);
+      const go = () => { b.classList.remove('spin'); void b.offsetWidth; b.classList.add('spin'); view.leaving = true; setTimeout(() => location.reload(), 250); };
+      if (view.edit && isDirty()) {
+        openModal(dlg('Unsaved changes', `<p class="lead">You changed <b>${esc(docNo(view.edit.draft, view.edit.kind))}</b> but haven’t saved it yet.</p><p class="sub">Refreshing loads the page again and those changes are lost. Keep editing to save them first.</p>`,
+          `<button class="btn ghost danger" data-refresh-anyway style="margin-right:auto">Refresh without saving</button><button class="btn primary" data-close>Keep editing</button>`, 'small'), m => {
+          $('[data-refresh-anyway]', m).addEventListener('click', () => { closeModal(); go(); });
+        });
+        return;
+      }
+      go();
     } else if (k === 'menu') {
       if (mobile()) H.classList.toggle('nav-open');
       else { const on = H.classList.toggle('side-mini'); try { localStorage.setItem('novyra-side-mini', on ? '1' : '0'); } catch {} }
@@ -1226,10 +1233,9 @@ function settingsHTML() {
   return `<div class="head"><div><h2>Settings</h2><p>Your payment details and backups.</p></div></div>
     <div class="settings">
     <section class="panel"><h3>Payment details</h3><p class="sub" style="margin:-4px 0 14px">Printed on every quote and invoice, and in invoice emails.</p><div class="grid2">
-      <label class="field"><span>Account name</span><input id="bk-name" value="${esc(b.accountName)}"></label>
       <label class="field"><span>Bank</span><input id="bk-bank" value="${esc(b.bank)}"></label>
       <label class="field"><span>Account type</span><input id="bk-type" value="${esc(b.accountType)}"></label>
-      <label class="field"><span>Account number</span><input id="bk-acc" inputmode="numeric" value="${esc(b.accountNumber)}"></label>
+      <label class="field" style="grid-column:1/-1"><span>Account number</span><input id="bk-acc" inputmode="numeric" value="${esc(b.accountNumber)}"></label>
     </div><div class="actions"><button class="btn primary" data-save-bank>Save payment details</button></div></section>
     <section class="panel"><h3>Your records are safe</h3>
       <p class="sub" style="margin:-4px 0 12px">Everything is saved in your private Novyra workspace, not in the browser, so it stays when you close the page, restart the Mac or the app is updated. Only you can open it. Sent quotes and invoices can’t be deleted, only drafts, and a client can only be removed if they have no quotes or invoices.</p>
@@ -1254,7 +1260,7 @@ function bindList(main) {
   const add = $('[data-add-price]', main); if (add) add.addEventListener('click', () => { pl.push({ cat: 'Other', item: 'New item', price: 0, unit: 'once-off', details: '' }); savePrices('Item added. Fill it in and save.'); });
   const sp = $('[data-save-prices]', main); if (sp) sp.addEventListener('click', async () => { await savePrices('Prices saved. The price sheet is updated.'); view.editPrices = false; render(); scrollTo(0, 0); });
   const sb = $('[data-save-bank]', main); if (sb) sb.addEventListener('click', async () => {
-    const v = { accountName: $('#bk-name').value.trim(), bank: $('#bk-bank').value.trim(), accountType: $('#bk-type').value.trim(), accountNumber: $('#bk-acc').value.replace(/\s/g, '') };
+    const v = { bank: $('#bk-bank').value.trim(), accountType: $('#bk-type').value.trim(), accountNumber: $('#bk-acc').value.replace(/\s/g, '') };
     if (!v.accountNumber) { toast('Type the account number.'); return; }
     try { await db.doc('settings/bank').set(v); toast('Payment details saved'); } catch { toast('Not saved. Check your connection and try again.'); }
   });
@@ -1328,7 +1334,7 @@ async function newDoc(kind, from, client, chosen) {
 /* ---------- dialogs ---------- */
 let modalKeys = null;
 function openModal(html, bind) {
-  const m = $('#modal'); m.innerHTML = html; m.hidden = false; document.body.style.overflow = 'hidden';
+  const m = $('#modal'); m.innerHTML = html; m.hidden = false; document.documentElement.style.overflow = 'hidden';
   m.onmousedown = e => { m.downOnBackdrop = e.target === m; };
   m.onclick = e => { if (e.target === m && m.downOnBackdrop) closeModal(); };
   $$('[data-close]', m).forEach(b => b.addEventListener('click', closeModal));
@@ -1338,7 +1344,7 @@ function openModal(html, bind) {
   if (bind) bind(m);
   m.scrollTop = 0; const f = m.querySelector('[autofocus]') || m.querySelector('.content input:not([type=checkbox]),.content textarea') || m.querySelector('footer .btn.primary'); if (f) f.focus({ preventScroll: true });
 }
-function closeModal() { const m = $('#modal'); if (m.hidden) return; m.hidden = true; m.innerHTML = ''; document.body.style.overflow = ''; if (modalKeys) removeEventListener('keydown', modalKeys); modalKeys = null; }
+function closeModal() { const m = $('#modal'); if (m.hidden) return; m.hidden = true; m.innerHTML = ''; document.documentElement.style.overflow = ''; if (modalKeys) removeEventListener('keydown', modalKeys); modalKeys = null; }
 const dlg = (title, body, foot, size) => `<div class="dialog ${size || ''}" role="dialog" aria-modal="true" aria-label="${esc(title)}"><header><button class="x" data-close aria-label="Back"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>Back</button><h3>${esc(title)}</h3></header><div class="content">${body}</div><footer>${foot}</footer></div>`;
 
 /* customer picker: type a name, pick a saved client, or add a new one */
