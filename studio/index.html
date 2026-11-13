@@ -684,6 +684,15 @@ a.back:hover{text-decoration:underline}
 .ticks{margin:0;padding:0;list-style:none;display:grid;gap:8px;max-width:760px}
 .ticks li{position:relative;padding-left:26px;color:var(--muted)}
 .ticks li::before{content:"✓";position:absolute;left:0;top:0;width:18px;height:18px;border-radius:50%;background:#eaf1ff;color:var(--soft);font:800 11px/18px var(--body);text-align:center}
+@media (max-width:1200px){.home-grid{grid-template-columns:minmax(0,1fr)}}
+.doclist a{min-width:0}
+@media (max-width:900px){.profile{grid-template-columns:minmax(0,1fr)}.profile .prof-card{grid-row:auto}.profile .signbox,.prof-actions{grid-column:auto}}
+@media (max-width:1200px) and (min-width:901px){.strip:not(.three){grid-template-columns:repeat(6,minmax(0,1fr))}.strip:not(.three) .stat{grid-column:span 2}.strip:not(.three) .stat:nth-child(4),.strip:not(.three) .stat:nth-child(5){grid-column:span 3}}
+@media (max-width:1200px){.profile{grid-template-columns:minmax(0,1fr)}.profile .prof-card{grid-row:auto}.profile .signbox,.prof-actions{grid-column:auto}
+  .actionbar .actions{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,#000 90%,transparent)}.actionbar .actions::-webkit-scrollbar{display:none}.actionbar .actions .btn{flex:none}}
+@media (max-width:600px){.dialog header h3{font-size:18px}.dialog header{gap:10px}}
+.strip .stat b{overflow-wrap:normal;white-space:nowrap}
+@media (max-width:1200px){.strip .stat b{font-size:20px}}
 </style></head><body>
 
 <header class="appbar">
