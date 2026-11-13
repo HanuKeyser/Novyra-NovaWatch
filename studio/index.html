@@ -567,7 +567,6 @@ body:has(.actionbar) .toast{bottom:calc(112px + env(safe-area-inset-bottom,0px))
 (function () {
   firebase.initializeApp({"apiKey": "AIzaSyBaFNF3r8iehEU00BRO0XKnal0THv9pXs4", "authDomain": "novyra-studio.firebaseapp.com", "projectId": "novyra-studio", "storageBucket": "novyra-studio.firebasestorage.app", "messagingSenderId": "277400731071", "appId": "1:277400731071:web:70871b84494b7a6d9a750a"});
   const auth = firebase.auth(), fs = firebase.firestore();
-  try { fs.enablePersistence({ synchronizeTabs: true }).catch(() => {}); } catch (e) {}
   const gate = document.getElementById('gate'), msg = document.getElementById('gate-msg'), btn = document.getElementById('gate-btn');
   const say = (t, bad) => { msg.textContent = t; msg.className = bad ? 'bad' : ''; };
   let ready, resolveReady; ready = new Promise(r => resolveReady = r);
@@ -870,7 +869,7 @@ async function save(col, doc) {
 function boot() {
   claude.use('db').then(async d => {
     db = d;
-    if (!db) { $('#main').innerHTML = `<div class="notice bad">Your quotes and invoices are kept in your private Novyra workspace. Open this page in Claude while signed in to load them.</div>`; return; }
+    if (!db) { $('#main').innerHTML = `<div class="notice bad">Your quotes and invoices are kept in your private Novyra workspace. Reload the page and sign in again to load them.</div>`; return; }
     try { const user = await claude.use('user'); if (user && !(await user.isOwner())) { db = null; $('#main').innerHTML = `<div class="notice bad">This is a private Novyra workspace.</div>`; return; } } catch {}
     const timer = setTimeout(() => { if (!Object.values(state.loaded).every(Boolean)) $('#main').innerHTML = `<div class="notice warn">Your records are taking long to load. Check your connection; the page fills in as soon as they arrive. Nothing has been lost.</div>`; }, 10000);
     const done = k => { state.loaded[k] = true; if (Object.values(state.loaded).every(Boolean)) clearTimeout(timer); render(); };
