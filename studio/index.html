@@ -1072,6 +1072,41 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:none;bor
 }
 .pricesheet.has-edit{position:relative}.ps-edit{position:absolute;top:0;right:0;z-index:2}.pricesheet.has-edit>.ps-sec:first-of-type .ps-head,.pricesheet.has-edit>section:first-of-type>header{padding-right:140px}
 @media (max-width:760px){.ps-edit{position:static;width:100%;margin:0 0 18px}}
+
+/* ===== settings: one page, sticky section list ===== */
+.set-layout{display:grid;grid-template-columns:240px minmax(0,1fr);gap:28px;align-items:start}
+.set-nav{position:sticky;top:84px;display:grid;gap:4px;padding:8px;background:#fff;border:1px solid var(--line);border-radius:var(--r-card);box-shadow:var(--sh-card)}
+.set-nav a{display:grid;grid-template-columns:20px minmax(0,1fr);column-gap:12px;row-gap:1px;align-items:center;padding:10px 12px;border-radius:11px;text-decoration:none;color:var(--text);transition:background-color .15s,color .15s}
+.set-nav a svg{width:19px;height:19px;color:var(--muted);grid-row:1/3}
+.set-nav a span{font-weight:600;font-size:14px}
+.set-nav a em{font-style:normal;font-size:12px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;grid-column:2}
+.set-nav a:hover{background:var(--ink)}
+.set-nav a[aria-current]{background:#eef3ff;color:var(--soft)}.set-nav a[aria-current] svg{color:var(--soft)}
+.set-nav a:focus-visible{outline:2px solid var(--spark);outline-offset:-2px}
+.set-main{display:grid;gap:40px;min-width:0}
+.set-sec{scroll-margin-top:84px;min-width:0}
+.set-h{display:flex;align-items:center;gap:14px;margin:0 0 14px}
+.set-h h3{font-size:20px !important;margin:0 !important}
+.set-h .sub{margin:2px 0 0;font-size:13.5px}
+.set-ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:#eaf1ff;color:var(--soft);box-shadow:inset 0 0 0 1px #d4e1fc;flex:none}.set-ic svg{width:20px;height:20px}
+.set-sec .sgrid{margin:0}
+.set-sec .sfoot-actions{margin-top:14px}
+@media (max-width:1100px){.set-layout{grid-template-columns:200px minmax(0,1fr);gap:20px}.set-nav a em{display:none}.set-nav a{grid-template-columns:20px minmax(0,1fr)}.set-nav a svg{grid-row:auto}}
+@media (max-width:900px){
+  .set-layout{grid-template-columns:minmax(0,1fr);gap:16px}
+  .set-nav{top:calc(var(--bar,60px) + 6px);z-index:8;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:6px;margin-inline:-4px}
+  .set-nav::-webkit-scrollbar{display:none}
+  .set-nav a{display:flex;flex:none;gap:8px;padding:8px 12px;white-space:nowrap}
+  .set-nav a svg{width:17px;height:17px}
+  .set-main{gap:32px}.set-sec{scroll-margin-top:132px}
+}
+/* overview buttons: same width as one summary card */
+@media (min-width:761px){
+  .home-hero{display:grid !important;grid-template-columns:minmax(0,1fr) calc((100% - 48px) / 5);align-items:end;column-gap:12px}
+  .home-hero>.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+  .home-hero>.actions>.btn{width:100%;padding-inline:8px;justify-content:center}
+}
+@media (min-width:901px) and (max-width:1200px){.home-hero{grid-template-columns:minmax(0,1fr) calc((100% - 12px) / 2)}}
 </style></head><body>
 
 <header class="appbar">
@@ -2135,14 +2170,19 @@ function settingsSummary(k) {
   return ({ profile: `${OWNER.name}${OWNER.title ? ' · ' + OWNER.title : ''}`, business: `${bank().bank || 'No bank yet'} · next Q-${nextQuote()}`, email: mailReady() ? 'Connected' : 'Not set up',
     team: `${state.users.length + 1} ${state.users.length ? 'people' : 'person'}`, menu: (state.menu && (state.menu.hidden || []).length) ? `${state.menu.hidden.length} hidden` : 'Default', data: state.trash.length ? `${state.trash.length} recently deleted` : ((state.meta || {}).lastBackup ? 'Backed up ' + fmtDate(state.meta.lastBackup.slice(0, 10)) : 'No backup yet') })[k];
 }
+const settingsSpy = {};
 function settingsHTML() {
   const secs = SET_SEC.filter(([k]) => k !== 'team' || can('team'));
   const body = { profile: setProfileHTML, business: setBusinessHTML, email: setEmailHTML, team: setTeamHTML, menu: setMenuHTML, data: setDataHTML };
-  return `<div class="head"><div><h2>Settings</h2><p>Everything about your account and business in one place. Open a section to change it.</p></div></div>
-    <div class="acc">${secs.map(([k, t, d, ic]) => { const open = view.stab === k; return `<section class="acc-sec ${open ? 'open' : ''}" data-sec="${k}" id="set-${k}">
-      <button type="button" class="acc-h" aria-expanded="${open}" aria-controls="acc-${k}" data-acc-toggle="${k}"><span class="acc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ic}</svg></span>
-        <span class="acc-t"><b>${t}</b><span class="sub">${d}</span></span><span class="acc-s">${esc(settingsSummary(k) || '')}</span><span class="acc-chev">${CHEV_DN}</span></button>
-      <div class="acc-b" id="acc-${k}" role="region" aria-label="${t}"><div class="acc-in"><div class="acc-pad">${body[k]()}</div></div></div></section>`; }).join('')}</div>`;
+  const ico = ic => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ic}</svg>`;
+  const cur = view.stab || secs[0][0];
+  return `<div class="head"><div><h2>Settings</h2><p>Everything about your account and business, on one page.</p></div></div>
+    <div class="set-layout">
+      <nav class="set-nav" aria-label="Settings sections">${secs.map(([k, t, d, ic]) => `<a href="#settings-${k}" data-set-go="${k}" ${k === cur ? 'aria-current="true"' : ''}>${ico(ic)}<span>${t}</span><em>${esc(settingsSummary(k) || '')}</em></a>`).join('')}</nav>
+      <div class="set-main">${secs.map(([k, t, d, ic]) => `<section class="set-sec" id="set-${k}" data-sec="${k}" aria-labelledby="set-${k}-h">
+        <header class="set-h"><span class="set-ic">${ico(ic)}</span><div><h3 id="set-${k}-h">${t}</h3><p class="sub">${d}</p></div></header>
+        ${body[k]()}</section>`).join('')}</div>
+    </div>`;
 }
 function setProfileHTML() {
   const u = { ...OWNER }, sg = { ...SIGN_DEFAULT, ...(OWNER.sign || {}) };
@@ -2346,14 +2386,17 @@ function bindList(main) {
   $$('[data-mshow]', main).forEach(c => c.addEventListener('change', () => { const g = menuGroups(); g.forEach(x => x.items.forEach(i => { if (i[0] === c.dataset.mshow) i[3] = !c.checked; })); saveMenu(g); }));
   const mr = $('[data-menu-reset]', main); if (mr) mr.addEventListener('click', async () => { state.menu = null; render(); try { await db.doc('menus/' + menuKey()).delete(); toast('Menu reset'); } catch {} });
   bindCalendar(main);
-  $$('[data-acc-toggle]', main).forEach(b => b.addEventListener('click', () => {
-    const k = b.dataset.accToggle, sec = b.closest('.acc-sec'), opening = !sec.classList.contains('open');
-    $$('.acc-sec.open', main).forEach(o => { if (o !== sec) { o.classList.remove('open'); $('.acc-h', o).setAttribute('aria-expanded', 'false'); } });
-    sec.classList.toggle('open', opening); b.setAttribute('aria-expanded', String(opening)); view.stab = opening ? k : '';
-    route.last = 'home:settings'; history.replaceState(null, '', opening ? '#settings-' + k : '#settings');
-    if (opening) setTimeout(() => { const r = sec.getBoundingClientRect(); if (r.top < 70 || r.top > innerHeight * .5) scrollTo({ top: scrollY + r.top - 80, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); }, 230);
-  }));
-  if (view.sub === 'settings' && view.stab && !bindList.scrolled) { bindList.scrolled = view.stab; const sec = $('#set-' + view.stab, main); if (sec && location.hash.startsWith('#settings-')) setTimeout(() => { const r = sec.getBoundingClientRect(); if (r.top > innerHeight * .6) scrollTo({ top: scrollY + r.top - 80 }); }, 30); }
+  if (view.sub === 'settings') {
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const toSec = (k, smooth) => { const el = $('#set-' + k, main); if (!el) return; const off = innerWidth <= 900 ? 132 : 84; scrollTo({ top: scrollY + el.getBoundingClientRect().top - off, behavior: smooth && !reduce ? 'smooth' : 'auto' }); };
+    const mark = k => { if (view.stab === k && $(`.set-nav [aria-current]`, main)?.dataset.setGo === k) return; view.stab = k; $$('.set-nav a', main).forEach(a => { if (a.dataset.setGo === k) { a.setAttribute('aria-current', 'true'); if (innerWidth <= 900) a.scrollIntoView({ block: 'nearest', inline: 'center' }); } else a.removeAttribute('aria-current'); }); };
+    $$('[data-set-go]', main).forEach(a => a.addEventListener('click', e => { e.preventDefault(); const k = a.dataset.setGo; mark(k); history.replaceState(null, '', '#settings-' + k); route.last = 'home:settings'; settingsSpy.pause = Date.now() + 800; toSec(k, true); }));
+    if (settingsSpy.obs) settingsSpy.obs.disconnect();
+    settingsSpy.obs = new IntersectionObserver(es => { if (Date.now() < (settingsSpy.pause || 0)) return; if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) { const l = $$('.set-sec', main).pop(); if (l) mark(l.dataset.sec); return; } const vis = es.filter(x => x.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0]; if (vis) mark(vis.target.dataset.sec); }, { rootMargin: '-90px 0px -65% 0px' });
+    $$('.set-sec', main).forEach(x => settingsSpy.obs.observe(x));
+    if (!settingsSpy.scroll) { settingsSpy.scroll = true; addEventListener('scroll', () => { if (view.sub !== 'settings' || Date.now() < (settingsSpy.pause || 0)) return; if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) { const l = $$('.set-sec').pop(); const a = l && $(`.set-nav [data-set-go="${l.dataset.sec}"]`); if (a && !a.hasAttribute('aria-current')) { $$('.set-nav a').forEach(x => x.removeAttribute('aria-current')); a.setAttribute('aria-current', 'true'); view.stab = l.dataset.sec; } } }, { passive: true }); }
+    if (location.hash.startsWith('#settings-') && settingsSpy.done !== location.hash) { settingsSpy.done = location.hash; settingsSpy.pause = Date.now() + 900; const k0 = view.stab; requestAnimationFrame(() => { toSec(k0, false); mark(k0); }); }
+  }
 }
 
 
