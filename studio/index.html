@@ -135,8 +135,7 @@ table.list .r{text-align:right}
 .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font:700 12px var(--body);background:var(--ink3);color:var(--muted);box-shadow:inset 0 0 0 1px var(--line2)}
 .pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
 .pill.draft{color:var(--muted)} .pill.open{color:var(--soft)} .pill.accepted,.pill.paid{color:var(--good)}
-.pill.declined,.pill.cancelled{color:var(--dim)} .pill.expired,.pill.overdue{color:var(--bad)} .pill.unpaid,.pill.partpaid,.pill.sent{color:var(--warn)}
-.empty{padding:40px 20px;text-align:center;color:var(--muted)}
+.pill.declined,.pill.cancelled{color:var(--dim)} .pill.expired,.pill.overdue{color:var(--bad)} .pill.unpaid,.pill.partpaid{color:var(--warn)} .empty{padding:40px 20px;text-align:center;color:var(--muted)}
 .empty h3{color:var(--text);margin-bottom:6px}
 .notice{border:1px solid var(--line2);background:var(--ink2);border-radius:14px;padding:14px 16px;color:var(--muted);margin-block:14px}
 .notice.warn{border-color:#f6d27a;background:#fffbeb;color:#8a4b08}
@@ -764,7 +763,7 @@ textarea.desc-in{min-height:58px;resize:vertical;line-height:1.45}
 .stabs a[aria-current]{background:#fff;color:var(--text);box-shadow:0 1px 3px rgba(16,24,48,.12),inset 0 0 0 1px var(--line)}
 .stabs em{font-style:normal;font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;background:var(--ink);color:var(--dim)}
 .sgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch}
-.sgrid.one{grid-template-columns:minmax(0,1fr)}.mgroups{grid-template-columns:repeat(3,minmax(0,1fr));align-items:start}@media (max-width:1200px){.mgroups{grid-template-columns:repeat(2,minmax(0,1fr))}}@media (max-width:700px){.mgroups{grid-template-columns:minmax(0,1fr)}}
+.sgrid.one{grid-template-columns:minmax(0,1fr)}
 .sgrid>.panel{margin:0;display:flex;flex-direction:column;min-width:0}
 .sgrid .panel h3{display:flex;align-items:center;gap:10px}
 .sgrid .hint{margin:-4px 0 14px}
@@ -787,13 +786,20 @@ textarea.desc-in{min-height:58px;resize:vertical;line-height:1.45}
 .alist li{display:grid;grid-template-columns:10px minmax(0,1fr);column-gap:10px;padding:7px 0;border-bottom:1px solid var(--line)}
 .alist li:last-child{border:0}
 .alist .adot{width:8px;height:8px;border-radius:50%;background:var(--line2);margin-top:6px;grid-row:span 2}
-.alist .adot.accepted,.alist .adot.payment{background:var(--good)}.alist .adot.deleted,.alist .adot.cancelled,.alist .adot.declined{background:var(--bad)}.alist .adot.issued,.alist .adot.created,.alist .adot.campaign{background:var(--spark)}
+.alist .adot.accepted,.alist .adot.payment{background:var(--good)}.alist .adot.deleted,.alist .adot.cancelled,.alist .adot.declined{background:var(--bad)}.alist .adot.issued,.alist .adot.created{background:var(--spark)}
 .alist .atext{font-size:13.5px}.alist .atext a{color:var(--text);text-decoration:none}.alist .atext a:hover{text-decoration:underline}
 .alist .sub{font-size:12px}
-.roles{display:grid;gap:8px}
-.role{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;box-shadow:inset 0 0 0 1px var(--line);cursor:pointer}
-.role:has(input:checked){box-shadow:inset 0 0 0 1.5px var(--spark);background:#f5f8ff}
-.role input{margin-top:3px}.role>span{display:grid;gap:2px}
+.roles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.rolecard{position:relative;display:grid;grid-template-columns:20px minmax(0,1fr);gap:12px;align-items:start;padding:16px;border-radius:14px;background:#fff;box-shadow:inset 0 0 0 1px var(--line);cursor:pointer;text-align:left;transition:box-shadow .15s,background-color .15s}
+.rolecard:hover{box-shadow:inset 0 0 0 1px var(--line2)}
+.rolecard:has(input:checked){box-shadow:inset 0 0 0 2px var(--spark);background:#f5f8ff}
+.rolecard input[type=radio]{appearance:none;-webkit-appearance:none;width:20px !important;height:20px !important;min-height:0 !important;margin:1px 0 0 !important;padding:0 !important;border-radius:50% !important;border:1.5px solid var(--line2) !important;background:#fff !important;box-shadow:none !important;display:grid;place-items:center;cursor:pointer}
+.rolecard input[type=radio]:checked{border-color:var(--spark) !important;background:radial-gradient(circle,var(--spark) 0 5px,#fff 5.5px) !important}
+.rolecard input[type=radio]:focus-visible{outline:2px solid var(--spark);outline-offset:2px}
+.rolecard>span{display:grid;gap:4px;min-width:0}.rolecard>span b{font-size:14.5px;color:var(--text)}.rolecard>span .sub{font-size:13px;line-height:1.45}
+.acc-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.acc-grid .chk{min-height:46px}
+@media (max-width:900px){.roles{grid-template-columns:minmax(0,1fr)}.acc-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .mgroups{display:grid;gap:12px}
 .mgroup{border-radius:14px;box-shadow:inset 0 0 0 1px var(--line);padding:6px}
 .mg-h{display:flex;align-items:center;justify-content:space-between;padding:6px 8px}
@@ -807,30 +813,6 @@ textarea.desc-in{min-height:58px;resize:vertical;line-height:1.45}
 .tgl span::after{content:"";position:absolute;left:2px;top:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:transform .15s}
 .tgl input:checked+span{background:var(--spark)}.tgl input:checked+span::after{transform:translateX(16px)}.tgl input:disabled+span{opacity:.5}
 @media (max-width:1100px){.sgrid{grid-template-columns:minmax(0,1fr)}.signbox .checks{grid-template-columns:repeat(2,minmax(0,1fr))}}
-/* campaigns */
-.cp-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;min-height:0}
-.cp-form{display:grid;gap:12px;align-content:start;min-width:0}
-.cp-form small.sub{display:block;margin-top:4px;font-size:12px}
-.cp-prev{display:flex;flex-direction:column;gap:10px;min-width:0;background:var(--ink);border-radius:14px;padding:12px;box-shadow:inset 0 0 0 1px var(--line);position:sticky;top:0;align-self:start}
-.cp-prev iframe{width:100%;height:560px;border:0;border-radius:10px;background:#f4f6fb;transition:width .2s}
-.cp-prev.mobile iframe{width:375px;max-width:100%;margin:0 auto;height:620px;box-shadow:0 0 0 8px #0b0f1e;border-radius:22px}
-.inbox{display:grid;gap:2px;padding:8px 12px;background:#fff;border-radius:10px;box-shadow:inset 0 0 0 1px var(--line);font-size:13px}.inbox span{color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.seg{display:inline-flex;gap:2px;padding:3px;border-radius:10px;background:var(--ink3);box-shadow:inset 0 0 0 1px var(--line);width:max-content}
-.seg button{border:0;background:none;padding:6px 12px;border-radius:8px;font:600 13px var(--body);color:var(--muted);cursor:pointer}
-.seg button[aria-pressed=true]{background:#fff;color:var(--text);box-shadow:0 1px 2px rgba(16,24,48,.12)}
-textarea.code{font:12.5px/1.5 ui-monospace,Menlo,monospace;min-height:200px}
-.cp-form .field.grow textarea{min-height:420px}
-.pickbox{display:grid;gap:6px;max-height:180px;overflow:auto;padding:8px;border-radius:10px;box-shadow:inset 0 0 0 1px var(--line);margin:8px 0}
-.tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
-.tpl{margin:0;padding:0;overflow:hidden;display:flex;flex-direction:column}
-.tpl-prev{height:300px;overflow:hidden;background:#f4f6fb;position:relative}
-.tpl-prev iframe{width:640px;height:640px;border:0;transform:scale(.45);transform-origin:0 0;pointer-events:none;position:absolute;left:0;top:0}
-.tpl-f{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;border-top:1px solid var(--line)}
-.linkbtn{border:0;background:none;padding:0;color:var(--soft);font:inherit;font-weight:600;cursor:pointer;text-decoration:underline}
-.pill.sending,.pill.scheduled{background:#eaf1ff;color:var(--soft);box-shadow:inset 0 0 0 1px #bcd0fb}
-.pill.sent{background:#e9f7ef;color:var(--good);box-shadow:inset 0 0 0 1px #a7e3bf}
-.dialog.xl{width:min(1180px,100%) !important}
-@media (max-width:900px){.cp-grid{grid-template-columns:minmax(0,1fr)}.cp-prev{position:static}.cp-prev iframe{height:480px}}
 /* calendar */
 .calbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
 .calnav{display:flex;align-items:center;gap:6px}.calnav h3{margin:0 6px;min-width:170px;text-align:center;font-size:19px}
@@ -856,7 +838,7 @@ textarea.code{font:12.5px/1.5 ui-monospace,Menlo,monospace;min-height:200px}
 /* matching block heights */
 .home-grid{align-items:stretch}.home-grid>.panel{margin:0;height:100%}
 .strip{align-items:stretch}.strip .stat{display:flex;flex-direction:column;justify-content:flex-start;gap:6px;min-height:92px}.strip .stat .label{line-height:1.2}
-.more-menu{position:relative;margin-left:auto}.more-menu summary{list-style:none;cursor:pointer}.more-menu summary::-webkit-details-marker{display:none}
+.more-menu{position:relative;margin-left:auto}.acts{display:contents}.more-menu summary{list-style:none;cursor:pointer}.more-menu summary::-webkit-details-marker{display:none}
 .more-menu .mm{position:absolute;right:0;bottom:calc(100% + 8px);min-width:260px;background:#fff;border-radius:14px;box-shadow:0 18px 50px rgba(16,24,48,.18),inset 0 0 0 1px var(--line);padding:6px;display:grid;gap:2px;z-index:30}
 .mi-btn{display:grid;gap:2px;text-align:left;border:0;background:none;padding:9px 12px;border-radius:10px;font:600 14px var(--body);color:var(--text);cursor:pointer}
 .mi-btn span{font-weight:400;font-size:12px;color:var(--dim)}.mi-btn:hover{background:var(--ink3)}.mi-btn.bad{color:var(--bad)}
@@ -910,6 +892,75 @@ details.adv{margin-top:2px}details.adv summary{cursor:pointer;font:600 13px var(
 .dialog{animation:dlgin .2s cubic-bezier(.2,.7,.2,1)}
 .dialog.still{animation:none}@keyframes dlgin{from{opacity:0;transform:translateY(8px) scale(.99)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){#main.enter,.dialog{animation:none}}
+
+/* menu editor */
+.menu-ed{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
+.mlist{columns:2;column-gap:10px}.mgrp{break-inside:avoid;margin-bottom:10px}@media (max-width:1300px){.mlist{columns:1}}
+.mgrp{border-radius:14px;box-shadow:inset 0 0 0 1px var(--line);overflow:hidden;background:#fff}
+.mrow{display:grid;grid-template-columns:minmax(0,1fr) auto 40px;gap:12px;align-items:center;padding:3px 12px 3px 14px;min-height:40px;transition:background-color .15s,opacity .15s}
+.mrow+.mrow{border-top:1px solid var(--line)}
+.mrow:not(.mhead):hover{background:var(--ink)}
+.mhead{background:var(--ink);min-height:34px}
+.mlabel{font:700 11px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.mname{display:flex;align-items:center;gap:12px;min-width:0;font-size:14.5px}.mname svg{width:18px;height:18px;color:var(--muted);flex:none}
+.mrow.off .mname{color:var(--dim)}.mrow.off .mname svg{opacity:.5}
+.tglsp{width:40px}
+.mprev{display:grid;gap:2px;padding:14px;border-radius:14px;background:#fff;box-shadow:inset 0 0 0 1px var(--line);align-content:start;flex:1}
+.mp-new{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;background:linear-gradient(135deg,var(--spark),#2a5fd6);color:#fff;font-weight:700;font-size:14px;margin-bottom:8px}.mp-new svg{width:18px;height:18px}
+.mp-it{display:flex;align-items:center;gap:12px;padding:4px 12px;border-radius:10px;font-size:14px;color:var(--text)}.mp-it svg{width:18px;height:18px;color:var(--muted)}
+.mp-h{font:700 10.5px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--dim);padding:10px 12px 2px}
+@media (max-width:1100px){.menu-ed{grid-template-columns:minmax(0,1fr)}}
+/* side-by-side blocks share one height and width */
+.cgrid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;align-items:stretch !important}
+.ccol{display:flex !important;flex-direction:column;gap:20px;min-width:0}
+.ccol>.cbox:last-child{flex:1;align-content:start}
+@media (max-width:900px){.cgrid{grid-template-columns:minmax(0,1fr) !important}.ccol>.cbox:last-child{flex:none}}
+/* opening and closing */
+#modal{transition:opacity .17s ease}
+#modal.closing{opacity:0}
+#modal.closing .dialog{transform:translateY(8px);transition:transform .17s ease}
+details.more-menu[open] .mm{animation:mmin .16s cubic-bezier(.2,.7,.2,1);transform-origin:bottom right}
+@keyframes mmin{from{opacity:0;transform:translateY(4px) scale(.98)}to{opacity:1;transform:none}}
+.more-menu summary svg{transition:transform .18s}.more-menu[open] summary svg{transform:rotate(180deg)}
+details.hch[open] ul,details.adv[open]>*:not(summary){animation:fadein .18s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
+#toast{transition:opacity .2s,transform .2s}
+@media (prefers-reduced-motion:reduce){#modal,#modal.closing .dialog{transition:none}details.more-menu[open] .mm,details.hch[open] ul{animation:none}}
+
+/* lists on small screens become cards */
+.list td.r,.list th.r{white-space:nowrap}
+.li{min-width:820px}
+@media (max-width:760px){
+  .table-wrap:has(.lq,.li,.lc,.lp,.le){overflow:visible;border:0;background:none;box-shadow:none}
+  .list.lq,.list.li,.list.lc,.list.lp,.list.le{min-width:0 !important;display:block;border:0}
+  .list.lq thead,.list.li thead,.list.lc thead,.list.lp thead,.list.le thead{display:none}
+  .list.lq tbody,.list.li tbody,.list.lc tbody,.list.lp tbody,.list.le tbody{display:grid;gap:10px}
+  .list.lq tr,.list.li tr,.list.lc tr,.list.lp tr,.list.le tr{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:12px;row-gap:6px;align-items:center;padding:14px 16px;background:var(--ink2);border:1px solid var(--line);border-radius:14px;box-shadow:0 1px 2px rgba(16,24,48,.04)}
+  .list.lq td,.list.li td,.list.lc td,.list.lp td,.list.le td{display:block;padding:0 !important;border:0 !important;min-width:0;height:auto}
+  .list td:nth-child(even){text-align:right}
+  .lq td:nth-child(1){grid-area:1/1}.lq td:nth-child(6){grid-area:1/2}.lq td:nth-child(3){grid-area:2/1}.lq td:nth-child(4){grid-area:2/2}.lq td:nth-child(2){grid-area:3/1;color:var(--dim);font-size:12.5px}.lq td:nth-child(7){grid-area:3/2}.lq td:nth-child(5),.lq td:nth-child(8){display:none !important}
+  .li td:nth-child(1){grid-area:1/1}.li td:nth-child(7){grid-area:1/2}.li td:nth-child(3){grid-area:2/1}.li td:nth-child(5){grid-area:2/2}.li td:nth-child(2){grid-area:3/1;color:var(--dim);font-size:12.5px}.li td:nth-child(4){grid-area:3/2;color:var(--dim);font-size:12.5px}.li td:nth-child(6),.li td:nth-child(8){display:none !important}
+  .lc td:nth-child(1){grid-area:1/1}.lc td:nth-child(6){grid-area:1/2}.lc td:nth-child(2){grid-area:2/1/2/3;text-align:left;color:var(--muted);font-size:13px;overflow:hidden;text-overflow:ellipsis}.lc td:nth-child(3),.lc td:nth-child(4),.lc td:nth-child(5){display:none !important}
+  .lp td:nth-child(1){grid-area:1/1}.lp td:nth-child(6){grid-area:1/2}.lp td:nth-child(5){grid-area:2/1;text-align:left;color:var(--dim);font-size:12.5px}.lp td:nth-child(3){grid-area:2/2}.lp td:nth-child(2),.lp td:nth-child(4){display:none !important}
+  .le td:nth-child(2){grid-area:1/1;text-align:left}.le td:nth-child(5){grid-area:1/2}.le td:nth-child(1){grid-area:2/1;color:var(--dim);font-size:12.5px;text-align:left}.le td:nth-child(3){grid-area:2/2}.le td:nth-child(4){display:none !important}
+}
+/* settings and campaign tabs scroll sideways on phones instead of wrapping */
+@media (max-width:760px){
+  .stabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;width:auto;max-width:100%;-webkit-overflow-scrolling:touch}
+  .stabs::-webkit-scrollbar{display:none}.stabs a{white-space:nowrap;flex:none}
+  .calnav h3{font-size:16px;min-width:0;flex:1}.calnav{flex:1;min-width:0}
+  .acc-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:900px){
+  .actionbar .actions{-webkit-mask-image:none !important;mask-image:none !important}
+  .actionbar .actions{display:flex !important;flex-wrap:nowrap !important;overflow:visible !important;gap:8px}
+  .actionbar .acts{display:flex;gap:8px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent);padding-right:18px}
+  .actionbar .acts::-webkit-scrollbar{display:none}.actionbar .acts .btn{flex:none}
+  .actionbar .more-menu{margin-left:0;flex:none}
+  .calnav h3{white-space:nowrap;font-size:17px !important}
+  .more-menu .mm{position:fixed;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));bottom:calc(92px + env(safe-area-inset-bottom,0px));min-width:0}
+}
+.calnav h3 .sm{display:none}@media (max-width:760px){.calnav h3 .lg{display:none}.calnav h3 .sm{display:inline}.calbar{flex-direction:column;align-items:stretch;gap:6px}.calnav{justify-content:space-between}}
 </style></head><body>
 
 <header class="appbar">
@@ -1003,7 +1054,6 @@ const LOGO_PAPER = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlgAAACyCAYAAA
 const DEFAULT_PRICES = [{"cat": "Logo", "item": "Logo Pack 1", "price": 1200, "unit": "once-off", "details": "Custom logo design with 2 unique logo concepts to choose from. The chosen direction is refined into 1 final logo, with 2 revision rounds. Final files in SVG, PNG, JPG and PDF, in colour, black and white."}, {"cat": "Logo", "item": "Logo Pack 2", "price": 2200, "unit": "once-off", "details": "Custom logo design with 4 unique logo concepts across 2 creative directions. The chosen concept is refined into 1 final logo, with 2 revision rounds. Final files in SVG, PNG, JPG and PDF, in colour, black and white."}, {"cat": "Logo", "item": "Logo Pack 3", "price": 3200, "unit": "once-off", "details": "Custom logo design with 6 unique logo concepts in multiple styles, followed by detailed refinement into 1 final logo, with 2 revision rounds. Final files in SVG, PNG, JPG and PDF, in colour, black and white."}, {"cat": "Identity", "item": "Identity Pack 1", "price": 3000, "unit": "once-off", "details": "Brand identity: 2 unique logo concepts refined into 1 final logo, a matching letterhead design, and 2 static image email signatures or 1 clickable HTML email signature. Includes 2 revision rounds. Logo files in SVG, PNG, JPG and PDF."}, {"cat": "Identity", "item": "Identity Pack 2", "price": 4000, "unit": "once-off", "details": "Brand identity: 4 unique logo concepts refined into 1 final logo, a matching letterhead design, and 4 static image email signatures or 2 clickable HTML email signatures. Includes 2 revision rounds. Logo files in SVG, PNG, JPG and PDF."}, {"cat": "Identity", "item": "Identity Pack 3", "price": 4950, "unit": "once-off", "details": "Brand identity: 6 unique logo concepts refined into 1 final logo, a matching letterhead design, and 6 static image email signatures or 3 clickable HTML email signatures. Includes 2 revision rounds. Logo files in SVG, PNG, JPG and PDF."}, {"cat": "Email signature", "item": "Static Email Signature", "price": 250, "unit": "once-off", "details": "Designed image email signature for 1 person, matching your brand, with your name, job title and contact details. Delivered as a PNG or JPG to add to your email app."}, {"cat": "Email signature", "item": "HTML Email Signature", "price": 350, "unit": "once-off", "details": "Coded HTML email signature for 1 person, matching your brand, with clickable phone, email and website links. Works in Gmail and Outlook. Includes 1 revision round."}, {"cat": "Email signature", "item": "Interactive Email Signature", "price": 450, "unit": "once-off", "details": "Advanced HTML email signature for 1 person, with a call-to-action button, social media icons and clickable contact details, matching your brand. Includes 2 revision rounds."}, {"cat": "Email signature", "item": "Signature Update", "price": 50, "unit": "per signature", "details": "Update the details on an existing Novyra HTML or interactive email signature, for example a new name, job title, phone number or email address. Priced per signature."}, {"cat": "Email signature", "item": "Extra Person", "price": 100, "unit": "per person", "details": "The same email signature set up for 1 more person, with their own name, job title and contact details. Priced per person."}, {"cat": "Email signature", "item": "Extra Person (Bigger Changes)", "price": 150, "unit": "per person", "details": "An interactive email signature for 1 more person who needs bigger changes, like their own button or links. Priced per person."}, {"cat": "Social media", "item": "Social Starter", "price": 1350, "unit": "per month", "details": "Monthly social media management on 1 platform: 4 posts a month designed, written, scheduled and posted for you, plus a monthly report on how they performed. Paid ads are not included. Billed monthly in advance."}, {"cat": "Social media", "item": "Social Growth", "price": 2150, "unit": "per month", "details": "Monthly social media management on 2 platforms: 7 posts a month designed, written, scheduled and posted for you, plus a monthly report on how they performed. Paid ads are not included. Billed monthly in advance."}, {"cat": "Social media", "item": "Social Pro", "price": 3150, "unit": "per month", "details": "Monthly social media management on 3 platforms: 10 posts a month designed, written, scheduled and posted for you, plus a monthly report on how they performed. Paid ads are not included. Billed monthly in advance."}, {"cat": "Social media", "item": "Social Authority", "price": 4450, "unit": "per month", "details": "Monthly social media management on 4 platforms: 13 posts a month designed, written, scheduled and posted for you, plus a monthly report on how they performed. Paid ads are not included. Billed monthly in advance."}, {"cat": "Social media", "item": "Social Elite", "price": 5950, "unit": "per month", "details": "Monthly social media management on 5 platforms: 16 posts a month designed, written, scheduled and posted for you, plus a monthly report on how they performed. Paid ads are not included. Billed monthly in advance."}, {"cat": "Content", "item": "Content Starter", "price": 850, "unit": "per month", "details": "Monthly content creation: 4 on-brand posts with captions, designed and delivered to you each month with creative direction. You post them yourself. Billed monthly in advance."}, {"cat": "Content", "item": "Content Growth", "price": 1600, "unit": "per month", "details": "Monthly content creation: 8 on-brand posts with captions, designed and delivered to you each month with creative direction. You post them yourself. Billed monthly in advance."}, {"cat": "Content", "item": "Content Studio", "price": 2150, "unit": "per month", "details": "Monthly content creation: 12 on-brand posts with captions, designed and delivered to you each month with creative direction. You post them yourself. Billed monthly in advance."}, {"cat": "Social media", "item": "Extra Post (Social Starter)", "price": 300, "unit": "per month", "details": "1 extra post a month on your Social Starter package, designed, written, scheduled and posted with the rest of your posts. Billed monthly in advance."}, {"cat": "Social media", "item": "Extra Post (Social Growth)", "price": 350, "unit": "per month", "details": "1 extra post a month on your Social Growth package, designed, written, scheduled and posted with the rest of your posts. Billed monthly in advance."}, {"cat": "Social media", "item": "Extra Post (Social Pro)", "price": 450, "unit": "per month", "details": "1 extra post a month on your Social Pro package, designed, written, scheduled and posted with the rest of your posts. Billed monthly in advance."}, {"cat": "Social media", "item": "Extra Post (Social Authority)", "price": 550, "unit": "per month", "details": "1 extra post a month on your Social Authority package, designed, written, scheduled and posted with the rest of your posts. Billed monthly in advance."}, {"cat": "Social media", "item": "Extra Post (Social Elite)", "price": 600, "unit": "per month", "details": "1 extra post a month on your Social Elite package, designed, written, scheduled and posted with the rest of your posts. Billed monthly in advance."}, {"cat": "Content", "item": "Extra Post (Content Starter)", "price": 200, "unit": "per month", "details": "1 extra on-brand post with caption a month on your Content Starter package, delivered with the rest of your content. Billed monthly in advance."}, {"cat": "Content", "item": "Extra Post (Content Growth)", "price": 150, "unit": "per month", "details": "1 extra on-brand post with caption a month on your Content Growth package, delivered with the rest of your content. Billed monthly in advance."}, {"cat": "Content", "item": "Extra Post (Content Studio)", "price": 200, "unit": "per month", "details": "1 extra on-brand post with caption a month on your Content Studio package, delivered with the rest of your content. Billed monthly in advance."}, {"cat": "Website", "item": "Landing Page", "price": 2500, "unit": "from", "details": "Single-page website that works on phones, tablets and computers, with a contact form and WhatsApp button. The full code is handed over to you. Domain name and hosting are quoted separately at the supplier's rates."}, {"cat": "Website", "item": "Business Website", "price": 5500, "unit": "from", "details": "Website of up to 5 pages that works on phones, tablets and computers, with a contact form and WhatsApp button. The full code is handed over to you. Domain name and hosting are quoted separately at the supplier's rates."}, {"cat": "Print", "item": "Business Card", "price": 350, "unit": "once-off", "details": "Double-sided business card design in your branding, supplied as a print-ready PDF. Printing is quoted separately at the printer's rates."}, {"cat": "Print", "item": "Flyer or Poster", "price": 350, "unit": "once-off", "details": "Single-sided flyer or poster design in your branding, supplied as a print-ready file and a digital version for sharing online. Printing is quoted separately at the printer's rates."}, {"cat": "Print", "item": "Brochure", "price": 850, "unit": "once-off", "details": "Tri-fold brochure design in your branding, supplied as a print-ready PDF. Printing is quoted separately at the printer's rates."}];
 const OLD_DETAILS = {"Logo Pack 1": "2 concepts, 1 final logo, 2 revisions", "Logo Pack 2": "4 concepts, 1 final logo, 2 revisions", "Logo Pack 3": "6 concepts, 1 final logo, 2 revisions", "Identity Pack 1": "Logo, letterhead, 2 static or 1 HTML sig", "Identity Pack 2": "Logo, letterhead, 4 static or 2 HTML sigs", "Identity Pack 3": "Logo, letterhead, 6 static or 3 HTML sigs", "Static Email Signature": "Image signature, first person", "HTML Email Signature": "Clickable HTML signature, first person", "Interactive Email Signature": "HTML with button and icons, first person", "Signature Update": "New details on an HTML signature", "Extra Person": "Same signature, their details", "Extra Person (Bigger Changes)": "Own button or links (interactive)", "Social Starter": "4 posts, 1 platform, per month", "Social Growth": "7 posts, 2 platforms, per month", "Social Pro": "10 posts, 3 platforms, per month", "Social Authority": "13 posts, 4 platforms, per month", "Social Elite": "16 posts, 5 platforms, per month", "Content Starter": "4 pieces of content, per month", "Content Growth": "8 pieces of content, per month", "Content Studio": "12 pieces of content, per month", "Extra Post (Social Starter)": "1 extra post a month on Social Starter", "Extra Post (Social Growth)": "1 extra post a month on Social Growth", "Extra Post (Social Pro)": "1 extra post a month on Social Pro", "Extra Post (Social Authority)": "1 extra post a month on Social Authority", "Extra Post (Social Elite)": "1 extra post a month on Social Elite", "Extra Post (Content Starter)": "1 extra post a month on Content Starter", "Extra Post (Content Growth)": "1 extra post a month on Content Growth", "Extra Post (Content Studio)": "1 extra post a month on Content Studio", "Landing Page": "1 page, mobile-friendly, code included", "Business Website": "Up to 5 pages, code included", "Business Card": "Double-sided, print-ready PDF", "Flyer or Poster": "Single-sided, print and digital", "Brochure": "Tri-fold, print-ready PDF"};
 const CAL_SEED = [];
-const MAIL_TEMPLATE = "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"color-scheme\" content=\"light only\"><title>{{subject}}</title>\n<style>\nbody{margin:0;padding:0;background:#f4f6fb;-webkit-text-size-adjust:100%}\na{color:#2a5fd6}\n.nv-wrap{width:100%;background:#f4f6fb}\n.nv-card{width:600px;max-width:100%;background:#ffffff;border:1px solid #d5dcea;border-radius:16px;overflow:hidden}\n.nv-body h1{margin:0 0 14px;font:800 26px/1.2 'Syne',Arial,Helvetica,sans-serif;color:#0b0f1e;letter-spacing:-.01em}\n.nv-body h2{margin:22px 0 10px;font:800 19px/1.25 'Syne',Arial,Helvetica,sans-serif;color:#0b0f1e}\n.nv-body p{margin:0 0 14px;font:400 16px/1.6 'Hanken Grotesk',Arial,Helvetica,sans-serif;color:#2b3249}\n.nv-body ul{margin:0 0 14px;padding-left:20px;font:400 16px/1.6 'Hanken Grotesk',Arial,Helvetica,sans-serif;color:#2b3249}\n.nv-body img{max-width:100%;height:auto;border-radius:12px;display:block}\n.nv-btn{display:inline-block;padding:13px 22px;border-radius:12px;background:#2a5fd6;color:#ffffff !important;text-decoration:none;font:700 15px/1 'Hanken Grotesk',Arial,Helvetica,sans-serif}\n@media (max-width:620px){.nv-pad{padding-left:22px !important;padding-right:22px !important}.nv-card{border-radius:0;border-left:0;border-right:0}.nv-body h1{font-size:23px}}\n</style></head>\n<body><span style=\"display:none;max-height:0;overflow:hidden;opacity:0;color:#f4f6fb\">{{preheader}}</span>\n<table role=\"presentation\" class=\"nv-wrap\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td align=\"center\" style=\"padding:28px 0\">\n<table role=\"presentation\" class=\"nv-card\" width=\"600\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n<tr><td style=\"height:4px;background:#4a86f7;line-height:4px;font-size:0\">&nbsp;</td></tr>\n<tr><td class=\"nv-pad\" style=\"padding:26px 40px 8px\"><a href=\"https://www.novyra.co.za/\"><img src=\"https://www.novyra.co.za/assets/img/novyra-complete-light.png\" width=\"150\" alt=\"Novyra\" style=\"display:block;width:150px;height:auto;border:0\"></a></td></tr>\n<tr><td class=\"nv-pad nv-body\" style=\"padding:18px 40px 26px\">{{content}}</td></tr>\n<tr><td class=\"nv-pad\" style=\"padding:20px 40px 26px;background:#f4f6fb;border-top:1px solid #d5dcea\">\n<p style=\"margin:0 0 6px;font:700 13px/1.5 'Hanken Grotesk',Arial,Helvetica,sans-serif;color:#0b0f1e\">Novyra</p>\n<p style=\"margin:0 0 12px;font:400 13px/1.6 'Hanken Grotesk',Arial,Helvetica,sans-serif;color:#535c78\">Logos, brands, social media, websites and print. <a href=\"https://www.novyra.co.za/\" style=\"color:#2a5fd6\">novyra.co.za</a></p>\n<p style=\"margin:0;font:400 12px/1.6 'Hanken Grotesk',Arial,Helvetica,sans-serif;color:#6b7390\">You get this email because you work with Novyra. <a href=\"{{unsubscribe}}\" style=\"color:#6b7390\">Unsubscribe</a></p>\n</td></tr></table></td></tr></table></body></html>\n";
 const SHEET = {"LOGO": [["Logo Pack 1", 1200, ["2 unique logo concepts", "1 final logo design", "Refinement of the chosen direction", "2 revision rounds"]], ["Logo Pack 2", 2200, ["4 unique logo concepts", "1 final logo design", "2 creative directions explored", "2 revision rounds"]], ["Logo Pack 3", 3200, ["6 unique logo concepts", "1 final logo design", "Multiple styles explored", "Detailed refinement", "2 revision rounds"]]], "IDENTITY": [["Identity Pack 1", 3000, ["2 unique logo concepts", "1 final logo design", "Letterhead design", "2 static or 1 HTML email signature", "2 revision rounds"]], ["Identity Pack 2", 4000, ["4 unique logo concepts", "1 final logo design", "Letterhead design", "4 static or 2 HTML email signatures", "2 revision rounds"]], ["Identity Pack 3", 4950, ["6 unique logo concepts", "1 final logo design", "Letterhead design", "6 static or 3 HTML email signatures", "2 revision rounds"]]], "SIGS": [["Static Email Signature", 250, "first person", ["Designed image signature", "Matches your brand", "Your contact details", "PNG or JPG delivery"]], ["HTML Email Signature", 350, "first person", ["Coded HTML signature", "Clickable phone, email and website", "Works in Gmail and Outlook", "1 revision round"]], ["Interactive Email Signature", 450, "first person", ["Advanced HTML signature", "Call-to-action button", "Social media icons", "2 revision rounds"]], ["Signature Update", 50, "per signature", ["Change details on an existing Novyra HTML or interactive signature", "New name, title, number or email"]]], "SOCIAL": [["Social Starter", 1350, 4, 1], ["Social Growth", 2150, 7, 2], ["Social Pro", 3150, 10, 3], ["Social Authority", 4450, 13, 4], ["Social Elite", 5950, 16, 5]], "CONTENT": [["Content Starter", 850, 4], ["Content Growth", 1600, 8], ["Content Studio", 2150, 12]], "WEB": [["Landing Page", 2500, true, ["1 page", "Mobile-friendly", "Contact form", "WhatsApp button", "Full code handed over"]], ["Business Website", 5500, true, ["Up to 5 pages", "Mobile-friendly", "Contact form and WhatsApp button", "Full code handed over"]]], "PRINT": [["Business Card", 350, ["Double-sided design", "Print-ready PDF"]], ["Flyer or Poster", 350, ["Single-sided design", "Print and digital versions"]], ["Brochure", 850, ["Tri-fold design", "Print-ready PDF"]]], "TERMS": [["Payment", "Jobs under R1,000 are paid upfront. Jobs of R1,000 and more need a 50% deposit, with the balance due on approval. EFT only."], ["Revisions", "Design packages include the revision rounds listed. Extra rounds or new requests are quoted before any work is done."], ["Rush jobs", "Need it faster than the quoted timeline? Add 25% for under 5 working days, or 50% for within 48 hours."], ["Ownership", "Final files are sent once payment is complete, and the final design is yours once it's paid in full."], ["Monthly packages", "Social media and content packages are paid monthly in advance, and extra posts can be added each month. Paid ads are not included."], ["Not included", "Printing, domain names and hosting are quoted separately at the supplier's rates."]], "LOGO_FILES": "Every logo pack includes SVG, PNG, JPG and PDF files, in colour, black and white.", "SIG_NOTE": "Each extra person is R100 on any signature. On an interactive signature, an extra person who needs bigger changes, like their own button or links, is R150. A static image signature can't be updated, so changes are priced as a new signature.", "SOCIAL_NOTE": "Novyra designs, writes, schedules and posts your content every month, then reports on how it performed. Paid ads are not included.", "CONTENT_NOTE": "On-brand posts and captions delivered to you each month, with creative direction. You post them yourself."};
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -1030,7 +1080,7 @@ const OWNER_LOGIN = 'hanukeyser@gmail.com';
 let ME = OWNER;
 const loginEmail = () => (window.STUDIO && window.STUDIO.email) || '';
 const isOwnerLogin = () => !loginEmail() || loginEmail().toLowerCase() === OWNER_LOGIN;
-const ACCESS = [['quotes', 'Quotes'], ['invoices', 'Invoices and monthly billing'], ['clients', 'Clients'], ['campaigns', 'Email campaigns'], ['calendar', 'Content calendar'], ['expenses', 'Expenses'], ['prices', 'Price list'], ['settings', 'Settings']];
+const ACCESS = [['quotes', 'Quotes'], ['invoices', 'Invoices and monthly billing'], ['clients', 'Clients'], ['calendar', 'Content calendar'], ['expenses', 'Expenses'], ['prices', 'Price list'], ['settings', 'Settings']];
 const ROLES = { owner: ['Owner', 'Everything, including team members and settings.'], admin: ['Admin', 'Everything except managing the team.'], staff: ['Staff', 'Only the areas you tick.'], viewer: ['Viewer', 'Can look at the areas you tick, but not change them.'] };
 const can = area => { if (isOwnerLogin() || ME.role === 'owner' || ME.role === 'admin') return area !== 'team' || isOwnerLogin() || ME.role === 'owner'; return !!(ME.access || {})[area]; };
 const AV_COLORS = ['#2f63d6', '#4f46e5', '#7c3aed', '#c026d3', '#db2777', '#dc2626', '#ea580c', '#ca8a04', '#16a34a', '#0d9488', '#0284c7', '#0b0f1e'];
@@ -1046,7 +1096,7 @@ function signOff(short) { const g = { ...SIGN_DEFAULT, ...(OWNER.sign || {}) }; 
   return L.join('\n'); }
 function paintAvatar() { const a = $('.appbar .avatar'); if (!a) return; a.textContent = userInitials(OWNER); a.style.background = OWNER.color || AV_COLORS[0]; a.title = `${OWNER.name} · Your details`; a.setAttribute('aria-label', `${OWNER.name}, your details`); }
 const DEFAULT_BANK = { bank: 'Discovery Bank', accountType: 'Savings account', accountNumber: '12687680212' };
-let db = null, state = { quotes: [], invoices: [], clients: [], prices: null, bank: null, meta: null, profile: null, plans: [], expenses: [], shares: [], campaigns: [], templates: [], calendar: [], users: [], activity: [], trash: [], email: null, menu: null, loaded: { tr: false, q: false, i: false, c: false, p: false, b: false, m: false, u: false, pl: false, ex: false, sh: false, cp: false, tp: false, ca: false, us: false, ac: false, em: false, mn: false } };
+let db = null, state = { quotes: [], invoices: [], clients: [], prices: null, bank: null, meta: null, profile: null, plans: [], expenses: [], shares: [], calendar: [], users: [], activity: [], trash: [], email: null, menu: null, loaded: { tr: false, q: false, i: false, c: false, p: false, b: false, m: false, u: false, pl: false, ex: false, sh: false, ca: false, us: false, ac: false, em: false, mn: false } };
 let view = { tab: 'home', filter: 'all', edit: null, q: '' };
 
 const initials = n => String(n || '').replace(/\(.*?\)/g, '').split(/[\s-]+/).filter(w => /^[A-Za-z0-9]/.test(w) && !/^(pty|ltd|cc|the|and|of)$/i.test(w)).slice(0, 2).map(w => w[0].toUpperCase()).join('') || '?';
@@ -1391,7 +1441,7 @@ function boot() {
     const col = (name, key, sort) => db.collection(name).onSnapshot(s => { state[name] = s.docs.map(x => ({ id: x.id, ...x.data() })); if (sort) state[name].sort(sort); done(key); }, fail);
     col('quotes', 'q'); col('invoices', 'i'); col('clients', 'c', (a, b) => norm(a.business).localeCompare(norm(b.business)));
     col('plans', 'pl'); col('shares', 'sh'); col('expenses', 'ex', (a, b) => (b.date || '').localeCompare(a.date || ''));
-    col('campaigns', 'cp', (a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || '')); col('templates', 'tp'); col('calendar', 'ca');
+    col('calendar', 'ca');
     col('activity', 'ac', (a, b) => (b.at || '').localeCompare(a.at || '')); col('trash', 'tr', (a, b) => (b.deletedAt || '').localeCompare(a.deletedAt || ''));
     db.collection('users').onSnapshot(s => { state.users = s.docs.map(x => ({ id: x.id, ...x.data() })); const me = !isOwnerLogin() && state.users.find(u => (u.email || '').toLowerCase() === loginEmail().toLowerCase());
       if (me) ME = { ...me, initials: initials(me.name || me.email) }; done('us'); }, fail);
@@ -1417,10 +1467,9 @@ function route() {
   const m = h.match(/^(quote|invoice)-([a-z0-9-]+)$/i);
   if (m) { view.tab = m[1] + 's'; view.open = { kind: m[1], id: m[2] }; }
   else {
-    const SUBS = { home: 'overview', clients: 'clients', prices: 'prices', settings: 'settings', bank: 'settings', search: 'search', profile: 'settings', plans: 'plans', expenses: 'expenses', campaigns: 'campaigns', audience: 'campaigns', templates: 'campaigns', calendar: 'calendar' };
+    const SUBS = { home: 'overview', clients: 'clients', prices: 'prices', settings: 'settings', bank: 'settings', search: 'search', profile: 'settings', plans: 'plans', expenses: 'expenses', calendar: 'calendar' };
     const sm = h.match(/^settings-(profile|business|email|team|menu|data)$/);
     if (sm || h === 'profile' || h === 'bank' || h === 'settings') view.stab = sm ? sm[1] : h === 'profile' ? 'profile' : h === 'bank' ? 'business' : (view.stab || 'profile');
-    if (['campaigns', 'audience', 'templates'].includes(h)) view.ctab = h;
     const key = sm ? 'settings' : h;
     const t = key in SUBS ? 'home' : ['quotes', 'invoices'].includes(key) ? key : 'home', sub = SUBS[key] || 'overview';
     if (t !== view.tab || sub !== view.sub || view.open) { view.filter = sub === 'expenses' ? 'month' : 'all'; view.q = ''; view.limit = PAGE; }
@@ -1527,7 +1576,7 @@ const SUB_ICONS = {
   prices: '<path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/>',
   settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>' };
 function portalHTML() {
-  return ({ overview: homeHTML, clients: clientsHTML, prices: pricesHTML, settings: settingsHTML, search: searchHTML, plans: plansHTML, expenses: expensesHTML, campaigns: campaignsHTML, calendar: calendarHTML }[view.sub || 'overview'])();
+  return ({ overview: homeHTML, clients: clientsHTML, prices: pricesHTML, settings: settingsHTML, search: searchHTML, plans: plansHTML, expenses: expensesHTML, calendar: calendarHTML }[view.sub || 'overview'])();
 }
 const SIDE_ICONS = { ...SUB_ICONS,
   profile: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.2-4 4.3-6 8-6s6.8 2 8 6"/>',
@@ -1537,16 +1586,15 @@ const SIDE_ICONS = { ...SUB_ICONS,
   plus: '<path d="M12 5v14M5 12h14"/>',
   plans: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/><path d="M9 15.5l2 2 4-4"/>',
   expenses: '<path d="M20 7H5a2 2 0 0 1 0-4h13v4"/><path d="M3 5v14a2 2 0 0 0 2 2h15V7"/><circle cx="16" cy="14" r="1.6"/>',
-  campaigns: '<path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>',
   calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/><path d="M8 14h3M8 17.5h6"/>' };
 const sicon = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${SIDE_ICONS[k]}</svg>`;
 const MENU = [
   { k: 'sales', l: 'Sales', items: [['quotes', 'quotes', 'Quotes'], ['invoices', 'invoices', 'Invoices'], ['plans', 'plans', 'Monthly billing']] },
   { k: 'clients', l: 'Clients', items: [['clients', 'clients', 'Clients']] },
-  { k: 'marketing', l: 'Marketing', items: [['campaigns', 'campaigns', 'Email campaigns'], ['calendar', 'calendar', 'Content calendar']] },
+  { k: 'marketing', l: 'Marketing', items: [['calendar', 'calendar', 'Content calendar']] },
   { k: 'money', l: 'Money', items: [['expenses', 'expenses', 'Expenses']] },
   { k: 'business', l: 'Business', items: [['prices', 'prices', 'Price list'], ['settings', 'settings', 'Settings']] }];
-const AREA_OF = { quotes: 'quotes', invoices: 'invoices', plans: 'invoices', clients: 'clients', campaigns: 'campaigns', calendar: 'calendar', expenses: 'expenses', prices: 'prices', settings: 'settings' };
+const AREA_OF = { quotes: 'quotes', invoices: 'invoices', plans: 'invoices', clients: 'clients', calendar: 'calendar', expenses: 'expenses', prices: 'prices', settings: 'settings' };
 const menuKey = () => (loginEmail() || 'owner').toLowerCase().replace(/[^a-z0-9]+/g, '-');
 function menuGroups() {
   const m = state.menu || {}, hidden = new Set(m.hidden || []);
@@ -1566,7 +1614,7 @@ function sideHTML() {
   const ready = db && coreReady();
   const late = ready ? state.invoices.filter(v => invoiceStatus(v) === 'Overdue').length : 0;
   const counts = !ready ? {} : { quotes: [state.quotes.filter(q => q.status === 'Open').length], invoices: [late || state.invoices.filter(v => v.status === 'Sent').length, late], plans: [state.plans.filter(p => p.active).length], clients: [state.clients.length],
-    campaigns: [state.campaigns.filter(c => c.status === 'Scheduled').length], calendar: [calendarItems().filter(c => c.date >= todayIso() && c.date <= addDays(todayIso(), 7) && c.status !== 'Posted').length] };
+    calendar: [calendarItems().filter(c => c.date >= todayIso() && c.date <= addDays(todayIso(), 7) && c.status !== 'Posted').length] };
   const it = (k, h, l) => { const [n, hot] = counts[k] || []; return `<a class="it" href="#${h}" ${cur === k ? 'aria-current="page"' : ''} title="${l}">${sicon(k)}<span>${l}</span>${n ? `<em class="${hot ? 'hot' : ''}">${n}</em>` : ''}</a>`; };
   const groups = menuGroups().map(g => ({ ...g, items: g.items.filter(i => !i[3] && can(AREA_OF[i[0]])) })).filter(g => g.items.length);
   side.innerHTML = `${can('quotes') ? `<button class="new" type="button" data-side-new title="New quote">${sicon('plus')}<span>New quote</span></button>` : ''}
@@ -1639,7 +1687,7 @@ function quotesHTML() {
   return `<div class="head"><div><h2>Quotes</h2><p>One quote per job. Update an open or expired quote instead of starting a new one; every change is kept in its history.</p></div>
       <button class="btn primary" data-new>New quote</button></div>
     <div class="toolbar">${filterBtns(['all', 'Draft', 'Open', 'Expired', 'Accepted', 'Declined', 'Cancelled'])}${searchBox('Search client, number or item')}</div>
-    <div class="table-wrap">${qs.length ? `<table class="list"><thead><tr><th>No</th><th>Date</th><th>Customer</th><th class="r">Total</th><th class="r">Age</th><th>Status</th><th>Approved by</th><th>Owner</th></tr></thead><tbody>${rows}</tbody></table>`
+    <div class="table-wrap">${qs.length ? `<table class="list lq"><thead><tr><th>No</th><th>Date</th><th>Customer</th><th class="r">Total</th><th class="r">Age</th><th>Status</th><th>Approved by</th><th>Owner</th></tr></thead><tbody>${rows}</tbody></table>`
       : state.quotes.length ? emptyBox('No quotes match', 'Try another filter or search.') : emptyBox('No quotes yet', 'Start with New quote. It gets the next number by itself.')}</div>${pg.more}${trashLink('quotes')}`;
 }
 function invoicesHTML() {
@@ -1655,7 +1703,7 @@ function invoicesHTML() {
       <td><span class="pill ${pillClass(st)}">${st}</span></td>${ownerCell(v)}</tr>`; }).join('');
   return `<div class="head"><div><h2>Invoices</h2><p>Every invoice comes from an accepted quote: open the quote and choose Create invoice. Numbers are given when you issue the invoice, so they never skip.</p></div></div>
     <div class="toolbar">${filterBtns(['all', 'Draft', 'Unpaid', 'Part paid', 'Overdue', 'Paid', 'Cancelled'])}${searchBox('Search client or number')}</div>
-    <div class="table-wrap">${vs.length ? `<table class="list" style="min-width:820px"><thead><tr><th>No</th><th>Date</th><th>Customer</th><th class="r">Total</th><th class="r">Still owed</th><th class="r">Age</th><th>Status</th><th>Owner</th></tr></thead><tbody>${rows}</tbody></table>`
+    <div class="table-wrap">${vs.length ? `<table class="list li"><thead><tr><th>No</th><th>Date</th><th>Customer</th><th class="r">Total</th><th class="r">Still owed</th><th class="r">Age</th><th>Status</th><th>Owner</th></tr></thead><tbody>${rows}</tbody></table>`
       : state.invoices.length ? emptyBox('No invoices match', 'Try another filter or search.') : emptyBox('No invoices yet', 'Open an accepted quote and choose Create invoice.')}</div>${pg.more}${trashLink('invoices')}`;
 }
 function clientsHTML() {
@@ -1667,7 +1715,7 @@ function clientsHTML() {
   return `<div class="head"><div><h2>Clients</h2><p>Save a client once, with as many contact people as they have. When you start a quote, type their name and everything fills in.</p></div>
       <button class="btn primary" data-add-client>Add client</button></div>
     <div class="toolbar"><span class="sub">${state.clients.length} client${state.clients.length === 1 ? '' : 's'}</span>${searchBox('Search name, contact or email')}</div>
-    <div class="table-wrap">${cs.length ? `<table class="list"><thead><tr><th>Client</th><th>Email</th><th>Phone</th><th class="r">Quotes</th><th class="r">Invoices</th><th class="r">Owed</th></tr></thead><tbody>${rows}</tbody></table>`
+    <div class="table-wrap">${cs.length ? `<table class="list lc"><thead><tr><th>Client</th><th>Email</th><th>Phone</th><th class="r">Quotes</th><th class="r">Invoices</th><th class="r">Owed</th></tr></thead><tbody>${rows}</tbody></table>`
       : state.clients.length ? emptyBox('No clients match', 'Try another search.') : emptyBox('No clients yet', 'Add your first client, or add one straight from a new quote.')}</div>${pg.more}`;
 }
 const sheetPrice = (name, fallback) => { const p = prices().find(x => x.item === name); return p ? Number(p.price) || 0 : fallback; };
@@ -1862,7 +1910,7 @@ function plansHTML() {
     <section class="strip three" aria-label="Summary"><div class="stat"><span class="label">Active packages</span><b class="num">${ps.filter(p => p.active).length}</b></div>
       <div class="stat"><span class="label">Billed each month</span><b class="num spark">${money0(total)}</b></div>
       <div class="stat"><span class="label">Next invoice</span><b class="num">${(() => { const n = ps.filter(p => p.active).map(p => planDate(p, nextPlanMonth(p))).sort()[0]; return n ? fmtDate(n) : '—'; })()}</b></div></section>
-    <div class="table-wrap">${ps.length ? `<table class="list"><thead><tr><th>Client and package</th><th>Quote</th><th class="r">Per month</th><th>Billing day</th><th>Next invoice</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>`
+    <div class="table-wrap">${ps.length ? `<table class="list lp"><thead><tr><th>Client and package</th><th>Quote</th><th class="r">Per month</th><th>Billing day</th><th>Next invoice</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>`
       : emptyBox('No monthly packages yet', 'Open an accepted quote with a Social or Content package and choose Set up monthly billing.')}</div>`;
 }
 const ordinal = n => { n = Number(n) || 1; const s = ['th', 'st', 'nd', 'rd'], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); };
@@ -1921,7 +1969,7 @@ function expensesHTML() {
       <div class="stat"><span class="label">Profit, ${label}</span><b class="num ${paidIn - spent < 0 ? 'bad' : ''}">${money0(paidIn - spent)}</b><span class="sub">Money in minus spent</span></div></section>
     <div class="toolbar"><div class="filters">${[['month', 'This month'], ['last', 'Last month'], ['year', 'This year'], ['all', 'All']].map(([k, l]) => `<button class="chipbtn" data-filter="${k}" aria-pressed="${f === k}">${l}</button>`).join('')}</div>${searchBox('Search description, supplier or category')}</div>
     ${byCat.length ? `<div class="catbar">${byCat.map(([c, v]) => `<span><i style="width:${Math.max(4, v / spent * 100)}%"></i><b>${esc(c)}</b><em class="num">${money0(v)}</em></span>`).join('')}</div>` : ''}
-    <div class="table-wrap">${list.length ? `<table class="list"><thead><tr><th>Date</th><th>Description</th><th>Category</th><th>For client</th><th class="r">Amount</th></tr></thead><tbody>${rows}</tbody></table>`
+    <div class="table-wrap">${list.length ? `<table class="list le"><thead><tr><th>Date</th><th>Description</th><th>Category</th><th>For client</th><th class="r">Amount</th></tr></thead><tbody>${rows}</tbody></table>`
       : state.expenses.length ? emptyBox('Nothing for this period', 'Try another period or search.') : emptyBox('No expenses yet', 'Add one with Add expense. A receipt, a subscription or a print job all count.')}</div>${pg.more}`;
 }
 function expenseDialog(e) {
@@ -1990,14 +2038,14 @@ function setBusinessHTML() {
       <div class="kv"><span>Next quote number</span><b class="num">Q-${nextQuote()}</b></div><div class="kv"><span>Next invoice number</span><b class="num">INV-${nextInvoice()}</b></div>
       <p class="sub" style="margin:12px 0 0">Numbers are never reused, even after a quote or invoice is deleted.</p></section></div>`;
 }
-const MAIL_SCRIPT = "/**\n * Novyra Mail – the free email service behind Novyra Desk. It runs in your own Google account and sends from your Gmail.\n *\n * Setup (about 5 minutes):\n *  1. In Novyra Desk go to Settings > Email and press \"Copy the script\". That copy already holds your secret key.\n *  2. Open script.google.com (signed in to the Gmail you send from) > New project. Name it \"Novyra Mail\".\n *     Select everything in the editor, paste, and press Save (the disk icon).\n *  3. In the toolbar choose the function \"setup\" and press Run. Google asks for permission: Review permissions >\n *     choose your account > Advanced > Go to Novyra Mail (unsafe) > Allow. (It says \"unsafe\" only because it's your own script.)\n *  4. Deploy > New deployment > the gear next to \"Select type\" > Web app. Execute as: Me. Who has access: Anyone. Deploy.\n *  5. Copy the Web app URL (it ends in /exec), paste it into Novyra Desk > Settings > Email, press Save, then \"Send a test email\".\n * After changing this file later: Deploy > Manage deployments > pencil > Version: New version > Deploy.\n */\nconst SECRET_KEY = '{{SECRET}}';      // filled in by Novyra Desk when you press \"Copy the script\"\nconst NOTIFY_TO = '{{NOTIFY_TO}}';    // where acceptance emails go\nconst PROJECT = 'novyra-studio';\nconst API_KEY = 'AIzaSyBaFNF3r8iehEU00BRO0XKnal0THv9pXs4'; // public web key, only reads client links\nconst P = () => PropertiesService.getScriptProperties();\nconst SECRET = () => P().getProperty('SECRET') || SECRET_KEY;\nconst TO = () => P().getProperty('NOTIFY_TO') || NOTIFY_TO;\n\nfunction doPost(e) {\n  let body = {};\n  try { body = JSON.parse(e.postData.contents || '{}'); } catch (err) { return out({ ok: false, error: 'Bad request' }); }\n  try { return out(handle(body)); } catch (err) { return out({ ok: false, error: String(err && err.message || err) }); }\n}\nfunction out(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }\n\nfunction handle(b) {\n  // the client page reports an acceptance; we check it against the database ourselves\n  if (/\\{\\{/.test(SECRET())) return { ok: false, error: 'This script has no key yet. Copy it again from Novyra Desk > Settings > Email and paste it in.' };\n  if (b.action === 'clientAccepted') return clientAccepted(String(b.share || ''));\n  if (!b.secret || b.secret !== SECRET()) return { ok: false, error: 'Wrong secret key. Copy the script again from Novyra Desk > Settings > Email and paste it in.' };\n  switch (b.action) {\n    case 'ping': return { ok: true, quota: MailApp.getRemainingDailyQuota() };\n    case 'notify': return notify(b.key, b.to || TO(), b.subject, b.text);\n    case 'send': return sendBatch(b);\n    case 'schedule': return schedule(b);\n    case 'unschedule': return unschedule(b.campaignId);\n    case 'sync': return sync();\n  }\n  return { ok: false, error: 'Unknown action' };\n}\n\n/* ---------- acceptance emails (never sent twice) ---------- */\nfunction notify(key, to, subject, text) {\n  const lock = LockService.getScriptLock(); lock.waitLock(20000);\n  try {\n    const k = 'sent:' + key;\n    if (key && !String(key).startsWith('test-') && P().getProperty(k)) return { ok: true, duplicate: true, quota: MailApp.getRemainingDailyQuota() };\n    GmailApp.sendEmail(to, subject, text, { name: 'Novyra Desk' });\n    if (key) P().setProperty(k, new Date().toISOString());\n    return { ok: true, quota: MailApp.getRemainingDailyQuota() };\n  } finally { lock.releaseLock(); }\n}\nfunction clientAccepted(share) {\n  if (!/^[A-Za-z0-9_-]{16,}$/.test(share)) return { ok: false, error: 'Bad link' };\n  const r = UrlFetchApp.fetch(`https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/(default)/documents/shares/${share}?key=${API_KEY}`, { muteHttpExceptions: true });\n  if (r.getResponseCode() !== 200) return { ok: false, error: 'Link not found' };\n  const f = JSON.parse(r.getContentText()).fields || {}, v = x => x ? (x.stringValue != null ? x.stringValue : x.integerValue != null ? Number(x.integerValue) : x.doubleValue != null ? x.doubleValue : null) : null;\n  if (v(f.status) !== 'Accepted' || !f.response || !f.response.mapValue) return { ok: false, error: 'Not accepted' };\n  const resp = f.response.mapValue.fields || {}, name = v(resp.name) || 'The client', business = v(f.business) || '', title = v(f.title) || '';\n  const key = `${v(f.quoteId)}:${v(f.rev) || 1}`;\n  const subject = `Quote ${v(f.ref)}${title ? ' – ' + title : ''} has been accepted by ${name}${business ? ' (' + business + ')' : ''}`;\n  const when = v(resp.at) ? Utilities.formatDate(new Date(v(resp.at)), 'Africa/Johannesburg', \"d MMMM yyyy, HH:mm\") : '';\n  const text = [`${v(f.ref)}${title ? ' – ' + title : ''} has been accepted online.`, '', `Accepted by: ${name}`, `Company: ${business || '—'}`, `Date and time: ${when}`,\n    `Quote total: R ${Number(v(f.total) || 0).toFixed(2)}`, v(resp.note) ? `Their note: ${v(resp.note)}` : '', '', `Open it in Novyra Desk: https://www.novyra.co.za/studio/#quote-${v(f.quoteId)}`].filter(x => x !== null).join('\\n');\n  return notify(key, TO(), subject, text);\n}\n\n/* ---------- campaigns ---------- */\nfunction hmac(s) { return Utilities.base64EncodeWebSafe(Utilities.computeHmacSha256Signature(s, SECRET())).slice(0, 22); }\nfunction unsubUrl(email, cid) { return ScriptApp.getService().getUrl() + '?u=' + encodeURIComponent(email) + '&c=' + encodeURIComponent(cid || '') + '&t=' + hmac(email); }\nfunction esc(s) { return String(s == null ? '' : s).replace(/[&<>\"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', \"'\": '&#39;' })[c]); }\nfunction sendBatch(b) {\n  const unsubs = JSON.parse(P().getProperty('unsubs') || '[]'), results = [];\n  (b.recipients || []).forEach(r => {\n    const email = String(r.email || '').trim().toLowerCase();\n    if (!email) return;\n    if (!b.test && unsubs.indexOf(email) >= 0) { results.push({ email, ok: false, error: 'unsubscribed' }); return; }\n    const fill = s => String(s || '').replace(/\\{\\{firstName\\}\\}/g, esc(r.firstName || 'there')).replace(/\\{\\{name\\}\\}/g, esc(r.name || '')).replace(/\\{\\{business\\}\\}/g, esc(r.business || 'your business')).replace(/\\{\\{unsubscribe\\}\\}/g, unsubUrl(email, b.campaignId));\n    try {\n      if (MailApp.getRemainingDailyQuota() < 1) throw new Error('Daily Gmail limit reached, try again tomorrow');\n      GmailApp.sendEmail(email, fill(b.subject).replace(/&amp;/g, '&'), fill(b.text) + '\\n\\nUnsubscribe: ' + unsubUrl(email, b.campaignId), { htmlBody: fill(b.html), name: b.fromName || 'Novyra', replyTo: b.replyTo || '' });\n      results.push({ email, ok: true });\n    } catch (err) { results.push({ email, ok: false, error: String(err.message || err) }); }\n  });\n  return { ok: true, results, quota: MailApp.getRemainingDailyQuota() };\n}\nfunction folder() { const it = DriveApp.getFoldersByName('Novyra Scheduled Emails'); return it.hasNext() ? it.next() : DriveApp.createFolder('Novyra Scheduled Emails'); }\nfunction schedule(b) {\n  unschedule(b.campaignId);\n  folder().createFile(`campaign-${b.campaignId}.json`, JSON.stringify({ ...b, secret: undefined, status: 'waiting' }), 'application/json');\n  return { ok: true };\n}\nfunction unschedule(id) { const it = folder().getFilesByName(`campaign-${id}.json`); while (it.hasNext()) it.next().setTrashed(true); return { ok: true }; }\nfunction runScheduled() {\n  const it = folder().getFiles(), now = new Date();\n  while (it.hasNext()) {\n    const f = it.next(); let c; try { c = JSON.parse(f.getBlob().getDataAsString()); } catch (e) { continue; }\n    if (c.status !== 'waiting' || new Date(c.at) > now) continue;\n    c.status = 'sending'; f.setContent(JSON.stringify(c));\n    const res = sendBatch(c), sent = res.results.filter(r => r.ok).length, failed = res.results.length - sent;\n    const done = JSON.parse(P().getProperty('results') || '{}'); done[c.campaignId] = { done: true, at: new Date().toISOString(), sent, failed }; P().setProperty('results', JSON.stringify(done));\n    f.setTrashed(true);\n  }\n}\nfunction setup() {\n  ScriptApp.getProjectTriggers().filter(t => t.getHandlerFunction() === 'runScheduled').forEach(t => ScriptApp.deleteTrigger(t));\n  ScriptApp.newTrigger('runScheduled').timeBased().everyMinutes(15).create();\n  folder();\n}\n\n/* ---------- unsubscribes and bounces ---------- */\nfunction doGet(e) {\n  const email = String(e.parameter.u || '').toLowerCase(), t = e.parameter.t || '';\n  let msg = 'This link isn’t complete.';\n  if (email && t === hmac(email)) {\n    const list = JSON.parse(P().getProperty('unsubs') || '[]'); if (list.indexOf(email) < 0) { list.push(email); P().setProperty('unsubs', JSON.stringify(list)); }\n    msg = `You’re unsubscribed. ${esc(email)} won’t get Novyra newsletters any more. You’ll still get quotes and invoices you ask for.`;\n  }\n  return HtmlService.createHtmlOutput(`<div style=\"font:16px/1.6 Arial,sans-serif;max-width:520px;margin:60px auto;padding:0 20px;color:#0b0f1e\"><h2 style=\"margin:0 0 10px\">Novyra</h2><p>${msg}</p><p><a href=\"https://www.novyra.co.za/\" target=\"_top\" style=\"color:#2a5fd6\">novyra.co.za</a></p></div>`).setTitle('Novyra · Unsubscribe');\n}\nfunction sync() {\n  const bounces = [], me = (Session.getEffectiveUser().getEmail() || '').toLowerCase(), notifyTo = (TO() || '').toLowerCase();\n  GmailApp.search('from:(mailer-daemon OR postmaster) newer_than:60d', 0, 50).forEach(th => th.getMessages().forEach(m => {\n    const found = (m.getPlainBody() || '').match(/[\\w.+-]+@[\\w-]+\\.[\\w.-]+/g) || [];\n    found.forEach(x => { x = x.toLowerCase(); if (x !== me && x !== notifyTo && !/mailer-daemon|postmaster|google\\.com$|googlemail/.test(x) && bounces.indexOf(x) < 0) bounces.push(x); });\n  }));\n  const results = JSON.parse(P().getProperty('results') || '{}');\n  return { ok: true, unsubs: JSON.parse(P().getProperty('unsubs') || '[]'), bounces, results, quota: MailApp.getRemainingDailyQuota() };\n}\n";
+const MAIL_SCRIPT = "/**\n * Novyra Mail – the free email service behind Novyra Desk. It runs in your own Google account and sends from your Gmail.\n *\n * Setup (about 5 minutes):\n *  1. In Novyra Desk go to Settings > Email and press \"Copy the script\". That copy already holds your secret key.\n *  2. Open script.google.com (signed in to the Gmail you send from) > New project. Name it \"Novyra Mail\".\n *     Select everything in the editor, paste, and press Save (the disk icon).\n *  3. In the toolbar choose the function \"setup\" and press Run. Google asks for permission: Review permissions >\n *     choose your account > Advanced > Go to Novyra Mail (unsafe) > Allow. (It says \"unsafe\" only because it's your own script.)\n *  4. Deploy > New deployment > the gear next to \"Select type\" > Web app. Execute as: Me. Who has access: Anyone. Deploy.\n *  5. Copy the Web app URL (it ends in /exec), paste it into Novyra Desk > Settings > Email, press Save, then \"Send a test email\".\n * After changing this file later: Deploy > Manage deployments > pencil > Version: New version > Deploy.\n */\nconst SECRET_KEY = '{{SECRET}}';      // filled in by Novyra Desk when you press \"Copy the script\"\nconst NOTIFY_TO = '{{NOTIFY_TO}}';    // where acceptance emails go\nconst PROJECT = 'novyra-studio';\nconst API_KEY = 'AIzaSyBaFNF3r8iehEU00BRO0XKnal0THv9pXs4'; // public web key, only reads client links\nconst P = () => PropertiesService.getScriptProperties();\nconst SECRET = () => P().getProperty('SECRET') || SECRET_KEY;\nconst TO = () => P().getProperty('NOTIFY_TO') || NOTIFY_TO;\n\nfunction doPost(e) {\n  let body = {};\n  try { body = JSON.parse(e.postData.contents || '{}'); } catch (err) { return out({ ok: false, error: 'Bad request' }); }\n  try { return out(handle(body)); } catch (err) { return out({ ok: false, error: String(err && err.message || err) }); }\n}\nfunction out(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }\n\nfunction handle(b) {\n  // the client page reports an acceptance; we check it against the database ourselves\n  if (/\\{\\{/.test(SECRET())) return { ok: false, error: 'This script has no key yet. Copy it again from Novyra Desk > Settings > Email and paste it in.' };\n  if (b.action === 'clientAccepted') return clientAccepted(String(b.share || ''));\n  if (!b.secret || b.secret !== SECRET()) return { ok: false, error: 'Wrong secret key. Copy the script again from Novyra Desk > Settings > Email and paste it in.' };\n  switch (b.action) {\n    case 'ping': return { ok: true, quota: MailApp.getRemainingDailyQuota() };\n    case 'notify': return notify(b.key, b.to || TO(), b.subject, b.text);\n  }\n  return { ok: false, error: 'Unknown action' };\n}\n\n/* ---------- acceptance emails (never sent twice) ---------- */\nfunction notify(key, to, subject, text) {\n  const lock = LockService.getScriptLock(); lock.waitLock(20000);\n  try {\n    const k = 'sent:' + key;\n    if (key && !String(key).startsWith('test-') && P().getProperty(k)) return { ok: true, duplicate: true, quota: MailApp.getRemainingDailyQuota() };\n    GmailApp.sendEmail(to, subject, text, { name: 'Novyra Desk' });\n    if (key) P().setProperty(k, new Date().toISOString());\n    return { ok: true, quota: MailApp.getRemainingDailyQuota() };\n  } finally { lock.releaseLock(); }\n}\nfunction clientAccepted(share) {\n  if (!/^[A-Za-z0-9_-]{16,}$/.test(share)) return { ok: false, error: 'Bad link' };\n  const r = UrlFetchApp.fetch(`https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/(default)/documents/shares/${share}?key=${API_KEY}`, { muteHttpExceptions: true });\n  if (r.getResponseCode() !== 200) return { ok: false, error: 'Link not found' };\n  const f = JSON.parse(r.getContentText()).fields || {}, v = x => x ? (x.stringValue != null ? x.stringValue : x.integerValue != null ? Number(x.integerValue) : x.doubleValue != null ? x.doubleValue : null) : null;\n  if (v(f.status) !== 'Accepted' || !f.response || !f.response.mapValue) return { ok: false, error: 'Not accepted' };\n  const resp = f.response.mapValue.fields || {}, name = v(resp.name) || 'The client', business = v(f.business) || '', title = v(f.title) || '';\n  const key = `${v(f.quoteId)}:${v(f.rev) || 1}`;\n  const subject = `Quote ${v(f.ref)}${title ? ' – ' + title : ''} has been accepted by ${name}${business ? ' (' + business + ')' : ''}`;\n  const when = v(resp.at) ? Utilities.formatDate(new Date(v(resp.at)), 'Africa/Johannesburg', \"d MMMM yyyy, HH:mm\") : '';\n  const text = [`${v(f.ref)}${title ? ' – ' + title : ''} has been accepted online.`, '', `Accepted by: ${name}`, `Company: ${business || '—'}`, `Date and time: ${when}`,\n    `Quote total: R ${Number(v(f.total) || 0).toFixed(2)}`, v(resp.note) ? `Their note: ${v(resp.note)}` : '', '', `Open it in Novyra Desk: https://www.novyra.co.za/studio/#quote-${v(f.quoteId)}`].filter(x => x !== null).join('\\n');\n  return notify(key, TO(), subject, text);\n}\n\n/* ---------- run once from the editor so Google asks for permission ---------- */\nfunction setup() {\n  UrlFetchApp.fetch('https://www.novyra.co.za/', { muteHttpExceptions: true });\n  Logger.log('Ready. Emails left today: ' + MailApp.getRemainingDailyQuota());\n}\n";
 const RULES = "rules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    function signedIn() { return request.auth != null && request.auth.token.email_verified == true; }\n    function isOwner() { return signedIn() && request.auth.token.email == 'hanukeyser@gmail.com'; }\n    function userDoc() { return /databases/$(database)/documents/users/$(request.auth.token.email.lower()); }\n    function member() { return signedIn() && exists(userDoc()) && get(userDoc()).data.active == true; }\n\n    // Owner: everything\n    match /{document=**} { allow read, write: if isOwner(); }\n\n    // Team members can see their own user record (needed later)\n    match /users/{email} { allow read: if signedIn() && request.auth.token.email.lower() == email; }\n\n    // TEAM ACCESS – leave commented out until you add your first team member, then remove the // on the next 4 lines\n    // match /{col}/{id} {\n    //   allow read: if member() && col != 'users';\n    //   allow write: if member() && get(userDoc()).data.role in ['admin', 'staff'] && col != 'users';\n    // }\n\n    // Client links: anyone with the link can open a quote, invoice or receipt; only quotes can be accepted, declined or changed\n    match /shares/{key} {\n      allow get: if true;\n      allow update: if resource.data.get('kind', 'quote') == 'quote'\n        && resource.data.status == 'Open' && request.time < resource.data.validTs\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'response'])\n        && request.resource.data.status in ['Accepted', 'Changes requested', 'Declined']\n        && request.resource.data.response.keys().hasOnly(['name', 'note', 'at', 'rev'])\n        && request.resource.data.response.name is string && request.resource.data.response.name.size() >= 2 && request.resource.data.response.name.size() <= 99\n        && request.resource.data.response.note is string && request.resource.data.response.note.size() < 2000\n        && request.resource.data.response.rev == resource.data.rev;\n    }\n  }\n}\n";
 function setEmailHTML() {
   const c = mailCfg(), ok = mailReady();
   const step = (n, t, body) => `<li class="stp"><span class="stp-n">${n}</span><div><b>${t}</b>${body ? `<div class="sub">${body}</div>` : ''}</div></li>`;
   return `<div class="sgrid">
     <section class="panel"><h3>Email service ${ok ? '<span class="pill accepted">Connected</span>' : '<span class="pill draft">Not set up</span>'}</h3>
-      <p class="sub hint">Acceptance emails and campaigns are sent from your own Gmail by a free Google script. Follow the steps on the right once.</p>
+      <p class="sub hint">When a quote is accepted, you get an email from your own Gmail, sent by a free Google script. Follow the steps on the right once.</p>
       <label class="field"><span>Web app link (ends in /exec)</span><input id="em-url" value="${esc(c.url || '')}" placeholder="https://script.google.com/macros/s/…/exec"></label>
       <label class="field"><span>Send acceptance emails to</span><input id="em-to" type="email" value="${esc(c.notifyTo || 'hanu@keysers.cc')}"></label>
       <details class="adv"><summary>Secret key</summary><div class="inrow"><input id="em-secret" value="${esc(c.secret || '')}" autocomplete="off" spellcheck="false" readonly><button type="button" class="btn" data-em-gen>New key</button></div><p class="sub" style="margin:6px 0 0">A new key means copying the script into Google again.</p></details>
@@ -2028,8 +2076,8 @@ function activityHTML(n) {
 function userDialog(u) {
   const isNew = !u; let x = { email: '', name: '', role: 'staff', access: { quotes: true, invoices: true, clients: true }, active: true, ...(u || {}) };
   const body = () => `<div class="grid2"><label class="field"><span>Name</span><input id="us-name" value="${esc(x.name)}"></label><label class="field"><span>Google account email</span><input id="us-email" type="email" value="${esc(x.email)}" ${isNew ? '' : 'disabled'}></label></div>
-    <div class="field"><span>Role</span><div class="roles">${Object.entries(ROLES).filter(([k]) => k !== 'owner').map(([k, [l, d]]) => `<label class="role"><input type="radio" name="us-role" value="${k}" ${x.role === k ? 'checked' : ''}><span><b>${l}</b><span class="sub">${d}</span></span></label>`).join('')}</div></div>
-    <div class="field" ${x.role === 'admin' ? 'hidden' : ''} id="us-acc"><span>Can open</span><div class="checks">${ACCESS.map(([k, l]) => `<label class="chk"><input type="checkbox" data-acc="${k}" ${x.access[k] ? 'checked' : ''}><span>${l}</span></label>`).join('')}</div></div>
+    <div class="field"><span>Role</span><div class="roles">${Object.entries(ROLES).filter(([k]) => k !== 'owner').map(([k, [l, d]]) => `<label class="rolecard"><input type="radio" name="us-role" value="${k}" ${x.role === k ? 'checked' : ''}><span><b>${l}</b><span class="sub">${d}</span></span></label>`).join('')}</div></div>
+    <div class="field" ${x.role === 'admin' ? 'hidden' : ''} id="us-acc"><span>Can open</span><div class="acc-grid">${ACCESS.map(([k, l]) => `<label class="chk"><input type="checkbox" data-acc="${k}" ${x.access[k] ? 'checked' : ''}><span>${l}</span></label>`).join('')}</div></div>
     ${isNew ? '' : `<label class="chk"><input type="checkbox" id="us-active" ${x.active !== false ? 'checked' : ''}><span>Can sign in (untick to disable without removing)</span></label>`}`;
   openModal(dlg(isNew ? 'Add a team member' : 'Team member', body(), `${isNew ? '' : '<button class="btn ghost danger" data-us-del style="margin-right:auto">Remove</button>'}<button class="btn ghost" data-close>Cancel</button><button class="btn primary" data-us-save>${isNew ? 'Add person' : 'Save'}</button>`), m => {
     $$('[name=us-role]', m).forEach(r => r.addEventListener('change', () => { $('#us-acc', m).hidden = r.value === 'admin' && r.checked; }));
@@ -2050,11 +2098,18 @@ const CHEV_UP = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" str
 const CHEV_DN = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
 function setMenuHTML() {
   const groups = menuGroups();
-  return `<div class="sgrid one"><section class="panel"><div class="ph"><h3>Menu</h3><button class="btn small ghost" data-menu-reset>Reset to default</button></div>
-    <p class="sub hint">Move sections and pages up or down, and hide the ones you don’t use. Saved for your account.</p>
-    <div class="mgroups">${groups.map((g, gi) => `<div class="mgroup"><div class="mg-h"><b>${esc(g.l)}</b><span class="mv"><button type="button" class="ib sm" data-mg="${gi}" data-dir="-1" ${gi ? '' : 'disabled'} aria-label="Move ${esc(g.l)} up">${CHEV_UP}</button><button type="button" class="ib sm" data-mg="${gi}" data-dir="1" ${gi < groups.length - 1 ? '' : 'disabled'} aria-label="Move ${esc(g.l)} down">${CHEV_DN}</button></span></div>
-      ${g.items.map((i, ii) => `<div class="mitem ${i[3] ? 'off' : ''}">${sicon(i[0])}<span>${esc(i[2])}</span><span class="mv"><button type="button" class="ib sm" data-mi="${gi}:${ii}" data-dir="-1" ${ii ? '' : 'disabled'} aria-label="Move up">${CHEV_UP}</button><button type="button" class="ib sm" data-mi="${gi}:${ii}" data-dir="1" ${ii < g.items.length - 1 ? '' : 'disabled'} aria-label="Move down">${CHEV_DN}</button></span>
-        <label class="tgl" title="${i[3] ? 'Hidden' : 'Shown'}"><input type="checkbox" data-mshow="${i[0]}" ${i[3] ? '' : 'checked'} ${i[0] === 'settings' ? 'disabled' : ''}><span></span></label></div>`).join('')}</div>`).join('')}</div></section></div>`;
+  const mvb = (attr, dir, on, label) => `<button type="button" class="ib sm" ${attr} data-dir="${dir}" ${on ? '' : 'disabled'} aria-label="${label}">${dir < 0 ? CHEV_UP : CHEV_DN}</button>`;
+  const preview = groups.map(g => ({ ...g, items: g.items.filter(i => !i[3]) })).filter(g => g.items.length);
+  return `<div class="sgrid menu-ed">
+    <section class="panel"><div class="ph"><h3>Menu</h3><button class="btn small ghost" data-menu-reset>Reset to default</button></div>
+      <p class="sub hint">Move sections and pages up or down, and switch off the pages you don’t use.</p>
+      <div class="mlist">${groups.map((g, gi) => `<div class="mgrp">
+        <div class="mrow mhead"><span class="mlabel">${esc(g.l)}</span><span class="mv">${mvb(`data-mg="${gi}"`, -1, gi > 0, `Move ${esc(g.l)} up`)}${mvb(`data-mg="${gi}"`, 1, gi < groups.length - 1, `Move ${esc(g.l)} down`)}</span><span class="tglsp"></span></div>
+        ${g.items.map((i, ii) => `<div class="mrow ${i[3] ? 'off' : ''}"><span class="mname">${sicon(i[0])}<span>${esc(i[2])}</span></span><span class="mv">${mvb(`data-mi="${gi}:${ii}"`, -1, ii > 0, `Move ${esc(i[2])} up`)}${mvb(`data-mi="${gi}:${ii}"`, 1, ii < g.items.length - 1, `Move ${esc(i[2])} down`)}</span>
+          <label class="tgl" title="${i[0] === 'settings' ? 'Settings is always shown' : i[3] ? 'Hidden' : 'Shown'}"><input type="checkbox" data-mshow="${i[0]}" ${i[3] ? '' : 'checked'} ${i[0] === 'settings' ? 'disabled' : ''} aria-label="Show ${esc(i[2])}"><span></span></label></div>`).join('')}</div>`).join('')}</div></section>
+    <section class="panel"><h3>Preview</h3><p class="sub hint">This is how your menu looks.</p>
+      <div class="mprev"><div class="mp-new">${sicon('plus')}<span>New quote</span></div><div class="mp-it">${sicon('overview')}<span>Overview</span></div>
+        ${preview.map(g => `<div class="mp-h">${esc(g.l)}</div>${g.items.map(i => `<div class="mp-it">${sicon(i[0])}<span>${esc(i[2])}</span></div>`).join('')}`).join('')}</div></section></div>`;
 }
 function setDataHTML() {
   const meta = state.meta || {}, pl = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
@@ -2137,7 +2192,7 @@ function bindList(main) {
     if (v.url && !/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(v.url)) { toast('The link should look like https://script.google.com/macros/s/…/exec'); return; }
     try { await db.doc('settings/email').set(v); toast('Email settings saved'); } catch { toast('Not saved. Check your connection.'); } });
   const et = $('[data-em-test]', main); if (et) et.addEventListener('click', async () => { const o = $('#em-out', main); et.disabled = true; o.textContent = 'Sending…';
-    try { const j = await mailCall({ action: 'notify', key: 'test-' + Date.now(), to: mailCfg().notifyTo || OWNER.email, subject: 'Novyra Desk test email', text: 'Your email service works. Acceptance emails and campaigns will be sent from this Gmail account.' });
+    try { const j = await mailCall({ action: 'notify', key: 'test-' + Date.now(), to: mailCfg().notifyTo || OWNER.email, subject: 'Novyra Desk test email', text: 'Your email service works. Acceptance emails will be sent from this Gmail account.' });
       o.textContent = `Sent to ${mailCfg().notifyTo || OWNER.email}.${j.quota != null ? ` ${j.quota} emails left today.` : ''}`; if (j.quota != null) db.doc('settings/email').set({ ...mailCfg(), quota: j.quota }).catch(() => {}); }
     catch (e) { o.textContent = 'Not sent: ' + e.message; } et.disabled = false; });
   $$('[data-restore-trash]', main).forEach(b => b.addEventListener('click', () => { b.disabled = true; restoreTrash(state.trash.find(t => t.id === b.dataset.restoreTrash)); }));
@@ -2152,184 +2207,9 @@ function bindList(main) {
   $$('[data-mi]', main).forEach(b => b.addEventListener('click', () => { const g = menuGroups(), [gi, ii] = b.dataset.mi.split(':').map(Number), it = g[gi].items, j = ii + Number(b.dataset.dir); [it[ii], it[j]] = [it[j], it[ii]]; saveMenu(g); }));
   $$('[data-mshow]', main).forEach(c => c.addEventListener('change', () => { const g = menuGroups(); g.forEach(x => x.items.forEach(i => { if (i[0] === c.dataset.mshow) i[3] = !c.checked; })); saveMenu(g); }));
   const mr = $('[data-menu-reset]', main); if (mr) mr.addEventListener('click', async () => { state.menu = null; render(); try { await db.doc('menus/' + menuKey()).delete(); toast('Menu reset'); } catch {} });
-  bindCampaigns(main); bindCalendar(main);
+  bindCalendar(main);
 }
 
-
-/* ---------- email campaigns ---------- */
-const allGroups = () => [...new Set(state.clients.flatMap(c => c.groups || []))].sort((a, b) => a.localeCompare(b));
-const unsubs = () => new Set(((state.email || {}).unsubs || []).map(e => e.toLowerCase()));
-const bounces = () => new Set(((state.email || {}).bounces || []).map(e => e.toLowerCase()));
-function audience() {
-  const out = [], seen = new Set(), U = unsubs(), B = bounces();
-  state.clients.forEach(c => {
-    const ppl = [...contactsOf(c), ...(c.finance && c.finance.email ? [{ ...c.finance, role: 'Finance' }] : [])];
-    ppl.forEach(p => { const e = (p.email || '').trim().toLowerCase(); if (!e || seen.has(e)) return; seen.add(e);
-      const st = U.has(e) ? 'Unsubscribed' : B.has(e) ? 'Bounced' : c.marketing === 'no' ? 'No consent' : 'Subscribed';
-      out.push({ email: e, name: p.name || '', firstName: firstName(p.name || ''), role: p.role || '', business: c.business || '', clientId: c.id, groups: c.groups || [], status: st }); });
-  });
-  return out.sort((a, b) => a.business.localeCompare(b.business) || a.email.localeCompare(b.email));
-}
-function recipientsFor(cp) {
-  const a = audience().filter(r => r.status === 'Subscribed'), t = (cp.audience || {}).type || 'all';
-  if (t === 'groups') { const g = new Set((cp.audience.groups || [])); return a.filter(r => r.groups.some(x => g.has(x))); }
-  if (t === 'selected') { const ids = new Set(cp.audience.emails || []); return a.filter(r => ids.has(r.email)); }
-  return a;
-}
-const templates = () => [{ id: 'novyra-light', name: 'Novyra light (default)', html: MAIL_TEMPLATE, builtIn: true }, ...state.templates];
-function mdLite(t) {
-  const lines = String(t || '').replace(/\r/g, '').split(/\n{2,}/);
-  const inline = x => esc(x).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2">$1</a>').replace(/(^|\s)(https?:\/\/[^\s<]+)/g, '$1<a href="$2">$2</a>').replace(/\n/g, '<br>');
-  return lines.map(b => { b = b.trim(); if (!b) return '';
-    if (/^## /.test(b)) return `<h2>${inline(b.slice(3))}</h2>`;
-    if (b.split('\n').every(l => /^[-•✦] /.test(l))) return `<ul>${b.split('\n').map(l => `<li>${inline(l.slice(2))}</li>`).join('')}</ul>`;
-    return `<p>${inline(b)}</p>`; }).join('');
-}
-function campaignHTML(cp, r) {
-  const tpl = (templates().find(t => t.id === cp.templateId) || templates()[0]).html;
-  const content = cp.mode === 'html' ? (cp.html || '') : `${cp.image ? `<p><img src="${esc(cp.image)}" alt=""></p>` : ''}${cp.heading ? `<h1>${esc(cp.heading)}</h1>` : ''}${mdLite(cp.body)}${cp.btnText && cp.btnUrl ? `<p style="margin:22px 0 6px"><a class="nv-btn" href="${esc(cp.btnUrl)}">${esc(cp.btnText)}</a></p>` : ''}`;
-  const v = { firstName: (r && r.firstName) || 'there', name: (r && r.name) || '', business: (r && r.business) || 'your business' };
-  return tpl.replace('{{content}}', content).replace(/\{\{subject\}\}/g, esc(cp.subject || '')).replace(/\{\{preheader\}\}/g, esc(cp.preheader || ''))
-    .replace(/\{\{(firstName|name|business)\}\}/g, (_, k) => esc(v[k])).replace(/\{\{year\}\}/g, new Date().getFullYear());
-}
-const cText = cp => cp.mode === 'html' ? (cp.html || '').replace(/<style[\s\S]*?<\/style>/g, '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : [cp.heading, String(cp.body || '').replace(/\*\*/g, ''), cp.btnText && cp.btnUrl ? `${cp.btnText}: ${cp.btnUrl}` : ''].filter(Boolean).join('\n\n');
-function campaignsHTML() {
-  const t = view.ctab || 'campaigns', A = audience();
-  const tabs = `<nav class="stabs" aria-label="Campaign sections">${[['campaigns', 'Campaigns'], ['audience', `Audience <em>${A.filter(r => r.status === 'Subscribed').length}</em>`], ['templates', 'Templates']].map(([k, l]) => `<a href="#${k}" ${k === t ? 'aria-current="page"' : ''}>${l}</a>`).join('')}</nav>`;
-  const warn = mailReady() ? '' : `<div class="notice warn" style="margin-bottom:14px">The email service isn’t set up yet, so campaigns can be written and saved but not sent. <a href="#settings-email" style="color:var(--soft)">Set it up in Settings, Email</a>.</div>`;
-  let body = '';
-  if (t === 'campaigns') {
-    const pg = pageOf(state.campaigns);
-    body = state.campaigns.length ? `<div class="tbl-wrap"><table class="list"><thead><tr><th>Campaign</th><th>Audience</th><th>Status</th><th class="r">Sent</th><th class="r">Date</th></tr></thead><tbody>${pg.rows.map(c => {
-      const res = c.results || {}, n = c.status === 'Sent' || c.status === 'Sending' ? `${res.sent || 0}${res.failed ? ` <span class="bad">· ${res.failed} failed</span>` : ''}` : `${recipientsFor(c).length} ready`;
-      return `<tr data-campaign="${c.id}" tabindex="0"><td><b>${esc(c.name || 'Untitled campaign')}</b><div class="sub ell">${esc(c.subject || 'No subject yet')}</div></td><td class="sub">${esc(audLabel(c))}</td><td><span class="pill ${pillClass(c.status || 'Draft')}">${esc(c.status || 'Draft')}</span></td><td class="r num">${n}</td><td class="r num sub">${fmtDate((c.sentAt || c.scheduledAt || c.updatedAt || '').slice(0, 10))}</td></tr>`; }).join('')}</tbody></table></div>${pg.more}`
-      : emptyBox('No campaigns yet', 'Write a newsletter, an offer or a season’s greeting and send it to your clients.');
-    return `<div class="head"><div><h2>Email campaigns</h2><p>Newsletters and announcements to your clients, sent from your Gmail.</p></div><div class="actions"><button class="btn primary" data-cp-new>New campaign</button></div></div>${tabs}${warn}${body}`;
-  }
-  if (t === 'audience') {
-    const g = view.agroup || '', list = A.filter(r => !g || r.groups.includes(g)).filter(r => !view.q || norm([r.email, r.name, r.business].join(' ')).includes(norm(view.q)));
-    const pg = pageOf(list);
-    body = `<div class="toolbar">${searchBox('Search people')}<div class="filters"><button class="chipbtn" data-agroup="" aria-pressed="${!g}">Everyone</button>${allGroups().map(x => `<button class="chipbtn" data-agroup="${esc(x)}" aria-pressed="${g === x}">${esc(x)}</button>`).join('')}</div></div>
-      ${list.length ? `<div class="tbl-wrap"><table class="list"><thead><tr><th>Person</th><th>Client</th><th>Groups</th><th>Status</th></tr></thead><tbody>${pg.rows.map(r => `<tr data-client="${r.clientId}" tabindex="0"><td><b>${esc(r.name || r.email)}</b><div class="sub ell">${esc(r.email)}${r.role ? ' · ' + esc(r.role) : ''}</div></td><td>${esc(r.business)}</td><td class="sub">${esc(r.groups.join(', ') || '—')}</td><td><span class="pill ${r.status === 'Subscribed' ? 'accepted' : r.status === 'No consent' ? 'draft' : 'declined'}">${r.status}</span></td></tr>`).join('')}</tbody></table></div>${pg.more}`
-        : emptyBox('Nobody here yet', 'Every contact person and finance contact with an email address is listed here automatically.')}
-      <p class="sub" style="margin-top:14px">Everyone comes from your clients, so there is one list to keep up to date. Put clients in groups and tick whether they may get campaign emails in each client’s details. People who unsubscribe or whose email bounces are skipped automatically.${mailReady() ? ' <button type="button" class="linkbtn" data-cp-sync>Check for unsubscribes and bounces now</button>' : ''}</p>`;
-    return `<div class="head"><div><h2>Email campaigns</h2><p>Newsletters and announcements to your clients, sent from your Gmail.</p></div></div>${tabs}${body}`;
-  }
-  body = `<div class="tpl-grid">${templates().map(x => `<article class="panel tpl"><div class="tpl-prev"><iframe title="${esc(x.name)}" sandbox="" srcdoc="${esc(campaignHTML({ templateId: x.id, heading: 'Hello {{firstName}}', body: 'This is how your campaign will look. Write your news here, add a button and an image if you like.', btnText: 'Visit novyra.co.za', btnUrl: 'https://www.novyra.co.za/' }, null))}" loading="lazy"></iframe></div>
-    <div class="tpl-f"><b>${esc(x.name)}</b>${x.builtIn ? '<span class="sub">Built in</span>' : `<span class="actions"><button class="btn small" data-tpl-edit="${x.id}">Edit</button></span>`}</div></article>`).join('')}</div>
-    <p class="sub" style="margin-top:14px">Templates are HTML emails. Put <code>{{content}}</code> where the campaign goes and <code>{{unsubscribe}}</code> in the unsubscribe link. <code>{{firstName}}</code>, <code>{{business}}</code> and <code>{{preheader}}</code> also work.</p>`;
-  return `<div class="head"><div><h2>Email campaigns</h2><p>Newsletters and announcements to your clients, sent from your Gmail.</p></div><div class="actions"><button class="btn" data-tpl-new>New template</button></div></div>${tabs}${body}`;
-}
-const audLabel = c => { const a = c.audience || {}; return a.type === 'groups' ? `Groups: ${(a.groups || []).join(', ') || 'none chosen'}` : a.type === 'selected' ? `${(a.emails || []).length} selected` : 'All subscribed clients'; };
-function templateDialog(t) {
-  const isNew = !t; let x = { name: '', html: MAIL_TEMPLATE, ...(t || {}) };
-  openModal(dlg(isNew ? 'New template' : 'Edit template', `<div class="cp-grid"><div class="cp-form"><label class="field"><span>Template name</span><input id="tp-name" value="${esc(x.name)}" placeholder="For example: Monthly newsletter"></label>
-      <label class="field grow"><span>HTML</span><textarea id="tp-html" class="code" spellcheck="false">${esc(x.html)}</textarea></label></div>
-      <div class="cp-prev"><iframe id="tp-prev" title="Preview" sandbox=""></iframe></div></div>`,
-    `${isNew ? '' : '<button class="btn ghost danger" data-tp-del style="margin-right:auto">Delete template</button>'}<button class="btn ghost" data-close>Cancel</button><button class="btn primary" data-tp-save>Save template</button>`, 'wide xl'), m => {
-    const draw = () => { $('#tp-prev', m).srcdoc = campaignHTML({ templateId: '__x', heading: 'Hello {{firstName}}', body: 'Your campaign text goes here.', btnText: 'A button', btnUrl: 'https://www.novyra.co.za/' }, null).replace(MAIL_TEMPLATE, '') || ''; };
-    const paint = () => { const html = $('#tp-html', m).value; $('#tp-prev', m).srcdoc = html.replace('{{content}}', '<h1>Hello there</h1><p>Your campaign text goes here.</p><p><a class="nv-btn" href="#">A button</a></p>').replace(/\{\{\w+\}\}/g, ''); };
-    $('#tp-html', m).addEventListener('input', paint); paint(); void draw;
-    $('[data-tp-save]', m).addEventListener('click', async () => {
-      const v = { name: $('#tp-name', m).value.trim() || 'Untitled template', html: $('#tp-html', m).value, updatedAt: new Date().toISOString(), updatedBy: ME.name };
-      if (!v.html.includes('{{content}}')) { toast('Add {{content}} where the campaign text should go.'); return; }
-      try { await db.collection('templates').doc(x.id || uid()).set(v); closeModal(); toast('Template saved'); } catch { toast('Not saved. Check your connection.'); } });
-    const d = $('[data-tp-del]', m); if (d) d.addEventListener('click', () => openModal(dlg('Delete template', `<p class="lead">Delete the template <b>${esc(x.name)}</b>?</p><p class="sub">Campaigns that used it switch to the Novyra light template.</p>`,
-      '<button class="btn ghost" data-close>Keep</button><button class="btn danger-solid" data-yes>Delete</button>', 'small'), m2 => $('[data-yes]', m2).addEventListener('click', async () => { try { await db.collection('templates').doc(x.id).delete(); closeModal(); toast('Template deleted'); } catch { toast('Not deleted.'); } })));
-  });
-}
-function campaignDialog(c) {
-  const isNew = !c; let x = { name: '', subject: '', preheader: '', heading: '', body: '', btnText: '', btnUrl: '', image: '', mode: 'simple', html: '', templateId: 'novyra-light', audience: { type: 'all', groups: [], emails: [] }, status: 'Draft', ...clone(c || {}) };
-  const locked = ['Sent', 'Sending'].includes(x.status);
-  let device = 'desktop', pickQ = '';
-  const read = m => { if (locked) return; ['name', 'subject', 'preheader', 'heading', 'body', 'btnText', 'btnUrl', 'image', 'html'].forEach(k => { const i = $(`[data-cf="${k}"]`, m); if (i) x[k] = i.value; });
-    const tp = $('#cp-tpl', m); if (tp) x.templateId = tp.value;
-    const t = ($('[name=cp-aud]:checked', m) || {}).value || 'all'; x.audience = { type: t, groups: $$('[data-cp-g]:checked', m).map(i => i.dataset.cpG), emails: t === 'selected' ? [...new Set([...(x.audience.emails || []).filter(e => !$(`[data-cp-e="${CSS.escape(e)}"]`, m)), ...$$('[data-cp-e]:checked', m).map(i => i.dataset.cpE)])] : (x.audience.emails || []) }; };
-  const A = audience().filter(r => r.status === 'Subscribed');
-  const audBox = () => `<div class="field"><span>Send to</span><div class="roles">${[['all', `All subscribed clients (${A.length})`], ['groups', 'Groups'], ['selected', 'Selected people']].map(([k, l]) => `<label class="role"><input type="radio" name="cp-aud" value="${k}" ${x.audience.type === k ? 'checked' : ''} ${locked ? 'disabled' : ''}><span><b>${l}</b></span></label>`).join('')}</div></div>
-    ${x.audience.type === 'groups' ? `<div class="checks">${allGroups().map(g => `<label class="chk"><input type="checkbox" data-cp-g="${esc(g)}" ${x.audience.groups.includes(g) ? 'checked' : ''} ${locked ? 'disabled' : ''}><span>${esc(g)} (${A.filter(r => r.groups.includes(g)).length})</span></label>`).join('') || '<p class="sub" style="margin:0">No groups yet. Add groups in a client’s details.</p>'}</div>` : ''}
-    ${x.audience.type === 'selected' ? `<input type="search" id="cp-pick-q" placeholder="Search people" value="${esc(pickQ)}"><div class="pickbox">${A.filter(r => !pickQ || norm(r.email + r.name + r.business).includes(norm(pickQ))).map(r => `<label class="chk"><input type="checkbox" data-cp-e="${esc(r.email)}" ${(x.audience.emails || []).includes(r.email) ? 'checked' : ''} ${locked ? 'disabled' : ''}><span>${esc(r.name || r.email)} <span class="sub">${esc(r.business)}</span></span></label>`).join('') || '<p class="sub" style="margin:0">Nobody found.</p>'}</div>` : ''}
-    <p class="sub" id="cp-count" style="margin:0">${recipientsFor(x).length} recipient${recipientsFor(x).length === 1 ? '' : 's'}</p>`;
-  const body = () => `<div class="cp-grid"><div class="cp-form">
-      ${locked ? `<div class="mailbar ok"><span class="mi">✓</span><div><b>${x.status === 'Sending' ? 'Sending' : 'Sent'} ${x.sentAt ? fmtWhen(x.sentAt) : ''}</b><span class="sub">${(x.results || {}).sent || 0} delivered to Gmail${(x.results || {}).failed ? `, ${x.results.failed} failed` : ''}. Duplicate it to send it again.</span></div></div>` : ''}
-      ${x.status === 'Scheduled' ? `<div class="mailbar"><span class="mi">⏱</span><div><b>Scheduled for ${fmtWhen(x.scheduledAt)}</b><span class="sub">Your Gmail sends it then, even if this page is closed.</span></div></div>` : ''}
-      <div class="grid2"><label class="field"><span>Campaign name (only you see it)</span><input data-cf="name" value="${esc(x.name)}" placeholder="December newsletter" ${locked ? 'disabled' : ''}></label>
-      <label class="field"><span>Template</span><select id="cp-tpl" ${locked ? 'disabled' : ''}>${templates().map(t => `<option value="${t.id}" ${t.id === x.templateId ? 'selected' : ''}>${esc(t.name)}</option>`).join('')}</select></label></div>
-      <label class="field"><span>Subject line</span><input data-cf="subject" value="${esc(x.subject)}" placeholder="A fresh look for 2027" ${locked ? 'disabled' : ''}></label>
-      <label class="field"><span>Preview text (shown after the subject in the inbox)</span><input data-cf="preheader" value="${esc(x.preheader)}" ${locked ? 'disabled' : ''}></label>
-      <div class="seg" role="group" aria-label="Editor">${[['simple', 'Simple editor'], ['html', 'HTML']].map(([k, l]) => `<button type="button" data-cp-mode="${k}" aria-pressed="${x.mode === k}" ${locked ? 'disabled' : ''}>${l}</button>`).join('')}</div>
-      ${x.mode === 'html' ? `<label class="field"><span>Email content (HTML)</span><textarea data-cf="html" class="code" rows="12" spellcheck="false" ${locked ? 'disabled' : ''}>${esc(x.html)}</textarea></label>`
-        : `<label class="field"><span>Heading</span><input data-cf="heading" value="${esc(x.heading)}" placeholder="Hi {{firstName}}, something new for 2027" ${locked ? 'disabled' : ''}></label>
-      <label class="field"><span>Message</span><textarea data-cf="body" rows="8" ${locked ? 'disabled' : ''} placeholder="Write as you would in an email. Leave an empty line between paragraphs.">${esc(x.body)}</textarea><small class="sub">**bold**, [link text](https://…), lines starting with - become a list, ## starts a subheading, {{firstName}} and {{business}} are filled in.</small></label>
-      <div class="grid2"><label class="field"><span>Button text (optional)</span><input data-cf="btnText" value="${esc(x.btnText)}" placeholder="See the new packages" ${locked ? 'disabled' : ''}></label><label class="field"><span>Button link</span><input data-cf="btnUrl" value="${esc(x.btnUrl)}" placeholder="https://www.novyra.co.za/services" ${locked ? 'disabled' : ''}></label></div>
-      <label class="field"><span>Image link (optional, shown at the top)</span><input data-cf="image" value="${esc(x.image)}" placeholder="https://www.novyra.co.za/assets/img/…" ${locked ? 'disabled' : ''}></label>`}
-      <section class="cbox">${audBox()}</section>
-    </div><div class="cp-prev ${device}"><div class="seg" role="group" aria-label="Preview size">${[['desktop', 'Desktop'], ['mobile', 'Mobile']].map(([k, l]) => `<button type="button" data-cp-dev="${k}" aria-pressed="${device === k}">${l}</button>`).join('')}</div>
-      <div class="inbox"><b>${esc(x.subject || 'Subject line')}</b><span>${esc(x.preheader || 'Preview text')}</span></div><iframe id="cp-frame" title="Email preview" sandbox=""></iframe></div></div>`;
-  const foot = () => locked ? `<button class="btn ghost danger" data-cp-del style="margin-right:auto">Delete</button><button class="btn" data-cp-dup>Duplicate</button><button class="btn primary" data-close>Close</button>`
-    : `${isNew ? '' : '<button class="btn ghost danger" data-cp-del style="margin-right:auto">Delete</button>'}<button class="btn ghost" data-cp-test ${mailReady() ? '' : 'disabled title="Set up the email service first"'}>Send test to me</button><button class="btn" data-cp-save>Save draft</button>${x.status === 'Scheduled' ? '<button class="btn" data-cp-unsched>Cancel schedule</button>' : `<button class="btn" data-cp-sched ${mailReady() ? '' : 'disabled'}>Schedule</button>`}<button class="btn primary" data-cp-send ${mailReady() ? '' : 'disabled'}>Send now</button>`;
-  const store = async (patch, msg) => { Object.assign(x, patch || {}); x.updatedAt = new Date().toISOString(); x.updatedBy = ME.name; if (!x.createdAt) { x.createdAt = x.updatedAt; x.createdBy = ME.name; } if (!x.id) x.id = uid();
-    const { id, ...data } = x; await db.collection('campaigns').doc(id).set(JSON.parse(JSON.stringify(data))); if (msg) toast(msg); };
-  const payload = () => ({ campaignId: x.id, subject: x.subject, html: campaignHTML(x, null), text: cText(x), fromName: 'Novyra', replyTo: OWNER.email });
-  const check = () => { if (!x.subject.trim()) { toast('Write a subject line first.'); return false; } if (x.mode !== 'html' && !x.body.trim() && !x.heading.trim()) { toast('Write the message first.'); return false; } return true; };
-  const open = () => openModal(dlg(isNew && !x.id ? 'New campaign' : (x.name || 'Campaign'), body(), foot(), 'wide xl'), m => {
-    const paint = () => { read(m); const r = recipientsFor(x)[0] || { firstName: firstName(OWNER.name), name: OWNER.name, business: 'Your Business' }; $('#cp-frame', m).srcdoc = campaignHTML(x, r).replace('{{unsubscribe}}', '#'); const inb = $('.inbox', m); inb.firstChild.textContent = x.subject || 'Subject line'; inb.lastChild.textContent = x.preheader || 'Preview text'; const ct = $('#cp-count', m); if (ct) { const n = recipientsFor(x).length; ct.textContent = `${n} recipient${n === 1 ? '' : 's'}`; } };
-    $$('[data-cf], #cp-tpl', m).forEach(i => i.addEventListener('input', paint)); paint();
-    $$('[data-cp-mode]', m).forEach(b => b.addEventListener('click', () => { read(m); if (b.dataset.cpMode === 'html' && !x.html) x.html = `${x.heading ? `<h1>${esc(x.heading)}</h1>` : ''}${mdLite(x.body)}`; x.mode = b.dataset.cpMode; open(); }));
-    $$('[data-cp-dev]', m).forEach(b => b.addEventListener('click', () => { read(m); device = b.dataset.cpDev; open(); }));
-    $$('[name=cp-aud]', m).forEach(r => r.addEventListener('change', () => { read(m); open(); }));
-    $$('[data-cp-g], [data-cp-e]', m).forEach(i => i.addEventListener('change', paint));
-    const pq = $('#cp-pick-q', m); if (pq) pq.addEventListener('input', () => { read(m); pickQ = pq.value; open(); const n = $('#cp-pick-q'); n.focus(); n.setSelectionRange(n.value.length, n.value.length); });
-    const on = (sel, fn) => { const b = $(sel, m); if (b) b.addEventListener('click', fn); };
-    on('[data-cp-save]', async () => { read(m); try { await store({}, 'Campaign saved'); closeModal(); } catch { toast('Not saved. Check your connection.'); } });
-    on('[data-cp-test]', async () => { read(m); if (!check()) return; const b = $('[data-cp-test]', m); b.disabled = true;
-      try { await store(); const me = { email: (mailCfg().notifyTo || OWNER.email), name: OWNER.name, firstName: firstName(OWNER.name), business: 'Novyra' };
-        const j = await mailCall({ action: 'send', test: true, ...payload(), html: campaignHTML(x, me), subject: '[Test] ' + x.subject, recipients: [me] }); toast(`Test sent to ${me.email}${j.quota != null ? ` · ${j.quota} left today` : ''}`); }
-      catch (e) { toast('Test not sent: ' + e.message); } b.disabled = false; });
-    on('[data-cp-sched]', () => { read(m); if (!check()) return; const n = recipientsFor(x).length; if (!n) { toast('Choose who it goes to first.'); return; }
-      const def = new Date(Date.now() + 864e5); def.setHours(8, 0, 0, 0); const v = new Date(def - def.getTimezoneOffset() * 6e4).toISOString().slice(0, 16);
-      openModal(dlg('Schedule campaign', `<p class="lead">Send <b>${esc(x.subject)}</b> to ${n} ${n === 1 ? 'person' : 'people'} later.</p><label class="field"><span>Date and time</span><input type="datetime-local" id="cp-when" value="${v}" min="${new Date(Date.now() - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0, 16)}"></label><p class="sub">Your Gmail sends it within 15 minutes of that time, even if this page is closed.</p>`,
-        '<button class="btn ghost" data-back>Back</button><button class="btn primary" data-yes>Schedule</button>', 'small'), m2 => {
-        $('[data-back]', m2).addEventListener('click', open);
-        $('[data-yes]', m2).addEventListener('click', async () => { const at = new Date($('#cp-when', m2).value); if (!(at > new Date())) { toast('Choose a time in the future.'); return; }
-          const btn = $('[data-yes]', m2); btn.disabled = true;
-          try { await store(); await mailCall({ action: 'schedule', at: at.toISOString(), ...payload(), recipients: recipientsFor(x) }); await store({ status: 'Scheduled', scheduledAt: at.toISOString() }, `Scheduled for ${fmtWhen(at.toISOString())}`); logActivity('campaign', `Campaign “${x.name || x.subject}” scheduled for ${fmtWhen(at.toISOString())}`, ''); closeModal(); }
-          catch (e) { btn.disabled = false; toast('Not scheduled: ' + e.message); } }); }); });
-    on('[data-cp-unsched]', async () => { try { await mailCall({ action: 'unschedule', campaignId: x.id }); await store({ status: 'Draft', scheduledAt: null }, 'Schedule cancelled'); closeModal(); } catch (e) { toast('Not cancelled: ' + e.message); } });
-    on('[data-cp-send]', () => { read(m); if (!check()) return; const R = recipientsFor(x); if (!R.length) { toast('Choose who it goes to first.'); return; }
-      openModal(dlg('Send campaign', `<p class="lead">Send <b>${esc(x.subject)}</b> to <b>${R.length}</b> ${R.length === 1 ? 'person' : 'people'} now?</p><p class="sub">It goes out from your Gmail, one email per person, each with an unsubscribe link. This can’t be undone.${R.length > 90 ? ' A personal Gmail sends about 100 a day, so some may only go out tomorrow.' : ''}</p>`,
-        '<button class="btn ghost" data-back>Back</button><button class="btn primary" data-yes>Send now</button>', 'small'), m2 => {
-        $('[data-back]', m2).addEventListener('click', open);
-        $('[data-yes]', m2).addEventListener('click', async () => { const btn = $('[data-yes]', m2); btn.disabled = true; btn.textContent = 'Sending…';
-          try { await store({ status: 'Sending', sentAt: new Date().toISOString() }); let sent = 0, failed = 0, errors = [];
-            for (let i = 0; i < R.length; i += 25) { const j = await mailCall({ action: 'send', ...payload(), recipients: R.slice(i, i + 25) }); (j.results || []).forEach(r => { if (r.ok) sent++; else { failed++; errors.push(r.email + ': ' + r.error); } }); btn.textContent = `Sending… ${sent + failed}/${R.length}`; }
-            await store({ status: 'Sent', results: { sent, failed, errors: errors.slice(0, 50), total: R.length } }, `Sent to ${sent} ${sent === 1 ? 'person' : 'people'}${failed ? `, ${failed} failed` : ''}`);
-            logActivity('campaign', `Campaign “${x.name || x.subject}” sent to ${sent}`, ''); closeModal(); }
-          catch (e) { await store({ status: 'Draft' }).catch(() => {}); btn.disabled = false; btn.textContent = 'Send now'; toast('Not sent: ' + e.message); } }); }); });
-    on('[data-cp-dup]', () => { const y = clone(x); delete y.id; Object.assign(y, { name: (x.name || x.subject) + ' (copy)', status: 'Draft', results: null, sentAt: null, scheduledAt: null, createdAt: null }); closeModal(); campaignDialog(null); setTimeout(() => { closeModal(); campaignDialogFrom(y); }, 0); });
-    on('[data-cp-del]', () => openModal(dlg('Delete campaign', `<p class="lead">Delete <b>${esc(x.name || x.subject || 'this campaign')}</b>?</p><p class="sub">${x.status === 'Sent' ? 'Emails already sent stay in people’s inboxes. ' : ''}${x.status === 'Scheduled' ? 'The schedule is cancelled too. ' : ''}This can’t be undone.</p>`,
-      '<button class="btn ghost" data-back>Back</button><button class="btn danger-solid" data-yes>Delete</button>', 'small'), m2 => { $('[data-back]', m2).addEventListener('click', open);
-      $('[data-yes]', m2).addEventListener('click', async () => { try { if (x.status === 'Scheduled') await mailCall({ action: 'unschedule', campaignId: x.id }).catch(() => {}); await db.collection('campaigns').doc(x.id).delete(); closeModal(); toast('Campaign deleted'); logActivity('deleted', `Campaign deleted: ${x.name || x.subject}`, ''); } catch { toast('Not deleted.'); } }); }));
-  });
-  open();
-}
-function campaignDialogFrom(y) { campaignDialog(y); }
-async function syncMail(quiet) {
-  if (!mailReady()) return; try { const j = await mailCall({ action: 'sync' }); const v = { ...mailCfg(), unsubs: j.unsubs || [], bounces: j.bounces || [], quota: j.quota, syncedAt: new Date().toISOString() };
-    await db.doc('settings/email').set(v);
-    for (const [id, r] of Object.entries(j.results || {})) { const c = state.campaigns.find(x => x.id === id); if (c && c.status === 'Scheduled' && r.done) { const { id: _, ...data } = c; await db.collection('campaigns').doc(id).set({ ...data, status: 'Sent', sentAt: r.at, results: { sent: r.sent, failed: r.failed, total: r.sent + r.failed } }); } }
-    if (!quiet) toast('Up to date'); } catch (e) { if (!quiet) toast('Couldn’t check: ' + e.message); }
-}
-function bindCampaigns(main) {
-  if (view.sub !== 'campaigns') return;
-  if (!bindCampaigns.synced && mailReady()) { bindCampaigns.synced = true; syncMail(true); }
-  const n = $('[data-cp-new]', main); if (n) n.addEventListener('click', () => campaignDialog(null));
-  $$('[data-campaign]', main).forEach(r => { const o = () => campaignDialog(state.campaigns.find(c => c.id === r.dataset.campaign)); r.addEventListener('click', o); r.addEventListener('keydown', e => { if (e.key === 'Enter') o(); }); });
-  $$('[data-agroup]', main).forEach(b => b.addEventListener('click', () => { view.agroup = b.dataset.agroup; view.limit = PAGE; render(); }));
-  const tn = $('[data-tpl-new]', main); if (tn) tn.addEventListener('click', () => templateDialog(null));
-  $$('[data-tpl-edit]', main).forEach(b => b.addEventListener('click', () => templateDialog(state.templates.find(t => t.id === b.dataset.tplEdit))));
-  const sy = $('[data-cp-sync]', main); if (sy) sy.addEventListener('click', () => syncMail(false));
-}
 
 /* ---------- content calendar ---------- */
 const CAL_STATUS = ['Idea', 'Planned', 'Ready', 'Scheduled', 'Posted'];
@@ -2352,7 +2232,7 @@ function calendarHTML() {
   const label = first.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
   const counts = CAL_STATUS.map(s => [s, inMonth.filter(i => (i.status || 'Planned') === s).length]).filter(x => x[1]);
   return `<div class="head"><div><h2>Content calendar</h2><p>Every social media post, with its date, best time, platforms and caption.</p></div><div class="actions"><button class="btn primary" data-cal-add="${t}">Add post</button></div></div>
-    <div class="calbar"><div class="calnav"><button class="ib" data-cal-m="-1" aria-label="Previous month">‹</button><h3>${label}</h3><button class="ib" data-cal-m="1" aria-label="Next month">›</button><button class="btn small" data-cal-today>Today</button></div>
+    <div class="calbar"><div class="calnav"><button class="ib" data-cal-m="-1" aria-label="Previous month">‹</button><h3><span class="lg">${label}</span><span class="sm">${first.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}</span></h3><button class="ib" data-cal-m="1" aria-label="Next month">›</button><button class="btn small" data-cal-today>Today</button></div>
       <div class="sub">${inMonth.length} post${inMonth.length === 1 ? '' : 's'}${counts.length ? ' · ' + counts.map(([s, n]) => `${n} ${s.toLowerCase()}`).join(' · ') : ''}</div></div>
     <div class="cal"><div class="cwk">${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => `<span>${d}</span>`).join('')}</div><div class="cgridm">${cells}</div></div>
     <div class="clist">${inMonth.length ? inMonth.map(i => `<button type="button" class="crow" data-cal="${esc(i.id)}"><span class="cd"><b>${new Date(i.date + 'T00:00').getDate()}</b><span>${new Date(i.date + 'T00:00').toLocaleDateString('en-GB', { weekday: 'short' })}</span></span><span class="ct"><b>${esc(i.name)}</b><span class="sub">${(i.platforms || []).join(', ')}${i.ig ? ` · Instagram ${esc(i.ig)}` : ''}${i.li ? ` · LinkedIn ${esc(i.li)}` : ''}</span></span><span class="pill ${pillClass(i.status || 'Planned')}">${esc(i.status || 'Planned')}</span></button>`).join('') : emptyBox('Nothing planned this month', 'Add a post with Add post.')}</div>`;
@@ -2391,7 +2271,7 @@ async function backup() {
   const downloads = await claude.use('downloads');
   if (!downloads) { toast('Downloads aren’t available in this view.'); return; }
   const strip = a => a.map(({ id, ...d }) => ({ id, ...d }));
-  const data = { app: 'Novyra Quotes & Invoices', made: new Date().toISOString(), clients: strip(state.clients), quotes: strip(state.quotes), invoices: strip(state.invoices), prices: state.prices, bank: state.bank, profile: state.profile, plans: strip(state.plans), expenses: strip(state.expenses), campaigns: strip(state.campaigns), templates: strip(state.templates), calendar: strip(state.calendar), users: strip(state.users), trash: strip(state.trash) };
+  const data = { app: 'Novyra Quotes & Invoices', made: new Date().toISOString(), clients: strip(state.clients), quotes: strip(state.quotes), invoices: strip(state.invoices), prices: state.prices, bank: state.bank, profile: state.profile, plans: strip(state.plans), expenses: strip(state.expenses), calendar: strip(state.calendar), users: strip(state.users), trash: strip(state.trash) };
   const name = `Novyra Backup ${todayIso()}.json`;
   try {
     await downloads.save({ filename: name, data: new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }) });
@@ -2446,7 +2326,8 @@ async function newDoc(kind, from, client, chosen) {
 /* ---------- dialogs ---------- */
 let modalKeys = null;
 function openModal(html, bind) {
-  const m = $('#modal'), old = !m.hidden && m.querySelector('.dialog'), same = old && old.getAttribute('aria-label') === (html.match(/aria-label="([^"]*)"/) || [])[1];
+  const m0 = $('#modal'); if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; m0.classList.remove('closing'); m0.hidden = true; }
+  const m = m0, old = !m.hidden && m.querySelector('.dialog'), same = old && old.getAttribute('aria-label') === (html.match(/aria-label="([^"]*)"/) || [])[1];
   const keep = same ? [m.scrollTop, (old.querySelector('.content') || {}).scrollTop || 0] : null;
   m.innerHTML = html; m.hidden = false; document.documentElement.style.overflow = 'hidden';
   if (old) m.querySelector('.dialog').classList.add('still');
@@ -2460,7 +2341,14 @@ function openModal(html, bind) {
   if (keep) { m.scrollTop = keep[0]; const c = m.querySelector('.content'); if (c) c.scrollTop = keep[1]; return; }
   m.scrollTop = 0; const f = m.querySelector('[autofocus]') || m.querySelector('.content input:not([type=checkbox]),.content textarea') || m.querySelector('footer .btn.primary'); if (f) f.focus({ preventScroll: true });
 }
-function closeModal() { const m = $('#modal'); if (m.hidden) return; m.hidden = true; m.innerHTML = ''; document.documentElement.style.overflow = ''; if (modalKeys) removeEventListener('keydown', modalKeys); modalKeys = null; }
+let closeTimer = null;
+function closeModal() {
+  const m = $('#modal'); if (m.hidden || m.classList.contains('closing')) return;
+  if (modalKeys) removeEventListener('keydown', modalKeys); modalKeys = null;
+  const finish = () => { closeTimer = null; m.classList.remove('closing'); m.hidden = true; m.innerHTML = ''; document.documentElement.style.overflow = ''; };
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return finish();
+  m.classList.add('closing'); closeTimer = setTimeout(finish, 170);
+}
 const dlg = (title, body, foot, size) => `<div class="dialog ${size || ''}" role="dialog" aria-modal="true" aria-label="${esc(title)}"><header><button class="x" data-close aria-label="Back"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>Back</button><h3>${esc(title)}</h3></header><div class="content">${body}</div><footer>${foot}</footer></div>`;
 
 /* customer picker: type a name, pick a saved client, or add a new one */
@@ -2622,9 +2510,7 @@ function clientDialog(c, onSaved, onCancel) {
       <div class="addr-grid">${ADDR_KEYS.map(([k, l]) => `<label class="field ${k === 'street' ? 'wide' : ''}"><span>${l}</span><input data-addr="${k}" value="${esc(x.addr[k])}" ${k === 'country' ? 'placeholder="South Africa"' : k === 'code' ? 'inputmode="numeric"' : ''} autocomplete="${{ street: 'address-line1', suburb: 'address-line2', city: 'address-level2', province: 'address-level1', code: 'postal-code', country: 'country-name' }[k]}"></label>`).join('')}</div>
       <label class="field"><span>Registration or VAT no. (optional)</span><input id="cl-reg" value="${esc(x.reg)}"></label>
       <label class="field"><span>Private notes (never printed)</span><textarea id="cl-notes" rows="2">${esc(x.notes)}</textarea></label></section>
-    <section class="cbox"><div class="sec-h"><span class="label">Email campaigns</span></div>
-      <label class="field"><span>Groups (separate with commas)</span><input id="cl-groups" value="${esc((x.groups || []).join(', '))}" list="cl-glist" placeholder="For example: Social clients, Aviation"><datalist id="cl-glist">${allGroups().map(g => `<option value="${esc(g)}">`).join('')}</datalist></label>
-      <label class="chk"><input type="checkbox" id="cl-mkt" ${x.marketing === 'no' ? '' : 'checked'}><span>May receive Novyra news and campaign emails</span></label></section>
+
     ${isNew ? '' : `<section class="cbox"><div class="sec-h"><span class="label">Quotes and invoices</span></div>${list.length ? `<div class="doclist">${list.map(l => `<a href="#${l.h}" data-go><b class="num">${esc(l.n)}</b><span class="sub">${fmtDate(l.d)}</span><span class="num">${money(l.t)}</span><span class="pill ${pillClass(l.s)}">${l.s}</span></a>`).join('')}</div>` : '<p class="sub" style="margin:0">Nothing yet.</p>'}</section>`}
     </div><div class="ccol">
     <section class="cbox"><div class="sec-h"><span class="label">Contact people</span><span class="sub">Quotes and invoices go to them</span></div><div class="pcards">${people.map(personHTML).join('')}</div>
@@ -2638,7 +2524,6 @@ function clientDialog(c, onSaved, onCancel) {
   const foot = `${canRemove ? '<button class="btn ghost danger" data-remove-client style="margin-right:auto">Remove client</button>' : ''}${isNew || onSaved ? '' : '<button class="btn" data-quote-client style="margin-right:auto">New quote for this client</button>'}<button class="btn ghost" data-cancel>Cancel</button><button class="btn primary" data-save-client>${isNew ? 'Save client' : 'Save changes'}</button>`;
   const readAll = m => {
     x.business = $('#cl-business', m).value.trim(); x.reg = $('#cl-reg', m).value.trim(); x.notes = $('#cl-notes', m).value.trim();
-    x.groups = [...new Set($('#cl-groups', m).value.split(',').map(g => g.trim()).filter(Boolean))]; x.marketing = $('#cl-mkt', m).checked ? 'yes' : 'no';
     $$('[data-addr]', m).forEach(i => { x.addr[i.dataset.addr] = i.value.trim(); }); x.address = addrOf({ addr: x.addr });
     fin = Object.fromEntries($$('[data-fin]', m).map(i => [i.dataset.fin, i.value.trim()]));
     people = $$('.pcard', m).map(card => Object.fromEntries($$('[data-pf]', card).map(inp => [inp.dataset.pf, inp.value.trim()])));
@@ -2666,7 +2551,7 @@ function clientDialog(c, onSaved, onCancel) {
       if (fin.email && !/^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/.test(fin.email)) { toast('The finance email address doesn’t look right.'); $('[data-fin=email]', m).focus(); return; }
       const btn = e.currentTarget; btn.disabled = true;
       const now = new Date().toISOString(), id = x.id || uid();
-      const rec = { business: x.business, avColor: x.avColor || (isNew ? CLIENT_COLORS[Math.floor(Math.random() * CLIENT_COLORS.length)] : clientColor(x)), logo: x.logo || '', logoSrc: x.logoSrc || '', logoCrop: x.logoCrop || null, finance: fin, contacts: ppl, address: x.address, addr: x.addr, reg: x.reg, groups: x.groups || [], marketing: x.marketing || 'yes', notes: x.notes, createdAt: x.createdAt || now, updatedAt: now, createdBy: x.createdBy || OWNER.name };
+      const rec = { business: x.business, avColor: x.avColor || (isNew ? CLIENT_COLORS[Math.floor(Math.random() * CLIENT_COLORS.length)] : clientColor(x)), logo: x.logo || '', logoSrc: x.logoSrc || '', logoCrop: x.logoCrop || null, finance: fin, contacts: ppl, address: x.address, addr: x.addr, reg: x.reg, notes: x.notes, createdAt: x.createdAt || now, updatedAt: now, createdBy: x.createdBy || OWNER.name };
       try { await db.collection('clients').doc(id).set(rec); }
       catch { btn.disabled = false; toast('Not saved. Check your connection and try again.'); return; }
       const saved = { id, ...rec };
@@ -2722,6 +2607,8 @@ function historyHTML(list) {
   });
   return `<ol class="htl">${out}</ol>${all.length > 8 ? `<button type="button" class="hmore" data-hist>${showAll ? 'Show latest only' : `Show all ${all.length} events`}</button>` : ''}`;
 }
+document.addEventListener('click', e => { $$('details.more-menu[open]').forEach(d => { if (!d.contains(e.target)) d.open = false; }); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') $$('details.more-menu[open]').forEach(d => { d.open = false; d.querySelector('summary').focus(); }); });
 function renderEditor(main) {
   const E = view.edit, Q = E.kind === 'quote', d = E.draft;
   const st = Q ? quoteStatus(d) : invoiceStatus(d);
@@ -2771,11 +2658,11 @@ function renderEditor(main) {
     actions += emailBtn + waBtn + (['Draft', 'Open'].includes(st) || d.shareId ? `<button class="btn ${d.shareId ? 'linked' : ''}" data-act="link" ${dirty ? 'disabled title="Save your changes first"' : ''}>${ICON_LINK}${d.shareId ? 'Client link' : 'Create client link'}</button>` : '') + `<button class="btn" data-act="pdf">Download PDF</button>`;
     if (d.status === 'Draft') actions += `<button class="btn" data-act="sent">Mark as sent</button>`;
     if (st === 'Expired') actions += `<button class="btn" data-act="renew">Renew at today's prices</button>`;
-    if (['Open', 'Expired'].includes(st)) actions += `<button class="btn" data-act="accept">Mark as accepted</button><button class="btn" data-act="decline">Mark as declined</button>`;
+    if (['Open', 'Expired'].includes(st)) { actions += `<button class="btn" data-act="accept">Mark as accepted</button>`; danger += `<button type="button" class="mi-btn" data-act="decline">Mark as declined<span>The client said no</span></button>`; }
     if (d.status === 'Accepted') { const inv = state.invoices.filter(v => v.quoteId === d.id && v.status !== 'Cancelled'); actions += inv.length ? `<a class="btn" href="#invoice-${inv[0].id}">Open ${inv[0].number ? 'INV-' + inv[0].number : 'draft invoice'}</a>` : `<button class="btn primary" data-act="invoice">Create invoice</button>`; actions += `<button class="btn" data-act="extra">New quote for extra work</button>`; }
     if (d.status === 'Accepted' && c.monthlyBase > 0) { const pl = state.plans.find(x => x.quoteId === d.id); actions += pl ? `<button class="btn" data-act="plan">Monthly billing · ${pl.active ? 'active' : 'paused'}</button>` : `<button class="btn" data-act="plan">Set up monthly billing</button>`; }
     if (['Open', 'Accepted'].includes(d.status) && !state.invoices.some(v => v.quoteId === d.id && v.status === 'Sent')) danger += `<button type="button" class="mi-btn" data-act="qcancel">Cancel quote<span>Keeps it in your records as Cancelled</span></button>`;
-    danger += `<button type="button" class="mi-btn bad" data-act="delete">Delete quote<span>Removes it for good, after you confirm</span></button>`;
+    danger += `<button type="button" class="mi-btn bad" data-act="delete">Delete quote<span>Moves it to Recently deleted</span></button>`;
   } else {
     if (!locked) actions += `<button class="btn ${dirty ? 'primary' : ''}" data-act="save" ${dirty ? '' : 'disabled'}>Save draft</button><button class="btn ${dirty ? '' : 'primary'}" data-act="send" ${dirty ? 'disabled title="Save your changes first"' : ''}>Issue invoice</button>`;
     else actions += emailBtn + waBtn + `<button class="btn" data-act="pdf">Download PDF</button>`;
@@ -2784,7 +2671,7 @@ function renderEditor(main) {
       if (c.due > 0) actions += f ? `<a class="btn" data-fin-mail="reminder" href="${esc(finHref(d, 'reminder'))}" target="_blank" rel="noopener">Payment reminder</a>` : `<button class="btn" data-act="no-finance">Payment reminder</button>`;
       if ((d.payments || []).length) actions += f ? `<a class="btn" data-fin-mail="receipt" href="${esc(finHref(d, 'receipt'))}" target="_blank" rel="noopener">Send receipt</a>` : `<button class="btn" data-act="no-finance">Send receipt</button>`; }
     if (d.status === 'Sent') danger += `<button type="button" class="mi-btn" data-act="cancel">Cancel invoice<span>Keeps it in your records as Cancelled</span></button>`;
-    danger += `<button type="button" class="mi-btn bad" data-act="delete">Delete ${d.number ? 'invoice' : 'draft'}<span>Removes it for good, after you confirm</span></button>`;
+    danger += `<button type="button" class="mi-btn bad" data-act="delete">Delete ${d.number ? 'invoice' : 'draft'}<span>Moves it to Recently deleted</span></button>`;
   }
   const viaWa = E.mailed && E.mailed.via === 'wa', viaFin = E.mailed && ['receipt', 'reminder'].includes(E.mailed.via);
   const mailBar = E.mailed ? `<div class="mailbar ${viaWa ? 'wa' : ''}" role="status"><span class="mi">${viaWa ? ICON_WA : ICON_MAIL}</span><div><b>${viaWa ? `WhatsApp is opening with a message to ${esc(E.mailed.name)}.` : viaFin ? `Mail is opening with the ${E.mailed.via === 'receipt' ? 'receipt' : 'payment reminder'} to ${esc(E.mailed.email)}.` : `Mail is opening with the email to ${esc(listAnd(emails))}.`}</b><span class="sub">Drag ${esc(viaFin ? E.mailed.file : pdfName(d, E.kind))} from your Downloads folder into the ${viaWa ? 'chat' : 'email'}, then press Send.</span></div>
@@ -2826,7 +2713,7 @@ function renderEditor(main) {
       </div>
       <div class="preview"><div class="preview-bar"><span class="label">Preview</span><span class="sub">${pages.length} page${pages.length === 1 ? '' : 's'} · A4</span></div><div class="preview-frame">${pages.map(p => `<div class="paper-holder"><div class="paper-scale">${p}</div></div>`).join('')}</div></div>
     </div>
-    <div class="actionbar"><div class="actions">${actions}<details class="more-menu"><summary class="btn ghost" aria-label="More actions">More<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary><div class="mm">${danger}</div></details></div></div>`;
+    <div class="actionbar"><div class="actions"><div class="acts">${actions}</div><details class="more-menu"><summary class="btn ghost" aria-label="More actions">More<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary><div class="mm">${danger}</div></details></div></div>`;
   fitPreview();
   bindEditor(main);
 }
