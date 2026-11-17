@@ -961,6 +961,59 @@ details.hch[open] ul,details.adv[open]>*:not(summary){animation:fadein .18s ease
   .more-menu .mm{position:fixed;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));bottom:calc(92px + env(safe-area-inset-bottom,0px));min-width:0}
 }
 .calnav h3 .sm{display:none}@media (max-width:760px){.calnav h3 .lg{display:none}.calnav h3 .sm{display:inline}.calbar{flex-direction:column;align-items:stretch;gap:6px}.calnav{justify-content:space-between}}
+
+/* ===== dropdown menus ===== */
+.more-menu summary.btn{gap:6px}
+.more-menu summary:focus{outline:none}
+.more-menu summary:focus-visible{outline:2px solid var(--spark);outline-offset:2px}
+.more-menu[open] summary.btn{background:#eef3ff;box-shadow:inset 0 0 0 1px #bcd0fb;color:var(--soft)}
+.more-menu .mm{bottom:calc(100% + 10px) !important;min-width:290px;padding:6px;border-radius:16px;box-shadow:0 1px 2px rgba(16,24,48,.06),0 18px 44px -10px rgba(16,24,48,.28),inset 0 0 0 1px var(--line) !important;gap:0}
+.more-menu .mm::after{content:"";position:absolute;right:28px;bottom:-6px;width:12px;height:12px;background:#fff;transform:rotate(45deg);box-shadow:1px 1px 0 var(--line);border-radius:0 0 3px 0}
+.mi-btn{display:grid !important;grid-template-columns:32px minmax(0,1fr);column-gap:10px;row-gap:1px;align-items:center;padding:10px 12px 10px 10px !important;border-radius:11px !important;font:600 14px var(--body)}
+.mi-btn .ico{grid-row:1/3;width:32px;height:32px;padding:8px;border-radius:9px;background:var(--ink3);color:var(--muted);box-sizing:border-box}
+.mi-btn>span{grid-column:2}
+.mi-btn:hover,.mi-btn:focus-visible{background:var(--ink) !important;outline:none}
+.mi-btn:hover .ico{background:#fff;box-shadow:inset 0 0 0 1px var(--line)}
+.mi-btn.bad{color:var(--bad)}.mi-btn.bad .ico{background:#fdecea;color:var(--bad)}
+.mi-btn.bad{margin-top:4px;position:relative}.mi-btn.bad::before{content:"";position:absolute;left:10px;right:10px;top:-3px;height:1px;background:var(--line)}
+.mi-btn:only-child.bad::before,.mi-btn.bad:first-child::before{display:none}
+@media (max-width:900px){.more-menu .mm::after{display:none}.more-menu .mm{border-radius:18px}}
+.combo-list{border-radius:16px !important;padding:6px !important;box-shadow:0 1px 2px rgba(16,24,48,.06),0 18px 44px -10px rgba(16,24,48,.28) !important;border-color:var(--line) !important;animation:mmin .16s cubic-bezier(.2,.7,.2,1);transform-origin:top left}
+.combo-list li{border-radius:11px !important}
+select{transition:border-color .15s,box-shadow .15s}
+.btn .ico{margin-right:6px;flex:none}
+.lockbtn{gap:0}
+.roles.one{grid-template-columns:minmax(0,1fr) !important}
+/* ===== header buttons match the cards on phones ===== */
+.head-end{justify-content:flex-end}
+@media (max-width:760px){
+  .head{flex-direction:column;align-items:stretch}
+  .head>.actions,.home-hero>.actions{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:10px;width:100%;margin:0}
+  .head>.actions>.btn,.home-hero>.actions>.btn,.head>.btn{width:100%;justify-content:center}
+  .home-hero{flex-direction:column;align-items:stretch}
+}
+/* ===== settings as one page with sections ===== */
+.acc{display:grid;gap:12px}
+.acc-sec{background:var(--ink2);border:1px solid var(--line);border-radius:18px;overflow:hidden;transition:box-shadow .2s,border-color .2s}
+.acc-sec.open{border-color:var(--line2);box-shadow:0 1px 2px rgba(16,24,48,.04),0 14px 34px -18px rgba(16,24,48,.22)}
+.acc-h{width:100%;display:grid;grid-template-columns:44px minmax(0,1fr) auto 28px;gap:16px;align-items:center;padding:16px 20px;border:0;background:none;text-align:left;font:inherit;color:var(--text);cursor:pointer;transition:background-color .15s}
+.acc-h:hover{background:var(--ink)}
+.acc-h:focus-visible{outline:2px solid var(--spark);outline-offset:-2px;border-radius:18px}
+.acc-ic{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:#eaf1ff;color:var(--soft);box-shadow:inset 0 0 0 1px #d4e1fc}
+.acc-ic svg{width:21px;height:21px}
+.acc-t{display:grid;gap:2px;min-width:0}.acc-t b{font:700 16px var(--body)}.acc-t .sub{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.acc-s{font-size:13px;font-weight:600;color:var(--muted);padding:5px 10px;border-radius:999px;background:var(--ink3);white-space:nowrap;max-width:260px;overflow:hidden;text-overflow:ellipsis}
+.acc-chev{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:var(--muted);transition:transform .25s cubic-bezier(.2,.7,.2,1)}
+.acc-sec.open .acc-chev{transform:rotate(180deg)}
+.acc-b{display:grid;grid-template-rows:0fr;transition:grid-template-rows .26s cubic-bezier(.2,.7,.2,1)}
+.acc-sec.open .acc-b{grid-template-rows:1fr}
+.acc-in{min-height:0;overflow:hidden}
+.acc-pad{padding:4px 20px 20px;border-top:1px solid var(--line);padding-top:20px;opacity:0;transition:opacity .2s}
+.acc-sec.open .acc-pad{opacity:1}
+.acc-pad .sgrid>.panel{box-shadow:none;background:var(--ink)}
+.acc-pad .sfoot-actions{margin-top:14px}
+@media (max-width:760px){.acc-h{grid-template-columns:40px minmax(0,1fr) 24px;gap:12px;padding:14px 16px}.acc-s{display:none}.acc-ic{width:40px;height:40px}.acc-pad{padding:16px 12px 16px}}
+@media (prefers-reduced-motion:reduce){.acc-b,.acc-chev,.acc-pad{transition:none}}
 </style></head><body>
 
 <header class="appbar">
@@ -1179,9 +1232,17 @@ function invoiceStatus(v) {
 }
 const acceptedBy = q => { if (!q || q.status !== 'Accepted') return null; if (q.acceptedBy) return q.acceptedBy; if (q.acceptedOnline) return { by: 'client', name: q.acceptedOnline.name, company: (q.client && q.client.business) || '', at: q.acceptedOnline.at }; return { by: 'novyra', name: '', at: q.decidedAt || '' }; };
 const acceptedText = a => !a ? '' : a.by === 'client' ? `${a.name || 'The client'}${a.company ? ` (${a.company})` : ''}` : 'Novyra';
+const isLocked = d => d.locked != null ? !!d.locked : d.status !== 'Draft';
+const svgI = d => `<svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const ICON_LOCK = svgI('<rect x="4.5" y="10.5" width="15" height="10" rx="2.2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/>');
+const ICON_UNLOCK = svgI('<rect x="4.5" y="10.5" width="15" height="10" rx="2.2"/><path d="M8 10.5V7.5a4 4 0 0 1 7.6-1.7"/>');
+const ICON_TRASH = svgI('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>');
+const ICON_BAN = svgI('<circle cx="12" cy="12" r="8.5"/><path d="m6 6 12 12"/>');
+const ICON_X = svgI('<path d="M18 6 6 18M6 6l12 12"/>');
+const stLabel = s => ({ Draft: 'Not sent', Open: 'Sent' })[s] || s;
 const pillClass = s => s.toLowerCase().replace(/\s/g, '');
 const qRef = q => `Q-${q.number}` + ((q.rev || 1) > 1 ? ` Rev ${q.rev}` : '');
-const docNo = (d, kind) => kind === 'quote' ? qRef(d) : (d.number ? `INV-${d.number}` : 'Draft invoice');
+const docNo = (d, kind) => kind === 'quote' ? qRef(d) : (d.number ? `INV-${d.number}` : 'New invoice');
 const nextQuote = () => Math.max(1000, Number((state.meta || {}).lastQuote) || 0, ...state.quotes.map(q => Number(q.number) || 0)) + 1;
 const nextInvoice = () => Math.max(1000, Number((state.meta || {}).lastInvoice) || 0, ...state.invoices.filter(v => v.number).map(v => Number(v.number) || 0)) + 1;
 const prices = () => (state.prices && state.prices.items) || DEFAULT_PRICES;
@@ -1241,7 +1302,7 @@ function paperParts(doc, kind) {
   const reference = Q ? `Q-${doc.number}` : number;
   const people = contactsOf(cl);
   const head = `<div class="facts">
-      <div><div class="l">${Q ? 'Quote no' : 'Invoice no'}</div><div class="v">${esc(number)}${!Q && !doc.number ? ' <span class="draftmark">draft</span>' : ''}</div></div>
+      <div><div class="l">${Q ? 'Quote no' : 'Invoice no'}</div><div class="v">${esc(number)}</div></div>
       <div><div class="l">${Q ? 'Date' : 'Invoice date'}</div><div class="v">${fmtDate(doc.date)}</div></div>
       <div><div class="l">${Q ? 'Valid until' : 'Due date'}</div><div class="v">${fmtDate(Q ? doc.validUntil : doc.dueDate)}</div></div>
       <div><div class="l">Reference</div><div class="v">${esc(reference)}</div></div>
@@ -1469,7 +1530,7 @@ function route() {
   else {
     const SUBS = { home: 'overview', clients: 'clients', prices: 'prices', settings: 'settings', bank: 'settings', search: 'search', profile: 'settings', plans: 'plans', expenses: 'expenses', calendar: 'calendar' };
     const sm = h.match(/^settings-(profile|business|email|team|menu|data)$/);
-    if (sm || h === 'profile' || h === 'bank' || h === 'settings') view.stab = sm ? sm[1] : h === 'profile' ? 'profile' : h === 'bank' ? 'business' : (view.stab || 'profile');
+    if (sm || h === 'profile' || h === 'bank' || h === 'settings') view.stab = sm ? sm[1] : h === 'profile' ? 'profile' : h === 'bank' ? 'business' : (h === 'settings' ? view.stab || '' : view.stab);
     const key = sm ? 'settings' : h;
     const t = key in SUBS ? 'home' : ['quotes', 'invoices'].includes(key) ? key : 'home', sub = SUBS[key] || 'overview';
     if (t !== view.tab || sub !== view.sub || view.open) { view.filter = sub === 'expenses' ? 'month' : 'all'; view.q = ''; view.limit = PAGE; }
@@ -1636,7 +1697,7 @@ function searchResults(q) {
   const qs = state.quotes.filter(x => hit(x.client && x.client.business, 'Q-' + x.number, qRef(x), ...(x.items || []).map(i => i.item), ...contactsOf(x.client).map(p => p.name))).sort((a, b) => (b.number || 0) - (a.number || 0)).slice(0, 10);
   const vs = state.invoices.filter(x => hit(x.client && x.client.business, x.number ? 'INV-' + x.number : 'draft', x.quoteRef)).sort((a, b) => (b.number || 0) - (a.number || 0)).slice(0, 10);
   if (!cs.length && !qs.length && !vs.length) return emptyBox('Nothing found', `No client, quote or invoice matches “${esc(q)}”.`);
-  const row = (h, n, c, amt, st) => `<a href="#${h}"><b class="num">${esc(n)}</b><span class="sub ell">${esc(c || 'No client')}</span><span class="num">${money(amt)}</span><span class="pill ${pillClass(st)}">${st}</span></a>`;
+  const row = (h, n, c, amt, st) => `<a href="#${h}"><b class="num">${esc(n)}</b><span class="sub ell">${esc(c || 'No client')}</span><span class="num">${money(amt)}</span><span class="pill ${pillClass(st)}">${stLabel(st)}</span></a>`;
   return (cs.length ? `<section class="panel"><h4>Clients</h4><div class="doclist">${cs.map(c => `<a href="#clients" data-client-pick="${c.id}"><b>${esc(c.business)}</b><span class="sub ell">${esc(contactsOf(c).map(p => p.name).filter(Boolean).join(', ') || 'No contact person yet')}</span><span></span><span class="sub">${docsFor(c).quotes.length} quote${docsFor(c).quotes.length === 1 ? '' : 's'}</span></a>`).join('')}</div></section>` : '')
     + (qs.length ? `<section class="panel"><h4>Quotes</h4><div class="doclist">${qs.map(x => row('quote-' + x.id, qRef(x), x.client && x.client.business, calc(x).total, quoteStatus(x))).join('')}</div></section>` : '')
     + (vs.length ? `<section class="panel"><h4>Invoices</h4><div class="doclist">${vs.map(x => row('invoice-' + x.id, x.number ? 'INV-' + x.number : 'Draft invoice', x.client && x.client.business, calc(x).total, invoiceStatus(x))).join('')}</div></section>` : '');
@@ -1647,20 +1708,20 @@ function homeHTML() {
   state.quotes.filter(q => q.changeRequest && q.status === 'Open').forEach(q => items.push({ h: `quote-${q.id}`, tone: 'warn', t: `${q.changeRequest.name} asked for changes on ${qRef(q)}`, s: `${q.client && q.client.business || 'No client'} · ${q.changeRequest.note ? '“' + q.changeRequest.note.slice(0, 80) + '”' : 'update it and save a new revision'}`, d: (q.changeRequest.at || '').slice(0, 10) }));
   state.quotes.filter(q => quoteStatus(q) === 'Expired').forEach(q => items.push({ h: `quote-${q.id}`, tone: 'warn', t: `${qRef(q)} has expired`, s: `${q.client && q.client.business || 'No client'} · follow up, renew it or mark what they decided`, d: q.validUntil }));
   state.invoices.filter(v => invoiceStatus(v) === 'Overdue').forEach(v => items.push({ h: `invoice-${v.id}`, tone: 'bad', t: `INV-${v.number} is overdue`, s: `${v.client && v.client.business || 'No client'} · ${money(calc(v).due)} still owed`, d: v.dueDate }));
-  state.quotes.filter(q => q.status === 'Draft').forEach(q => items.push({ h: `quote-${q.id}`, tone: 'info', t: `${qRef(q)} hasn’t been sent`, s: `${q.client && q.client.business || 'No client'} · draft, ${money(calc(q).total)}`, d: q.date }));
+  state.quotes.filter(q => q.status === 'Draft').forEach(q => items.push({ h: `quote-${q.id}`, tone: 'info', t: `${qRef(q)} hasn’t been sent`, s: `${q.client && q.client.business || 'No client'} · not sent yet, ${money(calc(q).total)}`, d: q.date }));
   state.quotes.filter(q => q.status === 'Accepted' && !state.invoices.some(v => v.quoteId === q.id && v.status !== 'Cancelled')).forEach(q => items.push({ h: `quote-${q.id}`, tone: 'info', t: `${qRef(q)} was accepted`, s: `${q.client && q.client.business || 'No client'} · create the invoice when the work is approved`, d: q.decidedAt ? q.decidedAt.slice(0, 10) : q.date }));
-  state.invoices.filter(v => v.status === 'Draft').forEach(v => items.push({ h: `invoice-${v.id}`, tone: 'info', t: v.period ? `${monthLabel(v.period)} invoice is ready` : `Draft invoice for ${v.quoteRef || 'a quote'}`, s: `${v.client && v.client.business || 'No client'} · ${v.period ? 'monthly package, issue and send it' : 'issue it when you’re ready'}`, d: v.date }));
+  state.invoices.filter(v => v.status === 'Draft').forEach(v => items.push({ h: `invoice-${v.id}`, tone: 'info', t: v.period ? `${monthLabel(v.period)} invoice is ready` : `${v.number ? 'INV-' + v.number : 'Invoice'} for ${v.quoteRef || 'a quote'} hasn’t been sent`, s: `${v.client && v.client.business || 'No client'} · ${v.period ? 'monthly package, check it and send it' : 'send it when you’re ready'}`, d: v.date }));
   const recent = [...state.quotes.map(q => ({ h: `quote-${q.id}`, n: qRef(q), c: q.client && q.client.business, t: calc(q).total, st: quoteStatus(q), u: q.updatedAt || q.createdAt || '' })),
-    ...state.invoices.map(v => ({ h: `invoice-${v.id}`, n: v.number ? 'INV-' + v.number : v.period ? monthLabel(v.period).replace(/ \d{4}$/, '') + ' draft' : 'Draft invoice', c: v.client && v.client.business, t: calc(v).total, st: invoiceStatus(v), u: v.updatedAt || v.createdAt || '' }))].sort((a, b) => b.u.localeCompare(a.u)).slice(0, 6);
+    ...state.invoices.map(v => ({ h: `invoice-${v.id}`, n: v.number ? 'INV-' + v.number : v.period ? monthLabel(v.period).replace(/ \d{4}$/, '') + '' : 'Invoice', c: v.client && v.client.business, t: calc(v).total, st: invoiceStatus(v), u: v.updatedAt || v.createdAt || '' }))].sort((a, b) => b.u.localeCompare(a.u)).slice(0, 6);
   return `<div class="home-hero"><div><h2>${hello}, ${esc(firstName(OWNER.name))}</h2><p class="muted">${items.length ? `${items.length} thing${items.length === 1 ? '' : 's'} need${items.length === 1 ? 's' : ''} your attention.` : 'You’re all caught up.'}</p></div>
       <div class="actions"><button class="btn primary" data-new>New quote</button><button class="btn" data-add-client>Add client</button></div></div>
     ${summaryHTML()}
     <div class="home-grid">
       <section class="panel"><h3>Needs your attention</h3>${items.length ? `<div class="todo">${items.map(i => `<a href="#${i.h}" class="todo-i ${i.tone}"><span class="dotc"></span><span><b>${esc(i.t)}</b><span class="sub">${esc(i.s)}</span></span><span class="sub num">${fmtDate(i.d)}</span></a>`).join('')}</div>` : '<div class="empty small"><p>Nothing waiting on you. New quotes, follow-ups and payments due will show here.</p></div>'}</section>
-      <section class="panel"><h3>Latest work</h3>${recent.length ? `<div class="doclist">${recent.map(r => `<a href="#${r.h}"><b class="num">${esc(r.n)}</b><span class="sub ell">${esc(r.c || 'No client')}</span><span class="num">${money(r.t)}</span><span class="pill ${pillClass(r.st)}">${r.st}</span></a>`).join('')}</div>` : '<div class="empty small"><p>Your quotes and invoices will show here.</p></div>'}</section>
+      <section class="panel"><h3>Latest work</h3>${recent.length ? `<div class="doclist">${recent.map(r => `<a href="#${r.h}"><b class="num">${esc(r.n)}</b><span class="sub ell">${esc(r.c || 'No client')}</span><span class="num">${money(r.t)}</span><span class="pill ${pillClass(r.st)}">${stLabel(r.st)}</span></a>`).join('')}</div>` : '<div class="empty small"><p>Your quotes and invoices will show here.</p></div>'}</section>
     </div>`;
 }
-function filterBtns(opts) { return `<div class="filters">${opts.map(o => `<button class="chipbtn" data-filter="${o}" aria-pressed="${view.filter === o}">${o === 'all' ? 'All' : o}</button>`).join('')}</div>`; }
+function filterBtns(opts) { return `<div class="filters">${opts.map(o => `<button class="chipbtn" data-filter="${o}" aria-pressed="${view.filter === o}">${o === 'all' ? 'All' : stLabel(o)}</button>`).join('')}</div>`; }
 function searchBox(ph) { return `<label class="search"><span class="vh">Search</span>${ICON_SEARCH}<input id="list-search" type="search" placeholder="${ph}" value="${esc(view.q)}" autocomplete="off"></label>`; }
 const matchQ = (...parts) => !view.q || parts.some(p => norm(p).includes(norm(view.q)));
 function ageCell(days, done) { if (days == null) return '<td class="r num age">—</td>'; return `<td class="r num age ${done ? 'done' : days > 30 ? 'old' : ''}">${days}d</td>`; }
@@ -1683,7 +1744,7 @@ function quotesHTML() {
       <td class="num">${fmtDate(q.date)}</td>
       <td><div class="client">${esc(q.client && q.client.business || 'No client yet')}</div><div class="sub">${esc((q.items || []).filter(i => i.item).map(i => i.item).join(', ') || 'No items yet')}</div></td>
       <td class="r num"><b>${money(calc(q).total)}</b></td>${ageCell(ageDays(q.date), ['Accepted', 'Declined'].includes(q.status))}
-      <td><span class="pill ${pillClass(st)}">${st}</span></td>${approvedCell(q)}${ownerCell(q)}</tr>`; }).join('');
+      <td><span class="pill ${pillClass(st)}">${stLabel(st)}</span></td>${approvedCell(q)}${ownerCell(q)}</tr>`; }).join('');
   return `<div class="head"><div><h2>Quotes</h2><p>One quote per job. Update an open or expired quote instead of starting a new one; every change is kept in its history.</p></div>
       <button class="btn primary" data-new>New quote</button></div>
     <div class="toolbar">${filterBtns(['all', 'Draft', 'Open', 'Expired', 'Accepted', 'Declined', 'Cancelled'])}${searchBox('Search client, number or item')}</div>
@@ -1696,18 +1757,18 @@ function invoicesHTML() {
   vs = vs.filter(v => matchQ(v.client && v.client.business, v.number ? 'INV-' + v.number : 'draft', v.quoteRef));
   const pg = pageOf(vs);
   const rows = pg.rows.map(v => { const st = invoiceStatus(v), c = calc(v); return `<tr data-open="invoice-${v.id}" tabindex="0">
-      <td><b class="num">${v.number ? 'INV-' + v.number : 'Draft'}</b></td>
+      <td><b class="num">${v.number ? 'INV-' + v.number : '—'}</b></td>
       <td class="num">${fmtDate(v.date)}</td>
       <td><div class="client">${esc(v.client && v.client.business || 'No client yet')}</div><div class="sub">${v.quoteRef ? 'For quote ' + esc(v.quoteRef) : ''}</div></td>
       <td class="r num">${money(c.total)}</td><td class="r num"><b>${money(st === 'Cancelled' ? 0 : c.due)}</b></td>${ageCell(v.status === 'Sent' ? ageDays(v.date) : null, st === 'Paid')}
-      <td><span class="pill ${pillClass(st)}">${st}</span></td>${ownerCell(v)}</tr>`; }).join('');
+      <td><span class="pill ${pillClass(st)}">${stLabel(st)}</span></td>${ownerCell(v)}</tr>`; }).join('');
   return `<div class="head"><div><h2>Invoices</h2><p>Every invoice comes from an accepted quote: open the quote and choose Create invoice. Numbers are given when you issue the invoice, so they never skip.</p></div></div>
     <div class="toolbar">${filterBtns(['all', 'Draft', 'Unpaid', 'Part paid', 'Overdue', 'Paid', 'Cancelled'])}${searchBox('Search client or number')}</div>
     <div class="table-wrap">${vs.length ? `<table class="list li"><thead><tr><th>No</th><th>Date</th><th>Customer</th><th class="r">Total</th><th class="r">Still owed</th><th class="r">Age</th><th>Status</th><th>Owner</th></tr></thead><tbody>${rows}</tbody></table>`
       : state.invoices.length ? emptyBox('No invoices match', 'Try another filter or search.') : emptyBox('No invoices yet', 'Open an accepted quote and choose Create invoice.')}</div>${pg.more}${trashLink('invoices')}`;
 }
 function clientsHTML() {
-  const cs = state.clients.filter(c => matchQ(c.business, ...contactsOf(c).flatMap(p => [p.name, p.email, p.phone])));
+  const cs = state.clients.filter(c => matchQ(c.business, ...contactsOf(c).flatMap(p => [p.name, p.email, p.phone]))).sort((a, b) => clientName(a).localeCompare(clientName(b), 'en', { sensitivity: 'base' }));
   const pg = pageOf(cs);
   const rows = pg.rows.map(c => { const { quotes, invoices } = docsFor(c), ppl = contactsOf(c); const owed = invoices.filter(v => v.status === 'Sent').reduce((a, v) => a + Math.max(0, calc(v).due), 0);
     return `<tr data-client="${c.id}" tabindex="0"><td><div class="who">${avHTML(c)}<div><div class="client">${esc(c.business)}</div><div class="sub">${ppl.length ? esc(ppl.map(p => p.name).filter(Boolean).join(', ') || 'Contact saved') : 'No contact person yet'}</div></div></div></td>
@@ -1741,8 +1802,7 @@ function pricesHTML() {
   take(all.filter(isExtra));
   const logo = take(by('Logo')), ident = take(by('Identity')), soc = take(by('Social media').filter(p => !isExtra(p))), con = take(by('Content').filter(p => !isExtra(p))), web = take([...by('Website'), ...by('Print')]);
   const other = all.filter(p => !used.has(p));
-    return `<div class="head"><div><h2>Price list</h2><p>Your Services &amp; Prices sheet, always showing the prices new quotes use.</p></div>
-      <div class="actions"><button class="btn primary" data-edit-prices>Edit prices</button></div></div>
+    return `<div class="head head-end"><div class="actions"><button class="btn primary" data-edit-prices>Edit prices</button></div></div>
     <article class="pricesheet">
       ${sec('Logos', SHEET.LOGO_FILES, cards(logo, 'Logo Pack 2'))}
       ${sec('Identity packs', 'A full brand look: your logo, a matching letterhead and email signatures for the team.', cards(ident, 'Identity Pack 2'))}
@@ -1828,7 +1888,7 @@ async function applyShares() {
       const r = sh.response || {}, now = new Date().toISOString(), upd = clone(q);
       upd.history = upd.history || [];
       if (sh.status === 'Accepted' && ['Open', 'Draft'].includes(q.status) && (q.rev || 1) === sh.rev) {
-        upd.status = 'Accepted'; upd.decidedAt = r.at || now; upd.acceptedOnline = { name: r.name, at: r.at || now, note: r.note || '' }; upd.acceptedBy = { by: 'client', name: r.name, company: (upd.client && upd.client.business) || '', at: r.at || now }; delete upd.changeRequest;
+        upd.status = 'Accepted'; upd.decidedAt = r.at || now; upd.acceptedOnline = { name: r.name, at: r.at || now, note: r.note || '' }; upd.acceptedBy = { by: 'client', name: r.name, company: (upd.client && upd.client.business) || '', at: r.at || now }; delete upd.changeRequest; upd.locked = true;
         upd.history.push({ at: now, rev: upd.rev || 1, title: `Accepted online by ${r.name} (${qRef(upd)})`, note: r.note || '', total: calc(upd).total, changes: [`Accepted on ${fmtWhen(r.at || now)}`] });
       } else if (sh.status === 'Declined' && ['Open', 'Draft'].includes(q.status) && (q.rev || 1) === sh.rev) {
         upd.status = 'Declined'; upd.decidedAt = r.at || now; upd.declinedOnline = { name: r.name, at: r.at || now, note: r.note || '' }; delete upd.changeRequest;
@@ -1886,7 +1946,8 @@ async function runPlans() {
         const id = `m-${p.id}-${m}`;
         if (!state.invoices.some(v => v.id === id)) {
           const rec = state.clients.find(c => c.id === p.clientId);
-          const doc = { id, number: null, status: 'Draft', date: planDate(p, m), dueDate: planDate(p, m), period: m, planId: p.id, quoteId: p.quoteId, quoteRef: p.quoteRef, clientId: p.clientId || null,
+          const num = nextInvoice(); setMeta({ lastInvoice: Math.max(Number((state.meta || {}).lastInvoice) || 0, num) });
+          const doc = { id, number: num, status: 'Draft', locked: false, date: planDate(p, m), dueDate: planDate(p, m), period: m, planId: p.id, quoteId: p.quoteId, quoteRef: p.quoteRef, clientId: p.clientId || null,
             client: rec ? clientSnap(rec, contactsOf(p.client)) : clone(p.client || {}), items: clone(p.items || []).map(it => ({ ...it, details: [it.details, monthLabel(m)].filter(Boolean).join(' · ') })),
             rush: 0, notes: `Monthly package for ${monthLabel(m)}.`, payments: [], createdBy: p.createdBy || OWNER.name, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
             history: [{ at: new Date().toISOString(), title: `${monthLabel(m)} invoice created automatically from monthly billing (${p.quoteRef})`, changes: [] }] };
@@ -1979,7 +2040,7 @@ function expenseDialog(e) {
       <label class="field"><span>What was it for?</span><input id="ex-desc" value="${esc(x.description)}" placeholder="For example: 500 business cards"></label>
       <div class="field"><span>Category</span><div class="catpick">${EXP_CATS.map(c => `<button type="button" data-cat="${esc(c)}" aria-pressed="${x.category === c}">${esc(c)}</button>`).join('')}</div></div></section></div>
     <div class="ccol"><section class="cbox"><label class="field"><span>Supplier (optional)</span><input id="ex-sup" value="${esc(x.supplier)}" placeholder="For example: Print shop, Adobe, Afrihost"></label>
-      <label class="field"><span>For a client (optional)</span><select id="ex-client"><option value="">Not for a specific client</option>${state.clients.map(c => `<option value="${c.id}" ${x.clientId === c.id ? 'selected' : ''}>${esc(c.business)}</option>`).join('')}</select></label>
+      <label class="field"><span>For a client (optional)</span><select id="ex-client"><option value="">Not for a specific client</option>${[...state.clients].sort((a, b) => clientName(a).localeCompare(clientName(b), 'en', { sensitivity: 'base' })).map(c => `<option value="${c.id}" ${x.clientId === c.id ? 'selected' : ''}>${esc(c.business)}</option>`).join('')}</select></label>
       <label class="field"><span>Note (optional)</span><textarea id="ex-note" rows="3">${esc(x.note)}</textarea></label></section></div></div>`,
     `${isNew ? '' : '<button class="btn ghost danger" data-ex-del style="margin-right:auto">Delete</button>'}<button class="btn ghost" data-close>Cancel</button><button class="btn primary" data-ex-save>${isNew ? 'Add expense' : 'Save changes'}</button>`, 'wide'), m => {
     $$('[data-cat]', m).forEach(b => b.addEventListener('click', () => { x.category = b.dataset.cat; $$('[data-cat]', m).forEach(o => o.setAttribute('aria-pressed', o === b)); }));
@@ -1998,13 +2059,26 @@ function expenseDialog(e) {
   });
 }
 const STABS = [['profile', 'Your details'], ['business', 'Business'], ['email', 'Email'], ['team', 'Team'], ['menu', 'Menu'], ['data', 'Data and backups']];
+const SET_SEC = [
+  ['profile', 'Your details', 'Your name, contact details and email sign-off', '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'],
+  ['business', 'Business', 'Payment details and numbering', '<path d="M3 21h18M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6"/>'],
+  ['email', 'Email', 'The email you get when a quote is accepted', '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>'],
+  ['team', 'Team', 'People who can sign in, and activity', '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/>'],
+  ['menu', 'Menu', 'Reorder and hide pages in the sidebar', '<path d="M4 6h16M4 12h16M4 18h10"/>'],
+  ['data', 'Data and backups', 'Backups, database rules and recently deleted', '<ellipse cx="12" cy="5.5" rx="8" ry="3"/><path d="M4 5.5v13c0 1.7 3.6 3 8 3s8-1.3 8-3v-13"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>']];
+function settingsSummary(k) {
+  const mc = mailCfg();
+  return ({ profile: `${OWNER.name}${OWNER.title ? ' · ' + OWNER.title : ''}`, business: `${bank().bank || 'No bank yet'} · next Q-${nextQuote()}`, email: mailReady() ? 'Connected' : 'Not set up',
+    team: `${state.users.length + 1} ${state.users.length ? 'people' : 'person'}`, menu: (state.menu && (state.menu.hidden || []).length) ? `${state.menu.hidden.length} hidden` : 'Default', data: state.trash.length ? `${state.trash.length} recently deleted` : ((state.meta || {}).lastBackup ? 'Backed up ' + fmtDate(state.meta.lastBackup.slice(0, 10)) : 'No backup yet') })[k];
+}
 function settingsHTML() {
-  const tabs = STABS.filter(([k]) => k !== 'team' || can('team'));
-  const t = tabs.some(x => x[0] === view.stab) ? view.stab : 'profile';
-  const body = { profile: setProfileHTML, business: setBusinessHTML, email: setEmailHTML, team: setTeamHTML, menu: setMenuHTML, data: setDataHTML }[t]();
-  return `<div class="head"><div><h2>Settings</h2><p>Your details, business details, email, team and backups, all in one place.</p></div></div>
-    <nav class="stabs" aria-label="Settings sections">${tabs.map(([k, l]) => `<a href="#settings-${k}" ${k === t ? 'aria-current="page"' : ''}>${l}</a>`).join('')}</nav>
-    <div class="spane" data-stab="${t}">${body}</div>`;
+  const secs = SET_SEC.filter(([k]) => k !== 'team' || can('team'));
+  const body = { profile: setProfileHTML, business: setBusinessHTML, email: setEmailHTML, team: setTeamHTML, menu: setMenuHTML, data: setDataHTML };
+  return `<div class="head"><div><h2>Settings</h2><p>Everything about your account and business in one place. Open a section to change it.</p></div></div>
+    <div class="acc">${secs.map(([k, t, d, ic]) => { const open = view.stab === k; return `<section class="acc-sec ${open ? 'open' : ''}" data-sec="${k}" id="set-${k}">
+      <button type="button" class="acc-h" aria-expanded="${open}" aria-controls="acc-${k}" data-acc-toggle="${k}"><span class="acc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ic}</svg></span>
+        <span class="acc-t"><b>${t}</b><span class="sub">${d}</span></span><span class="acc-s">${esc(settingsSummary(k) || '')}</span><span class="acc-chev">${CHEV_DN}</span></button>
+      <div class="acc-b" id="acc-${k}" role="region" aria-label="${t}"><div class="acc-in"><div class="acc-pad">${body[k]()}</div></div></div></section>`; }).join('')}</div>`;
 }
 function setProfileHTML() {
   const u = { ...OWNER }, sg = { ...SIGN_DEFAULT, ...(OWNER.sign || {}) };
@@ -2208,6 +2282,14 @@ function bindList(main) {
   $$('[data-mshow]', main).forEach(c => c.addEventListener('change', () => { const g = menuGroups(); g.forEach(x => x.items.forEach(i => { if (i[0] === c.dataset.mshow) i[3] = !c.checked; })); saveMenu(g); }));
   const mr = $('[data-menu-reset]', main); if (mr) mr.addEventListener('click', async () => { state.menu = null; render(); try { await db.doc('menus/' + menuKey()).delete(); toast('Menu reset'); } catch {} });
   bindCalendar(main);
+  $$('[data-acc-toggle]', main).forEach(b => b.addEventListener('click', () => {
+    const k = b.dataset.accToggle, sec = b.closest('.acc-sec'), opening = !sec.classList.contains('open');
+    $$('.acc-sec.open', main).forEach(o => { if (o !== sec) { o.classList.remove('open'); $('.acc-h', o).setAttribute('aria-expanded', 'false'); } });
+    sec.classList.toggle('open', opening); b.setAttribute('aria-expanded', String(opening)); view.stab = opening ? k : '';
+    route.last = 'home:settings'; history.replaceState(null, '', opening ? '#settings-' + k : '#settings');
+    if (opening) setTimeout(() => { const r = sec.getBoundingClientRect(); if (r.top < 70 || r.top > innerHeight * .5) scrollTo({ top: scrollY + r.top - 80, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); }, 230);
+  }));
+  if (view.sub === 'settings' && view.stab && !bindList.scrolled) { bindList.scrolled = view.stab; const sec = $('#set-' + view.stab, main); if (sec && location.hash.startsWith('#settings-')) setTimeout(() => { const r = sec.getBoundingClientRect(); if (r.top > innerHeight * .6) scrollTo({ top: scrollY + r.top - 80 }); }, 30); }
 }
 
 
@@ -2313,8 +2395,9 @@ async function newDoc(kind, from, client, chosen) {
       history: [{ at: now, rev: 1, title: from ? `Created by ${by} for extra work on ${qRef(from)}` : `Quote created by ${by}`, changes: [] }] };
   } else {
     if (!from || from.status !== 'Accepted') { toast('Invoices are made from an accepted quote.'); return; }
-    doc = { id, number: null, status: 'Draft', date: d, dueDate: d, quoteId: from.id, quoteRef: qRef(from), clientId: from.clientId || null, client: clone(from.client), items: clone(from.items), rush: from.rush || 0, notes: '', payments: [], createdBy: by, createdAt: now, updatedAt: now,
-      history: [{ at: now, title: `Invoice drafted by ${by} from ${qRef(from)}`, changes: [] }] };
+    doc = { id, number: nextInvoice(), status: 'Draft', locked: false, date: d, dueDate: d, quoteId: from.id, quoteRef: qRef(from), clientId: from.clientId || null, client: clone(from.client), items: clone(from.items), rush: from.rush || 0, notes: '', payments: [], createdBy: by, createdAt: now, updatedAt: now,
+      history: [{ at: now, title: `Invoice created by ${by} from ${qRef(from)}`, changes: [] }] };
+    setMeta({ lastInvoice: Math.max(Number((state.meta || {}).lastInvoice) || 0, doc.number) });
   }
   try { await save(kind === 'quote' ? 'quotes' : 'invoices', doc); }
   catch { toast('That couldn’t be created. Check your connection and try again.'); return; }
@@ -2511,7 +2594,7 @@ function clientDialog(c, onSaved, onCancel) {
       <label class="field"><span>Registration or VAT no. (optional)</span><input id="cl-reg" value="${esc(x.reg)}"></label>
       <label class="field"><span>Private notes (never printed)</span><textarea id="cl-notes" rows="2">${esc(x.notes)}</textarea></label></section>
 
-    ${isNew ? '' : `<section class="cbox"><div class="sec-h"><span class="label">Quotes and invoices</span></div>${list.length ? `<div class="doclist">${list.map(l => `<a href="#${l.h}" data-go><b class="num">${esc(l.n)}</b><span class="sub">${fmtDate(l.d)}</span><span class="num">${money(l.t)}</span><span class="pill ${pillClass(l.s)}">${l.s}</span></a>`).join('')}</div>` : '<p class="sub" style="margin:0">Nothing yet.</p>'}</section>`}
+    ${isNew ? '' : `<section class="cbox"><div class="sec-h"><span class="label">Quotes and invoices</span></div>${list.length ? `<div class="doclist">${list.map(l => `<a href="#${l.h}" data-go><b class="num">${esc(l.n)}</b><span class="sub">${fmtDate(l.d)}</span><span class="num">${money(l.t)}</span><span class="pill ${pillClass(l.s)}">${stLabel(l.s)}</span></a>`).join('')}</div>` : '<p class="sub" style="margin:0">Nothing yet.</p>'}</section>`}
     </div><div class="ccol">
     <section class="cbox"><div class="sec-h"><span class="label">Contact people</span><span class="sub">Quotes and invoices go to them</span></div><div class="pcards">${people.map(personHTML).join('')}</div>
       <button type="button" class="btn small" data-add-person>+ Add another contact person</button></section>
@@ -2609,10 +2692,42 @@ function historyHTML(list) {
 }
 document.addEventListener('click', e => { $$('details.more-menu[open]').forEach(d => { if (!d.contains(e.target)) d.open = false; }); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') $$('details.more-menu[open]').forEach(d => { d.open = false; d.querySelector('summary').focus(); }); });
+function lockDialog(lock) {
+  const E = view.edit, d = E.draft, Q = E.kind === 'quote', no = docNo(d, E.kind), cur = d.status;
+  const opts = Q ? ['Draft', 'Open', 'Accepted', 'Declined', 'Cancelled'] : ['Draft', 'Sent', 'Cancelled'];
+  const lbl = s => Q ? stLabel(s) : ({ Draft: 'Not sent', Sent: 'Sent', Cancelled: 'Cancelled' })[s];
+  openModal(dlg(`${lock ? 'Lock' : 'Unlock'} ${no}`, `<p class="lead">${lock ? `Lock <b>${esc(no)}</b> so it can’t be changed?` : `Unlock <b>${esc(no)}</b> to make changes?`}</p>
+    <div class="roles one">
+      <label class="rolecard"><input type="radio" name="lk" value="keep" checked><span><b>${lock ? 'Lock' : 'Unlock'} and keep the status</b><span class="sub">It stays ${esc(lbl(cur))}.</span></span></label>
+      <label class="rolecard"><input type="radio" name="lk" value="change"><span><b>${lock ? 'Lock' : 'Unlock'} and change the status</b><span class="sub">Choose the new status below.</span></span></label>
+    </div>
+    <label class="field" id="lk-st" hidden><span>New status</span><select id="lk-sel">${opts.filter(o => o !== cur).map(o => `<option value="${o}">${esc(lbl(o))}</option>`).join('')}</select></label>
+    ${lock ? '' : `<p class="sub" style="margin:0">${Q && cur !== 'Draft' ? 'Saved changes become a new revision, so you always know what the client saw. ' : ''}It locks again when you send it, or when you lock it yourself.</p>`}`,
+    `<button class="btn ghost" data-close>Back</button><button class="btn primary" data-lk-go>${lock ? ICON_LOCK + 'Lock' : ICON_UNLOCK + 'Unlock'}</button>`, 'small'), m => {
+    $$('[name=lk]', m).forEach(r => r.addEventListener('change', () => { $('#lk-st', m).hidden = r.value !== 'change' || !r.checked; }));
+    $('[data-lk-go]', m).addEventListener('click', async () => {
+      const now = new Date().toISOString(), change = ($('[name=lk]:checked', m) || {}).value === 'change', to = change ? $('#lk-sel', m).value : cur;
+      if (isDirty()) { toast('Save or undo your changes first.'); return; }
+      d.locked = lock;
+      const ch = [`${lock ? 'Locked' : 'Unlocked'} by ${ME.name}`];
+      if (change && to !== cur) {
+        ch.push(`Status changed from ${lbl(cur)} to ${lbl(to)}`); d.status = to;
+        if (Q && to === 'Accepted') { d.decidedAt = now; d.acceptedBy = { by: 'novyra', name: ME.name, at: now }; }
+        if (Q && cur === 'Accepted' && to !== 'Accepted') { delete d.acceptedBy; delete d.acceptedOnline; }
+        if (Q && to === 'Declined') d.decidedAt = now;
+        if (to === 'Open' || to === 'Sent') d.sentAt = d.sentAt || now;
+      }
+      d.history.push({ at: now, rev: Q ? d.rev || 1 : undefined, title: `${no} ${lock ? 'locked' : 'unlocked'}${change && to !== cur ? ` · now ${lbl(to)}` : ''}`, changes: ch });
+      E.saved.locked = d.locked;
+      const ok = await persist(lock ? 'Locked' : 'Unlocked. Make your changes, then save.');
+      if (ok) logActivity(lock ? 'locked' : 'unlocked', `${no} ${lock ? 'locked' : 'unlocked'}${change && to !== cur ? ' and changed to ' + lbl(to) : ''}`, `${E.kind}-${d.id}`);
+    });
+  });
+}
 function renderEditor(main) {
   const E = view.edit, Q = E.kind === 'quote', d = E.draft;
   const st = Q ? quoteStatus(d) : invoiceStatus(d);
-  const locked = Q ? ['Accepted', 'Declined', 'Cancelled'].includes(d.status) : d.status !== 'Draft';
+  const locked = isLocked(d);
   const dirty = isDirty();
   const c = calc(d), cl = d.client || {};
   const rec = d.clientId && state.clients.find(x => x.id === d.clientId);
@@ -2631,22 +2746,22 @@ function renderEditor(main) {
       <div class="amount num">${money(calc({ items: [it] }).total)}${unitOf(it) === 'per month' ? ' <span class="sub">per month</span>' : ''}</div></div>`).join('');
 
   const statusNote = Q ? ({
-    Draft: 'Draft: not sent yet. Change anything freely, then email it to the client.',
-    Open: `Sent and waiting on the client. Changes now are saved as Rev ${(d.rev || 1) + 1}.`,
+    Draft: 'Not sent yet, so it’s unlocked. Change anything, then send it to the client; it locks once it’s sent.',
+    Open: locked ? 'Sent and locked, waiting on the client. Unlock it to make changes.' : `Unlocked. Changes are saved as Rev ${(d.rev || 1) + 1}, then send it again.`,
     Expired: `The valid-until date has passed. Renew it at today's prices, or mark what the client decided.`,
-    Accepted: 'Accepted, so this quote is locked. Create the invoice from here; extra work gets a new quote.',
-    Declined: 'Declined, so this quote is locked. If the client comes back, start a new quote.',
-    Cancelled: 'Cancelled, so this quote is locked. It stays in your records; delete it if it was made by mistake.'
+    Accepted: locked ? 'Accepted and locked. Create the invoice from here; extra work gets a new quote.' : `Accepted, and unlocked for changes. They’re saved as Rev ${(d.rev || 1) + 1}.`,
+    Declined: locked ? 'Declined and locked. If the client comes back, unlock it or start a new quote.' : 'Declined, and unlocked for changes.',
+    Cancelled: locked ? 'Cancelled and locked. It stays in your records; delete it if it was made by mistake.' : 'Cancelled, and unlocked for changes.'
   })[st] : ({
-    Draft: `Draft: it gets number INV-${nextInvoice()} when you issue it.`,
-    Unpaid: 'Issued and locked. Record payments as they come in.', 'Part paid': 'Part paid. Record the rest when it comes in.',
+    Draft: 'Not sent yet, so it’s unlocked. Change anything, then send it to the client; it locks once it’s sent.',
+    Unpaid: locked ? 'Sent and locked. Record payments as they come in.' : 'Unlocked for changes. Save them, then send it again.', 'Part paid': 'Part paid. Record the rest when it comes in.',
     Overdue: 'Payment was due on the invoice date. Follow up with the client.', Paid: 'Paid in full. Send the final files.',
     Cancelled: 'Cancelled. This number stays in your records.'
   })[st];
 
   const hist = historyHTML(d.history || []);
 
-  const canEmail = Q ? d.status !== 'Declined' : d.status === 'Sent';
+  const canEmail = Q ? d.status !== 'Declined' : d.status !== 'Cancelled' && !!d.number;
   const emailBtn = !canEmail ? '' : dirty ? `<button class="btn" disabled title="Save your changes first">${ICON_MAIL}Email to client</button>`
     : !emails.length ? `<button class="btn" data-act="no-email">${ICON_MAIL}Email to client</button>`
     : `<a class="btn primary" data-mail href="${esc(mailHref(d, Q))}" target="_blank" rel="noopener">${ICON_MAIL}Email to client</a>`;
@@ -2654,24 +2769,29 @@ function renderEditor(main) {
   const waBtn = !canEmail || !wap.length ? '' : dirty ? `<button class="btn" disabled title="Save your changes first">${ICON_WA}WhatsApp</button>` : `<button class="btn wa" data-act="wa">${ICON_WA}WhatsApp</button>`;
   let actions = '', danger = '';
   if (Q) {
-    if (!locked) actions += `<button class="btn ${dirty ? 'primary' : ''}" data-act="save" ${dirty ? '' : 'disabled'}>${d.status === 'Draft' ? 'Save draft' : `Save as Rev ${(d.rev || 1) + 1}`}</button>`;
+    if (!locked) actions += `<button class="btn ${dirty ? 'primary' : ''}" data-act="save" ${dirty ? '' : 'disabled'}>${d.status === 'Draft' ? 'Save changes' : `Save as Rev ${(d.rev || 1) + 1}`}</button>`;
+    else actions += `<button class="btn lockbtn" data-act="unlock">${ICON_UNLOCK}Unlock</button>`;
     actions += emailBtn + waBtn + (['Draft', 'Open'].includes(st) || d.shareId ? `<button class="btn ${d.shareId ? 'linked' : ''}" data-act="link" ${dirty ? 'disabled title="Save your changes first"' : ''}>${ICON_LINK}${d.shareId ? 'Client link' : 'Create client link'}</button>` : '') + `<button class="btn" data-act="pdf">Download PDF</button>`;
     if (d.status === 'Draft') actions += `<button class="btn" data-act="sent">Mark as sent</button>`;
+    if (!locked && d.status !== 'Draft') danger += `<button type="button" class="mi-btn" data-act="lock">${ICON_LOCK}Lock<span>Stops changes until you unlock it</span></button>`;
     if (st === 'Expired') actions += `<button class="btn" data-act="renew">Renew at today's prices</button>`;
-    if (['Open', 'Expired'].includes(st)) { actions += `<button class="btn" data-act="accept">Mark as accepted</button>`; danger += `<button type="button" class="mi-btn" data-act="decline">Mark as declined<span>The client said no</span></button>`; }
+    if (['Open', 'Expired'].includes(st)) { actions += `<button class="btn" data-act="accept">Mark as accepted</button>`; danger += `<button type="button" class="mi-btn" data-act="decline">${ICON_X}Mark as declined<span>The client said no</span></button>`; }
     if (d.status === 'Accepted') { const inv = state.invoices.filter(v => v.quoteId === d.id && v.status !== 'Cancelled'); actions += inv.length ? `<a class="btn" href="#invoice-${inv[0].id}">Open ${inv[0].number ? 'INV-' + inv[0].number : 'draft invoice'}</a>` : `<button class="btn primary" data-act="invoice">Create invoice</button>`; actions += `<button class="btn" data-act="extra">New quote for extra work</button>`; }
     if (d.status === 'Accepted' && c.monthlyBase > 0) { const pl = state.plans.find(x => x.quoteId === d.id); actions += pl ? `<button class="btn" data-act="plan">Monthly billing · ${pl.active ? 'active' : 'paused'}</button>` : `<button class="btn" data-act="plan">Set up monthly billing</button>`; }
-    if (['Open', 'Accepted'].includes(d.status) && !state.invoices.some(v => v.quoteId === d.id && v.status === 'Sent')) danger += `<button type="button" class="mi-btn" data-act="qcancel">Cancel quote<span>Keeps it in your records as Cancelled</span></button>`;
-    danger += `<button type="button" class="mi-btn bad" data-act="delete">Delete quote<span>Moves it to Recently deleted</span></button>`;
+    if (['Open', 'Accepted'].includes(d.status) && !state.invoices.some(v => v.quoteId === d.id && v.status === 'Sent')) danger += `<button type="button" class="mi-btn" data-act="qcancel">${ICON_BAN}Cancel quote<span>Keeps it in your records as Cancelled</span></button>`;
+    danger += `<button type="button" class="mi-btn bad" data-act="delete">${ICON_TRASH}Delete quote<span>Moves it to Recently deleted</span></button>`;
   } else {
-    if (!locked) actions += `<button class="btn ${dirty ? 'primary' : ''}" data-act="save" ${dirty ? '' : 'disabled'}>Save draft</button><button class="btn ${dirty ? '' : 'primary'}" data-act="send" ${dirty ? 'disabled title="Save your changes first"' : ''}>Issue invoice</button>`;
-    else actions += emailBtn + waBtn + `<button class="btn" data-act="pdf">Download PDF</button>`;
+    if (!locked) actions += `<button class="btn ${dirty ? 'primary' : ''}" data-act="save" ${dirty ? '' : 'disabled'}>Save changes</button>`;
+    else actions += `<button class="btn lockbtn" data-act="unlock">${ICON_UNLOCK}Unlock</button>`;
+    actions += emailBtn + waBtn + `<button class="btn" data-act="pdf">Download PDF</button>`;
+    if (d.status === 'Draft') actions += `<button class="btn" data-act="send" ${dirty ? 'disabled title="Save your changes first"' : ''}>Mark as sent</button>`;
+    if (!locked && d.status !== 'Draft') danger += `<button type="button" class="mi-btn" data-act="lock">${ICON_LOCK}Lock<span>Stops changes until you unlock it</span></button>`;
     if (d.status === 'Sent' && c.due > 0) actions += `<button class="btn" data-act="pay">Record payment</button>`;
     if (d.status === 'Sent' && !dirty) { const f = financeOf(d);
       if (c.due > 0) actions += f ? `<a class="btn" data-fin-mail="reminder" href="${esc(finHref(d, 'reminder'))}" target="_blank" rel="noopener">Payment reminder</a>` : `<button class="btn" data-act="no-finance">Payment reminder</button>`;
       if ((d.payments || []).length) actions += f ? `<a class="btn" data-fin-mail="receipt" href="${esc(finHref(d, 'receipt'))}" target="_blank" rel="noopener">Send receipt</a>` : `<button class="btn" data-act="no-finance">Send receipt</button>`; }
-    if (d.status === 'Sent') danger += `<button type="button" class="mi-btn" data-act="cancel">Cancel invoice<span>Keeps it in your records as Cancelled</span></button>`;
-    danger += `<button type="button" class="mi-btn bad" data-act="delete">Delete ${d.number ? 'invoice' : 'draft'}<span>Moves it to Recently deleted</span></button>`;
+    if (d.status === 'Sent') danger += `<button type="button" class="mi-btn" data-act="cancel">${ICON_BAN}Cancel invoice<span>Keeps it in your records as Cancelled</span></button>`;
+    danger += `<button type="button" class="mi-btn bad" data-act="delete">${ICON_TRASH}Delete invoice<span>Moves it to Recently deleted</span></button>`;
   }
   const viaWa = E.mailed && E.mailed.via === 'wa', viaFin = E.mailed && ['receipt', 'reminder'].includes(E.mailed.via);
   const mailBar = E.mailed ? `<div class="mailbar ${viaWa ? 'wa' : ''}" role="status"><span class="mi">${viaWa ? ICON_WA : ICON_MAIL}</span><div><b>${viaWa ? `WhatsApp is opening with a message to ${esc(E.mailed.name)}.` : viaFin ? `Mail is opening with the ${E.mailed.via === 'receipt' ? 'receipt' : 'payment reminder'} to ${esc(E.mailed.email)}.` : `Mail is opening with the email to ${esc(listAnd(emails))}.`}</b><span class="sub">Drag ${esc(viaFin ? E.mailed.file : pdfName(d, E.kind))} from your Downloads folder into the ${viaWa ? 'chat' : 'email'}, then press Send.</span></div>
@@ -2683,7 +2803,7 @@ function renderEditor(main) {
   const pages = pagesHTML(d, E.kind);
   main.innerHTML = `
     <div class="ed-head"><a href="#${Q ? 'quotes' : 'invoices'}" class="back">← All ${Q ? 'quotes' : 'invoices'}</a>
-      <div class="ed-title"><h2 class="num">${esc(docNo(d, E.kind))}</h2><span class="pill ${pillClass(st)}">${st}</span>${dirty && !locked ? '<span class="unsaved">Unsaved changes</span>' : ''}</div>
+      <div class="ed-title"><h2 class="num">${esc(docNo(d, E.kind))}</h2><span class="pill ${pillClass(st)}">${stLabel(st)}</span>${dirty && !locked ? '<span class="unsaved">Unsaved changes</span>' : ''}</div>
       <p class="muted" style="margin:6px 0 0">${esc(statusNote)}</p>
       <dl class="meta"><div><dt>Type</dt><dd>${Q ? 'Quote' : 'Invoice'}</dd></div><div><dt>Customer</dt><dd>${esc(cl.business || '—')}</dd></div><div><dt>Reference</dt><dd class="num">${esc(reference)}</dd></div>${!Q && d.quoteRef ? `<div><dt>For quote</dt><dd><a href="#quote-${esc(d.quoteId)}">${esc(d.quoteRef)}</a></dd></div>` : ''}<div><dt>Prepared by</dt><dd>${esc(ownerOf(d))}</dd></div>${d.createdAt ? `<div><dt>Created</dt><dd>${fmtDate(d.createdAt.slice(0, 10))}</dd></div>` : ''}</dl></div>
     ${mailBar}${crBar}${onlineBar}
@@ -2796,14 +2916,14 @@ function emailDraft(d, Q) {
 function confirmDialog(cf) {
   const E = view.edit, d = E.draft, c = calc(d);
   const spec = {
-    rev: ['Save as a new revision', `<p class="lead">${esc(qRef(d))} was already sent, so saving makes it <b>Rev ${(d.rev || 1) + 1}</b>. The history keeps what changed.</p>
+    rev: ['Save as a new revision', `<p class="lead">${esc(qRef(d))} was already sent, so saving makes it <b>Rev ${(d.rev || 1) + 1}</b>. It stays unlocked until you send it again. The history keeps what changed.</p>
       <ul class="changes">${describeChanges(E.saved, d).map(x => `<li>${esc(x)}</li>`).join('') || '<li>No changes</li>'}</ul>
       <label class="field"><span>Why did it change? (optional, kept in the history)</span><input id="cf-note" placeholder="For example: client added a letterhead"></label>`, `Save as Rev ${(d.rev || 1) + 1}`],
     renew: ['Renew quote', `<p class="lead">Renew ${esc(qRef(d))} as <b>Rev ${(d.rev || 1) + 1}</b>, dated today and valid for 30 days.</p><p class="sub">Every listed item moves to today's price list. The history keeps the old prices.</p>`, 'Renew quote'],
     sent: ['Mark as sent', `<p class="lead">Mark ${esc(qRef(d))} as sent to ${esc(cl(d))}?</p><p class="sub">From now on, changes are saved as new revisions so you always know what the client saw.</p>`, 'Mark as sent'],
     accept: ['Client accepted', `<p class="lead">${esc(cl(d))} accepted <b>${esc(qRef(d))}</b>?</p><p class="sub">The quote is locked after this. Before you start, ask for ${money(c.deposit)}: ${c.firstMonth && c.once ? (c.once < 1000 ? 'the full job plus the first month' : 'the 50% deposit plus the first month') : c.firstMonth ? 'the first month, paid in advance' : c.total < 1000 ? 'the full amount, paid upfront' : 'the 50% deposit'}.</p>`, 'Yes, accepted'],
     decline: ['Client declined', `<p class="lead">${esc(cl(d))} declined <b>${esc(qRef(d))}</b>?</p><p class="sub">The quote is locked after this.</p>`, 'Yes, declined'],
-    send: ['Issue invoice', `<p class="lead">Issue this invoice as <b>INV-${nextInvoice()}</b> for ${money(c.total)}?</p><p class="sub">The number is fixed and the invoice is locked. Then email it to the client; you can still record payments or cancel it.</p>`, `Issue INV-${nextInvoice()}`],
+    send: ['Mark as sent', `<p class="lead">Mark <b>${esc(docNo(d, 'invoice'))}</b> for ${money(c.total)} as sent?</p><p class="sub">It locks so it matches what the client has. You can still record payments, and unlock it if something needs fixing.</p>`, 'Mark as sent'],
     pay: ['Record payment', `<div class="grid2"><label class="field"><span>Amount (R)</span><input id="cf-amount" type="number" min="0" step="0.01" value="${Math.max(0, c.due).toFixed(2)}" autofocus></label>
       <label class="field"><span>Date paid</span><input id="cf-date" type="date" value="${todayIso()}"></label></div>
       <label class="field"><span>Note (optional)</span><input id="cf-note" placeholder="For example: deposit"></label><p class="sub" style="margin:0">Still owed before this payment: ${money(c.due)}</p>`, 'Record payment'],
@@ -2838,7 +2958,7 @@ async function act(a) {
   if (a === 'save') {
     if (Q && d.status !== 'Draft') return confirmDialog('rev');
     const changes = describeChanges(E.saved, d);
-    if (changes.length) d.history.push({ at: now, title: 'Draft saved', changes });
+    if (changes.length) d.history.push({ at: now, title: 'Changes saved', changes });
     return persist('Saved');
   }
   if (a === 'pdf') {
@@ -2847,6 +2967,7 @@ async function act(a) {
     if (ok) { d.history.push({ at: now, title: `PDF downloaded (${docNo(d, E.kind)})`, changes: [] }); await persist(); }
     return;
   }
+  if (a === 'unlock' || a === 'lock') return lockDialog(a === 'lock');
   if (a === 'link') return linkDialog();
   if (a === 'plan') { const pl = state.plans.find(x => x.quoteId === d.id); return planDialog(pl || null, pl ? null : d); }
   if (a === 'wa') {
@@ -2870,7 +2991,9 @@ async function act(a) {
     d.history.push({ at: now, rev: Q ? d.rev || 1 : undefined, title: via.via === 'wa' ? `Sent on WhatsApp to ${via.name} (${via.phone})` : via.via === 'receipt' ? `Receipt emailed to ${via.email}` : via.via === 'reminder' ? `Payment reminder emailed to ${via.email}` : `Emailed to ${listAnd(toList(d))}`, changes: [] });
     if (via.via === 'receipt' || via.via === 'reminder') return persist('Logged in the history');
     if (Q && d.status === 'Draft') { d.status = 'Open'; d.sentAt = now; d.history.push({ at: now, rev: d.rev || 1, title: `Sent to the client (${qRef(d)})`, total: calc(d).total, changes: [] }); }
-    return persist(Q && d.sentAt === now ? 'Marked as sent' : 'Logged in the history');
+    if (!Q && d.status === 'Draft') { d.status = 'Sent'; d.sentAt = now; if (!d.shareId) d.shareId = newToken(); d.history.push({ at: now, title: `INV-${d.number} sent to the client`, total: calc(d).total, changes: [] }); logActivity('issued', `INV-${d.number} sent${d.client && d.client.business ? ' to ' + d.client.business : ''}`, `invoice-${d.id}`); }
+    const wasOpen = !isLocked(d); d.locked = true; if (wasOpen && d.history.length) d.history[d.history.length - 1].changes.push('Locked after sending');
+    return persist(d.sentAt === now ? 'Marked as sent and locked' : 'Logged in the history');
   }
   if (a === 'copy-mail') {
     const m = emailDraft(d, Q), text = `To: ${toList(d).join(', ')}\nSubject: ${m.subject}\n\n${m.body}`;
@@ -2894,7 +3017,7 @@ async function confirmAct(cf) {
   const note = ($('#cf-note') || {}).value?.trim() || '';
   if (cf === 'rev') {
     const changes = describeChanges(E.saved, d);
-    d.rev = (d.rev || 1) + 1; d.status = 'Open'; delete d.changeRequest;
+    d.rev = (d.rev || 1) + 1; if (!['Accepted', 'Declined', 'Cancelled'].includes(d.status)) d.status = 'Open'; delete d.changeRequest;
     d.history.push({ at: now, rev: d.rev, title: `Rev ${d.rev} saved`, total: calc(d).total, note, changes });
     return persist(`Saved as Rev ${d.rev}. Email the new version to the client.`);
   }
@@ -2905,7 +3028,7 @@ async function confirmAct(cf) {
     d.history.push({ at: now, rev: d.rev, title: `Renewed as Rev ${d.rev} at today's prices`, total: calc(d).total, changes: describeChanges(before, d) });
     return persist(`Renewed as Rev ${d.rev}. Email the new version to the client.`);
   }
-  if (cf === 'sent') { d.status = 'Open'; d.sentAt = now; d.history.push({ at: now, rev: d.rev || 1, title: `Sent to the client (${qRef(d)})`, total: calc(d).total, changes: [] }); return persist('Marked as sent'); }
+  if (cf === 'sent') { d.status = 'Open'; d.sentAt = now; d.locked = true; d.history.push({ at: now, rev: d.rev || 1, title: `Sent to the client (${qRef(d)})`, total: calc(d).total, changes: [] }); return persist('Marked as sent'); }
   if (cf === 'accept' || cf === 'decline') {
     const st = cf === 'accept' ? 'Accepted' : 'Declined';
     d.status = st; d.decidedAt = now;
@@ -2920,11 +3043,11 @@ async function confirmAct(cf) {
     const ok = await persist('Quote cancelled'); if (ok) logActivity('cancelled', `${qRef(d)} cancelled${note ? ': ' + note : ''}`, `quote-${d.id}`); return;
   }
   if (cf === 'send') {
-    d.number = nextInvoice(); d.status = 'Sent'; d.sentAt = now; if (!d.shareId) d.shareId = newToken(); setMeta({ lastInvoice: Math.max(Number((state.meta || {}).lastInvoice) || 0, d.number) });
-    d.history.push({ at: now, title: `Issued as INV-${d.number}`, total: calc(d).total, changes: ['Online link created for the client'] });
+    if (!d.number) d.number = nextInvoice(); d.status = 'Sent'; d.locked = true; d.sentAt = now; if (!d.shareId) d.shareId = newToken(); setMeta({ lastInvoice: Math.max(Number((state.meta || {}).lastInvoice) || 0, d.number) });
+    d.history.push({ at: now, title: `INV-${d.number} marked as sent`, total: calc(d).total, changes: ['Locked', 'Online link created for the client'] });
     logActivity('issued', `INV-${d.number} issued${d.client && d.client.business ? ' to ' + d.client.business : ''}`, `invoice-${d.id}`);
-    const ok = await persist(`Issued as INV-${d.number}. Now email it to the client.`);
-    if (!ok) { d.number = null; d.status = 'Draft'; d.history.pop(); }
+    const ok = await persist(`INV-${d.number} marked as sent and locked`);
+    if (!ok) { d.status = 'Draft'; d.locked = false; d.history.pop(); }
     return;
   }
   if (cf === 'pay') {
