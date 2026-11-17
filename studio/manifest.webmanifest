@@ -1,6 +1,6 @@
 {
- "name": "Novyra Studio",
- "short_name": "Novyra",
+ "name": "Novyra Desk",
+ "short_name": "Novyra Desk",
  "start_url": "/studio/",
  "scope": "/studio/",
  "display": "standalone",
