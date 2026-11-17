@@ -557,3 +557,15 @@ section.section[id]{scroll-margin-top:76px}
 :root:not([data-theme="dark"]) .sig{border:1px solid var(--line)}
 :root:not([data-theme="dark"]) ::-webkit-scrollbar-track{background:var(--ink)}
 .cta .btn-ghost{color:#fff;border-color:rgba(255,255,255,.5)}.cta .btn-ghost:hover{color:#fff;border-color:#fff}
+
+/* consistency layer: one card style, readable prices, full-width intros */
+.tiles{gap:16px;background:none;border:0;border-radius:0;overflow:visible}
+.tile{background:var(--ink-2);border:1px solid var(--line);border-radius:18px;padding:28px 26px;min-height:220px;transition:border-color .2s ease,background .3s ease}
+.tile:hover{border-color:var(--line-hover);background:var(--ink-2)}
+.tile h3{font-size:clamp(22px,2vw,26px)}
+:root:not([data-theme="dark"]) .tile{box-shadow:0 1px 2px rgba(16,24,48,.04),0 12px 32px -18px rgba(16,24,48,.18)}
+:root:not([data-theme="dark"]) .tile:hover{background:#fff}
+.pkg .price,.q-total span:last-child{font-family:var(--f-body);letter-spacing:-.02em}
+.svc-group > header p{max-width:none}
+.platforms{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:2px 0 0;padding:0}
+.platforms li{font:600 14px var(--f-body);color:var(--text);border:1px solid var(--line);background:var(--ink-2);border-radius:999px;padding:5px 14px}
