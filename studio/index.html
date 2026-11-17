@@ -1164,6 +1164,35 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:none;bor
 .sbtns{display:flex;flex-wrap:wrap;gap:8px}
 @media (max-width:900px){.smenu{grid-template-columns:minmax(0,1fr)}.smenu-prev{position:static}}
 @media (max-width:640px){.set-hero{flex-wrap:wrap;padding:22px 18px;gap:14px}.set-hero-av{width:58px;height:58px;font-size:21px}.set-hero-out{width:100%}.set-hero::after{display:none}.smenu{margin:14px 16px}.sdet summary{padding:14px 16px}.sdet-b{padding:0 16px 16px}.scard-h{flex-wrap:wrap}.scard-h>.btn{margin-left:54px}}
+/* ================= team ================= */
+@media (min-width:761px){.tm-strip{grid-template-columns:repeat(4,minmax(0,1fr)) !important}}
+.tm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:16px}
+.tm-card{position:relative;display:flex;flex-direction:column;gap:14px;padding:20px;border:1px solid var(--line);border-radius:var(--r-card);background:#fff;box-shadow:var(--sh-card);text-align:left;font:inherit;color:var(--text);min-width:0;transition:border-color .15s,box-shadow .15s,transform .15s}
+.tm-card[data-user]{cursor:pointer}
+.tm-card[data-user]:hover,.tm-card[data-user]:focus-visible{border-color:#bcd0fb;box-shadow:0 12px 30px -16px rgba(42,95,214,.45);transform:translateY(-1px);outline:none}
+.tm-card.tm-owner{background:linear-gradient(140deg,#f2f6ff,#fff 65%);border-color:#cfdcfa}
+.tm-card.off{opacity:.65}
+.tm-card header{display:flex;align-items:center;gap:12px}
+.tm-av{width:46px;height:46px;flex:none;border-radius:50%;display:grid;place-items:center;color:#fff;font:700 15px var(--body);box-shadow:0 0 0 3px #fff,0 6px 14px -8px rgba(16,24,48,.5)}
+.tm-who{display:grid;min-width:0;flex:1;line-height:1.3}.tm-who b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tm-who span{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tm-role{margin:0;color:var(--muted);font-size:13.5px;line-height:1.45}
+.tm-chips{display:flex;flex-wrap:wrap;gap:6px}
+.tm-chip{font:600 12px var(--body);padding:4px 10px;border-radius:999px;background:var(--ink3);color:var(--muted)}
+.tm-chip.all{background:#eef3ff;color:var(--soft)}.tm-chip.none{background:#fff6e5;color:#9a5b08}
+.tm-card footer{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:12px;border-top:1px solid var(--line);font-size:12.5px}
+.tm-edit{font-weight:700;color:var(--soft);font-size:13px}
+.tm-add{align-items:center;justify-content:center;text-align:center;gap:8px;min-height:200px;border:1.5px dashed var(--line2);background:var(--ink);box-shadow:none;cursor:pointer}
+.tm-add:hover{border-color:var(--spark);background:#f5f8ff}
+.tm-plus{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:#fff;color:var(--soft);box-shadow:inset 0 0 0 1px var(--line)}.tm-plus svg{width:22px;height:22px}
+.tm-add b{font-size:15px}.tm-add .sub{max-width:260px}
+.tm-roles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:16px 22px}
+.tm-roles>div{display:grid;gap:8px;align-content:start;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--ink)}
+.tm-roles .pill{justify-self:start}.tm-roles p{margin:0;font-size:13px;color:var(--muted);line-height:1.45}
+.tm-note{display:flex;gap:10px;align-items:flex-start;margin:0 22px 18px;padding:12px 14px;border-radius:12px;background:#eef3ff;color:#1f3f8f;font-size:13.5px;line-height:1.45}
+.tm-note svg{width:18px;height:18px;flex:none;margin-top:1px}.tm-note a{color:var(--soft);font-weight:600}
+@media (min-width:761px) and (max-width:1100px){.tm-strip{grid-template-columns:repeat(2,minmax(0,1fr)) !important}}
+@media (max-width:1100px){.tm-roles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.tm-roles{grid-template-columns:minmax(0,1fr);margin:14px 16px}.tm-note{margin:0 16px 16px}}
 /* sidebar: items never squash, the list scrolls when the window is short */
 .side>*{flex-shrink:0}
 .side a.it{padding:8px 12px}
@@ -2773,7 +2802,13 @@ const sRow = (label, help, ctrl, cls = '') => `<div class="srow ${cls}"><div cla
 const sCard = (title, desc, body, opt = {}) => `<section class="scard ${opt.cls || ''}" ${opt.id ? `id="${opt.id}"` : ''}>${title ? `<header class="scard-h">${opt.ic ? `<span class="scard-ic">${sicon(opt.ic)}</span>` : ''}<div class="scard-t"><h3>${title}${opt.badge || ''}</h3>${desc ? `<p>${desc}</p>` : ''}</div>${opt.act || ''}</header>` : ''}<div class="scard-b">${body}</div>${opt.foot ? `<footer class="scard-f">${opt.foot}</footer>` : ''}</section>`;
 const pageHead = (t, d, act) => `<div class="head"><div><h2>${t}</h2><p>${d}</p></div>${act ? `<div class="actions">${act}</div>` : ''}</div>`;
 function companyPageHTML() { return pageHead('Business info', 'How Novyra is named and reached, your social links and the platforms you offer customers.') + `<div class="pg-stack">${setCompanyHTML()}</div>`; }
-function teamPageHTML() { return pageHead('Team', 'People who can sign in to Novyra Desk and what they can open. New people can get in once the team rules are switched on in the database rules (Settings, Backups and rules).', can('team') ? '<button class="btn primary" data-user-add>Add person</button>' : '') + `<div class="pg-stack">${setTeamHTML()}</div>`; }
+function teamPageHTML() {
+  const us = state.users, on = us.filter(u => u.active !== false);
+  const stat = (l, n, d) => `<div class="stat"><span class="label">${l}</span><b class="num">${n}</b><span class="sub">${d}</span></div>`;
+  return pageHead('Team', 'Everyone who can sign in to Novyra Desk, their role and the areas they can open.', can('team') ? '<button class="btn primary" data-user-add>Add person</button>' : '')
+    + `<section class="strip tm-strip" aria-label="Summary">${stat('People', us.length + 1, 'Including you')}${stat('Admins', us.filter(u => u.role === 'admin' && u.active !== false).length, 'Everything but the team')}${stat('Staff and viewers', on.filter(u => u.role !== 'admin').length, 'Only the areas you tick')}${stat('Disabled', us.length - on.length, 'Can’t sign in')}</section>`
+    + `<div class="pg-stack">${setTeamHTML()}</div>`;
+}
 function settingsHTML() {
   const S = window.STUDIO || {}, pr = S.providers || [], em = S.email || OWNER.email || '';
   const methods = S.email ? `${pr.includes('google.com') || !pr.length ? '<span class="pill accepted">Google</span>' : ''}${pr.includes('password') ? '<span class="pill accepted">Email and password</span>' : ''}` : '';
@@ -2875,11 +2910,24 @@ function setCompanyHTML() {
     + `<div class="ssave"><span class="sub">Changes are kept when you press Save.</span><button class="btn primary" data-save-biz>Save changes</button></div>`;
 }
 function setTeamHTML() {
-  const us = state.users;
-  return sCard('', 'Each person signs in with their own Google account or email and password. People you add can only open Novyra Desk once the team rules are switched on in the database rules.',
-      `<div class="ulist"><div class="urow is-owner"><span class="uav" style="background:${esc(OWNER.color || AV_COLORS[0])}">${esc(userInitials(OWNER))}</span><span><b>${esc(OWNER.name)}</b><span class="sub">${esc(OWNER_LOGIN)}</span></span><span class="pill accepted">Owner</span><span></span></div>
-      ${us.map(u => `<div class="urow ${u.active === false ? 'off' : ''}" data-user="${esc(u.id)}" tabindex="0"><span class="uav" style="background:${clientColor({ business: u.email })}">${esc(initials(u.name || u.email).toUpperCase().slice(0, 2))}</span><span><b>${esc(u.name || u.email)}</b><span class="sub">${esc(u.email)}</span></span><span class="pill ${u.active === false ? 'cancelled' : 'open'}">${u.active === false ? 'Disabled' : esc((ROLES[u.role] || ROLES.staff)[0])}</span><span class="sub">${u.role === 'admin' ? 'All areas' : ACCESS.filter(([k]) => (u.access || {})[k]).length + ' areas'}</span></div>`).join('')}</div>`,
-      {});
+  const us = [...state.users].sort((a, b) => (a.active === false) - (b.active === false) || (a.name || a.email).localeCompare(b.name || b.email));
+  const chips = u => u.role === 'admin' ? '<span class="tm-chip all">All areas</span>' : (() => { const l = ACCESS.filter(([k]) => (u.access || {})[k]).map(([, n]) => n); return l.length ? l.map(n => `<span class="tm-chip">${esc(n)}</span>`).join('') : '<span class="tm-chip none">No areas yet</span>'; })();
+  const card = u => { const off = u.active === false, r = ROLES[u.role] || ROLES.staff;
+    return `<article class="tm-card ${off ? 'off' : ''}" data-user="${esc(u.id)}" tabindex="0" role="button" aria-label="Edit ${esc(u.name || u.email)}">
+      <header><span class="tm-av" style="background:${clientColor({ business: u.email })}">${esc(initials(u.name || u.email).toUpperCase().slice(0, 2))}</span>
+        <div class="tm-who"><b>${esc(u.name || u.email)}</b><span>${esc(u.email)}</span></div>
+        <span class="pill ${off ? 'cancelled' : u.role === 'admin' ? 'accepted' : 'open'}">${off ? 'Disabled' : esc(r[0])}</span></header>
+      <p class="tm-role">${esc(r[1])}</p>
+      <div class="tm-chips">${chips(u)}</div>
+      <footer><span class="sub">${u.addedAt ? `Added ${fmtDate(u.addedAt.slice(0, 10))}${u.addedBy ? ' by ' + esc(u.addedBy) : ''}` : ''}</span><span class="tm-edit">Edit</span></footer></article>`; };
+  const owner = `<article class="tm-card tm-owner"><header><span class="tm-av" style="background:${esc(OWNER.color || AV_COLORS[0])}">${esc(userInitials(OWNER))}</span>
+      <div class="tm-who"><b>${esc(OWNER.name)}</b><span>${esc(OWNER_LOGIN)}</span></div><span class="pill accepted">Owner</span></header>
+      <p class="tm-role">${esc(ROLES.owner[1])}</p><div class="tm-chips"><span class="tm-chip all">Everything</span></div><footer><span class="sub">That’s you</span></footer></article>`;
+  const invite = can('team') ? `<button type="button" class="tm-card tm-add" data-user-add><span class="tm-plus">${sicon('plus')}</span><b>Add a team member</b><span class="sub">Give someone their own sign-in and choose what they can open.</span></button>` : '';
+  const roles = `<section class="scard"><header class="scard-h"><span class="scard-ic">${sicon('lock')}</span><div class="scard-t"><h3>Roles</h3><p>What each role can do.</p></div></header>
+      <div class="tm-roles">${Object.entries(ROLES).map(([k, [l, d]]) => `<div><span class="pill ${k === 'owner' || k === 'admin' ? 'accepted' : 'open'}">${esc(l)}</span><p>${esc(d)}</p></div>`).join('')}</div>
+      <div class="tm-note">${sicon('data')}<span>New people can sign in once the team rules are switched on in the database rules. Copy them from <a href="#settings-data">Settings, Backups and database rules</a>.</span></div></section>`;
+  return `<div class="tm-grid">${owner}${us.map(card).join('')}${invite}</div>${roles}`;
 }
 function bindList(main) {
   $$('[data-open]', main).forEach(tr => { const open = () => go(tr.dataset.open); tr.addEventListener('click', open); tr.addEventListener('keydown', e => { if (e.key === 'Enter') open(); }); });
@@ -2945,7 +2993,7 @@ function bindList(main) {
     try { const j = await mailCall({ action: 'notify', key: 'test-' + Date.now(), to: mailCfg().notifyTo || OWNER.email, subject: 'Novyra Desk test email', text: 'Your email service works. Acceptance emails will be sent from this Gmail account.' });
       o.textContent = `Sent to ${mailCfg().notifyTo || OWNER.email}.${j.quota != null ? ` ${j.quota} emails left today.` : ''}`; if (j.quota != null) db.doc('settings/email').set({ ...mailCfg(), quota: j.quota }).catch(() => {}); }
     catch (e) { o.textContent = 'Not sent: ' + e.message; } et.disabled = false; });
-  const ua = $('[data-user-add]', main); if (ua) ua.addEventListener('click', () => userDialog(null));
+  $$('[data-user-add]', main).forEach(ua => ua.addEventListener('click', () => userDialog(null)));
   $$('[data-user]', main).forEach(r => { const o = () => userDialog(state.users.find(u => u.id === r.dataset.user)); r.addEventListener('click', o); r.addEventListener('keydown', e => { if (e.key === 'Enter') o(); }); });
   const aa = $('[data-act-all]', main); if (aa) aa.addEventListener('click', () => { view.actAll = true; render(); });
   const saveMenu = async groups => { const v = { groups: groups.map(g => ({ k: g.k, items: g.items.map(i => i[0]) })), hidden: groups.flatMap(g => g.items.filter(i => i[3]).map(i => i[0])) }; state.menu = v; render(); try { await db.doc('menus/' + menuKey()).set(v); } catch { toast('Not saved. Check your connection.'); } };
