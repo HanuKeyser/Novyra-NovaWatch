@@ -1070,6 +1070,8 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:none;bor
   .stat .label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .toolbar .search,.toolbar>.search{flex:1 1 100% !important;max-width:none !important}
 }
+.pricesheet.has-edit{position:relative}.ps-edit{position:absolute;top:0;right:0;z-index:2}.pricesheet.has-edit>.ps-sec:first-of-type .ps-head,.pricesheet.has-edit>section:first-of-type>header{padding-right:140px}
+@media (max-width:760px){.ps-edit{position:static;width:100%;margin:0 0 18px}}
 </style></head><body>
 
 <header class="appbar">
@@ -1865,8 +1867,7 @@ function pricesHTML() {
   take(all.filter(isExtra));
   const logo = take(by('Logo')), ident = take(by('Identity')), soc = take(by('Social media').filter(p => !isExtra(p))), con = take(by('Content').filter(p => !isExtra(p))), web = take([...by('Website'), ...by('Print')]);
   const other = all.filter(p => !used.has(p));
-    return `<div class="head head-end"><div class="actions"><button class="btn primary" data-edit-prices>Edit prices</button></div></div>
-    <article class="pricesheet">
+    return `<article class="pricesheet has-edit"><button class="btn primary ps-edit" data-edit-prices>Edit prices</button>
       ${sec('Logos', SHEET.LOGO_FILES, cards(logo, 'Logo Pack 2'))}
       ${sec('Identity packs', 'A full brand look: your logo, a matching letterhead and email signatures for the team.', cards(ident, 'Identity Pack 2'))}
       ${sec('Email signatures', SHEET.SIG_NOTE, cards(sigMain, '', 'g4') + (sigAdd.length ? `<div class="ps-addons">${sigAdd.map(p => `<span><b>${esc(p.item)}</b> ${money0(p.price)} <em>${esc(p.unit)}</em></span>`).join('')}</div>` : ''))}
