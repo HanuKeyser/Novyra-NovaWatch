@@ -1014,6 +1014,62 @@ select{transition:border-color .15s,box-shadow .15s}
 .acc-pad .sfoot-actions{margin-top:14px}
 @media (max-width:760px){.acc-h{grid-template-columns:40px minmax(0,1fr) 24px;gap:12px;padding:14px 16px}.acc-s{display:none}.acc-ic{width:40px;height:40px}.acc-pad{padding:16px 12px 16px}}
 @media (prefers-reduced-motion:reduce){.acc-b,.acc-chev,.acc-pad{transition:none}}
+
+/* ================= Novyra Desk design system (last layer: keeps every page consistent) ================= */
+:root{--r-card:16px;--r-ctrl:12px;--sh-card:0 1px 2px rgba(16,24,48,.04),0 6px 20px -12px rgba(16,24,48,.12);--pad-card:20px;--gap:16px}
+/* surfaces */
+.panel,.cbox,.stat,.table-wrap,.acc-sec,.cal,.sk-card,.mprev,.crow,.mgrp{border:1px solid var(--line) !important;border-radius:var(--r-card) !important;background:#fff !important;box-shadow:var(--sh-card)}
+.panel,.cbox{padding:var(--pad-card) !important}
+.acc-pad .sgrid>.panel,.acc-pad .cbox{background:var(--ink) !important;box-shadow:none}
+.mgrp{box-shadow:none}
+.sgrid,.home-grid,.cgrid{gap:var(--gap) !important}
+/* headings */
+.head h2,.home-hero h2{font-size:clamp(24px,2.4vw,30px) !important;line-height:1.1}
+.head p,.home-hero p{margin-top:6px !important;max-width:62ch;font-size:14.5px;line-height:1.5;color:var(--muted)}
+.head,.home-hero{margin-bottom:20px !important}
+.panel h3,.cbox h3{font-size:16px !important;margin:0 0 14px !important;min-height:0 !important;line-height:1.25}
+.panel h4{font:700 11px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:0 0 10px}
+.ph{margin-bottom:6px}.ph h3{margin:0 !important}
+.sub.hint,.panel>.hint{margin:-6px 0 16px !important;font-size:13px;line-height:1.5}
+/* summary strip: numbers in the body font, so R0 never reads as "Ro" */
+.strip{margin:0 0 20px !important;gap:12px !important}
+.stat{display:flex !important;flex-direction:column;gap:4px !important;padding:16px 18px !important;min-height:104px !important;text-decoration:none;color:inherit;transition:border-color .15s,box-shadow .15s,transform .15s}
+.stat .label{font-size:10.5px}
+.stat b{font:800 26px/1.15 var(--body) !important;font-variant-numeric:tabular-nums;letter-spacing:-.02em;margin:6px 0 0 !important;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat b.spark{color:var(--soft)}.stat b.good{color:var(--good)}.stat b.warn{color:var(--warn)}.stat b.bad{color:var(--bad)}
+.stat .sub{font-size:12.5px;margin-top:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+a.stat.link:hover{border-color:var(--line2) !important;box-shadow:0 1px 2px rgba(16,24,48,.05),0 12px 28px -14px rgba(16,24,48,.22);transform:translateY(-1px)}
+a.stat.link:focus-visible{outline:2px solid var(--spark);outline-offset:2px}
+@media (max-width:1200px){.stat b{font-size:22px !important}}
+@media (max-width:760px){.strip{grid-template-columns:repeat(2,minmax(0,1fr)) !important}.strip .stat{grid-column:auto !important}.strip .stat:last-child:nth-child(odd){grid-column:1/-1 !important}.stat{min-height:96px !important;padding:14px !important}.stat b{font-size:21px !important}}
+/* controls */
+.btn{min-height:40px !important;border-radius:var(--r-ctrl) !important;font-size:14px}
+.btn.small{min-height:32px !important;border-radius:10px !important;font-size:13px}
+input:not([type=checkbox]):not([type=radio]):not([type=range]),select{min-height:42px;border-radius:10px !important}
+textarea{border-radius:10px !important}
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline:none;border-color:var(--spark) !important;box-shadow:0 0 0 3px rgba(74,134,247,.18) !important}
+.field>span:first-child{font-size:12.5px;font-weight:600;color:var(--muted)}
+/* toolbars above lists */
+.toolbar{margin:0 0 12px !important;gap:12px !important}
+.toolbar .search{flex:0 1 320px}
+.chipbtn{min-height:34px}
+/* tables */
+.list th{font:700 10.5px var(--body) !important;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.list tbody tr{transition:background-color .12s}
+.list tbody tr[tabindex]:hover{background:#f7f9fe}
+.list tbody tr:focus-visible{outline:2px solid var(--spark);outline-offset:-2px}
+/* empty states */
+.empty{border-radius:var(--r-card)}
+.empty h3{font-size:18px !important}
+
+@media (max-width:760px){
+  .strip{display:grid !important;grid-template-columns:none !important;grid-auto-flow:column;grid-auto-columns:min(46%,180px);overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin-inline:-16px !important;padding:2px 16px 4px;scroll-padding-inline:16px}
+  .strip::-webkit-scrollbar{display:none}
+  .strip .stat,.strip .stat:last-child:nth-child(odd){scroll-snap-align:start;grid-column:auto !important}
+  .lq td:nth-child(2),.li td:nth-child(2){text-align:left !important}.lq td:nth-child(7) .nobody{display:none}
+  .stat .label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .toolbar .search,.toolbar>.search{flex:1 1 100% !important;max-width:none !important}
+}
 </style></head><body>
 
 <header class="appbar">
@@ -1617,19 +1673,26 @@ function render() {
 }
 
 /* ---------- summary + lists ---------- */
-function summaryHTML() {
-  const open = state.quotes.filter(q => q.status === 'Open');
-  const follow = open.filter(q => quoteStatus(q) === 'Expired').length;
-  const live = state.invoices.filter(v => v.status === 'Sent');
-  const owed = live.reduce((a, v) => a + Math.max(0, calc(v).due), 0);
-  const overdue = live.filter(v => invoiceStatus(v) === 'Overdue').length;
-  return `<section class="strip" aria-label="Summary">
-    <div class="stat"><span class="label">Next quote</span><b class="spark num">Q-${nextQuote()}</b></div>
-    <div class="stat"><span class="label">Next invoice</span><b class="spark num">INV-${nextInvoice()}</b></div>
-    <div class="stat"><span class="label">Quotes waiting</span><b class="num">${open.length - follow}</b></div>
-    <div class="stat"><span class="label">Expired, follow up</span><b class="num ${follow ? 'warn' : ''}">${follow}</b></div>
-    <div class="stat"><span class="label">Owed to you</span><b class="num ${overdue ? 'bad' : ''}">${money0(owed)}</b><span class="sub">${overdue ? overdue + ' overdue' : 'Nothing overdue'}</span></div>
-  </section>`;
+function summaryHTML(kind) {
+  const k = kind || view.tab, ym = todayIso().slice(0, 7);
+  const stat = (label, value, sub, tone, href) => `<${href ? `a href="#${href}"` : 'div'} class="stat ${href ? 'link' : ''}"><span class="label">${label}</span><b class="num ${tone || ''}">${value}</b><span class="sub">${sub}</span></${href ? 'a' : 'div'}>`;
+  const sent = state.quotes.filter(q => q.status === 'Open'), expired = sent.filter(q => quoteStatus(q) === 'Expired'), waiting = sent.filter(q => quoteStatus(q) === 'Open');
+  const notSentQ = state.quotes.filter(q => q.status === 'Draft');
+  const accM = state.quotes.filter(q => q.status === 'Accepted' && String(q.decidedAt || q.date || '').slice(0, 7) === ym);
+  const live = state.invoices.filter(v => v.status === 'Sent'), owed = live.reduce((a, v) => a + Math.max(0, calc(v).due), 0);
+  const overdue = live.filter(v => invoiceStatus(v) === 'Overdue'), overdueAmt = overdue.reduce((a, v) => a + Math.max(0, calc(v).due), 0);
+  const notSentI = state.invoices.filter(v => v.status === 'Draft');
+  const paidM = state.invoices.flatMap(v => v.payments || []).filter(p => String(p.date || '').slice(0, 7) === ym).reduce((a, p) => a + (Number(p.amount) || 0), 0);
+  const sum = l => l.reduce((a, q) => a + calc(q).total, 0);
+  const n = (x, w) => `${x} ${w}${x === 1 ? '' : 's'}`;
+  let cells;
+  if (k === 'quotes') cells = [stat('Waiting on clients', waiting.length, waiting.length ? money0(sum(waiting)) + ' in total' : 'Nothing waiting', 'spark'), stat('Expired, follow up', expired.length, expired.length ? 'Renew or close them' : 'All up to date', expired.length ? 'warn' : ''),
+    stat('Not sent yet', notSentQ.length, notSentQ.length ? 'Finish and send them' : 'All sent'), stat('Accepted this month', accM.length, accM.length ? money0(sum(accM)) : 'None yet', accM.length ? 'good' : ''), stat('Next quote', 'Q-' + nextQuote(), 'Given to the next new quote')];
+  else if (k === 'invoices') cells = [stat('Owed to you', money0(owed), n(live.filter(v => calc(v).due > 0).length, 'unpaid invoice'), 'spark'), stat('Overdue', money0(overdueAmt), overdue.length ? n(overdue.length, 'invoice') + ' late' : 'Nothing overdue', overdue.length ? 'bad' : ''),
+    stat('Paid this month', money0(paidM), 'Payments recorded', paidM ? 'good' : ''), stat('Not sent yet', notSentI.length, notSentI.length ? 'Check and send them' : 'All sent'), stat('Next invoice', 'INV-' + nextInvoice(), 'Given to the next new invoice')];
+  else cells = [stat('Owed to you', money0(owed), overdue.length ? `${money0(overdueAmt)} overdue` : 'Nothing overdue', overdue.length ? 'bad' : 'spark', 'invoices'), stat('Waiting on clients', waiting.length, waiting.length ? money0(sum(waiting)) + ' in quotes' : 'Nothing waiting', '', 'quotes'),
+    stat('Accepted this month', accM.length, accM.length ? money0(sum(accM)) : 'None yet', accM.length ? 'good' : '', 'quotes'), stat('Paid this month', money0(paidM), 'Payments recorded', '', 'invoices'), stat('Follow up', expired.length + notSentQ.length, expired.length + notSentQ.length ? 'Expired or not sent' : 'All up to date', expired.length ? 'warn' : '', 'quotes')];
+  return `<section class="strip" aria-label="Summary">${cells.join('')}</section>`;
 }
 const SUB_ICONS = {
   overview: '<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',
@@ -1715,7 +1778,7 @@ function homeHTML() {
     ...state.invoices.map(v => ({ h: `invoice-${v.id}`, n: v.number ? 'INV-' + v.number : v.period ? monthLabel(v.period).replace(/ \d{4}$/, '') + '' : 'Invoice', c: v.client && v.client.business, t: calc(v).total, st: invoiceStatus(v), u: v.updatedAt || v.createdAt || '' }))].sort((a, b) => b.u.localeCompare(a.u)).slice(0, 6);
   return `<div class="home-hero"><div><h2>${hello}, ${esc(firstName(OWNER.name))}</h2><p class="muted">${items.length ? `${items.length} thing${items.length === 1 ? '' : 's'} need${items.length === 1 ? 's' : ''} your attention.` : 'You’re all caught up.'}</p></div>
       <div class="actions"><button class="btn primary" data-new>New quote</button><button class="btn" data-add-client>Add client</button></div></div>
-    ${summaryHTML()}
+    ${summaryHTML('home')}
     <div class="home-grid">
       <section class="panel"><h3>Needs your attention</h3>${items.length ? `<div class="todo">${items.map(i => `<a href="#${i.h}" class="todo-i ${i.tone}"><span class="dotc"></span><span><b>${esc(i.t)}</b><span class="sub">${esc(i.s)}</span></span><span class="sub num">${fmtDate(i.d)}</span></a>`).join('')}</div>` : '<div class="empty small"><p>Nothing waiting on you. New quotes, follow-ups and payments due will show here.</p></div>'}</section>
       <section class="panel"><h3>Latest work</h3>${recent.length ? `<div class="doclist">${recent.map(r => `<a href="#${r.h}"><b class="num">${esc(r.n)}</b><span class="sub ell">${esc(r.c || 'No client')}</span><span class="num">${money(r.t)}</span><span class="pill ${pillClass(r.st)}">${stLabel(r.st)}</span></a>`).join('')}</div>` : '<div class="empty small"><p>Your quotes and invoices will show here.</p></div>'}</section>
@@ -1745,7 +1808,7 @@ function quotesHTML() {
       <td><div class="client">${esc(q.client && q.client.business || 'No client yet')}</div><div class="sub">${esc((q.items || []).filter(i => i.item).map(i => i.item).join(', ') || 'No items yet')}</div></td>
       <td class="r num"><b>${money(calc(q).total)}</b></td>${ageCell(ageDays(q.date), ['Accepted', 'Declined'].includes(q.status))}
       <td><span class="pill ${pillClass(st)}">${stLabel(st)}</span></td>${approvedCell(q)}${ownerCell(q)}</tr>`; }).join('');
-  return `<div class="head"><div><h2>Quotes</h2><p>One quote per job. Update an open or expired quote instead of starting a new one; every change is kept in its history.</p></div>
+  return `<div class="head"><div><h2>Quotes</h2><p>One quote per job. A quote stays unlocked until it’s sent; after that, unlock it to make changes and they’re saved as a new revision.</p></div>
       <button class="btn primary" data-new>New quote</button></div>
     <div class="toolbar">${filterBtns(['all', 'Draft', 'Open', 'Expired', 'Accepted', 'Declined', 'Cancelled'])}${searchBox('Search client, number or item')}</div>
     <div class="table-wrap">${qs.length ? `<table class="list lq"><thead><tr><th>No</th><th>Date</th><th>Customer</th><th class="r">Total</th><th class="r">Age</th><th>Status</th><th>Approved by</th><th>Owner</th></tr></thead><tbody>${rows}</tbody></table>`
@@ -1762,7 +1825,7 @@ function invoicesHTML() {
       <td><div class="client">${esc(v.client && v.client.business || 'No client yet')}</div><div class="sub">${v.quoteRef ? 'For quote ' + esc(v.quoteRef) : ''}</div></td>
       <td class="r num">${money(c.total)}</td><td class="r num"><b>${money(st === 'Cancelled' ? 0 : c.due)}</b></td>${ageCell(v.status === 'Sent' ? ageDays(v.date) : null, st === 'Paid')}
       <td><span class="pill ${pillClass(st)}">${stLabel(st)}</span></td>${ownerCell(v)}</tr>`; }).join('');
-  return `<div class="head"><div><h2>Invoices</h2><p>Every invoice comes from an accepted quote: open the quote and choose Create invoice. Numbers are given when you issue the invoice, so they never skip.</p></div></div>
+  return `<div class="head"><div><h2>Invoices</h2><p>Every invoice comes from an accepted quote and gets its number straight away. It stays unlocked until it’s sent.</p></div></div>
     <div class="toolbar">${filterBtns(['all', 'Draft', 'Unpaid', 'Part paid', 'Overdue', 'Paid', 'Cancelled'])}${searchBox('Search client or number')}</div>
     <div class="table-wrap">${vs.length ? `<table class="list li"><thead><tr><th>No</th><th>Date</th><th>Customer</th><th class="r">Total</th><th class="r">Still owed</th><th class="r">Age</th><th>Status</th><th>Owner</th></tr></thead><tbody>${rows}</tbody></table>`
       : state.invoices.length ? emptyBox('No invoices match', 'Try another filter or search.') : emptyBox('No invoices yet', 'Open an accepted quote and choose Create invoice.')}</div>${pg.more}${trashLink('invoices')}`;
@@ -1967,7 +2030,7 @@ function plansHTML() {
       <td class="num">${esc(p.quoteRef || '')}</td><td class="r num"><b>${money(per(p))}</b></td><td class="num">${ordinal(p.day)} of the month</td>
       <td class="num">${p.active ? fmtDate(planDate(p, nextPlanMonth(p))) : '—'}</td><td><span class="pill ${p.active ? 'accepted' : 'cancelled'}">${p.active ? 'Active' : 'Paused'}</span></td></tr>`).join('');
   const total = ps.filter(p => p.active).reduce((a, p) => a + per(p), 0);
-  return `<div class="head"><div><h2>Monthly billing</h2><p>Social and Content packages bill themselves. On the billing day, the month’s invoice is drafted for you. Open it, check it, then issue and send it.</p></div></div>
+  return `<div class="head"><div><h2>Monthly billing</h2><p>Social and Content packages bill themselves. On the billing day, the month’s invoice is created for you. Open it, check it, then send it.</p></div></div>
     <section class="strip three" aria-label="Summary"><div class="stat"><span class="label">Active packages</span><b class="num">${ps.filter(p => p.active).length}</b></div>
       <div class="stat"><span class="label">Billed each month</span><b class="num spark">${money0(total)}</b></div>
       <div class="stat"><span class="label">Next invoice</span><b class="num">${(() => { const n = ps.filter(p => p.active).map(p => planDate(p, nextPlanMonth(p))).sort()[0]; return n ? fmtDate(n) : '—'; })()}</b></div></section>
@@ -1984,7 +2047,7 @@ function planDialog(plan, fromQuote) {
       <section class="cbox"><div class="sec-h"><span class="label">Client</span></div><div class="who">${avHTML(p.client)}<div><div class="client">${esc((p.client && p.client.business) || 'Client')}</div><div class="sub">From ${esc(p.quoteRef || '')}</div></div></div></section>
       <section class="cbox"><div class="grid2"><label class="field"><span>Billing day</span><select id="pl-day">${Array.from({ length: 28 }, (_, i) => `<option value="${i + 1}" ${Number(p.day) === i + 1 ? 'selected' : ''}>${ordinal(i + 1)} of the month</option>`).join('')}</select></label>
         <label class="field"><span>${isNew ? 'First automatic invoice' : 'Next automatic invoice'}</span><input id="pl-start" type="month" value="${esc(isNew ? p.start : nextPlanMonth(p))}"></label></div>
-        <p class="sub" style="margin:0">The first month is already on the quote’s invoice, so automatic invoices normally start the month after. Invoices are drafted on the billing day and get their number when you issue them.</p>
+        <p class="sub" style="margin:0">The first month is already on the quote’s invoice, so automatic invoices normally start the month after. Each month’s invoice is created on the billing day with its own number, ready for you to check and send.</p>
         <label class="chk switch"><input type="checkbox" id="pl-active" ${p.active ? 'checked' : ''}><span>Billing is active</span></label></section></div>
     <div class="ccol"><section class="cbox"><div class="sec-h"><span class="label">Billed every month</span><span class="sub">Change quantities if they add extra posts</span></div>
       <div class="plan-items">${(p.items || []).map((it, i) => `<div class="pi" data-pi="${i}"><div><b>${esc(it.item)}</b><span class="sub">${esc(it.details || '')}</span></div>
@@ -3045,7 +3108,7 @@ async function confirmAct(cf) {
   if (cf === 'send') {
     if (!d.number) d.number = nextInvoice(); d.status = 'Sent'; d.locked = true; d.sentAt = now; if (!d.shareId) d.shareId = newToken(); setMeta({ lastInvoice: Math.max(Number((state.meta || {}).lastInvoice) || 0, d.number) });
     d.history.push({ at: now, title: `INV-${d.number} marked as sent`, total: calc(d).total, changes: ['Locked', 'Online link created for the client'] });
-    logActivity('issued', `INV-${d.number} issued${d.client && d.client.business ? ' to ' + d.client.business : ''}`, `invoice-${d.id}`);
+    logActivity('issued', `INV-${d.number} marked as sent${d.client && d.client.business ? ' to ' + d.client.business : ''}`, `invoice-${d.id}`);
     const ok = await persist(`INV-${d.number} marked as sent and locked`);
     if (!ok) { d.status = 'Draft'; d.locked = false; d.history.pop(); }
     return;
