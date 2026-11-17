@@ -987,8 +987,8 @@ const userInitials = u => String(u.initials || initials(u.name) || '?').toUpperC
 const CLIENT_COLORS = ['#2f63d6', '#4f46e5', '#7c3aed', '#c026d3', '#db2777', '#dc2626', '#ea580c', '#b45309', '#16a34a', '#0d9488', '#0284c7', '#475569'];
 const clientLetter = c => { const n = String((c && c.business) || '').replace(/^the\s+/i, '').trim(); const m = n.match(/[A-Za-z0-9]/); return m ? m[0].toUpperCase() : '?'; };
 const clientColor = c => { if (!c) return CLIENT_COLORS[0]; const r = (c.id && state.clients.find(o => o.id === c.id)) || state.clients.find(o => norm(o.business) === norm(c.business)); if (c.avColor || (r && r.avColor)) return c.avColor || r.avColor; let h = 0; for (const ch of norm(c.business)) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return CLIENT_COLORS[h % CLIENT_COLORS.length]; };
-const SIGN_DEFAULT = { closing: 'Kind regards', name: true, title: false, company: true, phone: false, email: false, web: false };
-function signOff(short) { const g = { ...SIGN_DEFAULT, ...(OWNER.sign || {}) }; const L = [g.closing || 'Kind regards'];
+const SIGN_DEFAULT = { closing: 'Kind Regards', name: true, title: false, company: true, phone: false, email: false, web: false };
+function signOff(short) { const g = { ...SIGN_DEFAULT, ...(OWNER.sign || {}) }; const cl0 = (g.closing || 'Kind Regards').trim(), L = [/[,.!]$/.test(cl0) ? cl0 : cl0 + ','];
   if (g.name && OWNER.name) L.push(g.title && OWNER.title ? `${OWNER.name}\n${OWNER.title}` : OWNER.name); else if (g.title && OWNER.title) L.push(OWNER.title);
   if (g.company) L.push('Novyra');
   if (!short) { const c = [g.phone && OWNER.phone, g.email && OWNER.email, g.web && 'novyra.co.za'].filter(Boolean); if (c.length) L.push(c.join(' · ')); }
@@ -1035,7 +1035,7 @@ const toList = d => recipients(d).map(p => p.email);
 const waNum = ph => { let n = String(ph || '').replace(/[^\d+]/g, ''); if (n.startsWith('+')) n = n.slice(1); else if (n.startsWith('00')) n = n.slice(2); else if (n.startsWith('0')) n = '27' + n.slice(1); return n.length >= 10 ? n : ''; };
 const waPeople = d => { const own = contactsOf(d.client).filter(p => waNum(p.phone)); if (own.length) return own; const rec = d.clientId ? state.clients.find(x => x.id === d.clientId) : state.clients.find(x => norm(x.business) === norm(d.client && d.client.business)); return rec ? contactsOf(rec).filter(p => waNum(p.phone)) : []; };
 function waText(d, Q, p) { const hi = p && firstName(p.name) ? `Hi ${firstName(p.name)},` : 'Hi,';
-  const body = Q ? `${hi} here is ${(d.rev || 1) > 1 ? 'the updated' : 'your'} Novyra quote ${qRef(d)}${d.shareId ? `. You can view, download and accept it here: ${shareUrl(d)}` : ' (PDF attached). To go ahead, just reply here.'}` : `${hi} here is Novyra invoice INV-${d.number}${d.shareId ? `. You can view and download it here: ${shareUrl(d)}` : ' (PDF attached)'}. Please use INV-${d.number} as the payment reference.`;
+  const body = Q ? `${hi} I hope you are well! Please find Sales Quotation #${qRef(d)}${docTitle(d) ? ` (${docTitle(d)})` : ''} ${d.shareId ? `here: ${shareUrl(d)}\n\nOpen the link to view the Quotation and to approve it, decline it or request changes, using the buttons on the left side of the page.` : 'attached. To approve it, decline it or request changes, just reply here.'}` : `${hi} here is Novyra invoice INV-${d.number}${d.shareId ? `. You can view and download it here: ${shareUrl(d)}` : ' (PDF attached)'}. Please use INV-${d.number} as the payment reference.`;
   return `${body}\n\n${signOff(true)}`; }
 const waHref = (d, Q, p) => `https://wa.me/${waNum(p.phone)}?text=${encodeURIComponent(waText(d, Q, p))}`;
 const docsFor = c => {
@@ -1681,13 +1681,16 @@ let shareBusy = false;
 async function applyShares() {
   if (shareBusy || !db) return; shareBusy = true;
   try {
-    for (const sh of state.shares.filter(x => x.response && !x.applied && ['Accepted', 'Changes requested'].includes(x.status))) {
+    for (const sh of state.shares.filter(x => x.response && !x.applied && ['Accepted', 'Changes requested', 'Declined'].includes(x.status))) {
       const q = state.quotes.find(x => x.id === sh.quoteId); if (!q) continue;
       const r = sh.response || {}, now = new Date().toISOString(), upd = clone(q);
       upd.history = upd.history || [];
       if (sh.status === 'Accepted' && ['Open', 'Draft'].includes(q.status) && (q.rev || 1) === sh.rev) {
         upd.status = 'Accepted'; upd.decidedAt = r.at || now; upd.acceptedOnline = { name: r.name, at: r.at || now, note: r.note || '' }; upd.acceptedBy = { by: 'client', name: r.name, company: (upd.client && upd.client.business) || '', at: r.at || now }; delete upd.changeRequest;
         upd.history.push({ at: now, rev: upd.rev || 1, title: `Accepted online by ${r.name} (${qRef(upd)})`, note: r.note || '', total: calc(upd).total, changes: [`Accepted on ${fmtWhen(r.at || now)}`] });
+      } else if (sh.status === 'Declined' && ['Open', 'Draft'].includes(q.status) && (q.rev || 1) === sh.rev) {
+        upd.status = 'Declined'; upd.decidedAt = r.at || now; upd.declinedOnline = { name: r.name, at: r.at || now, note: r.note || '' }; delete upd.changeRequest;
+        upd.history.push({ at: now, rev: upd.rev || 1, title: `Declined online by ${r.name} (${qRef(upd)})`, note: r.note || '', total: calc(upd).total, changes: [`Declined on ${fmtWhen(r.at || now)}`] });
       } else if (sh.status === 'Changes requested') {
         upd.changeRequest = { name: r.name, at: r.at || now, note: r.note || '' };
         upd.history.push({ at: now, rev: upd.rev || 1, title: `${r.name} asked for changes online`, note: r.note || '', changes: [] });
@@ -1696,7 +1699,8 @@ async function applyShares() {
       await save('quotes', upd);
       Object.assign(q, upd);
       await db.collection('shares').doc(sh.id).set(JSON.parse(JSON.stringify({ ...sh, id: undefined, applied: true }))); sh.applied = true;
-      toast(sh.status === 'Accepted' ? `${r.name} accepted ${qRef(upd)} online` : `${r.name} asked for changes on ${qRef(upd)}`);
+      toast(sh.status === 'Accepted' ? `${r.name} accepted ${qRef(upd)} online` : sh.status === 'Declined' ? `${r.name} declined ${qRef(upd)} online` : `${r.name} asked for changes on ${qRef(upd)}`);
+      if (sh.status === 'Declined') logActivity('declined', `${qRef(upd)} declined online by ${r.name}`, `quote-${upd.id}`);
       if (sh.status === 'Accepted') { logActivity('accepted', `${qRef(upd)} accepted online by ${r.name}${upd.client && upd.client.business ? ` (${upd.client.business})` : ''}`, `quote-${upd.id}`); notifyAccepted(q, sh.id); }
     }
   } catch (e) { console.warn('apply shares', e); }
@@ -2765,9 +2769,13 @@ function emailDraft(d, Q) {
   const hi = names.length ? `Hi ${listAnd(names)},` : 'Hi there,';
   const cl = d.client || {}, sign = signOff();
   if (Q) {
-    const rev = (d.rev || 1) > 1;
-    return { subject: `Novyra quote ${qRef(d)}${cl.business ? ' – ' + cl.business : ''}`,
-      body: `${hi}\n\n${rev ? `Please find attached the updated quote ${qRef(d)}. It replaces the earlier version.` : `Thank you for the opportunity. Please find attached quote ${qRef(d)}.`}\n\n${d.shareId ? `You can view, download and accept it online here:\n${shareUrl(d)}\n\nOr simply reply to this email to go ahead.` : 'To go ahead, simply reply to this email.'} Let me know if you have any questions.\n\n${sign}` };
+    const ppl = recipients(d).filter(p => p.name), title = docTitle(d), ref = `Sales Quotation #${qRef(d)}`;
+    const greet = ppl.length === 1 ? `Hi ${firstName(ppl[0].name)},` : cl.business ? `Hi ${cl.business},` : ppl.length ? `Hi ${listAnd(ppl.map(p => firstName(p.name)))},` : 'Hi there,';
+    const body = d.shareId
+      ? `Please find ${ref}${title ? ` (${title})` : ''} linked below.\n\nClick on the following link to view the Quotation and to approve it, decline it or request changes. To do this, click the applicable button on the left side of the page.\n\n${ref}: ${shareUrl(d)}`
+      : `Please find ${ref}${title ? ` (${title})` : ''} attached.\n\nTo approve it, decline it or request changes, simply reply to this email.`;
+    return { subject: `${ref}${title ? ' – ' + title : ''}${cl.business ? ' | ' + cl.business : ''}`,
+      body: `${greet}\n\nI hope you are well!\n\n${body}\n\nShould you experience any difficulty viewing this Quotation, please do not hesitate to contact me.\n\n${sign}` };
   }
   return { subject: `Novyra invoice INV-${d.number}${cl.business ? ' – ' + cl.business : ''}`,
     body: `${hi}\n\nPlease find attached invoice INV-${d.number}. Please use INV-${d.number} as the payment reference.${d.shareId ? `\n\nYou can also view and download it online here:\n${shareUrl(d)}` : ''}\n\nThank you for choosing Novyra.\n\n${sign}` };

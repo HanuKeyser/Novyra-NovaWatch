@@ -184,16 +184,19 @@ h1{margin:0;font:800 30px/1.1 var(--display);letter-spacing:-.01em}
     const state = after === 'Accepted' || (st === 'Accepted' && r.name) ? `<div class="card done"><div class="ic">✓</div><h1 style="font-size:22px">${after ? 'Thank you, ' + esc((r.name || '').split(' ')[0]) + '!' : 'Quote accepted'}</h1><p class="note">${esc(r.name || '')} accepted this quote${r.at ? ' on ' + fmtWhen(r.at) : ''}. ${f.name ? esc(f.name.split(' ')[0]) : 'Novyra'} will be in touch about the next steps.${q.dueNow ? ` To start, ${money(q.dueNow)} is due now; the payment details are on the quote.` : ''}</p></div>`
       : after === 'Changes requested' || st === 'Changes requested' ? `<div class="card done warn"><div class="ic">✎</div><h1 style="font-size:22px">Changes requested</h1><p class="note">Your message was sent${r.at ? ' on ' + fmtWhen(r.at) : ''}. You’ll get an updated quote at this same link.</p></div>`
       : st === 'Cancelled' ? `<div class="card"><b>This quote was cancelled</b><p class="note">It is no longer valid. Ask ${esc(f.name || 'Novyra')} if you have any questions.</p></div>`
-      : st === 'Declined' ? `<div class="card"><b>This quote was declined</b><p class="note">Ask ${esc(f.name || 'Novyra')} for a new quote whenever you’re ready.</p></div>`
+      : after === 'Declined' || st === 'Declined' ? `<div class="card done warn"><div class="ic">✕</div><h1 style="font-size:22px">Quote declined</h1><p class="note">${r.name ? esc(r.name) + ' declined this quote' + (r.at ? ' on ' + fmtWhen(r.at) : '') + '. ' : ''}Thank you for letting us know. Ask ${esc(f.name || 'Novyra')} for a new quote whenever you’re ready.</p></div>`
       : st === 'Expired' ? `<div class="card"><b>This quote has expired</b><p class="note">It was valid until ${fmtDate(q.validUntil)}. Ask ${esc(f.name || 'Novyra')} for an updated quote at today’s prices.</p></div>`
-      : st === 'Open' ? `<div class="card acts" id="acts"><button class="btn primary" data-open="accept">Accept quote</button><div class="row"><button class="btn" data-open="changes">Request changes</button><button class="btn" data-pdf>Download PDF</button></div>
+      : st === 'Open' ? `<div class="card acts" id="acts"><button class="btn primary" data-open="accept">Accept quote</button><div class="row"><button class="btn" data-open="changes">Request changes</button><button class="btn" data-open="decline">Decline</button></div><button class="btn" data-pdf>Download PDF</button>
           <div class="panel" id="p-accept"><label class="field"><span>Your full name</span><input id="a-name" autocomplete="name" placeholder="Name and surname"></label>
             <label class="agree"><input type="checkbox" id="a-ok"><span>I accept quote ${esc(q.ref)} for ${esc(q.business)}, including the terms on the quote.</span></label>
             <label class="field"><span>Anything to add? (optional)</span><textarea id="a-note" rows="2" placeholder="For example: preferred start date"></textarea></label>
             <button class="btn primary" data-send="Accepted">Confirm acceptance</button><p class="note">Your name, the date and time are recorded as your acceptance.</p></div>
           <div class="panel" id="p-changes"><label class="field"><span>Your name</span><input id="c-name" autocomplete="name"></label>
             <label class="field"><span>What would you like changed?</span><textarea id="c-note" rows="4" placeholder="For example: add 2 extra posts a month"></textarea></label>
-            <button class="btn primary" data-send="Changes requested">Send request</button></div></div>`
+            <button class="btn primary" data-send="Changes requested">Send request</button></div>
+          <div class="panel" id="p-decline"><label class="field"><span>Your name</span><input id="d-name" autocomplete="name"></label>
+            <label class="field"><span>Reason (optional)</span><textarea id="d-note" rows="3" placeholder="For example: we went with a different option"></textarea></label>
+            <button class="btn primary" data-send="Declined">Decline quote</button></div></div>`
       : '';
     app.innerHTML = `<div class="grid"><aside class="side">
         <div class="card"><span class="eyebrow">Quote from Novyra</span><h1>${esc(q.ref)}</h1><p class="for">For ${esc(q.business)}</p><span class="pill ${pill[1]}">${pill[0]}</span>
@@ -215,15 +218,16 @@ h1{margin:0;font:800 30px/1.1 var(--display);letter-spacing:-.01em}
     document.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => { const id = 'p-' + b.dataset.open; document.querySelectorAll('.panel').forEach(p => p.classList.toggle('on', p.id === id && !p.classList.contains('on'))); const f = document.querySelector('#' + id + '.on input'); if (f) f.focus(); }));
     document.querySelectorAll('[data-pdf]').forEach(b => b.addEventListener('click', () => pdf(b)));
     document.querySelectorAll('[data-send]').forEach(b => b.addEventListener('click', async () => {
-      const acc = b.dataset.send === 'Accepted', name = (acc ? $('#a-name') : $('#c-name')).value.trim(), note = (acc ? $('#a-note') : $('#c-note')).value.trim();
-      if (name.length < 2) { (acc ? $('#a-name') : $('#c-name')).focus(); return flash(b, 'Please type your name'); }
+      const acc = b.dataset.send === 'Accepted', dec = b.dataset.send === 'Declined', px = acc ? 'a' : dec ? 'd' : 'c';
+      const name = $('#' + px + '-name').value.trim(), note = $('#' + px + '-note').value.trim();
+      if (name.length < 2) { $('#' + px + '-name').focus(); return flash(b, 'Please type your name'); }
       if (acc && !$('#a-ok').checked) return flash(b, 'Please tick the box to accept');
-      if (!acc && !note) { $('#c-note').focus(); return flash(b, 'Say what you’d like changed'); }
+      if (!acc && !dec && !note) { $('#c-note').focus(); return flash(b, 'Say what you’d like changed'); }
       b.disabled = true; b.textContent = 'Sending…';
       const response = { name: name.slice(0, 99), note: note.slice(0, 1999), at: new Date().toISOString(), rev: q.rev || 1 };
       try { await ref.update({ status: b.dataset.send, response }); q.status = b.dataset.send; q.response = response; draw(b.dataset.send); scrollTo({ top: 0, behavior: 'smooth' });
         if (acc && q.notifyUrl) fetch(q.notifyUrl, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'clientAccepted', share: key }) }).catch(() => {}); }
-      catch (e) { b.disabled = false; b.textContent = acc ? 'Confirm acceptance' : 'Send request'; flash(b, 'That didn’t go through. The quote may have changed or expired; reload the page.'); }
+      catch (e) { b.disabled = false; b.textContent = acc ? 'Confirm acceptance' : dec ? 'Decline quote' : 'Send request'; flash(b, 'That didn’t go through. The quote may have changed or expired; reload the page.'); }
     }));
   }
   function flash(b, t) { let n = b.parentElement.querySelector('.flash'); if (!n) { n = document.createElement('p'); n.className = 'note flash'; n.style.color = 'var(--bad)'; b.after(n); } n.textContent = t; }
