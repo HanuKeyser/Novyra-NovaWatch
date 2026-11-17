@@ -2786,7 +2786,7 @@ const CHEV_UP = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" str
 const CHEV_DN = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
 const SET_GROUPS = [
   ['Account', [['profile', 'Your details', 'Your name, contact details and message sign-off', 'profile'], ['security', 'Sign-in and security', 'How you sign in, your password and signing out', 'lock']]],
-  ['Business', [['business', 'Payments and numbering', 'Bank details, document numbers and terms', 'card'], ['email', 'Email alerts', 'An email when a customer accepts a quote', 'mail']]],
+  ['Business', [['business', 'Payments and numbering', 'Bank details, document numbers and terms', 'card']]],
   ['Workspace', [['menu', 'Menu', 'Reorder and hide pages in the sidebar', 'menu'], ['data', 'Backups and rules', 'Download a backup and update the database rules', 'data']]]];
 const SET_KEYS = SET_GROUPS.flatMap(g => g[1].map(i => i[0]));
 const SET_SEC = SET_GROUPS.flatMap(g => g[1]);
@@ -2818,8 +2818,8 @@ function settingsHTML() {
       <div class="set-hero-av" id="pf-av" style="background:${esc(OWNER.color || AV_COLORS[0])}">${esc(userInitials(OWNER))}</div>
       <div class="set-hero-id"><h2 id="pf-nm">${esc(OWNER.name)}</h2><p><span id="pf-tt">${esc(OWNER.title || '')}</span><span class="dotsep">${esc(biz().name)}</span></p><div class="set-hero-meta"><span>${esc(em)}</span><span class="pill accepted">${isOwnerLogin() ? 'Owner' : esc((ROLES[ME.role] || ROLES.staff)[0])}</span>${methods}</div></div>
       ${S.email ? '<button class="btn set-hero-out" data-signout>Sign out</button>' : ''}</section>`;
-  return `<div class="head"><div><h2>Settings</h2><p>Your details, how you sign in, payments, email alerts, the menu and backups, all on one page.</p></div></div>
-    <div class="set-page">${hero}${setProfileHTML()}${setSecurityHTML()}${setBusinessHTML()}${setEmailHTML()}${setMenuHTML()}${setDataHTML()}</div>`;
+  return `<div class="head"><div><h2>Settings</h2><p>Your details, how you sign in, payments, the menu and backups, all on one page.</p></div></div>
+    <div class="set-page">${hero}${setProfileHTML()}${setSecurityHTML()}${setBusinessHTML()}${setMenuHTML()}${setDataHTML()}</div>`;
 }
 function setProfileHTML() {
   const u = { ...OWNER }, sg = { ...SIGN_DEFAULT, ...(OWNER.sign || {}) };
@@ -2855,22 +2855,6 @@ function setBusinessHTML() {
       + sRow('Next numbers', 'Numbers are never reused.', `<div class="snums"><span><em>Quote</em><b class="num">Q-${nextQuote()}</b></span><span><em>Invoice</em><b class="num">INV-${nextInvoice()}</b></span><span><em>Quotes valid for</em><b>30 days</b></span></div>`)
       + `<details class="sdet"><summary>Terms on your price list and website</summary><div class="sdet-b">${(SHEET.TERMS || []).map(([t, d]) => `<p><b>${esc(t)}</b>${esc(d)}</p>`).join('')}</div></details>`,
     { ic: 'card', id: 'set-business', foot: '<button class="btn primary" data-save-bank>Save bank details</button>' });
-}
-function setEmailHTML() {
-  const c = mailCfg(), ok = mailReady();
-  const step = (n, t, body) => `<li class="stp"><span class="stp-n">${n}</span><div><b>${t}</b>${body ? `<div class="sub">${body}</div>` : ''}</div></li>`;
-  return sCard('Email alerts', 'When a customer accepts a quote online, you get an email from your own Gmail, sent by a free Google script.',
-      sRow('Web app link', 'Ends in /exec.', `<input id="em-url" value="${esc(c.url || '')}" placeholder="https://script.google.com/macros/s/…/exec" aria-label="Web app link">`)
-      + sRow('Send alerts to', '', `<input id="em-to" type="email" value="${esc(c.notifyTo || 'hanu@keysers.cc')}" aria-label="Send alerts to">`)
-      + sRow('Secret key', 'A new key means copying the script into Google again.', `<div class="inrow"><input id="em-secret" value="${esc(c.secret || '')}" autocomplete="off" spellcheck="false" readonly aria-label="Secret key"><button type="button" class="btn" data-em-gen>New key</button></div>`)
-      + `<details class="sdet" ${ok ? '' : 'open'}><summary>How to set it up (5 steps, about 5 minutes)</summary><div class="sdet-b"><ol class="steps">
-        ${step(1, 'Copy the script', `<button type="button" class="btn small primary" data-copy-script>Copy the script</button> It already holds your secret key.`)}
-        ${step(2, 'Paste it into Google', `Open <a href="https://script.google.com/home/projects/create" target="_blank" rel="noopener">script.google.com</a> with the Gmail you send from. Name the project “Novyra Mail”, select all the code, paste, and press Save.`)}
-        ${step(3, 'Allow it once', 'In the toolbar pick the function <b>setup</b> and press Run. Then Review permissions, your account, Advanced, Go to Novyra Mail, Allow.')}
-        ${step(4, 'Publish it', 'Deploy, New deployment, the gear, Web app. Execute as: Me. Who has access: Anyone. Deploy and copy the Web app URL.')}
-        ${step(5, 'Connect it here', 'Paste the link above, press Save, then Send a test email.')}</ol></div></details>`,
-    { ic: 'mail', id: 'set-email', badge: ok ? ' <span class="pill accepted">Connected</span>' : ' <span class="pill draft">Not set up</span>',
-      foot: `<p class="sub" id="em-out">${ok && c.quota != null ? `${c.quota} emails left today.` : ''}</p><button class="btn" data-em-test ${ok ? '' : 'disabled'}>Send a test email</button><button class="btn primary" data-em-save>Save</button>` });
 }
 function setMenuHTML() {
   const groups = menuGroups();
