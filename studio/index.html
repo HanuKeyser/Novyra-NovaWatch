@@ -1195,6 +1195,28 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:none;bor
 @media (max-width:640px){.tm-roles{grid-template-columns:minmax(0,1fr);margin:14px 16px}.tm-note{margin:0 16px 16px}}
 .side .side-end{margin-top:auto;padding-top:10px}
 .side .side-end+.sfoot{margin-top:8px}
+/* ================= sample data bar + getting started ================= */
+.demo-bar{position:sticky;top:var(--bar);z-index:25;display:flex;align-items:center;gap:12px;padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));background:linear-gradient(90deg,#1d3a8a,#4a86f7);color:#fff;font-size:14px}
+.demo-bar[hidden]{display:none}
+.demo-bar .demo-ic{font-size:16px;opacity:.9}
+.demo-bar>span:nth-child(2){flex:1;min-width:0}
+.demo-bar .btn{background:#fff !important;color:var(--soft) !important;border:0 !important;flex:none}
+html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(100vh - var(--bar) - 44px)}
+@media (max-width:640px){.demo-bar{font-size:13px;flex-wrap:wrap}.demo-bar .btn{width:100%}}
+.start{margin-bottom:16px;padding:20px 22px;border:1px solid #cfdcfa;border-radius:var(--r-card);background:linear-gradient(135deg,#f2f6ff,#fff 60%);box-shadow:var(--sh-card)}
+.start-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.start-h h3{margin:0;font-size:18px !important}
+.start-h p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.start-act{display:flex;align-items:center;gap:6px;flex:none}
+.start-bar{height:6px;border-radius:999px;background:#e1e9fb;margin:14px 0 16px;overflow:hidden}.start-bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#5b93fa,#2a5fd6);transition:width .4s var(--ease)}
+.start-list{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.start-i{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:14px;border:1px solid var(--line);border-radius:14px;background:#fff;text-align:left;font:inherit;color:var(--text);cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .15s}
+.start-i:not(.ok):hover{border-color:#bcd0fb;box-shadow:0 10px 24px -14px rgba(42,95,214,.45);transform:translateY(-1px)}
+.start-ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:#eef3ff;color:var(--soft)}.start-ic svg{width:17px;height:17px}
+.start-t{display:grid;gap:3px}.start-t b{font-size:14px}.start-t span{font-size:12.5px;color:var(--muted);line-height:1.4}
+.start-i.ok{cursor:default;background:#f7faf8;border-color:#d4ecdc}.start-i.ok .start-ic{background:var(--good);color:#fff}.start-i.ok b{text-decoration:line-through;text-decoration-color:rgba(21,128,61,.5);color:var(--muted)}
+@media (max-width:1200px){.start-list{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:760px){.start-list{grid-template-columns:minmax(0,1fr)}.start-i{flex-direction:row;align-items:center}.start-h{flex-direction:column}.start-act{width:100%;justify-content:space-between}}
 /* sidebar: items never squash, the list scrolls when the window is short */
 .side>*{flex-shrink:0}
 .side a.it{padding:8px 12px}
@@ -1491,6 +1513,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:none;bor
   <span class="sep" aria-hidden="true"></span>
   <a class="avatar" href="#settings-profile" title="Hanu Keyser · Your details" aria-label="Hanu Keyser, your details">HK</a>
 </header>
+<div class="demo-bar" id="demo-bar" hidden><span class="demo-ic">✦</span><span><b>You’re looking at sample data.</b> Try anything you like. Nothing here is saved or sent.</span><button type="button" class="btn small" data-demo-off>Back to my records</button></div>
 <div class="shell">
   <nav class="side" id="side" aria-label="Menu"></nav>
   <div class="scrim" data-nav="close"></div>
@@ -2099,11 +2122,71 @@ function skeletonHTML() {
     <div class="sk-card" style="padding:0">${b('100%', 40, 'border-radius:0')}${Array.from({ length: 8 }, () => `<div class="sk-row">${b('12%', 14)}${b('14%', 14)}${b('26%', 14)}${b('14%', 14)}${b('10%', 20, 'border-radius:999px')}</div>`).join('')}</div></div>`;
 }
 function paintSkeleton() { const m = $('#main'); if (!m || state.failed) return; const k = (view.open ? 'ed' : view.tab + ':' + view.sub); if (m.dataset.sk === k && m.querySelector('.sk-wrap')) return; m.dataset.sk = k; m.setAttribute('aria-busy', 'true'); m.innerHTML = skeletonHTML(); }
+/* ---------- sample data: a full, realistic Novyra Desk that lives only in memory ---------- */
+const DEMO = (() => { try { return localStorage.getItem('nd-demo') === '1'; } catch { return false; } })();
+function setDemo(on) { try { on ? localStorage.setItem('nd-demo', '1') : localStorage.removeItem('nd-demo'); } catch {} location.hash = '#home'; location.reload(); }
+function memDb(store) {
+  const subs = []; const notify = () => subs.forEach(s => s());
+  const cp = x => JSON.parse(JSON.stringify(x));
+  const colDocs = col => Object.keys(store).filter(k => k.startsWith(col + '/') && k.split('/').length === 2).map(k => ({ id: k.split('/')[1], exists: true, data: () => cp(store[k]) }));
+  const doc = path => ({ id: path.split('/').pop(), path,
+    set: async d => { store[path] = cp(d); setTimeout(notify, 10); }, update: async d => { store[path] = { ...store[path], ...cp(d) }; setTimeout(notify, 10); },
+    delete: async () => { delete store[path]; setTimeout(notify, 10); }, get: async () => ({ id: path.split('/').pop(), exists: path in store, data: () => cp(store[path] || null) }),
+    onSnapshot: next => { const f = () => next({ id: path.split('/').pop(), exists: path in store, data: () => cp(store[path] || null) }); subs.push(f); setTimeout(f, 20); return () => {}; } });
+  const collection = col => ({ path: col, doc: id => doc(col + '/' + (id || uid())),
+    onSnapshot: next => { const f = () => next({ docs: colDocs(col), size: 0, empty: false, docChanges: () => [] }); subs.push(f); setTimeout(f, 20); return () => {}; } });
+  return { doc, collection };
+}
+function demoSeed() {
+  const t = todayIso(), d = n => addDays(t, n), at = n => d(n) + 'T09:00:00.000Z', S = {};
+  const P = Object.fromEntries(DEFAULT_PRICES.map(p => [p.item, p]));
+  const it = (name, qty = 1) => { const p = P[name] || { price: 0, details: '', unit: 'once-off' }; return { item: name, details: p.details, qty, rate: p.price, discount: 0, unit: p.unit === 'per month' ? 'per month' : undefined }; };
+  const C = {
+    juniper: { business: 'Juniper & Sage Café', contacts: [{ name: 'Thandi Nkosi', role: 'Owner', email: 'thandi@juniperandsage.example', phone: '082 555 0141' }], addr: { street: '14 Fourth Avenue', suburb: 'Parkhurst', city: 'Johannesburg', province: 'Gauteng', code: '2193', country: 'South Africa' } },
+    rooftop: { business: 'Rooftop Fitness Studio', contacts: [{ name: 'Ruan van Wyk', role: 'Founder', email: 'ruan@rooftopfit.example', phone: '083 555 0177' }, { name: 'Ayesha Patel', role: 'Marketing', email: 'ayesha@rooftopfit.example', phone: '' }] },
+    kloof: { business: 'Kloof Street Dental', contacts: [{ name: 'Dr Michael Botha', role: 'Practice owner', email: 'reception@kloofdental.example', phone: '021 555 0190' }], finance: { name: 'Lerato Molefe', email: 'accounts@kloofdental.example', phone: '' } },
+    marula: { business: 'Marula Interiors', contacts: [{ name: 'Nadia Jacobs', role: 'Director', email: 'nadia@marulainteriors.example', phone: '072 555 0123' }] },
+    bright: { business: 'Bright Path Tutoring', contacts: [{ name: 'Sipho Dlamini', role: 'Owner', email: 'sipho@brightpath.example', phone: '' }] },
+    sunbird: { business: 'Sunbird Travel', contacts: [{ name: 'Megan Fourie', role: 'Manager', email: 'megan@sunbirdtravel.example', phone: '084 555 0165' }] } };
+  Object.entries(C).forEach(([k, c]) => { S['clients/' + k] = { ...c, createdAt: at(-60) }; });
+  const snap = k => ({ ...C[k] });
+  const q = (id, n, k, items, status, days, extra = {}) => { S['quotes/' + id] = { number: n, rev: 1, status, date: d(days), validUntil: d(days + 30), clientId: k, client: snap(k), items, rush: 0, locked: status !== 'Draft',
+    history: [{ at: at(days), rev: 1, title: `Q-${n} created`, changes: [] }, ...(status !== 'Draft' ? [{ at: at(days), rev: 1, title: `Sent to the customer (Q-${n})`, changes: [] }] : [])], createdBy: OWNER.name, createdAt: at(days), updatedAt: at(days + 1), ...extra }; };
+  const acc = (days, name) => ({ decidedAt: at(days), acceptedBy: { by: 'client', name, at: at(days) } });
+  q('q1', 1001, 'juniper', [it('Identity Pack 1'), it('HTML Email Signature', 2)], 'Accepted', -48, acc(-45, 'Thandi Nkosi'));
+  q('q2', 1002, 'rooftop', [it('Logo Pack 1'), it('Social Growth')], 'Accepted', -33, acc(-30, 'Ruan van Wyk'));
+  q('q3', 1003, 'kloof', [it('Signature Update', 4)], 'Accepted', -50, acc(-49, 'Dr Michael Botha'));
+  q('q4', 1004, 'bright', [it('Flyer or Poster', 2)], 'Declined', -22, { decidedAt: at(-18) });
+  q('q5', 1005, 'marula', [it('Brochure')], 'Open', -41);
+  q('q6', 1006, 'marula', [it('Logo Pack 2'), it('Business Card')], 'Open', -9);
+  q('q7', 1007, 'kloof', [it('Business Website')], 'Open', -4);
+  q('q8', 1008, 'juniper', [it('Content Growth')], 'Accepted', -6, acc(-3, 'Thandi Nkosi'));
+  q('q9', 1009, 'sunbird', [it('Content Starter'), it('Static Email Signature')], 'Draft', 0);
+  const inv = (id, n, qid, k, items, days, payments, extra = {}) => { S['invoices/' + id] = { number: n, status: 'Sent', date: d(days), dueDate: d(days + 7), quoteId: qid, quoteRef: `Q-${S['quotes/' + qid].number}`, clientId: k, client: snap(k), items, locked: true, rush: 0,
+    payments, history: [{ at: at(days), title: `Issued as INV-${n}`, changes: [] }], createdBy: OWNER.name, createdAt: at(days), updatedAt: at(days + 1), ...extra }; };
+  const pay = (amount, days, note) => ({ amount, date: d(days), note, at: at(days), by: OWNER.name });
+  const tot = qid => calc(S['quotes/' + qid]).total;
+  inv('i1', 1001, 'q1', 'juniper', S['quotes/q1'].items, -44, [pay(Math.round(tot('q1') / 2), -43, 'Deposit'), pay(tot('q1') - Math.round(tot('q1') / 2), -20, 'Balance')]);
+  inv('i2', 1002, 'q2', 'rooftop', [it('Logo Pack 1')], -29, [pay(600, -2, 'Deposit')]);
+  inv('i3', 1003, 'q3', 'kloof', S['quotes/q3'].items, -40, []);
+  S['plans/p1'] = { quoteId: 'q2', quoteRef: 'Q-1002', clientId: 'rooftop', client: snap('rooftop'), day: 1, active: true, start: addMonths(ym(t), 1), items: [{ ...it('Social Growth'), unit: 'per month' }], createdBy: OWNER.name, createdAt: at(-29), updatedAt: at(-29) };
+  [['e1', -2, 'Adobe Creative Cloud', 'Software and subscriptions', 'Adobe', 1099], ['e2', -6, '500 business cards for Marula Interiors', 'Printing', 'Print shop', 450, 'marula'], ['e3', -12, 'novyra.co.za renewal', 'Domains and hosting', 'Domains.co.za', 179],
+    ['e4', -20, 'Stock photos', 'Fonts, photos and assets', 'Unsplash+', 150], ['e5', -35, 'Canva Pro', 'Software and subscriptions', 'Canva', 110]].forEach(([id, days, description, category, supplier, amount, clientId]) => { S['expenses/' + id] = { date: d(days), description, category, supplier, amount, clientId: clientId || '', note: '', createdAt: at(days) }; });
+  [['c1', -10, 'Brand refresh tips', 'Posted', ['Instagram', 'LinkedIn']], ['c2', -5, 'Client spotlight: Juniper & Sage', 'Posted', ['Instagram', 'Facebook']], ['c3', -1, 'Behind the design', 'Scheduled', ['Instagram', 'TikTok']],
+    ['c4', 1, 'Website launch checklist', 'Ready', ['LinkedIn', 'Threads']], ['c5', 3, 'Colour psychology for small brands', 'Planned', ['Instagram', 'LinkedIn']], ['c6', 6, 'Reel: logo process', 'Idea', ['Instagram', 'TikTok', 'YouTube']], ['c7', 9, 'Price list explainer', 'Planned', ['Facebook', 'Instagram']]]
+    .forEach(([id, days, name, status, platforms]) => { S['calendar/' + id] = { name, date: d(days), status, platforms, fb: '18:00', ig: '12:00', th: '12:30', li: '07:30', tt: '19:00', yt: '17:00', caption: `${name}. More on novyra.co.za\n#Novyra #BrandDesign`, notes: '', slides: 1 }; });
+  [['a1', -3, 'accepted', 'Q-1008 accepted by Thandi Nkosi', 'quote-q8'], ['a2', -4, 'sent', 'Q-1007 sent to Kloof Street Dental', 'quote-q7'], ['a3', -9, 'sent', 'Q-1006 sent to Marula Interiors', 'quote-q6'], ['a4', -20, 'payment', 'Payment recorded on INV-1001', 'invoice-i1']]
+    .forEach(([id, days, type, text, ref]) => { S['activity/' + id] = { at: at(days), by: OWNER.name, type, text, ref }; });
+  S['settings/meta'] = { lastQuote: 1009, lastInvoice: 1003 };
+  S['settings/bank'] = { bank: 'Example Bank', accountType: 'Business cheque', accountNumber: '1234567890' };
+  return S;
+}
 function boot() {
-  claude.use('db').then(async d => {
+  if (DEMO) { const b = $('#demo-bar'); if (b) b.hidden = false; }
+  (DEMO ? Promise.resolve(memDb(demoSeed())) : claude.use('db')).then(async d => {
     db = d;
-    if (!db) { state.failed = true; $('#main').innerHTML = `<div class="notice bad">Your quotes and invoices are kept in your private Novyra workspace. Reload the page and sign in again to load them.</div>`; return; }
-    try { const user = await claude.use('user'); if (user && !(await user.isOwner())) { db = null; state.failed = true; $('#main').innerHTML = `<div class="notice bad">This is a private Novyra workspace.</div>`; return; } } catch {}
+    if (!db) { state.failed = true; $('#main').innerHTML = `<div class="notice bad">We couldn’t open your records. Reload the page and sign in again.</div>`; return; }
+    if (!DEMO) try { const user = await claude.use('user'); if (user && !(await user.isOwner())) { db = null; state.failed = true; $('#main').innerHTML = `<div class="notice bad">This account can’t open Novyra Desk.</div>`; return; } } catch {}
     const timer = setTimeout(() => { if (!coreReady()) $('#main').innerHTML = `<div class="notice warn">Your records are taking long to load. Check your connection; the page fills in as soon as they arrive. Nothing has been lost.</div>`; }, 10000);
     const done = k => { const was = coreReady(); state.loaded[k] = true; if (coreReady()) { clearTimeout(timer); $('#main').removeAttribute('aria-busy'); } if (coreReady() || was) render(); };
     const fail = e => { clearTimeout(timer); state.failed = true; $('#main').innerHTML = `<div class="notice bad">Your records couldn’t be loaded right now (${esc(e && e.code || 'connection')}). They are still saved. Reload the page to try again.</div>`; };
@@ -2121,7 +2204,7 @@ function boot() {
     db.doc('settings/business').onSnapshot(s => { state.biz = s.exists ? s.data() : null; if (view.sub === 'settings' || view.sub === 'calendar') render(); }, () => {});
     db.doc('settings/meta').onSnapshot(s => { state.meta = s.exists ? s.data() : null; done('m'); }, fail);
     db.doc('settings/profile').onSnapshot(s => { state.profile = s.exists ? s.data() : null; if (state.profile) Object.assign(OWNER, state.profile); paintAvatar(); done('u'); }, fail);
-  }).catch(() => { state.failed = true; $('#main').innerHTML = `<div class="notice bad">Your workspace couldn’t be opened. Reload the page to try again.</div>`; });
+  }).catch(() => { state.failed = true; $('#main').innerHTML = `<div class="notice bad">Novyra Desk couldn’t open. Reload the page to try again.</div>`; });
 }
 
 /* ---------- routing (with a guard for unsaved changes) ---------- */
@@ -2187,6 +2270,7 @@ addEventListener('hashchange', route);
   });
 })();
 matchMedia('(max-width:900px)').addEventListener('change', () => { if (view.sub === 'settings') render(); });
+document.addEventListener('click', e => { if (e.target.closest('[data-demo-on]')) setDemo(true); else if (e.target.closest('[data-demo-off]')) setDemo(false); });
 function go(hash) { if (location.hash === '#' + hash) route(); else location.hash = hash; }
 function leaveDialog(target) {
   openModal(dlg('Unsaved changes', `<p class="lead">You changed <b>${esc(docNo(view.edit.draft, view.edit.kind))}</b> but haven’t saved it yet. If you leave now, those changes are lost.</p>`,
@@ -2410,6 +2494,20 @@ function closeSearch(clear) {
   }, true);
   addEventListener('hashchange', () => closeSearch(true));
 })();
+function startHTML() {
+  let hide = false; try { hide = localStorage.getItem('nd-start-hide') === '1'; } catch {}
+  if (DEMO || hide || !can('quotes')) return '';
+  const steps = [
+    ['company', 'Add your business details', 'Your name, contact details and the platforms you offer.', !!state.biz, 'go:company'],
+    ['card', 'Add your bank details', 'So customers know where to pay.', !!bank().accountNumber, 'go:settings-business'],
+    ['clients', 'Add your first customer', 'Save their business and contact people once.', state.clients.length > 0, 'customer'],
+    ['quotes', 'Send your first quote', 'Price a job and send it by email or WhatsApp.', state.quotes.some(q => q.status !== 'Draft'), 'quote'],
+    ['calendar', 'Plan a social post', 'Put your next post on the content calendar.', state.calendar.length > 0, 'go:calendar']];
+  const done = steps.filter(x => x[3]).length; if (done === steps.length) return '';
+  return `<section class="start"><div class="start-h"><div><h3>Get Novyra Desk ready</h3><p>${done} of ${steps.length} done. A few quick steps and you’re set.</p></div><div class="start-act"><button type="button" class="btn small ghost" data-demo-on>See it with sample data</button><button type="button" class="ib sm" data-start-hide aria-label="Hide this" title="Hide this"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div></div>
+    <div class="start-bar"><i style="width:${Math.round(done / steps.length * 100)}%"></i></div>
+    <div class="start-list">${steps.map(([ic, t, d, ok, act]) => `<button type="button" class="start-i ${ok ? 'ok' : ''}" data-start="${act}" ${ok ? 'disabled' : ''}><span class="start-ic">${ok ? '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>' : sicon(ic)}</span><span class="start-t"><b>${t}</b><span>${d}</span></span></button>`).join('')}</div></section>`;
+}
 function homeHTML() {
   const hr = new Date().getHours(), hello = hr < 12 ? 'Good Morning' : hr < 18 ? 'Good Afternoon' : 'Good Evening';
   const items = [];
@@ -2423,7 +2521,7 @@ function homeHTML() {
     ...state.invoices.map(v => ({ h: `invoice-${v.id}`, n: v.number ? 'INV-' + v.number : v.period ? monthLabel(v.period).replace(/ \d{4}$/, '') + '' : 'Invoice', c: v.client && v.client.business, t: calc(v).total, st: invoiceStatus(v), u: v.updatedAt || v.createdAt || '' }))].sort((a, b) => b.u.localeCompare(a.u)).slice(0, 6);
   return `<div class="home-hero"><div><h2>${hello}, ${esc(firstName(OWNER.name))}</h2><p class="muted">${items.length ? `${items.length} thing${items.length === 1 ? '' : 's'} need${items.length === 1 ? 's' : ''} your attention.` : 'You’re all caught up.'}</p></div>
       <div class="actions"><button class="btn primary" data-new>New quote</button><button class="btn" data-add-client>Add customer</button></div></div>
-    ${summaryHTML('home')}
+    ${startHTML()}${summaryHTML('home')}
     <div class="home-grid">
       <section class="panel"><h3>Needs your attention</h3>${items.length ? `<div class="todo">${items.map(i => `<a href="#${i.h}" class="todo-i ${i.tone}"><span class="dotc"></span><span><b>${esc(i.t)}</b><span class="sub">${esc(i.s)}</span></span><span class="sub num">${fmtDate(i.d)}</span></a>`).join('')}</div>` : '<div class="empty small"><p>Nothing waiting on you. New quotes, follow-ups and payments due will show here.</p></div>'}</section>
       <section class="panel"><h3>Latest work</h3>${recent.length ? `<div class="doclist">${recent.map(r => `<a href="#${r.h}"><b class="num">${esc(r.n)}</b><span class="sub ell">${esc(r.c || 'No customer')}</span><span class="num">${money(r.t)}</span><span class="pill ${pillClass(r.st)}">${stLabel(r.st)}</span></a>`).join('')}</div>` : '<div class="empty small"><p>Your quotes and invoices will show here.</p></div>'}</section>
@@ -2450,10 +2548,10 @@ function quotesHTML() {
       <td><div class="client">${esc(q.client && q.client.business || 'No customer yet')}</div><div class="sub">${esc((q.items || []).filter(i => i.item).map(i => i.item).join(', ') || 'No items yet')}</div></td>
       <td class="r num"><b>${money(calc(q).total)}</b></td>${ageCell(ageDays(q.date), ['Accepted', 'Declined'].includes(q.status))}
       <td><span class="pill ${pillClass(st)}">${stLabel(st)}</span></td>${approvedCell(q)}${ownerCell(q)}</tr>`; }).join('');
-  return `<div class="head"><div><h2>Quotes</h2><p>One quote per job. A quote stays unlocked until it’s sent; after that, unlock it to make changes and they’re saved as a new revision.</p></div>
+  return `<div class="head"><div><h2>Quotes</h2><p>${(() => { const w = state.quotes.filter(q => quoteStatus(q) === 'Open'); return w.length ? `${w.length} waiting on a reply, worth ${money0(w.reduce((a, q) => a + calc(q).total, 0))}.` : state.quotes.length ? 'No quotes waiting on a reply right now.' : 'Your quotes will appear here.'; })()}</p></div>
       <button class="btn primary" data-new>New quote</button></div>
     <div class="table-wrap">${qs.length ? `<table class="list lq"><thead><tr><th>No</th><th>Date</th><th>Customer</th><th class="r">Total</th><th class="r">Age</th><th>Status</th><th>Approved by</th><th>Owner</th></tr></thead><tbody>${rows}</tbody></table>`
-      : emptyBox('No quotes yet', 'Start with New quote. It gets the next number by itself.')}</div>${pg.more}`;
+      : emptyBox('No quotes yet', 'Ready when you are. Press New quote to price your first job.')}</div>${pg.more}`;
 }
 function invoicesHTML() {
   let vs = [...state.invoices].sort((a, b) => (b.number || 99999) - (a.number || 99999));
@@ -2464,9 +2562,9 @@ function invoicesHTML() {
       <td><div class="client">${esc(v.client && v.client.business || 'No customer yet')}</div><div class="sub">${esc((v.items || []).filter(i => i.item).map(i => i.item).join(', ') || 'No items yet')}</div></td>
       <td class="r num"><b>${money(c.total)}</b></td><td class="r num">${money(st === 'Cancelled' ? 0 : c.due)}</td>${ageCell(v.status === 'Sent' ? ageDays(v.date) : null, st === 'Paid')}
       <td><span class="pill ${pillClass(st)}">${stLabel(st)}</span></td>${ownerCell(v)}</tr>`; }).join('');
-  return `<div class="head"><div><h2>Invoices</h2><p>Every invoice comes from an accepted quote and gets its number straight away. It stays unlocked until it’s sent.</p></div></div>
+  return `<div class="head"><div><h2>Invoices</h2><p>${(() => { const due = state.invoices.filter(v => v.status === 'Sent').reduce((a, v) => a + Math.max(0, calc(v).due), 0); return due > 0 ? `${money0(due)} still owed to you.` : state.invoices.length ? 'Everything’s paid up.' : 'Your invoices will appear here.'; })()}</p></div></div>
     <div class="table-wrap">${vs.length ? `<table class="list li"><thead><tr><th>No</th><th>Date</th><th>Customer</th><th class="r">Total</th><th class="r">Still owed</th><th class="r">Age</th><th>Status</th><th>Owner</th></tr></thead><tbody>${rows}</tbody></table>`
-      : emptyBox('No invoices yet', 'Open an accepted quote and choose Create invoice.')}</div>${pg.more}`;
+      : emptyBox('No invoices yet', 'When a customer accepts a quote, you can invoice them from it.')}</div>${pg.more}`;
 }
 function clientsHTML() {
   const cs = state.clients.filter(c => matchQ(c.business, ...contactsOf(c).flatMap(p => [p.name, p.email, p.phone]))).sort((a, b) => clientName(a).localeCompare(clientName(b), 'en', { sensitivity: 'base' }));
@@ -2474,11 +2572,11 @@ function clientsHTML() {
   const rows = pg.rows.map(c => { const { quotes, invoices } = docsFor(c), ppl = contactsOf(c); const owed = invoices.filter(v => v.status === 'Sent').reduce((a, v) => a + Math.max(0, calc(v).due), 0);
     return `<tr data-client="${c.id}" tabindex="0"><td><div class="who">${avHTML(c)}<div><div class="client">${esc(c.business)}</div><div class="sub">${ppl.length ? esc(ppl.map(p => p.name).filter(Boolean).join(', ') || 'Contact saved') : 'No contact person yet'}</div></div></div></td>
       <td>${esc(ppl[0] && ppl[0].email || '—')}${ppl.length > 1 ? ` <span class="sub">+${ppl.length - 1}</span>` : ''}</td><td class="num">${esc(ppl[0] && ppl[0].phone || '—')}</td><td class="r num">${quotes.length}</td><td class="r num">${invoices.length}</td><td class="r num"><b>${owed ? money(owed) : '—'}</b></td></tr>`; }).join('');
-  return `<div class="head"><div><h2>Customers</h2><p>Save a customer once, with as many contact people as they have. When you start a quote, type their name and everything fills in.</p></div>
+  return `<div class="head"><div><h2>Customers</h2><p>${state.clients.length ? `${state.clients.length} business${state.clients.length === 1 ? '' : 'es'} you work with.` : 'The businesses you work with.'}</p></div>
       <button class="btn primary" data-add-client>Add customer</button></div>
     <div class="toolbar"><span class="sub">${state.clients.length} customer${state.clients.length === 1 ? '' : 's'}</span>${searchBox('Search name, contact or email')}</div>
     <div class="table-wrap">${cs.length ? `<table class="list lc"><thead><tr><th>Customer</th><th>Email</th><th>Phone</th><th class="r">Quotes</th><th class="r">Invoices</th><th class="r">Owed</th></tr></thead><tbody>${rows}</tbody></table>`
-      : state.clients.length ? emptyBox('No customers match', 'Try another search.') : emptyBox('No customers yet', 'Add your first customer, or add one straight from a new quote.')}</div>${pg.more}`;
+      : state.clients.length ? emptyBox('No customers match', 'Try another search.') : emptyBox('No customers yet', 'Add the businesses you work with and they’ll be ready for every quote.')}</div>${pg.more}`;
 }
 const sheetPrice = (name, fallback) => { const p = prices().find(x => x.item === name); return p ? Number(p.price) || 0 : fallback; };
 const rr = n => 'R' + Math.round(n).toLocaleString('en-US');
@@ -2667,12 +2765,12 @@ function plansHTML() {
       <td class="num">${esc(p.quoteRef || '')}</td><td class="r num"><b>${money(per(p))}</b></td><td class="num">${ordinal(p.day)} of the month</td>
       <td class="num">${p.active ? fmtDate(planDate(p, nextPlanMonth(p))) : '—'}</td><td><span class="pill ${p.active ? 'accepted' : 'cancelled'}">${p.active ? 'Active' : 'Paused'}</span></td></tr>`).join('');
   const total = ps.filter(p => p.active).reduce((a, p) => a + per(p), 0);
-  return `<div class="head"><div><h2>Monthly billing</h2><p>Social and Content packages bill themselves. On the billing day, the month’s invoice is created for you. Open it, check it, then send it.</p></div></div>
+  return `<div class="head"><div><h2>Monthly billing</h2><p>${(() => { const a = state.plans.filter(p => p.active); return a.length ? `${a.length} customer${a.length === 1 ? '' : 's'} on a monthly package.` : 'Customers you bill every month.'; })()}</p></div></div>
     <section class="strip three" aria-label="Summary"><div class="stat"><span class="label">Active packages</span><b class="num">${ps.filter(p => p.active).length}</b></div>
       <div class="stat"><span class="label">Billed each month</span><b class="num spark">${money0(total)}</b></div>
       <div class="stat"><span class="label">Next invoice</span><b class="num">${(() => { const n = ps.filter(p => p.active).map(p => planDate(p, nextPlanMonth(p))).sort()[0]; return n ? fmtDate(n) : '—'; })()}</b></div></section>
     <div class="table-wrap">${ps.length ? `<table class="list lp"><thead><tr><th>Customer and package</th><th>Quote</th><th class="r">Per month</th><th>Billing day</th><th>Next invoice</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>`
-      : emptyBox('No monthly packages yet', 'Open an accepted quote with a Social or Content package and choose Set up monthly billing.')}</div>`;
+      : emptyBox('No monthly packages yet', 'When a customer signs up for a monthly package, their billing shows here.')}</div>`;
 }
 const ordinal = n => { n = Number(n) || 1; const s = ['th', 'st', 'nd', 'rd'], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); };
 function planDialog(plan, fromQuote) {
@@ -2724,14 +2822,14 @@ function expensesHTML() {
   const pg = pageOf(list);
   const rows = pg.rows.map(e => `<tr data-expense="${e.id}" tabindex="0"><td class="num">${fmtDate(e.date)}</td><td><div class="client">${esc(e.description)}</div>${e.supplier ? `<div class="sub">${esc(e.supplier)}</div>` : ''}</td>
       <td><span class="cat">${esc(e.category || 'Other')}</span></td><td class="sub">${esc(e.clientName || '—')}</td><td class="r num"><b>${money(e.amount)}</b></td></tr>`).join('');
-  return `<div class="head"><div><h2>Expenses</h2><p>Log what the business spends, like printing, software and domains, so you can see what you actually keep.</p></div><button class="btn primary" data-add-expense>Add expense</button></div>
+  return `<div class="head"><div><h2>Expenses</h2><p>What Novyra spends, so you know what you keep.</p></div><button class="btn primary" data-add-expense>Add expense</button></div>
     <section class="strip three" aria-label="Summary"><div class="stat"><span class="label">Money in, ${label}</span><b class="num spark">${money0(paidIn)}</b><span class="sub">Payments recorded on invoices</span></div>
       <div class="stat"><span class="label">Spent, ${label}</span><b class="num">${money0(spent)}</b><span class="sub">${list.length} expense${list.length === 1 ? '' : 's'}</span></div>
       <div class="stat"><span class="label">Profit, ${label}</span><b class="num ${paidIn - spent < 0 ? 'bad' : ''}">${money0(paidIn - spent)}</b><span class="sub">Money in minus spent</span></div></section>
     <div class="toolbar"><div class="filters">${[['month', 'This month'], ['last', 'Last month'], ['year', 'This year'], ['all', 'All']].map(([k, l]) => `<button class="chipbtn" data-filter="${k}" aria-pressed="${f === k}">${l}</button>`).join('')}</div>${searchBox('Search description, supplier or category')}</div>
     ${byCat.length ? `<div class="catbar">${byCat.map(([c, v]) => `<span><i style="width:${Math.max(4, v / spent * 100)}%"></i><b>${esc(c)}</b><em class="num">${money0(v)}</em></span>`).join('')}</div>` : ''}
     <div class="table-wrap">${list.length ? `<table class="list le"><thead><tr><th>Date</th><th>Description</th><th>Category</th><th>For customer</th><th class="r">Amount</th></tr></thead><tbody>${rows}</tbody></table>`
-      : state.expenses.length ? emptyBox('Nothing for this period', 'Try another period or search.') : emptyBox('No expenses yet', 'Add one with Add expense. A receipt, a subscription or a print job all count.')}</div>${pg.more}`;
+      : state.expenses.length ? emptyBox('Nothing for this period', 'Try another period or search.') : emptyBox('No expenses yet', 'Add what you spend, like printing, software or a domain.')}</div>${pg.more}`;
 }
 function expenseDialog(e) {
   const isNew = !e; let x = e ? clone(e) : { date: todayIso(), amount: '', description: '', category: 'Printing', supplier: '', clientId: '', note: '' };
@@ -2803,11 +2901,11 @@ function settingsSummary(k) {
 const sRow = (label, help, ctrl, cls = '') => `<div class="srow ${cls}"><div class="srow-l"><b>${label}</b>${help ? `<span>${help}</span>` : ''}</div><div class="srow-c">${ctrl}</div></div>`;
 const sCard = (title, desc, body, opt = {}) => `<section class="scard ${opt.cls || ''}" ${opt.id ? `id="${opt.id}"` : ''}>${title ? `<header class="scard-h">${opt.ic ? `<span class="scard-ic">${sicon(opt.ic)}</span>` : ''}<div class="scard-t"><h3>${title}${opt.badge || ''}</h3>${desc ? `<p>${desc}</p>` : ''}</div>${opt.act || ''}</header>` : ''}<div class="scard-b">${body}</div>${opt.foot ? `<footer class="scard-f">${opt.foot}</footer>` : ''}</section>`;
 const pageHead = (t, d, act) => `<div class="head"><div><h2>${t}</h2><p>${d}</p></div>${act ? `<div class="actions">${act}</div>` : ''}</div>`;
-function companyPageHTML() { return pageHead('Business info', 'How Novyra is named and reached, your social links and the platforms you offer customers.') + `<div class="pg-stack">${setCompanyHTML()}</div>`; }
+function companyPageHTML() { return pageHead('Business info', 'How customers see and reach Novyra.') + `<div class="pg-stack">${setCompanyHTML()}</div>`; }
 function teamPageHTML() {
   const us = state.users, on = us.filter(u => u.active !== false);
   const stat = (l, n, d) => `<div class="stat"><span class="label">${l}</span><b class="num">${n}</b><span class="sub">${d}</span></div>`;
-  return pageHead('Team', 'Everyone who can sign in to Novyra Desk, their role and the areas they can open.', can('team') ? '<button class="btn primary" data-user-add>Add person</button>' : '')
+  return pageHead('Team', 'The people who help you run Novyra.', can('team') ? '<button class="btn primary" data-user-add>Add person</button>' : '')
     + `<section class="strip tm-strip" aria-label="Summary">${stat('People', us.length + 1, 'Including you')}${stat('Admins', us.filter(u => u.role === 'admin' && u.active !== false).length, 'Everything but the team')}${stat('Staff and viewers', on.filter(u => u.role !== 'admin').length, 'Only the areas you tick')}${stat('Disabled', us.length - on.length, 'Can’t sign in')}</section>`
     + `<div class="pg-stack">${setTeamHTML()}</div>`;
 }
@@ -2818,8 +2916,8 @@ function settingsHTML() {
       <div class="set-hero-av" id="pf-av" style="background:${esc(OWNER.color || AV_COLORS[0])}">${esc(userInitials(OWNER))}</div>
       <div class="set-hero-id"><h2 id="pf-nm">${esc(OWNER.name)}</h2><p><span id="pf-tt">${esc(OWNER.title || '')}</span><span class="dotsep">${esc(biz().name)}</span></p><div class="set-hero-meta"><span>${esc(em)}</span><span class="pill accepted">${isOwnerLogin() ? 'Owner' : esc((ROLES[ME.role] || ROLES.staff)[0])}</span>${methods}</div></div>
       ${S.email ? '<button class="btn set-hero-out" data-signout>Sign out</button>' : ''}</section>`;
-  return `<div class="head"><div><h2>Settings</h2><p>Your details, how you sign in, payments, the menu and backups, all on one page.</p></div></div>
-    <div class="set-page">${hero}${setProfileHTML()}${setSecurityHTML()}${setBusinessHTML()}${setMenuHTML()}${setDataHTML()}</div>`;
+  return `<div class="head"><div><h2>Settings</h2><p>Your account and preferences.</p></div></div>
+    <div class="set-page">${hero}${setProfileHTML()}${setSecurityHTML()}${setBusinessHTML()}${setMenuHTML()}${setDataHTML()}${sCard('Sample data', 'Explore Novyra Desk with example customers, quotes, invoices and posts. Your own records stay exactly as they are.', sRow(DEMO ? 'You’re looking at sample data' : 'Try it with sample data', DEMO ? 'Nothing you do here is saved.' : 'Great for trying things out or taking screenshots.', DEMO ? '<button class="btn primary" data-demo-off>Back to my records</button>' : '<button class="btn" data-demo-on>Show sample data</button>'), { ic: 'share', id: 'set-sample' })}</div>`;
 }
 function setProfileHTML() {
   const u = { ...OWNER }, sg = { ...SIGN_DEFAULT, ...(OWNER.sign || {}) };
@@ -2870,11 +2968,9 @@ function setMenuHTML() {
 }
 function setDataHTML() {
   const meta = state.meta || {}, pl = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
-  return sCard('Backups and database rules', 'Everything is saved in your private Novyra workspace. Download a backup about once a month and keep it in your Novyra folder.',
-      sRow('In your workspace', '', `<b class="sval">${pl(state.clients.length, 'customer')} · ${pl(state.quotes.length, 'quote')} · ${pl(state.invoices.length, 'invoice')}</b>`)
-      + sRow('Last backup', '', `<b class="sval">${meta.lastBackup ? fmtWhen(meta.lastBackup) : 'Not yet'}</b>`)
-      + sRow('Database rules', 'They decide who can open what. Copy them, open the Firebase console, select all, paste and press Publish.',
-        `<div class="sbtns"><button type="button" class="btn" data-copy-rules>Copy the rules</button><a class="btn ghost" href="https://console.firebase.google.com/project/novyra-studio/firestore/databases/-default-/rules" target="_blank" rel="noopener">Open Firebase</a></div>`),
+  return sCard('Backups', 'Keep your own copy of your records. Download one about once a month.',
+      sRow('Saved records', '', `<b class="sval">${pl(state.clients.length, 'customer')} · ${pl(state.quotes.length, 'quote')} · ${pl(state.invoices.length, 'invoice')}</b>`)
+      + sRow('Last backup', '', `<b class="sval">${meta.lastBackup ? fmtWhen(meta.lastBackup) : 'Not yet'}</b>`),
     { ic: 'data', id: 'set-data', foot: '<label class="btn">Restore from a backup<input type="file" accept="application/json,.json" data-restore hidden></label><button class="btn primary" data-backup>Download backup</button>' });
 }
 function setCompanyHTML() {
@@ -2912,7 +3008,7 @@ function setTeamHTML() {
   const invite = can('team') ? `<button type="button" class="tm-card tm-add" data-user-add><span class="tm-plus">${sicon('plus')}</span><b>Add a team member</b><span class="sub">Give someone their own sign-in and choose what they can open.</span></button>` : '';
   const roles = `<section class="scard"><header class="scard-h"><span class="scard-ic">${sicon('lock')}</span><div class="scard-t"><h3>Roles</h3><p>What each role can do.</p></div></header>
       <div class="tm-roles">${Object.entries(ROLES).map(([k, [l, d]]) => `<div><span class="pill ${k === 'owner' || k === 'admin' ? 'accepted' : 'open'}">${esc(l)}</span><p>${esc(d)}</p></div>`).join('')}</div>
-      <div class="tm-note">${sicon('data')}<span>New people can sign in once the team rules are switched on in the database rules. Copy them from <a href="#settings-data">Settings, Backups and database rules</a>.</span></div></section>`;
+</section>`;
   return `<div class="tm-grid">${owner}${us.map(card).join('')}${invite}</div>${roles}`;
 }
 function bindList(main) {
@@ -2988,6 +3084,8 @@ function bindList(main) {
   $$('[data-mshow]', main).forEach(c => c.addEventListener('change', () => { const g = menuGroups(); g.forEach(x => x.items.forEach(i => { if (i[0] === c.dataset.mshow) i[3] = !c.checked; })); saveMenu(g); }));
   const mr = $('[data-menu-reset]', main); if (mr) mr.addEventListener('click', async () => { state.menu = null; render(); try { await db.doc('menus/' + menuKey()).delete(); toast('Menu reset'); } catch {} });
   bindCalendar(main);
+  $$('[data-start]', main).forEach(b => b.addEventListener('click', () => { const a = b.dataset.start; if (a.startsWith('go:')) go(a.slice(3)); else if (a === 'customer') clientDialog(null); else if (a === 'quote') newQuoteDialog(); }));
+  const sh = $('[data-start-hide]', main); if (sh) sh.addEventListener('click', () => { try { localStorage.setItem('nd-start-hide', '1'); } catch {} render(); });
   if (view.sub === 'settings' && view.stab && settingsHTML.jump !== location.hash) { settingsHTML.jump = location.hash; const t = $('#set-' + view.stab, main); if (t) requestAnimationFrame(() => scrollTo({ top: t.getBoundingClientRect().top + scrollY - 84, behavior: 'auto' })); }
   if (view.sub !== 'settings') settingsHTML.jump = '';
   const spw = $('[data-set-pass]', main); if (spw) spw.addEventListener('click', async () => { const o = $('#pw-out', main); spw.disabled = true; o.textContent = 'Sending…';
@@ -3053,7 +3151,7 @@ function calendarHTML() {
       <div class="panel cv-prog"><h3>${esc(first.toLocaleDateString('en-GB', { month: 'long' }))} progress</h3><div class="cv-pn"><b>${done}</b><span>of ${inMonth.length} posted</span></div><div class="cv-bar" role="img" aria-label="${done} of ${inMonth.length} posted">${inMonth.length ? counts.filter(c => c[1]).map(([s, n]) => `<i class="st-${pillClass(s)}" style="flex:${n}"></i>`).join('') : ''}</div>
         <ul class="cv-leg">${counts.map(([s, n]) => `<li><span class="cv-nd st-${pillClass(s)}"></span>${s}<b>${n}</b></li>`).join('')}</ul></div></aside>`;
   const filt = `<div class="cv-filt" role="group" aria-label="Filter by status"><button type="button" data-cal-f="" aria-pressed="${!f}">All <b>${inMonth.length}</b></button>${counts.map(([s, n]) => `<button type="button" data-cal-f="${s}" aria-pressed="${f === s}"><span class="cv-nd st-${pillClass(s)}"></span>${s} <b>${n}</b></button>`).join('')}</div>`;
-  return `<div class="head"><div><h2>Content calendar</h2><p>Plan every social post: when it goes out, where, and the caption to use.</p></div><div class="actions"><button class="btn primary" data-cal-add="${t}">Add post</button></div></div>
+  return `<div class="head"><div><h2>Content calendar</h2><p>${(() => { const n = calendarItems().filter(i => i.date >= todayIso() && calSt(i) !== 'Posted').length; return n ? `${n} post${n === 1 ? '' : 's'} coming up.` : 'Your social posts, planned ahead.'; })()}</p></div><div class="actions"><button class="btn primary" data-cal-add="${t}">Add post</button></div></div>
     <div class="cv-bar1"><div class="cv-nav"><button class="ib" data-cal-m="-1" aria-label="Previous month"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button><h3>${esc(label)}</h3><button class="ib" data-cal-m="1" aria-label="Next month"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>${m !== t.slice(0, 7) ? '<button class="btn small" data-cal-today>Today</button>' : ''}</div>
       <div class="seg cv-seg" role="group" aria-label="View"><button type="button" data-cal-v="month" aria-pressed="${mode === 'month'}">Month</button><button type="button" data-cal-v="list" aria-pressed="${mode === 'list'}">List</button></div></div>
     ${filt}
@@ -3144,7 +3242,7 @@ async function restoreDialog(file) {
   const n = add.clients.length + add.quotes.length + add.invoices.length + add.plans.length + add.expenses.length + extra.length;
   openModal(dlg('Restore from backup', `<p class="lead">Backup made <b>${esc(fmtWhen(data.made))}</b>.</p>
       ${n ? `<p>This puts back <b>${add.clients.length} customer${add.clients.length === 1 ? '' : 's'}</b>, <b>${add.quotes.length} quote${add.quotes.length === 1 ? '' : 's'}</b> and <b>${add.invoices.length} invoice${add.invoices.length === 1 ? '' : 's'}</b>${(() => { const more = [add.plans.length ? `${add.plans.length} monthly billing plan${add.plans.length === 1 ? '' : 's'}` : '', add.expenses.length ? `${add.expenses.length} expense${add.expenses.length === 1 ? '' : 's'}` : '', ...extra.map(x => x[2])].filter(Boolean); return more.length ? ', plus ' + listAnd(more) : ''; })()} that are missing now.</p><p class="sub">Nothing you have now is changed or replaced; only missing records are added back.</p>`
-        : '<p>Everything in this backup is already in your workspace. Nothing needs restoring.</p>'}`,
+        : '<p>Everything in this backup is already in Novyra Desk. Nothing needs restoring.</p>'}`,
     `<button class="btn ghost" data-close>${n ? 'Cancel' : 'Close'}</button>${n ? '<button class="btn primary" data-do-restore>Restore missing records</button>' : ''}`), m => {
     const b = $('[data-do-restore]', m); if (!b) return;
     b.addEventListener('click', async () => {
