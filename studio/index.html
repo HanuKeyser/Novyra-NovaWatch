@@ -1107,6 +1107,126 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:none;bor
   .home-hero>.actions>.btn{width:100%;padding-inline:8px;justify-content:center}
 }
 @media (min-width:901px) and (max-width:1200px){.home-hero{grid-template-columns:minmax(0,1fr) calc((100% - 12px) / 2)}}
+/* ================= content calendar (v2) ================= */
+.st-idea{--sc:#8a93ad;--sb:#f2f4f9;--st:#535c78}.st-planned{--sc:#e9a23b;--sb:#fff6e5;--st:#9a5b08}.st-ready{--sc:#4a86f7;--sb:#ecf2ff;--st:#2a5fd6}.st-scheduled{--sc:#7c5cf0;--sb:#f2eeff;--st:#5b3fc9}.st-posted{--sc:#1f9d55;--sb:#e8f6ee;--st:#15803d}
+.pill.scheduled{background:#f2eeff;color:#5b3fc9}
+.cv-nd{width:8px;height:8px;border-radius:50%;background:var(--sc);flex:none;display:inline-block}
+.cv-pfs{display:inline-flex;gap:3px;flex:none}
+.cv-pf{width:17px;height:17px;border-radius:5px;display:inline-grid;place-items:center;font:800 8.5px/1 var(--body);font-style:normal;color:#fff;letter-spacing:0}
+.cv-pf.pf-ig{background:linear-gradient(135deg,#f58529,#dd2a7b 55%,#8134af)}.cv-pf.pf-li{background:#0a66c2}.cv-pf.pf-fb{background:#1877f2}.cv-pf.pf-st{background:#fff;color:#dd2a7b;box-shadow:inset 0 0 0 1.5px #dd2a7b}
+/* toolbar */
+.cv-bar1{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.cv-nav{display:flex;align-items:center;gap:4px;min-width:0}
+.cv-nav h3{font-size:22px;margin:0 8px;min-width:190px;text-align:center;white-space:nowrap}
+.cv-nav .ib{border:1px solid var(--line);background:#fff;width:36px;height:36px}
+.cv-nav .btn{margin-left:8px}
+.cv-seg button{padding:7px 16px}
+.cv-filt{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:16px;padding:1px}
+.cv-filt::-webkit-scrollbar{display:none}
+.cv-filt button{display:inline-flex;align-items:center;gap:7px;flex:none;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font:600 13px var(--body);color:var(--muted);cursor:pointer;transition:border-color .15s,background-color .15s,color .15s}
+.cv-filt button b{font-weight:700;color:var(--dim);font-variant-numeric:tabular-nums}
+.cv-filt button:hover{border-color:var(--line2);color:var(--text)}
+.cv-filt button[aria-pressed="true"]{background:var(--text);border-color:var(--text);color:#fff}.cv-filt button[aria-pressed="true"] b{color:rgba(255,255,255,.7)}
+/* layout */
+.cv-wrap{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:var(--gap);align-items:start}
+.cv-side{display:grid;gap:var(--gap);position:sticky;top:84px}
+@media (max-width:1200px){.cv-wrap{grid-template-columns:minmax(0,1fr)}.cv-side{position:static;grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* month grid */
+.cv-month{border:1px solid var(--line);border-radius:var(--r-card);background:#fff;box-shadow:var(--sh-card);overflow:hidden}
+.cv-wk{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-bottom:1px solid var(--line)}
+.cv-wk span{padding:10px 12px;font:700 11px var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.cv-wk span:nth-child(n+6){color:#9aa2bb}
+.cv-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));grid-auto-rows:minmax(122px,auto)}
+.cv-day{position:relative;min-width:0;padding:6px 6px 8px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:4px;transition:background-color .15s}
+.cv-day:nth-child(7n){border-right:0}.cv-grid>.cv-day:nth-last-child(-n+7){border-bottom:0}
+.cv-day.wkend{background:#fafbfd}.cv-day.out{background:repeating-linear-gradient(135deg,#f7f8fb 0 6px,#fbfcfd 6px 12px)}
+.cv-day.out .cv-dn{color:#b4bbcf}
+.cv-dh{display:flex;align-items:center;justify-content:space-between;height:26px}
+.cv-dn{font:600 13px var(--body);color:var(--muted);min-width:26px;height:26px;display:grid;place-items:center;border-radius:999px;font-variant-numeric:tabular-nums}
+.cv-day.past:not(.today) .cv-dn{color:#a3abc2}
+.cv-day.today{background:#f5f8ff}.cv-day.today .cv-dn{background:var(--spark);color:#fff;font-weight:700}
+.cv-add{width:26px;height:26px;border:0;border-radius:8px;background:none;color:var(--dim);display:grid;place-items:center;cursor:pointer;opacity:0;transition:opacity .15s,background-color .15s}
+.cv-day:hover .cv-add,.cv-add:focus-visible{opacity:1}.cv-add:hover{background:var(--ink3);color:var(--text)}
+@media (hover:none){.cv-add{opacity:.6}}
+.cv-chip{display:flex;align-items:center;gap:6px;width:100%;min-width:0;border:0;text-align:left;cursor:pointer;font:inherit;padding:5px 6px 5px 8px;border-radius:8px;background:var(--sb);box-shadow:inset 3px 0 0 var(--sc);transition:transform .15s var(--ease),box-shadow .15s}
+.cv-chip:hover{box-shadow:inset 3px 0 0 var(--sc),0 4px 12px -6px rgba(16,24,48,.3);transform:translateY(-1px)}
+.cv-chip.drag{opacity:.4}
+.cv-ct{display:grid;min-width:0;flex:1;line-height:1.25}
+.cv-ct time{font:700 10.5px var(--body);color:var(--st);font-variant-numeric:tabular-nums}
+.cv-ct b{font-size:12.5px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cv-chip .cv-pf{width:14px;height:14px;font-size:7px;border-radius:4px}.cv-cl{display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:14px}.cv-chip .cv-pfs{gap:2px}
+.cv-more{border:0;background:none;text-align:left;padding:2px 8px;font:700 12px var(--body);color:var(--soft);cursor:pointer;border-radius:6px}.cv-more:hover{background:var(--ink3)}
+.cv-dragging .cv-day[data-cal-day]{background:#fbfcff}
+.cv-day.over{background:#eaf1ff !important;box-shadow:inset 0 0 0 2px var(--spark)}
+/* agenda list */
+.cv-agenda{display:grid;gap:12px}
+.cv-agenda.cv-mobonly{display:none}
+.cv-mini{display:none}
+.cv-list{display:grid;gap:10px}
+.cv-ag{display:grid;grid-template-columns:56px minmax(0,1fr);gap:12px;align-items:start;border-radius:var(--r-card);transition:background-color .6s}
+.cv-ag.flash{background:#eaf1ff}
+.cv-agd{display:grid;justify-items:center;align-content:center;height:56px;border-radius:14px;background:#fff;border:1px solid var(--line);line-height:1.05}
+.cv-agd b{font:800 21px var(--display);font-variant-numeric:tabular-nums}.cv-agd span{font:700 10.5px var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.cv-ag.today .cv-agd{background:var(--spark);border-color:var(--spark);color:#fff}.cv-ag.today .cv-agd span{color:rgba(255,255,255,.85)}
+.cv-ag.past .cv-agd{opacity:.6}
+.cv-agl{display:grid;gap:6px;min-width:0}
+.cv-tag{font:700 11px var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--soft);padding-top:2px}
+.cv-row{display:grid;grid-template-columns:52px minmax(0,1fr) auto auto;gap:12px;align-items:center;text-align:left;width:100%;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px 10px 14px;font:inherit;cursor:pointer;box-shadow:inset 3px 0 0 var(--sc);transition:border-color .15s,box-shadow .15s}
+.cv-row:hover{border-color:var(--line2);box-shadow:inset 3px 0 0 var(--sc),0 6px 16px -10px rgba(16,24,48,.3)}
+.cv-rt{font:700 13px var(--body);color:var(--st);font-variant-numeric:tabular-nums}
+.cv-rm{display:grid;min-width:0}.cv-rm b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cv-rm .sub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12.5px}
+.cv-empty{display:grid;justify-items:center;text-align:center;gap:8px;padding:48px 20px;border:1px dashed var(--line2);border-radius:var(--r-card);background:#fff;color:var(--dim)}
+.cv-empty h3{font-size:17px;color:var(--text);margin:4px 0 0}.cv-empty p{margin:0 0 6px;color:var(--muted)}
+/* side panel */
+.cv-side>.panel{margin:0 !important}.cv-side .panel h3{margin-bottom:10px !important}
+.cv-next{display:grid;gap:2px}
+.cv-nx{display:grid;grid-template-columns:8px minmax(0,1fr) auto;gap:10px;align-items:center;border:0;background:none;text-align:left;padding:9px 8px;margin:0 -8px;border-radius:10px;font:inherit;cursor:pointer}
+.cv-nx:hover{background:var(--ink)}
+.cv-nm{display:grid;min-width:0;line-height:1.3}.cv-nm b{font-weight:600;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cv-nm .sub{font-size:12px}
+.cv-pn{display:flex;align-items:baseline;gap:8px;margin-bottom:10px}.cv-pn b{font:800 30px var(--display);font-variant-numeric:tabular-nums;line-height:1}.cv-pn span{color:var(--muted)}
+.cv-bar{display:flex;gap:3px;height:8px;border-radius:999px;background:var(--ink3);overflow:hidden;margin-bottom:14px}.cv-bar i{background:var(--sc);min-width:6px}
+.cv-leg{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+.cv-leg li{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--muted)}.cv-leg b{margin-left:auto;color:var(--text);font-variant-numeric:tabular-nums}
+/* post dialog */
+.cv-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:20px}
+.cv-fl,.cv-fr{display:grid;gap:14px;align-content:start;min-width:0}
+.cv-sts{display:flex;flex-wrap:wrap;gap:6px}
+.cv-sto{display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border:1px solid var(--line2);border-radius:999px;font:600 13px var(--body);color:var(--muted);cursor:pointer;background:#fff;transition:background-color .15s,border-color .15s,color .15s}
+.cv-sto input{position:absolute;opacity:0;pointer-events:none;width:1px !important;height:1px !important}
+.cv-sto:has(input:checked){background:var(--sb);border-color:var(--sc);color:var(--st)}
+.cv-sto:has(input:focus-visible){outline:2px solid var(--soft);outline-offset:2px}
+.cv-pls{display:grid;gap:6px}
+.cv-pl{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 6px 6px 12px;border:1px solid var(--line2);border-radius:12px;background:#fff;transition:border-color .15s,background-color .15s}
+.cv-pl.on{border-color:var(--spark);background:#f5f8ff}
+.cv-plt{display:flex;align-items:center;gap:10px;font-weight:600;cursor:pointer;flex:1;min-width:0}
+.cv-plt input{accent-color:var(--spark);width:16px !important;height:16px !important;margin:0;flex:none}
+.cv-plh{width:118px !important;flex:none;min-height:36px !important;padding:6px 10px !important;transition:opacity .15s}
+.cv-pl:not(.on) .cv-plh{opacity:.35;pointer-events:none}
+.cv-capl{display:flex !important;justify-content:space-between;gap:8px}.cv-capl em{font-style:normal;font-weight:500;color:var(--dim);letter-spacing:0;text-transform:none}
+.cv-capa{display:flex;align-items:center;gap:10px;margin-top:-6px}.cv-capa .btn svg{margin-right:6px;vertical-align:-2px}
+#ca-cap{min-height:200px}
+/* phones and tablets */
+@media (max-width:900px){.cv-form{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:760px){
+  .cv-month,.cv-seg{display:none !important}
+  .cv-agenda.cv-mobonly{display:grid}
+  .cv-bar1{margin-bottom:10px}
+  .cv-nav{width:100%;justify-content:space-between}.cv-nav h3{flex:1;min-width:0;font-size:19px;margin:0}
+  .cv-nav .btn{order:-1;margin:0 4px 0 0;display:none}
+  .cv-mini{display:block;border:1px solid var(--line);border-radius:var(--r-card);background:#fff;padding:10px;box-shadow:var(--sh-card)}
+  .cv-mwk,.cv-mg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;text-align:center}
+  .cv-mwk span{font:700 10.5px var(--body);color:var(--dim);padding:2px 0 6px}
+  .cv-mn{position:relative;height:38px;border:0;background:none;border-radius:10px;font:600 14px var(--body);color:var(--text);cursor:pointer;font-variant-numeric:tabular-nums}
+  .cv-mn.out{pointer-events:none}
+  .cv-mn.has{background:#eef3ff;color:var(--soft)}
+  .cv-mn i{position:absolute;left:50%;bottom:5px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:var(--spark)}
+  .cv-mn.today{background:var(--spark);color:#fff}.cv-mn.today i{background:#fff}
+  .cv-ag{grid-template-columns:46px minmax(0,1fr);gap:10px}.cv-agd{height:50px;border-radius:12px}.cv-agd b{font-size:18px}
+  .cv-row{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"m p" "t s";row-gap:6px;padding:10px 12px 10px 14px}
+  .cv-row .cv-rm{grid-area:m}.cv-row .cv-pfs{grid-area:p}.cv-row .cv-rt{grid-area:t;font-size:12px}.cv-row .pill{grid-area:s;justify-self:end}
+  .cv-side{display:none}
+}
+@media (prefers-reduced-motion:reduce){.cv-chip,.cv-ag,.cv-row{transition:none}}
 </style></head><body>
 
 <header class="appbar">
@@ -1244,6 +1364,7 @@ function paintAvatar() { const a = $('.appbar .avatar'); if (!a) return; a.textC
 const DEFAULT_BANK = { bank: 'Discovery Bank', accountType: 'Savings account', accountNumber: '12687680212' };
 let db = null, state = { quotes: [], invoices: [], clients: [], prices: null, bank: null, meta: null, profile: null, plans: [], expenses: [], shares: [], calendar: [], users: [], activity: [], trash: [], email: null, menu: null, loaded: { tr: false, q: false, i: false, c: false, p: false, b: false, m: false, u: false, pl: false, ex: false, sh: false, ca: false, us: false, ac: false, em: false, mn: false } };
 let view = { tab: 'home', filter: 'all', edit: null, q: '' };
+try { view.calView = localStorage.getItem('nd-calview') || 'month'; } catch {}
 
 const initials = n => String(n || '').replace(/\(.*?\)/g, '').split(/[\s-]+/).filter(w => /^[A-Za-z0-9]/.test(w) && !/^(pty|ltd|cc|the|and|of)$/i.test(w)).slice(0, 2).map(w => w[0].toUpperCase()).join('') || '?';
 const ageDays = s => s ? Math.max(0, Math.round((new Date(todayIso() + 'T00:00:00') - new Date(s + 'T00:00:00')) / 864e5)) : null;
@@ -2402,57 +2523,117 @@ function bindList(main) {
 
 /* ---------- content calendar ---------- */
 const CAL_STATUS = ['Idea', 'Planned', 'Ready', 'Scheduled', 'Posted'];
+const CAL_PLAT = { Instagram: { k: 'ig', s: 'IG', t: 'ig' }, LinkedIn: { k: 'li', s: 'in', t: 'li' }, Facebook: { k: 'fb', s: 'f', t: 'fb' }, Stories: { k: 'st', s: 'St', t: 'st' } };
+const CAL_DEF_TIME = { ig: '12:00', li: '07:30', fb: '18:00', st: '12:00' };
 function calendarItems() {
   const byId = Object.fromEntries(state.calendar.map(c => [c.id, c]));
   const seed = CAL_SEED.map(s => byId[s.id] ? { ...s, ...byId[s.id] } : s);
   const extra = state.calendar.filter(c => !CAL_SEED.some(s => s.id === c.id) && !String(c.id).startsWith('s-'));
-  return [...seed, ...extra].filter(c => !c.hidden).sort((a, b) => (a.date || '').localeCompare(b.date || '') || (a.ig || '').localeCompare(b.ig || ''));
+  return [...seed, ...extra].filter(c => !c.hidden).sort((a, b) => (a.date || '').localeCompare(b.date || '') || calTime(a).localeCompare(calTime(b)));
 }
+const calTime = i => (i.platforms || []).map(p => i[(CAL_PLAT[p] || {}).t]).filter(Boolean).sort()[0] || '';
+const calSt = i => i.status || 'Planned';
+const calDot = p => { const c = CAL_PLAT[p]; return c ? `<i class="cv-pf pf-${c.k}" title="${p}">${c.s}</i>` : ''; };
+const calDate = (d, o) => new Date(d + 'T00:00').toLocaleDateString('en-GB', o);
+function calRel(d) { const t = todayIso(); if (d === t) return 'Today'; if (d === addDays(t, 1)) return 'Tomorrow'; if (d === addDays(t, -1)) return 'Yesterday'; return calDate(d, { weekday: 'short', day: 'numeric', month: 'short' }); }
 function calendarHTML() {
-  const items = calendarItems(), t = todayIso();
-  const m = view.calMonth || (items.find(i => i.date >= t) || { date: t }).date.slice(0, 7) || t.slice(0, 7);
-  view.calMonth = m;
+  const all = calendarItems(), t = todayIso();
+  const m = view.calMonth || t.slice(0, 7); view.calMonth = m;
+  const mode = view.calView || 'month', f = view.calFilter || '';
   const [y, mo] = m.split('-').map(Number), first = new Date(y, mo - 1, 1), days = new Date(y, mo, 0).getDate(), lead = (first.getDay() + 6) % 7;
-  const iso = d => `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-  const inMonth = items.filter(i => (i.date || '').startsWith(m));
-  const chip = i => `<button type="button" class="cchip ${pillClass(i.status || 'Planned')}" data-cal="${esc(i.id)}" title="${esc(i.name)}"><b>${esc(i.name)}</b><span>${[(i.platforms || []).includes('Instagram') && i.ig ? 'IG ' + esc(i.ig) : '', (i.platforms || []).includes('LinkedIn') && i.li ? 'LI ' + esc(i.li) : ''].filter(Boolean).join(' · ') || esc((i.platforms || []).join(', '))}</span></button>`;
-  let cells = ''; for (let k = 0; k < lead; k++) cells += '<div class="cday pad"></div>';
-  for (let d = 1; d <= days; d++) { const di = iso(d), list = inMonth.filter(i => i.date === di); cells += `<div class="cday ${di === t ? 'today' : ''} ${di < t ? 'past' : ''}" data-cal-day="${di}"><span class="dn">${d}</span>${list.map(chip).join('')}<button type="button" class="cadd" data-cal-add="${di}" aria-label="Add a post on ${fmtDate(di)}">+</button></div>`; }
+  const iso = dt => `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+  const inMonth = all.filter(i => (i.date || '').startsWith(m)), shown = inMonth.filter(i => !f || calSt(i) === f);
   const label = first.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
-  const counts = CAL_STATUS.map(s => [s, inMonth.filter(i => (i.status || 'Planned') === s).length]).filter(x => x[1]);
-  return `<div class="head"><div><h2>Content calendar</h2><p>Every social media post, with its date, best time, platforms and caption.</p></div><div class="actions"><button class="btn primary" data-cal-add="${t}">Add post</button></div></div>
-    <div class="calbar"><div class="calnav"><button class="ib" data-cal-m="-1" aria-label="Previous month">‹</button><h3><span class="lg">${label}</span><span class="sm">${first.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}</span></h3><button class="ib" data-cal-m="1" aria-label="Next month">›</button><button class="btn small" data-cal-today>Today</button></div>
-      <div class="sub">${inMonth.length} post${inMonth.length === 1 ? '' : 's'}${counts.length ? ' · ' + counts.map(([s, n]) => `${n} ${s.toLowerCase()}`).join(' · ') : ''}</div></div>
-    <div class="cal"><div class="cwk">${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => `<span>${d}</span>`).join('')}</div><div class="cgridm">${cells}</div></div>
-    <div class="clist">${inMonth.length ? inMonth.map(i => `<button type="button" class="crow" data-cal="${esc(i.id)}"><span class="cd"><b>${new Date(i.date + 'T00:00').getDate()}</b><span>${new Date(i.date + 'T00:00').toLocaleDateString('en-GB', { weekday: 'short' })}</span></span><span class="ct"><b>${esc(i.name)}</b><span class="sub">${(i.platforms || []).join(', ')}${i.ig ? ` · Instagram ${esc(i.ig)}` : ''}${i.li ? ` · LinkedIn ${esc(i.li)}` : ''}</span></span><span class="pill ${pillClass(i.status || 'Planned')}">${esc(i.status || 'Planned')}</span></button>`).join('') : emptyBox('Nothing planned this month', 'Add a post with Add post.')}</div>`;
+  const chip = i => `<button type="button" class="cv-chip st-${pillClass(calSt(i))}" data-cal="${esc(i.id)}" draggable="true" title="${esc(i.name)} · ${esc(calSt(i))}"><span class="cv-ct"><span class="cv-cl"><time>${esc(calTime(i) || '')}</time><span class="cv-pfs">${(i.platforms || []).map(calDot).join('')}</span></span><b>${esc(i.name)}</b></span></button>`;
+  // month grid: always 6 weeks would leave empty rows, so use only the weeks needed
+  const weeks = Math.ceil((lead + days) / 7), start = new Date(y, mo - 1, 1 - lead);
+  let cells = '';
+  for (let k = 0; k < weeks * 7; k++) {
+    const dt = new Date(start); dt.setDate(start.getDate() + k); const di = iso(dt), out = dt.getMonth() !== mo - 1, list = out ? [] : shown.filter(i => i.date === di), wk = k % 7 > 4;
+    cells += `<div class="cv-day${out ? ' out' : ''}${di === t ? ' today' : ''}${di < t ? ' past' : ''}${wk ? ' wkend' : ''}" ${out ? '' : `data-cal-day="${di}"`}><div class="cv-dh"><span class="cv-dn">${dt.getDate()}</span>${out ? '' : `<button type="button" class="cv-add" data-cal-add="${di}" aria-label="Add a post on ${fmtDate(di)}"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>`}</div>${list.slice(0, 3).map(chip).join('')}${list.length > 3 ? `<button type="button" class="cv-more" data-cal-dayopen="${di}">+${list.length - 3} more</button>` : ''}</div>`;
+  }
+  const grid = `<div class="cv-month"><div class="cv-wk">${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => `<span>${d}</span>`).join('')}</div><div class="cv-grid" style="--weeks:${weeks}">${cells}</div></div>`;
+  // list (agenda) grouped by day
+  const byDay = {}; shown.forEach(i => (byDay[i.date] = byDay[i.date] || []).push(i));
+  const row = i => `<button type="button" class="cv-row st-${pillClass(calSt(i))}" data-cal="${esc(i.id)}"><span class="cv-rt">${esc(calTime(i) || '—')}</span><span class="cv-rm"><b>${esc(i.name)}</b><span class="sub">${esc((i.caption || i.notes || '').split('\n')[0] || 'No caption yet')}</span></span><span class="cv-pfs">${(i.platforms || []).map(calDot).join('')}</span><span class="pill ${pillClass(calSt(i))}">${esc(calSt(i))}</span></button>`;
+  const list = Object.keys(byDay).length ? Object.entries(byDay).map(([d, l]) => `<section class="cv-ag${d === t ? ' today' : ''}${d < t ? ' past' : ''}" id="cv-${d}"><div class="cv-agd"><b>${new Date(d + 'T00:00').getDate()}</b><span>${calDate(d, { weekday: 'short' })}</span></div><div class="cv-agl">${d === t ? '<span class="cv-tag">Today</span>' : ''}${l.map(row).join('')}</div></section>`).join('')
+    : `<div class="cv-empty"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg><h3>${f ? `No ${f.toLowerCase()} posts in ${esc(label)}` : `Nothing planned for ${esc(label)}`}</h3><p>${f ? 'Try another status, or show all posts.' : 'Plan your first post for this month.'}</p>${f ? `<button class="btn" data-cal-f="">Show all posts</button>` : `<button class="btn primary" data-cal-add="${m === t.slice(0, 7) ? t : m + '-01'}">Add post</button>`}</div>`;
+  // mini month for phones (dots show posting days)
+  let mini = ''; for (let k = 0; k < weeks * 7; k++) { const dt = new Date(start); dt.setDate(start.getDate() + k); const di = iso(dt), out = dt.getMonth() !== mo - 1, n = out ? 0 : shown.filter(i => i.date === di).length;
+    mini += out ? '<span class="cv-mn out"></span>' : `<button type="button" class="cv-mn${di === t ? ' today' : ''}${n ? ' has' : ''}" data-cal-jump="${di}" aria-label="${fmtDate(di)}${n ? `, ${n} post${n > 1 ? 's' : ''}` : ''}">${dt.getDate()}${n ? '<i></i>' : ''}</button>`; }
+  // side panel
+  const next = all.filter(i => i.date >= t && calSt(i) !== 'Posted').slice(0, 5);
+  const counts = CAL_STATUS.map(s => [s, inMonth.filter(i => calSt(i) === s).length]);
+  const done = inMonth.filter(i => calSt(i) === 'Posted').length;
+  const aside = `<aside class="cv-side">
+      <div class="panel cv-next"><h3>Up next</h3>${next.length ? next.map(i => `<button type="button" class="cv-nx" data-cal="${esc(i.id)}"><span class="cv-nd st-${pillClass(calSt(i))}"></span><span class="cv-nm"><b>${esc(i.name)}</b><span class="sub">${esc(calRel(i.date))}${calTime(i) ? ' · ' + esc(calTime(i)) : ''}</span></span><span class="cv-pfs">${(i.platforms || []).map(calDot).join('')}</span></button>`).join('') : '<p class="sub">Nothing coming up. Add a post to plan ahead.</p>'}</div>
+      <div class="panel cv-prog"><h3>${esc(first.toLocaleDateString('en-GB', { month: 'long' }))} progress</h3><div class="cv-pn"><b>${done}</b><span>of ${inMonth.length} posted</span></div><div class="cv-bar" role="img" aria-label="${done} of ${inMonth.length} posted">${inMonth.length ? counts.filter(c => c[1]).map(([s, n]) => `<i class="st-${pillClass(s)}" style="flex:${n}"></i>`).join('') : ''}</div>
+        <ul class="cv-leg">${counts.map(([s, n]) => `<li><span class="cv-nd st-${pillClass(s)}"></span>${s}<b>${n}</b></li>`).join('')}</ul></div></aside>`;
+  const filt = `<div class="cv-filt" role="group" aria-label="Filter by status"><button type="button" data-cal-f="" aria-pressed="${!f}">All <b>${inMonth.length}</b></button>${counts.map(([s, n]) => `<button type="button" data-cal-f="${s}" aria-pressed="${f === s}"><span class="cv-nd st-${pillClass(s)}"></span>${s} <b>${n}</b></button>`).join('')}</div>`;
+  return `<div class="head"><div><h2>Content calendar</h2><p>Plan every social post: when it goes out, where, and the caption to use.</p></div><div class="actions"><button class="btn primary" data-cal-add="${t}">Add post</button></div></div>
+    <div class="cv-bar1"><div class="cv-nav"><button class="ib" data-cal-m="-1" aria-label="Previous month"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button><h3>${esc(label)}</h3><button class="ib" data-cal-m="1" aria-label="Next month"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>${m !== t.slice(0, 7) ? '<button class="btn small" data-cal-today>Today</button>' : ''}</div>
+      <div class="seg cv-seg" role="group" aria-label="View"><button type="button" data-cal-v="month" aria-pressed="${mode === 'month'}">Month</button><button type="button" data-cal-v="list" aria-pressed="${mode === 'list'}">List</button></div></div>
+    ${filt}
+    <div class="cv-wrap"><div class="cv-main">${mode === 'month' ? grid : ''}<div class="cv-agenda${mode === 'month' ? ' cv-mobonly' : ''}"><div class="cv-mini"><div class="cv-mwk">${'MTWTFSS'.split('').map(d => `<span>${d}</span>`).join('')}</div><div class="cv-mg">${mini}</div></div><div class="cv-list">${list}</div></div></div>${aside}</div>`;
+}
+function calDayDialog(d) {
+  const l = calendarItems().filter(i => i.date === d && (!view.calFilter || calSt(i) === view.calFilter));
+  openModal(dlg(calDate(d, { weekday: 'long', day: 'numeric', month: 'long' }), `<div class="cv-list">${l.map(i => `<button type="button" class="cv-row st-${pillClass(calSt(i))}" data-cal="${esc(i.id)}"><span class="cv-rt">${esc(calTime(i) || '—')}</span><span class="cv-rm"><b>${esc(i.name)}</b></span><span class="cv-pfs">${(i.platforms || []).map(calDot).join('')}</span><span class="pill ${pillClass(calSt(i))}">${esc(calSt(i))}</span></button>`).join('')}</div>`,
+    `<button class="btn ghost" data-close>Close</button><button class="btn primary" data-cal-add2>Add post</button>`), m => {
+    $$('[data-cal]', m).forEach(b => b.addEventListener('click', () => { closeModal(); setTimeout(() => calDialog(calendarItems().find(i => i.id === b.dataset.cal)), 220); }));
+    $('[data-cal-add2]', m).addEventListener('click', () => { closeModal(); setTimeout(() => calDialog(null, d), 220); });
+  });
 }
 function calDialog(it, date) {
-  const isNew = !it; let x = { name: '', date: date || todayIso(), ig: '12:00', li: '07:30', platforms: ['Instagram', 'LinkedIn'], status: 'Planned', caption: '', notes: '', slides: 1, ...clone(it || {}) };
+  const isNew = !it; let x = { name: '', date: date || todayIso(), ...CAL_DEF_TIME, platforms: ['Instagram', 'LinkedIn'], status: 'Planned', caption: '', notes: '', slides: 1, ...clone(it || {}) };
   const seeded = CAL_SEED.some(s => s.id === x.id);
-  openModal(dlg(isNew ? 'Add a post' : x.name, `<div class="grid2"><label class="field wide"><span>Post name</span><input id="ca-name" value="${esc(x.name)}" placeholder="For example: Light vs dark mode"></label>
-      <label class="field"><span>Date</span><input id="ca-date" type="date" value="${esc(x.date)}"></label><label class="field"><span>Status</span><select id="ca-status">${CAL_STATUS.map(s => `<option ${s === x.status ? 'selected' : ''}>${s}</option>`).join('')}</select></label>
-      <label class="field"><span>Instagram time</span><input id="ca-ig" type="time" value="${esc(x.ig)}"></label><label class="field"><span>LinkedIn time</span><input id="ca-li" type="time" value="${esc(x.li)}"></label></div>
-    <div class="field"><span>Platforms</span><div class="checks">${['Instagram', 'LinkedIn', 'Facebook', 'Stories'].map(p => `<label class="chk"><input type="checkbox" data-ca-p="${p}" ${(x.platforms || []).includes(p) ? 'checked' : ''}><span>${p}</span></label>`).join('')}</div></div>
-    <label class="field"><span>Caption</span><textarea id="ca-cap" rows="7">${esc(x.caption)}</textarea></label>
-    <div class="actions" style="margin-top:-4px"><button type="button" class="btn small" data-ca-copy ${x.caption ? '' : 'disabled'}>Copy caption</button>${x.slides > 1 ? `<span class="sub">${x.slides} slides</span>` : ''}</div>
-    <label class="field"><span>Notes (only you see them)</span><textarea id="ca-notes" rows="2">${esc(x.notes)}</textarea></label>`,
-    `${isNew ? '' : `<button class="btn ghost danger" data-ca-del style="margin-right:auto">${seeded ? 'Remove from calendar' : 'Delete'}</button>`}<button class="btn ghost" data-close>Cancel</button><button class="btn primary" data-ca-save>${isNew ? 'Add post' : 'Save'}</button>`), m => {
-    $('[data-ca-copy]', m).addEventListener('click', async () => { try { await navigator.clipboard.writeText($('#ca-cap', m).value); toast('Caption copied'); } catch { $('#ca-cap', m).select(); toast('Press Cmd+C to copy'); } });
+  const pf = p => { const c = CAL_PLAT[p], on = (x.platforms || []).includes(p); return `<div class="cv-pl${on ? ' on' : ''}" data-pl="${p}"><label class="cv-plt"><input type="checkbox" data-ca-p="${p}" ${on ? 'checked' : ''}>${calDot(p)}<span>${p}</span></label><input type="time" class="cv-plh" data-ca-t="${c.t}" value="${esc(x[c.t] || CAL_DEF_TIME[c.t])}" aria-label="${p} time"></div>`; };
+  openModal(dlg(isNew ? 'Add a post' : 'Edit post', `<div class="cv-form">
+      <div class="cv-fl">
+        <label class="field"><span>Post name</span><input id="ca-name" value="${esc(x.name)}" placeholder="For example: Light vs dark mode"></label>
+        <label class="field"><span>Date</span><input id="ca-date" type="date" value="${esc(x.date)}"></label>
+        <div class="field"><span>Status</span><div class="cv-sts" role="radiogroup" aria-label="Status">${CAL_STATUS.map(s => `<label class="cv-sto st-${pillClass(s)}"><input type="radio" name="ca-st" value="${s}" ${s === calSt(x) ? 'checked' : ''}><span class="cv-nd st-${pillClass(s)}"></span>${s}</label>`).join('')}</div></div>
+        <div class="field"><span>Platforms and times</span><div class="cv-pls">${Object.keys(CAL_PLAT).map(pf).join('')}</div></div>
+      </div>
+      <div class="cv-fr">
+        <label class="field"><span class="cv-capl">Caption <em id="ca-cc">${(x.caption || '').length} characters</em></span><textarea id="ca-cap" rows="9" placeholder="Write the caption here">${esc(x.caption)}</textarea></label>
+        <div class="cv-capa"><button type="button" class="btn small" data-ca-copy ${x.caption ? '' : 'disabled'}><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copy caption</button>${x.slides > 1 ? `<span class="sub">${x.slides} slides</span>` : ''}</div>
+        <label class="field"><span>Notes (only you see these)</span><textarea id="ca-notes" rows="3" placeholder="Assets, ideas, reminders">${esc(x.notes)}</textarea></label>
+      </div></div>`,
+    `${isNew ? '' : `<button class="btn ghost danger" data-ca-del style="margin-right:auto">${seeded ? 'Remove from calendar' : 'Delete'}</button>`}<button class="btn ghost" data-close>Cancel</button><button class="btn primary" data-ca-save>${isNew ? 'Add post' : 'Save'}</button>`, 'wide'), m => {
+    const cap = $('#ca-cap', m), cc = $('#ca-cc', m), cp = $('[data-ca-copy]', m);
+    cap.addEventListener('input', () => { cc.textContent = `${cap.value.length} characters`; cp.disabled = !cap.value; });
+    $$('[data-ca-p]', m).forEach(c => c.addEventListener('change', () => c.closest('.cv-pl').classList.toggle('on', c.checked)));
+    cp.addEventListener('click', async () => { try { await navigator.clipboard.writeText(cap.value); toast('Caption copied'); } catch { cap.select(); toast('Press Cmd+C to copy'); } });
     $('[data-ca-save]', m).addEventListener('click', async () => {
-      const v = { ...x, name: $('#ca-name', m).value.trim(), date: $('#ca-date', m).value, status: $('#ca-status', m).value, ig: $('#ca-ig', m).value, li: $('#ca-li', m).value, platforms: $$('[data-ca-p]:checked', m).map(c => c.dataset.caP),
-        caption: $('#ca-cap', m).value, notes: $('#ca-notes', m).value.trim(), updatedAt: new Date().toISOString(), updatedBy: ME.name };
-      if (!v.name) { toast('Give the post a name.'); return; } if (!v.date) { toast('Choose a date.'); return; }
+      const v = { ...x, name: $('#ca-name', m).value.trim(), date: $('#ca-date', m).value, status: ($('[name=ca-st]:checked', m) || {}).value || 'Planned', platforms: $$('[data-ca-p]:checked', m).map(c => c.dataset.caP),
+        caption: cap.value, notes: $('#ca-notes', m).value.trim(), updatedAt: new Date().toISOString(), updatedBy: ME.name };
+      $$('[data-ca-t]', m).forEach(i => { v[i.dataset.caT] = i.value; });
+      if (!v.name) { toast('Give the post a name.'); $('#ca-name', m).focus(); return; } if (!v.date) { toast('Choose a date.'); return; }
       const id = v.id || 'p-' + uid(); delete v.id;
       try { await db.collection('calendar').doc(id).set(JSON.parse(JSON.stringify(v))); closeModal(); toast(isNew ? 'Post added' : 'Saved'); view.calMonth = v.date.slice(0, 7); render(); } catch { toast('Not saved. Check your connection.'); } });
     const d = $('[data-ca-del]', m); if (d) d.addEventListener('click', async () => { try { if (seeded) await db.collection('calendar').doc(x.id).set({ ...JSON.parse(JSON.stringify(x)), id: undefined, hidden: true }); else await db.collection('calendar').doc(x.id).delete(); closeModal(); toast('Removed'); } catch { toast('Not removed.'); } });
+    if (isNew) setTimeout(() => $('#ca-name', m).focus(), 60);
   });
 }
 function bindCalendar(main) {
   if (view.sub !== 'calendar') return;
   $$('[data-cal]', main).forEach(b => b.addEventListener('click', e => { e.stopPropagation(); calDialog(calendarItems().find(i => i.id === b.dataset.cal)); }));
   $$('[data-cal-add]', main).forEach(b => b.addEventListener('click', e => { e.stopPropagation(); calDialog(null, b.dataset.calAdd); }));
+  $$('[data-cal-dayopen]', main).forEach(b => b.addEventListener('click', e => { e.stopPropagation(); calDayDialog(b.dataset.calDayopen); }));
+  $$('[data-cal-day]', main).forEach(c => c.addEventListener('dblclick', e => { if (e.target === c || e.target.closest('.cv-dh')) calDialog(null, c.dataset.calDay); }));
   $$('[data-cal-m]', main).forEach(b => b.addEventListener('click', () => { const [y, m] = view.calMonth.split('-').map(Number), d = new Date(y, m - 1 + Number(b.dataset.calM), 1); view.calMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; render(); }));
   const td = $('[data-cal-today]', main); if (td) td.addEventListener('click', () => { view.calMonth = todayIso().slice(0, 7); render(); });
+  $$('[data-cal-v]', main).forEach(b => b.addEventListener('click', () => { view.calView = b.dataset.calV; try { localStorage.setItem('nd-calview', view.calView); } catch {} render(); }));
+  $$('[data-cal-f]', main).forEach(b => b.addEventListener('click', () => { view.calFilter = b.dataset.calF; render(); }));
+  $$('[data-cal-jump]', main).forEach(b => b.addEventListener('click', () => { const s = document.getElementById('cv-' + b.dataset.calJump); if (s) { scrollTo({ top: s.getBoundingClientRect().top + scrollY - 80, behavior: 'smooth' }); s.classList.remove('flash'); void s.offsetWidth; s.classList.add('flash'); } else calDialog(null, b.dataset.calJump); }));
+  // drag a post onto another day to move it
+  $$('.cv-chip[draggable]', main).forEach(c => { c.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', c.dataset.cal); e.dataTransfer.effectAllowed = 'move'; c.classList.add('drag'); main.classList.add('cv-dragging'); });
+    c.addEventListener('dragend', () => { c.classList.remove('drag'); main.classList.remove('cv-dragging'); $$('.cv-day.over', main).forEach(x => x.classList.remove('over')); }); });
+  $$('[data-cal-day]', main).forEach(c => { c.addEventListener('dragover', e => { e.preventDefault(); c.classList.add('over'); }); c.addEventListener('dragleave', e => { if (!c.contains(e.relatedTarget)) c.classList.remove('over'); });
+    c.addEventListener('drop', async e => { e.preventDefault(); c.classList.remove('over'); const id = e.dataTransfer.getData('text/plain'), it = calendarItems().find(i => i.id === id), d = c.dataset.calDay; if (!it || it.date === d) return;
+      const v = { ...clone(it), date: d, updatedAt: new Date().toISOString(), updatedBy: ME.name }; delete v.id;
+      try { await db.collection('calendar').doc(id).set(JSON.parse(JSON.stringify(v))); toast(`Moved to ${fmtDate(d)}`); } catch { toast('Not moved. Check your connection.'); } }); });
 }
 
 /* ---------- backup ---------- */
