@@ -31,6 +31,27 @@
     window.addEventListener("resize", function () { if (getComputedStyle(btn).display === "none") setMenu(false); });
   }
 
+
+  /* Light and dark mode: light is the default; the choice is remembered on this device */
+  (function () {
+    var root = document.documentElement, head = document.querySelector(".site-head .wrap"), menu = document.querySelector(".menu-btn");
+    var meta = document.querySelector('meta[name="theme-color"]'), tb = null;
+    var paint = function () { var dark = root.getAttribute("data-theme") === "dark"; if (meta) meta.setAttribute("content", dark ? "#07080e" : "#ffffff");
+      if (tb) { tb.setAttribute("aria-label", dark ? "Switch to light mode" : "Switch to dark mode"); tb.title = dark ? "Light mode" : "Dark mode"; tb.setAttribute("aria-pressed", dark ? "true" : "false"); } };
+    if (head) {
+      tb = document.createElement("button"); tb.type = "button"; tb.className = "theme-btn";
+      tb.innerHTML = '<svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+      var tools = document.createElement("div"); tools.className = "head-tools";
+      head.appendChild(tools); tools.appendChild(tb); if (menu) tools.appendChild(menu);
+      tb.addEventListener("click", function () {
+        var dark = root.getAttribute("data-theme") !== "dark";
+        if (dark) root.setAttribute("data-theme", "dark"); else root.removeAttribute("data-theme");
+        try { localStorage.setItem("novyra-theme", dark ? "dark" : "light"); } catch (e) {}
+        paint(); document.dispatchEvent(new Event("novyra-theme"));
+      });
+    }
+    paint();
+  })();
   /* Back to top: a round button above the WhatsApp button, shown once the page has been scrolled */
   var wa = document.querySelector(".wa-float");
   if (wa) {
@@ -124,20 +145,23 @@
       if (!streaks.length) for (var j = 0; j < 26; j++) streaks.push({ o: j / 26, s: 0.4 + Math.random() * 0.8, a: 0.15 + Math.random() * 0.45 });
     }
 
+    var C = {};
+    function colours() { var cs = getComputedStyle(document.documentElement), v = function (k) { return cs.getPropertyValue(k).trim(); }; C = { star: v("--star") || "219,230,255", starA: parseFloat(v("--star-a")) || 1, glowA: parseFloat(v("--glow-a")) || 0.32, streak: v("--streak") || "147,197,253" }; }
+    colours(); document.addEventListener("novyra-theme", function () { colours(); if (reduce) draw(0); });
     function draw(time) {
       ctx.clearRect(0, 0, w, h);
       var t = (time || 0) / 1000;
       /* glow behind the headline */
       var g = ctx.createRadialGradient(w * mx, h * my, 0, w * mx, h * my, Math.max(w, h) * 0.6);
-      g.addColorStop(0, "rgba(74,134,247,0.32)");
-      g.addColorStop(0.45, "rgba(29,58,138,0.12)");
-      g.addColorStop(1, "rgba(7,8,14,0)");
+      g.addColorStop(0, "rgba(74,134,247," + C.glowA + ")");
+      g.addColorStop(0.45, "rgba(29,58,138," + (C.glowA * 0.37).toFixed(3) + ")");
+      g.addColorStop(1, "rgba(74,134,247,0)");
       ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
       /* stars */
       for (var i = 0; i < stars.length; i++) {
         var s = stars[i];
-        ctx.globalAlpha = 0.35 + 0.35 * Math.sin(t * 1.3 + s.t);
-        ctx.fillStyle = "#dbe6ff";
+        ctx.globalAlpha = (0.35 + 0.35 * Math.sin(t * 1.3 + s.t)) * C.starA;
+        ctx.fillStyle = "rgb(" + C.star + ")";
         ctx.beginPath(); ctx.arc(s.x * w, s.y * h, s.r, 0, Math.PI * 2); ctx.fill();
       }
       /* streaks: arcs sweeping from bottom-left toward the light */
@@ -149,7 +173,7 @@
         ctx.globalAlpha = k.a * (0.6 + 0.4 * Math.sin(t + j));
         var grad = ctx.createLinearGradient(0, y0, w, h * my);
         grad.addColorStop(0, "rgba(74,134,247,0)");
-        grad.addColorStop(Math.max(0.01, phase), "rgba(147,197,253,0.9)");
+        grad.addColorStop(Math.max(0.01, phase), "rgba(" + C.streak + ",0.9)");
         grad.addColorStop(Math.min(0.99, phase + 0.12), "rgba(74,134,247,0)");
         ctx.strokeStyle = grad; ctx.lineWidth = 1 + k.s;
         ctx.beginPath();
