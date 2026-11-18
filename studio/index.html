@@ -1222,6 +1222,11 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
 .head>.btn,.head>.actions{margin-left:auto}
 @media (min-width:761px){.head>.actions{justify-content:flex-end;width:auto !important;flex:0 1 auto !important}}
 @media (max-width:760px){.head>.btn,.head>.actions{width:100%}}
+.pageact{display:flex;align-items:center;gap:8px;margin-right:10px}
+.pageact:empty{display:none}
+.pageact .btn{height:40px;padding:0 18px;white-space:nowrap}
+@media (max-width:760px){.pageact{display:none}}
+.sp-it{grid-template-columns:32px minmax(0,1fr) auto auto !important}.sp-it .pill{font-size:11px}
 /* sidebar: items never squash, the list scrolls when the window is short */
 .side>*{flex-shrink:0}
 .side a.it{padding:8px 12px}
@@ -1508,8 +1513,9 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
   <button class="ib wide" type="button" data-nav="refresh" title="Refresh" aria-label="Refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36L21 8"/><path d="M21 3v5h-5"/></svg></button>
   <button class="ib wide" type="button" data-nav="forward" title="Forward" aria-label="Forward"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
   <div class="grow"></div>
-  <div class="tsw" id="tsw"><label class="topsearch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span class="vh">Search customers and contacts</span><input id="top-q" type="search" placeholder="Search customers and contacts" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="spop-res" aria-autocomplete="list"></label><button class="ib tsbtn" type="button" data-search-open aria-label="Search customers and contacts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>
-    <div class="spop" id="spop" hidden><div class="spop-panel" role="dialog" aria-label="Search results"><label class="spop-in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span class="vh">Search</span><input id="spop-q" type="search" placeholder="Search customers and contacts" autocomplete="off" spellcheck="false"><button type="button" class="spop-x" data-search-close>Cancel</button></label><div class="spop-res" id="spop-res" role="listbox" aria-label="Customers and contacts"></div></div></div></div>
+  <div class="pageact" id="pageact"></div>
+  <div class="tsw" id="tsw"><label class="topsearch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span class="vh">Search</span><input id="top-q" type="search" placeholder="Search customers, quotes, invoices…" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="spop-res" aria-autocomplete="list"></label><button class="ib tsbtn" type="button" data-search-open aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>
+    <div class="spop" id="spop" hidden><div class="spop-panel" role="dialog" aria-label="Search results"><label class="spop-in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span class="vh">Search</span><input id="spop-q" type="search" placeholder="Search customers, quotes, invoices…" autocomplete="off" spellcheck="false"><button type="button" class="spop-x" data-search-close>Cancel</button></label><div class="spop-res" id="spop-res" role="listbox" aria-label="Search results"></div></div></div></div>
   <a class="ib" data-top="overview" href="#home" title="Home" aria-label="Home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg></a>
   <a class="ib" data-top="settings" href="#settings" title="Settings" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></a>
   <button class="ib" type="button" data-nav="menu" title="Compact menu" aria-label="Compact menu" aria-pressed="false">
@@ -1553,12 +1559,12 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
       <form id="g-form" novalidate>
         <label class="gf"><span>Email address</span><input id="g-email" type="email" autocomplete="username" inputmode="email" spellcheck="false" placeholder="you@example.com" required></label>
         <label class="gf"><span class="gf-l">Password<button type="button" class="glink" id="g-forgot">Forgot password?</button></span><span class="gpw"><input id="g-pass" type="password" autocomplete="current-password" placeholder="Your password" required><button type="button" class="geye" id="g-eye" aria-label="Show password" aria-pressed="false">Show</button></span>
-          <span class="g-hint" id="g-hint" hidden><i class="g-dot"></i>At least 6 characters</span></label>
+          <span class="g-hint" id="g-hint"><i class="g-dot"></i>At least 6 characters</span></label>
         <p class="gmsg" id="g-msg" role="status" aria-live="polite"></p>
         <button class="gbtn primary" id="g-submit" type="submit">Sign in</button>
       </form>
       <p class="g-switch" id="g-switch">New here? <button type="button" class="glink" data-mode="up">Create an account</button></p>
-      <p class="g-fine" id="g-fine" hidden>We’ll email you a link to confirm your address. Your account opens Novyra Desk once the owner has added you to the team.</p>
+      <p class="g-fine" id="g-fine">We’ll email you a link to confirm your address. Your account opens Novyra Desk once the owner has added you to the team.</p>
     </section>
   </div>
 </div>
@@ -1600,7 +1606,7 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
 #g-form{display:grid;gap:14px}
 .gf{display:grid;gap:7px;font:600 13.5px var(--body,system-ui);color:var(--text)}
 .gf-l{display:flex;justify-content:space-between;align-items:center}
-.gate.up #g-forgot{display:none}
+.gate.up #g-forgot,.gate:not(.up) #g-hint,.gate:not(.up) #g-fine{visibility:hidden}
 .gf input{width:100%;height:50px;border:1px solid var(--line2);border-radius:13px;padding:0 15px;font:500 16px var(--body,system-ui);color:var(--text);background:#fff;outline:none;transition:border-color .15s,box-shadow .15s}
 .gf input::placeholder{color:#9aa2bb}
 .gf input:focus{border-color:var(--spark);box-shadow:0 0 0 4px rgba(74,134,247,.16)}
@@ -1673,7 +1679,6 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
     $g('g-title').textContent = up ? 'Create your account' : 'Welcome back';
     $g('g-sub').textContent = up ? 'It takes less than a minute.' : 'Sign in to pick up where you left off.';
     sub.textContent = up ? 'Create account' : 'Sign in'; pw.autocomplete = up ? 'new-password' : 'current-password'; pw.placeholder = up ? 'Choose a password' : 'Your password';
-    hint.hidden = !up; $g('g-fine').hidden = !up;
     $g('g-switch').innerHTML = up ? 'Already have an account? <button type="button" class="glink" data-mode="in">Sign in</button>' : 'New here? <button type="button" class="glink" data-mode="up">Create an account</button>';
     say(msg, ''); };
   gate.addEventListener('click', e => { const t = e.target.closest('[data-mode]'); if (t) { setMode(t.dataset.mode); em.focus(); } });
@@ -2314,15 +2319,25 @@ function render() {
       const found = list.find(d => d.id === view.open.id);
       if (found && !isDirty() && (found.updatedAt || '') > (view.edit.saved.updatedAt || '')) { const f = { history: [], items: [], payments: [], client: {}, ...clone(found) }; view.edit.draft = f; view.edit.saved = clone(f); }
     }
-    renderEditor(main); autoLinks(); return;
+    placePageActions(null); renderEditor(main); autoLinks(); return;
   }
   const focus = document.activeElement && document.activeElement.id === 'list-search' ? document.activeElement.selectionStart : null;
   main.innerHTML = view.tab === 'home' ? portalHTML() : ({ quotes: quotesHTML, invoices: invoicesHTML }[view.tab])().replace('<div class="toolbar">', summaryHTML() + '<div class="toolbar">');
   sideHTML();
   bindList(main);
+  placePageActions(main);
   if (focus != null) { const s = $('#list-search'); if (s) { s.focus(); s.setSelectionRange(focus, focus); } }
 }
 
+// on computers the page's buttons sit in the top bar, so pages start straight with their content
+function placePageActions(main) {
+  const slot = $('#pageact'); if (!slot) return; slot.innerHTML = '';
+  if (!main || matchMedia('(max-width:760px)').matches) return;
+  const h = main.querySelector(':scope > .head'); if (!h) return;
+  [...h.querySelectorAll(':scope > .btn, :scope > .actions > *')].forEach(el => slot.appendChild(el));
+  h.remove();
+}
+matchMedia('(max-width:760px)').addEventListener('change', () => render());
 /* ---------- summary + lists ---------- */
 function summaryHTML(kind) {
   const k = kind || view.tab, ym = todayIso().slice(0, 7);
@@ -2442,26 +2457,34 @@ function spHL(text, q) {
 const spAv = (c, txt) => `<span class="sp-av" style="background:${clientColor(c)}">${esc(txt)}</span>`;
 function spGroups(raw) {
   const q = raw.trim(), t = norm(q), G = [], add = (title, items) => { if (items.length) G.push({ title, items }); };
+  const ok = a => { try { return !a || can(a); } catch { return true; } }, hit = (...p) => p.some(x => norm(x).includes(t));
   const open = c => () => { go('clients'); setTimeout(() => clientDialog(c), 90); };
   const cust = c => { const ppl = contactsOf(c).map(p => p.name).filter(Boolean);
-    return { av: spAv(c, initials(c.business || '?').toUpperCase().slice(0, 2)), title: spHL(c.business || 'Unnamed customer', q), sub: spHL(ppl.join(', ') || 'No contact person yet', q), meta: `${docsFor(c).quotes.length} quote${docsFor(c).quotes.length === 1 ? '' : 's'}`, run: open(c) }; };
+    return { av: spAv(c, initials(c.business || '?').toUpperCase().slice(0, 2)), title: spHL(c.business || 'Unnamed customer', q), sub: spHL(ppl.join(', ') || 'No contact person yet', q), run: open(c) }; };
+  const quote = x => { const st = quoteStatus(x); return { ic: 'quotes', title: spHL(qRef(x), q), sub: `${spHL((x.client && x.client.business) || 'No customer', q)} · ${money(calc(x).total)}`, pill: [stLabel(st), pillClass(st)], run: () => go('quote-' + x.id) }; };
+  const invoice = x => { const st = invoiceStatus(x); return { ic: 'invoices', title: spHL(x.number ? 'INV-' + x.number : 'Invoice', q), sub: `${spHL((x.client && x.client.business) || 'No customer', q)} · ${money(calc(x).total)}`, pill: [stLabel(st), pillClass(st)], run: () => go('invoice-' + x.id) }; };
   if (!t) {
-    add('Customers', state.clients.slice(0, 6).map(cust));
-    G.push({ title: '', items: [{ ic: 'plus', title: 'Add customer', sub: 'Save a business and its contact people', cls: 'act', run: () => { go('clients'); setTimeout(() => clientDialog(null), 90); } }] });
+    if (ok('quotes')) add('Recent', [...state.quotes.map(x => ({ x, k: 'q', u: x.updatedAt || x.createdAt || '' })), ...(ok('invoices') ? state.invoices.map(x => ({ x, k: 'i', u: x.updatedAt || x.createdAt || '' })) : [])].sort((a, b) => b.u.localeCompare(a.u)).slice(0, 4).map(r => r.k === 'q' ? quote(r.x) : invoice(r.x)));
+    if (ok('clients')) add('Customers', state.clients.slice().sort((a, b) => (a.business || '').localeCompare(b.business || '')).slice(0, 4).map(cust));
     return G;
   }
-  add('Customers', state.clients.filter(c => norm(c.business).includes(t)).slice(0, 6).map(cust));
-  const people = state.clients.flatMap(c => contactsOf(c).filter(p => [p.name, p.email, p.phone, p.role].some(x => norm(x).includes(t))).map(p => ({ c, p }))).slice(0, 6);
-  add('Contacts', people.map(({ c, p }) => ({ av: spAv(c, initials(p.name || p.email || '?').toUpperCase().slice(0, 2)), title: spHL(p.name || p.email || 'Contact', q),
-    sub: `${p.role ? spHL(p.role, q) + ' · ' : ''}${esc(c.business || '')}`, meta: p.email ? spHL(p.email, q) : p.phone ? spHL(p.phone, q) : '', run: open(c) })));
+  if (ok('clients')) {
+    add('Customers', state.clients.filter(c => hit(c.business)).slice(0, 5).map(cust));
+    add('Contacts', state.clients.flatMap(c => contactsOf(c).filter(p => hit(p.name, p.email, p.phone, p.role)).map(p => ({ c, p }))).slice(0, 5).map(({ c, p }) => ({ av: spAv(c, initials(p.name || p.email || '?').toUpperCase().slice(0, 2)), title: spHL(p.name || p.email || 'Contact', q),
+      sub: `${p.role ? spHL(p.role, q) + ' · ' : ''}${esc(c.business || '')}`, run: open(c) })));
+  }
+  if (ok('quotes')) add('Quotes', state.quotes.filter(x => hit(qRef(x), 'Q-' + x.number, x.client && x.client.business, ...(x.items || []).map(i => i.item), ...contactsOf(x.client).map(p => p.name))).sort((a, b) => (b.number || 0) - (a.number || 0)).slice(0, 5).map(quote));
+  if (ok('invoices')) add('Invoices', state.invoices.filter(x => hit(x.number ? 'INV-' + x.number : '', x.quoteRef, x.client && x.client.business, ...(x.items || []).map(i => i.item))).sort((a, b) => (b.number || 0) - (a.number || 0)).slice(0, 5).map(invoice));
+  if (ok('calendar')) add('Posts', calendarItems().filter(i => hit(i.name, i.caption, ...(i.platforms || []))).slice(-4).reverse().map(i => ({ ic: 'calendar', title: spHL(i.name, q), sub: esc(calRel(i.date)), pill: [calSt(i), pillClass(calSt(i))], run: () => { view.calMonth = i.date.slice(0, 7); go('calendar'); setTimeout(() => calDialog(i), 90); } })));
+  if (ok('expenses')) add('Expenses', state.expenses.filter(e => hit(e.description, e.category, e.supplier)).slice(0, 4).map(e => ({ ic: 'expenses', title: spHL(e.description || 'Expense', q), sub: `${esc(e.category || 'Expense')} · ${money(e.amount)}`, run: () => { go('expenses'); setTimeout(() => expenseDialog(e), 90); } })));
   return G;
 }
 function spRender() {
   const q = spInput().value, G = spGroups(q), box = $('#spop-res'); spop.list = []; let n = 0;
   const has = G.some(g => g.title);
   box.innerHTML = (has || !q.trim()) ? G.map(g => `<div class="sp-g" role="group" ${g.title ? `aria-label="${esc(g.title)}"` : ''}>${g.title ? `<div class="sp-gh">${esc(g.title)}</div>` : '<div class="sp-sep"></div>'}${g.items.map(it => { spop.list.push(it); const k = n++;
-    return `<button type="button" class="sp-it ${it.cls || ''}" role="option" id="sp-${k}" data-sp="${k}">${it.av || `<span class="sp-ic">${sicon(it.ic)}</span>`}<span class="sp-tx"><b>${it.title}</b>${it.sub ? `<span>${it.sub}</span>` : ''}</span>${it.meta ? `<span class="sp-meta">${it.meta}</span>` : ''}</button>`; }).join('')}</div>`).join('')
-    : `<div class="sp-empty"><b>No customer or contact matches “${esc(q.trim())}”</b><span>Try a business name, a person, an email address or a phone number.</span></div>`;
+    return `<button type="button" class="sp-it ${it.cls || ''}" role="option" id="sp-${k}" data-sp="${k}">${it.av || `<span class="sp-ic">${sicon(it.ic)}</span>`}<span class="sp-tx"><b>${it.title}</b>${it.sub ? `<span>${it.sub}</span>` : ''}</span>${it.pill ? `<span class="pill ${it.pill[1]}">${esc(it.pill[0])}</span>` : ''}</button>`; }).join('')}</div>`).join('')
+    : `<div class="sp-empty"><b>Nothing matches “${esc(q.trim())}”</b><span>Try a customer, a person, a quote number like Q-1001, an invoice number or a post.</span></div>`;
   spop.i = 0; spMark();
   $$('[data-sp]', box).forEach(b => { b.addEventListener('mousedown', e => e.preventDefault()); b.addEventListener('click', () => spRun(Number(b.dataset.sp))); b.addEventListener('mousemove', () => { if (spop.i !== Number(b.dataset.sp)) { spop.i = Number(b.dataset.sp); spMark(false); } }); });
 }
@@ -2577,16 +2600,15 @@ function invoicesHTML() {
       : emptyBox('No invoices yet', 'When a customer accepts a quote, you can invoice them from it.')}</div>${pg.more}`;
 }
 function clientsHTML() {
-  const cs = state.clients.filter(c => matchQ(c.business, ...contactsOf(c).flatMap(p => [p.name, p.email, p.phone]))).sort((a, b) => clientName(a).localeCompare(clientName(b), 'en', { sensitivity: 'base' }));
+  const cs = state.clients.slice().sort((a, b) => clientName(a).localeCompare(clientName(b), 'en', { sensitivity: 'base' }));
   const pg = pageOf(cs);
   const rows = pg.rows.map(c => { const { quotes, invoices } = docsFor(c), ppl = contactsOf(c); const owed = invoices.filter(v => v.status === 'Sent').reduce((a, v) => a + Math.max(0, calc(v).due), 0);
     return `<tr data-client="${c.id}" tabindex="0"><td><div class="who">${avHTML(c)}<div><div class="client">${esc(c.business)}</div><div class="sub">${ppl.length ? esc(ppl.map(p => p.name).filter(Boolean).join(', ') || 'Contact saved') : 'No contact person yet'}</div></div></div></td>
       <td>${esc(ppl[0] && ppl[0].email || '—')}${ppl.length > 1 ? ` <span class="sub">+${ppl.length - 1}</span>` : ''}</td><td class="num">${esc(ppl[0] && ppl[0].phone || '—')}</td><td class="r num">${quotes.length}</td><td class="r num">${invoices.length}</td><td class="r num"><b>${owed ? money(owed) : '—'}</b></td></tr>`; }).join('');
   return `<div class="head">
       <button class="btn primary" data-add-client>Add customer</button></div>
-    <div class="toolbar"><span class="sub">${state.clients.length} customer${state.clients.length === 1 ? '' : 's'}</span>${searchBox('Search name, contact or email')}</div>
     <div class="table-wrap">${cs.length ? `<table class="list lc"><thead><tr><th>Customer</th><th>Email</th><th>Phone</th><th class="r">Quotes</th><th class="r">Invoices</th><th class="r">Owed</th></tr></thead><tbody>${rows}</tbody></table>`
-      : state.clients.length ? emptyBox('No customers match', 'Try another search.') : emptyBox('No customers yet', 'Add the businesses you work with and they’ll be ready for every quote.')}</div>${pg.more}`;
+      : emptyBox('No customers yet', 'Add the businesses you work with and they’ll be ready for every quote.')}</div>${pg.more}`;
 }
 const sheetPrice = (name, fallback) => { const p = prices().find(x => x.item === name); return p ? Number(p.price) || 0 : fallback; };
 const rr = n => 'R' + Math.round(n).toLocaleString('en-US');
