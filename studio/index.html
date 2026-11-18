@@ -1216,6 +1216,12 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
 .start-i.ok{cursor:default;background:#f7faf8;border-color:#d4ecdc}.start-i.ok .start-ic{background:var(--good);color:#fff}.start-i.ok b{text-decoration:line-through;text-decoration-color:rgba(21,128,61,.5);color:var(--muted)}
 @media (max-width:1200px){.start-list{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:760px){.start-i.ok{display:none}.start-list{grid-template-columns:minmax(0,1fr)}.start-i{flex-direction:row;align-items:center}.start-h{flex-direction:column}.start-act{width:100%;justify-content:space-between}}
+/* no page titles: the sidebar shows where you are, and page buttons sit at the top right */
+.head{display:flex !important;justify-content:flex-end !important;align-items:center;margin:0 0 16px !important;min-height:0}
+.head:empty{display:none}
+.head>.btn,.head>.actions{margin-left:auto}
+@media (min-width:761px){.head>.actions{justify-content:flex-end;width:auto !important;flex:0 1 auto !important}}
+@media (max-width:760px){.head>.btn,.head>.actions{width:100%}}
 /* sidebar: items never squash, the list scrolls when the window is short */
 .side>*{flex-shrink:0}
 .side a.it{padding:8px 12px}
@@ -2407,7 +2413,7 @@ function sideHTML() {
   const nb = $('[data-side-new]', side); if (nb) nb.addEventListener('click', () => { if (ready) newQuoteDialog(); });
 }
 function searchHTML() {
-  return `<div class="head"><div><h2>Search</h2></div></div>
+  return `
     <label class="bigsearch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
     <span class="vh">Search everything</span><input id="big-search" type="search" placeholder="Type a customer, Q-1001, INV-1001, a person or an item…" value="${esc(view.big || '')}" autocomplete="off"></label>
     <div class="sres" id="sres">${searchResults(view.big || '')}</div>`;
@@ -2552,7 +2558,7 @@ function quotesHTML() {
       <td><div class="client">${esc(q.client && q.client.business || 'No customer yet')}</div><div class="sub">${esc((q.items || []).filter(i => i.item).map(i => i.item).join(', ') || 'No items yet')}</div></td>
       <td class="r num"><b>${money(calc(q).total)}</b></td>${ageCell(ageDays(q.date), ['Accepted', 'Declined'].includes(q.status))}
       <td><span class="pill ${pillClass(st)}">${stLabel(st)}</span></td>${approvedCell(q)}${ownerCell(q)}</tr>`; }).join('');
-  return `<div class="head"><div><h2>Quotes</h2></div>
+  return `<div class="head">
       <button class="btn primary" data-new>New quote</button></div>
     <div class="table-wrap">${qs.length ? `<table class="list lq"><thead><tr><th>No</th><th>Date</th><th>Customer</th><th class="r">Total</th><th class="r">Age</th><th>Status</th><th>Approved by</th><th>Owner</th></tr></thead><tbody>${rows}</tbody></table>`
       : emptyBox('No quotes yet', 'Ready when you are. Press New quote to price your first job.')}</div>${pg.more}`;
@@ -2566,7 +2572,7 @@ function invoicesHTML() {
       <td><div class="client">${esc(v.client && v.client.business || 'No customer yet')}</div><div class="sub">${esc((v.items || []).filter(i => i.item).map(i => i.item).join(', ') || 'No items yet')}</div></td>
       <td class="r num"><b>${money(c.total)}</b></td><td class="r num">${money(st === 'Cancelled' ? 0 : c.due)}</td>${ageCell(v.status === 'Sent' ? ageDays(v.date) : null, st === 'Paid')}
       <td><span class="pill ${pillClass(st)}">${stLabel(st)}</span></td>${ownerCell(v)}</tr>`; }).join('');
-  return `<div class="head"><div><h2>Invoices</h2></div></div>
+  return `
     <div class="table-wrap">${vs.length ? `<table class="list li"><thead><tr><th>No</th><th>Date</th><th>Customer</th><th class="r">Total</th><th class="r">Still owed</th><th class="r">Age</th><th>Status</th><th>Owner</th></tr></thead><tbody>${rows}</tbody></table>`
       : emptyBox('No invoices yet', 'When a customer accepts a quote, you can invoice them from it.')}</div>${pg.more}`;
 }
@@ -2576,7 +2582,7 @@ function clientsHTML() {
   const rows = pg.rows.map(c => { const { quotes, invoices } = docsFor(c), ppl = contactsOf(c); const owed = invoices.filter(v => v.status === 'Sent').reduce((a, v) => a + Math.max(0, calc(v).due), 0);
     return `<tr data-client="${c.id}" tabindex="0"><td><div class="who">${avHTML(c)}<div><div class="client">${esc(c.business)}</div><div class="sub">${ppl.length ? esc(ppl.map(p => p.name).filter(Boolean).join(', ') || 'Contact saved') : 'No contact person yet'}</div></div></div></td>
       <td>${esc(ppl[0] && ppl[0].email || '—')}${ppl.length > 1 ? ` <span class="sub">+${ppl.length - 1}</span>` : ''}</td><td class="num">${esc(ppl[0] && ppl[0].phone || '—')}</td><td class="r num">${quotes.length}</td><td class="r num">${invoices.length}</td><td class="r num"><b>${owed ? money(owed) : '—'}</b></td></tr>`; }).join('');
-  return `<div class="head"><div><h2>Customers</h2></div>
+  return `<div class="head">
       <button class="btn primary" data-add-client>Add customer</button></div>
     <div class="toolbar"><span class="sub">${state.clients.length} customer${state.clients.length === 1 ? '' : 's'}</span>${searchBox('Search name, contact or email')}</div>
     <div class="table-wrap">${cs.length ? `<table class="list lc"><thead><tr><th>Customer</th><th>Email</th><th>Phone</th><th class="r">Quotes</th><th class="r">Invoices</th><th class="r">Owed</th></tr></thead><tbody>${rows}</tbody></table>`
@@ -2769,7 +2775,7 @@ function plansHTML() {
       <td class="num">${esc(p.quoteRef || '')}</td><td class="r num"><b>${money(per(p))}</b></td><td class="num">${ordinal(p.day)} of the month</td>
       <td class="num">${p.active ? fmtDate(planDate(p, nextPlanMonth(p))) : '—'}</td><td><span class="pill ${p.active ? 'accepted' : 'cancelled'}">${p.active ? 'Active' : 'Paused'}</span></td></tr>`).join('');
   const total = ps.filter(p => p.active).reduce((a, p) => a + per(p), 0);
-  return `<div class="head"><div><h2>Monthly billing</h2></div></div>
+  return `
     <section class="strip three" aria-label="Summary"><div class="stat"><span class="label">Active packages</span><b class="num">${ps.filter(p => p.active).length}</b></div>
       <div class="stat"><span class="label">Billed each month</span><b class="num spark">${money0(total)}</b></div>
       <div class="stat"><span class="label">Next invoice</span><b class="num">${(() => { const n = ps.filter(p => p.active).map(p => planDate(p, nextPlanMonth(p))).sort()[0]; return n ? fmtDate(n) : '—'; })()}</b></div></section>
@@ -2826,7 +2832,7 @@ function expensesHTML() {
   const pg = pageOf(list);
   const rows = pg.rows.map(e => `<tr data-expense="${e.id}" tabindex="0"><td class="num">${fmtDate(e.date)}</td><td><div class="client">${esc(e.description)}</div>${e.supplier ? `<div class="sub">${esc(e.supplier)}</div>` : ''}</td>
       <td><span class="cat">${esc(e.category || 'Other')}</span></td><td class="sub">${esc(e.clientName || '—')}</td><td class="r num"><b>${money(e.amount)}</b></td></tr>`).join('');
-  return `<div class="head"><div><h2>Expenses</h2></div><button class="btn primary" data-add-expense>Add expense</button></div>
+  return `<div class="head"><button class="btn primary" data-add-expense>Add expense</button></div>
     <section class="strip three" aria-label="Summary"><div class="stat"><span class="label">Money in, ${label}</span><b class="num spark">${money0(paidIn)}</b><span class="sub">Payments recorded on invoices</span></div>
       <div class="stat"><span class="label">Spent, ${label}</span><b class="num">${money0(spent)}</b><span class="sub">${list.length} expense${list.length === 1 ? '' : 's'}</span></div>
       <div class="stat"><span class="label">Profit, ${label}</span><b class="num ${paidIn - spent < 0 ? 'bad' : ''}">${money0(paidIn - spent)}</b><span class="sub">Money in minus spent</span></div></section>
@@ -2907,7 +2913,7 @@ function settingsSummary(k) {
 }
 const sRow = (label, help, ctrl, cls = '') => `<div class="srow ${cls}"><div class="srow-l"><b>${label}</b>${help ? `<span>${help}</span>` : ''}</div><div class="srow-c">${ctrl}</div></div>`;
 const sCard = (title, desc, body, opt = {}) => `<section class="scard ${opt.cls || ''}" ${opt.id ? `id="${opt.id}"` : ''}>${title ? `<header class="scard-h">${opt.ic ? `<span class="scard-ic">${sicon(opt.ic)}</span>` : ''}<div class="scard-t"><h3>${title}${opt.badge || ''}</h3>${desc ? `<p>${desc}</p>` : ''}</div>${opt.act || ''}</header>` : ''}<div class="scard-b">${body}</div>${opt.foot ? `<footer class="scard-f">${opt.foot}</footer>` : ''}</section>`;
-const pageHead = (t, d, act) => `<div class="head"><div><h2>${t}</h2></div>${act ? `<div class="actions">${act}</div>` : ''}</div>`;
+const pageHead = (t, d, act) => act ? `<div class="head"><div class="actions">${act}</div></div>` : '';
 function companyPageHTML() { return pageHead('Business info', 'How customers see and reach Novyra.') + `<div class="pg-stack">${setCompanyHTML()}</div>`; }
 function teamPageHTML() {
   const us = state.users, on = us.filter(u => u.active !== false);
@@ -2923,7 +2929,7 @@ function settingsHTML() {
       <div class="set-hero-av" id="pf-av" style="background:${esc(OWNER.color || AV_COLORS[0])}">${esc(userInitials(OWNER))}</div>
       <div class="set-hero-id"><h2 id="pf-nm">${esc(OWNER.name)}</h2><p><span id="pf-tt">${esc(OWNER.title || '')}</span><span class="dotsep">${esc(biz().name)}</span></p><div class="set-hero-meta"><span>${esc(em)}</span><span class="pill accepted">${isOwnerLogin() ? 'Owner' : esc((ROLES[ME.role] || ROLES.staff)[0])}</span>${methods}</div></div>
       ${S.email ? '<button class="btn set-hero-out" data-signout>Sign out</button>' : ''}</section>`;
-  return `<div class="head"><div><h2>Settings</h2></div></div>
+  return `
     <div class="set-page">${hero}${setProfileHTML()}${setSecurityHTML()}${setBusinessHTML()}${setMenuHTML()}${setDataHTML()}${sCard('Sample data', 'Explore Novyra Desk with example customers, quotes, invoices and posts. Your own records stay exactly as they are.', sRow(DEMO ? 'You’re looking at sample data' : 'Try it with sample data', DEMO ? 'Nothing you do here is saved.' : 'Great for trying things out or taking screenshots.', DEMO ? '<button class="btn primary" data-demo-off>Back to my records</button>' : '<button class="btn" data-demo-on>Show sample data</button>'), { ic: 'share', id: 'set-sample' })}</div>`;
 }
 function setProfileHTML() {
@@ -3158,7 +3164,7 @@ function calendarHTML() {
       <div class="panel cv-prog"><h3>${esc(first.toLocaleDateString('en-GB', { month: 'long' }))} progress</h3><div class="cv-pn"><b>${done}</b><span>of ${inMonth.length} posted</span></div><div class="cv-bar" role="img" aria-label="${done} of ${inMonth.length} posted">${inMonth.length ? counts.filter(c => c[1]).map(([s, n]) => `<i class="st-${pillClass(s)}" style="flex:${n}"></i>`).join('') : ''}</div>
         <ul class="cv-leg">${counts.map(([s, n]) => `<li><span class="cv-nd st-${pillClass(s)}"></span>${s}<b>${n}</b></li>`).join('')}</ul></div></aside>`;
   const filt = `<div class="cv-filt" role="group" aria-label="Filter by status"><button type="button" data-cal-f="" aria-pressed="${!f}">All <b>${inMonth.length}</b></button>${counts.map(([s, n]) => `<button type="button" data-cal-f="${s}" aria-pressed="${f === s}"><span class="cv-nd st-${pillClass(s)}"></span>${s} <b>${n}</b></button>`).join('')}</div>`;
-  return `<div class="head"><div><h2>Content calendar</h2></div><div class="actions"><button class="btn primary" data-cal-add="${t}">Add post</button></div></div>
+  return `<div class="head"><div class="actions"><button class="btn primary" data-cal-add="${t}">Add post</button></div></div>
     <div class="cv-bar1"><div class="cv-nav"><button class="ib" data-cal-m="-1" aria-label="Previous month"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button><h3>${esc(label)}</h3><button class="ib" data-cal-m="1" aria-label="Next month"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>${m !== t.slice(0, 7) ? '<button class="btn small" data-cal-today>Today</button>' : ''}</div>
       <div class="seg cv-seg" role="group" aria-label="View"><button type="button" data-cal-v="month" aria-pressed="${mode === 'month'}">Month</button><button type="button" data-cal-v="list" aria-pressed="${mode === 'list'}">List</button></div></div>
     ${filt}
