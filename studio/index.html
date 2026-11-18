@@ -2552,8 +2552,7 @@ function homeHTML() {
   state.invoices.filter(v => v.status === 'Draft').forEach(v => items.push({ h: `invoice-${v.id}`, tone: 'info', t: v.period ? `${monthLabel(v.period)} invoice is ready` : `${v.number ? 'INV-' + v.number : 'Invoice'} for ${v.quoteRef || 'a quote'} hasn’t been sent`, s: `${v.client && v.client.business || 'No customer'} · ${v.period ? 'monthly package, check it and send it' : 'send it when you’re ready'}`, d: v.date }));
   const recent = [...state.quotes.map(q => ({ h: `quote-${q.id}`, n: qRef(q), c: q.client && q.client.business, t: calc(q).total, st: quoteStatus(q), u: q.updatedAt || q.createdAt || '' })),
     ...state.invoices.map(v => ({ h: `invoice-${v.id}`, n: v.number ? 'INV-' + v.number : v.period ? monthLabel(v.period).replace(/ \d{4}$/, '') + '' : 'Invoice', c: v.client && v.client.business, t: calc(v).total, st: invoiceStatus(v), u: v.updatedAt || v.createdAt || '' }))].sort((a, b) => b.u.localeCompare(a.u)).slice(0, 6);
-  return `<div class="home-hero"><div><h2>${hello}${firstName(OWNER.name) ? ', ' + esc(firstName(OWNER.name)) : ''}</h2></div>
-      <div class="actions"><button class="btn primary" data-new>New quote</button><button class="btn" data-add-client>Add customer</button></div></div>
+  return `<div class="head"><div class="actions"><button class="btn" data-add-client>Add customer</button><button class="btn primary" data-new>New quote</button></div></div>
     ${startHTML()}${summaryHTML('home')}
     <div class="home-grid">
       <section class="panel"><h3>Needs your attention</h3>${items.length ? `<div class="todo">${items.map(i => `<a href="#${i.h}" class="todo-i ${i.tone}"><span class="dotc"></span><span><b>${esc(i.t)}</b><span class="sub">${esc(i.s)}</span></span><span class="sub num">${fmtDate(i.d)}</span></a>`).join('')}</div>` : '<div class="empty small"><p>Nothing waiting on you. New quotes, follow-ups and payments due will show here.</p></div>'}</section>
@@ -2633,7 +2632,7 @@ function pricesHTML() {
   take(all.filter(isExtra));
   const logo = take(by('Logo')), ident = take(by('Identity')), soc = take(by('Social media').filter(p => !isExtra(p))), con = take(by('Content').filter(p => !isExtra(p))), web = take([...by('Website'), ...by('Print')]);
   const other = all.filter(p => !used.has(p));
-    return `<article class="pricesheet has-edit"><button class="btn primary ps-edit" data-edit-prices>Edit prices</button>
+    return `<div class="head"><button class="btn primary" data-edit-prices>Edit prices</button></div><article class="pricesheet">
       ${sec('Logos', SHEET.LOGO_FILES, cards(logo, 'Logo Pack 2'))}
       ${sec('Identity packs', 'A full brand look: your logo, a matching letterhead and email signatures for the team.', cards(ident, 'Identity Pack 2'))}
       ${sec('Email signatures', SHEET.SIG_NOTE, cards(sigMain, '', 'g4') + (sigAdd.length ? `<div class="ps-addons">${sigAdd.map(p => `<span><b>${esc(p.item)}</b> ${money0(p.price)} <em>${esc(p.unit)}</em></span>`).join('')}</div>` : ''))}
