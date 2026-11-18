@@ -44,7 +44,7 @@ html.side-mini .appbar .brand .full{opacity:0} html.side-mini .appbar .brand .ma
 .ib.spin svg{animation:spin .6s ease}
 @keyframes spin{to{transform:rotate(360deg)}}
 .appbar .sep{width:1px;height:24px;background:var(--line);margin:0 6px}
-.avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-left:8px;flex:none;text-decoration:none;color:#fff;font:700 12.5px/1 var(--body);letter-spacing:0;text-indent:0;padding-top:2px;box-sizing:border-box;background:#2f63d6;box-shadow:0 0 0 2px #fff,0 0 0 3.5px var(--line2);transition:box-shadow .15s,background-color .2s}
+.avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-left:12px;flex:none;text-decoration:none;color:#fff;font:700 13px/1 var(--body);letter-spacing:0;text-indent:0;padding-top:2px;box-sizing:border-box;background:#2f63d6;box-shadow:0 0 0 2px #fff,0 0 0 3.5px var(--line2);transition:box-shadow .15s,background-color .2s}
 .avatar:hover{box-shadow:0 0 0 2px #fff,0 0 0 3.5px var(--spark)}
 .shell{display:grid;grid-template-columns:var(--side) minmax(0,1fr);min-height:calc(100vh - var(--bar));transition:grid-template-columns .25s var(--ease)}
 .side{position:sticky;top:var(--bar);height:calc(100vh - var(--bar));overflow-y:auto;background:#fff;border-right:1px solid var(--line);padding:18px 14px 16px max(14px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:2px;overflow-x:hidden}
@@ -911,9 +911,35 @@ textarea.desc-in{min-height:58px;resize:vertical;line-height:1.45}
 @keyframes sk{from{background-position:120% 0}to{background-position:-120% 0}}
 @media (prefers-reduced-motion:reduce){.sk{animation:none}}
 .sk-wrap{display:grid;gap:0;min-width:0;overflow:hidden}
+.sk-wrap .sk-card{box-shadow:none}
+.sk-2{display:flex;flex-direction:column;gap:8px;min-width:0;flex:1}
+.sk-tbl{padding:0 !important}
+.sk-th,.sk-tr{display:grid;grid-template-columns:.7fr .9fr 2.2fr 1fr .5fr .9fr .7fr;gap:18px;align-items:center;padding:14px 18px}
+.sk-th{border-bottom:1px solid var(--line);padding:13px 18px}
+.sk-tr{border-top:1px solid var(--line);min-height:58px}
+.sk-th>span,.sk-tr>span{display:block;min-width:0}
+.sk-tr:first-of-type{border-top:0}
+.sk-list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;margin-top:16px;overflow:hidden}
+.sk-li{display:flex;align-items:center;gap:14px;padding:13px 16px;border-top:1px solid var(--line)}
+.sk-list .sk-li:first-child{border-top:0}
+.sk-cc{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:16px;margin-bottom:16px}
+.sk-c{border-radius:18px !important}
+.sk-row2{display:flex;align-items:center;gap:16px;margin-top:16px}
+.sk-empty{display:flex;flex-direction:column;align-items:center;padding:36px 18px !important}
+.sk-pk{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr));gap:14px;margin-bottom:26px}
+.sk-calbar{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.sk-calwrap{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+.sk-form{padding:0 !important}
+.sk-fh{display:flex;align-items:center;gap:14px;padding:20px 22px;border-bottom:1px solid var(--line)}
+.sk-fr{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:20px;align-items:center;padding:16px 22px;border-top:1px solid var(--line)}
+.sk-fh + .sk-fr{border-top:0}
+.sk-banner{display:flex;align-items:center;gap:22px;padding:28px 32px;border-radius:var(--r-card);margin-bottom:16px;background:radial-gradient(120% 160% at 100% 0,#7fb0ff 0%,#4a86f7 35%,#1d3a8a 100%)}
+.sk-av{width:84px;height:84px;border-radius:50% !important;flex:none;background:rgba(255,255,255,.3) !important;animation:none !important}
+.sk-banner .sk-2 .sk{animation:none}
+@media (max-width:900px){.sk-calwrap{grid-template-columns:minmax(0,1fr)}.sk-th,.sk-tr{grid-template-columns:1fr 2fr 1fr}.sk-th>*:nth-child(n+4),.sk-tr>*:nth-child(n+4){display:none}.sk-fr{grid-template-columns:minmax(0,1fr);gap:8px}}
 .sk-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:22px}
 .sk-card{background:var(--ink2);border:1px solid var(--line);border-radius:16px;padding:18px;overflow:hidden}
-.sk-strip{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:22px}
+.sk-strip{display:grid;grid-template-columns:repeat(var(--n,5),minmax(0,1fr));gap:12px;margin-bottom:18px}
 .sk-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 .sk-bar{display:flex;justify-content:space-between;gap:12px;margin-bottom:14px}
 .sk-row{display:flex;gap:4%;align-items:center;padding:18px 16px;border-top:1px solid var(--line)}
@@ -1189,9 +1215,9 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:none;bor
 @media (min-width:761px){.spop{width:100% !important}.spop-panel::before{display:none}.sp-meta{display:none}}
 /* ================= settings: one page ================= */
 .set-page{display:grid;gap:16px;min-width:0}
-.set-hero{position:relative;overflow:hidden;display:flex;align-items:center;gap:20px;padding:26px 28px;border-radius:var(--r-card);color:#fff;background:radial-gradient(120% 160% at 100% 0,#7fb0ff 0%,#4a86f7 35%,#1d3a8a 100%);box-shadow:0 18px 40px -22px rgba(29,58,138,.7)}
+.set-hero{position:relative;overflow:hidden;display:flex;align-items:center;gap:22px;padding:28px 32px;border-radius:var(--r-card);color:#fff;background:radial-gradient(120% 160% at 100% 0,#7fb0ff 0%,#4a86f7 35%,#1d3a8a 100%);box-shadow:0 18px 40px -22px rgba(29,58,138,.7)}
 .set-hero::after{content:"";position:absolute;right:28px;top:50%;width:120px;height:120px;transform:translateY(-50%);background:#fff;opacity:.12;clip-path:polygon(50% 0,58% 42%,100% 50%,58% 58%,50% 100%,42% 58%,0 50%,42% 42%);pointer-events:none}
-.set-hero-av{width:72px;height:72px;flex:none;border-radius:50%;display:grid;place-items:center;font:800 26px/1 var(--display);color:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.9),0 10px 24px -10px rgba(0,0,0,.5)}
+.set-hero-av{width:84px;height:84px;flex:none;border-radius:50%;display:grid;place-items:center;font:700 28px/1 var(--body);letter-spacing:.02em;color:#fff;margin:6px 8px 6px 4px;box-shadow:0 0 0 3px #fff,0 0 0 9px rgba(255,255,255,.18),0 14px 30px -12px rgba(0,0,0,.55)}
 .set-hero-id{display:grid;gap:4px;min-width:0;flex:1}
 .set-hero-id h2{margin:0;font-size:24px !important;color:#fff;line-height:1.15}
 .set-hero-id p{margin:0;color:rgba(255,255,255,.85);font-size:14.5px}
@@ -1226,7 +1252,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:none;bor
 .smenu-prev .mprev{margin:0 !important}
 .sbtns{display:flex;flex-wrap:wrap;gap:8px}
 @media (max-width:900px){.smenu{grid-template-columns:minmax(0,1fr)}.smenu-prev{position:static}}
-@media (max-width:640px){.set-hero{flex-wrap:wrap;padding:22px 18px;gap:14px}.set-hero-av{width:58px;height:58px;font-size:21px}.set-hero-out{width:100%}.set-hero::after{display:none}.smenu{margin:14px 16px}.sdet summary{padding:14px 16px}.sdet-b{padding:0 16px 16px}.scard-h{flex-wrap:wrap}.scard-h>.btn{margin-left:54px}}
+@media (max-width:640px){.set-hero{flex-wrap:wrap;padding:22px 18px;gap:14px}.set-hero-av{width:64px;height:64px;font-size:22px;margin:6px}.set-hero-out{width:100%}.set-hero::after{display:none}.smenu{margin:14px 16px}.sdet summary{padding:14px 16px}.sdet-b{padding:0 16px 16px}.scard-h{flex-wrap:wrap}.scard-h>.btn{margin-left:54px}}
 /* ================= team ================= */
 @media (min-width:761px){.tm-strip{grid-template-columns:repeat(4,minmax(0,1fr)) !important}}
 .tm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:16px}
@@ -1818,7 +1844,10 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
     // open the workspace straight away; the access check runs alongside it
     window.STUDIO.email = u.email || ''; window.STUDIO.providers = providers;
     if (SLUG) {
-      try { const c = await raw.doc('companies/' + SLUG).get(); if (!c.exists) throw { code: 'not-found' }; window.STUDIO.company = { id: SLUG, ...c.data() }; }
+      try { const c = await raw.doc('companies/' + SLUG).get(); if (!c.exists) throw { code: 'not-found' };
+        const me = (u.email || '').toLowerCase(), co = c.data() || {};
+        if (!(co.owners || []).map(x => String(x).toLowerCase()).includes(me)) { const t = await raw.doc(`companies/${SLUG}/users/${me}`).get(); if (!t.exists || t.data().active !== true) throw { code: 'permission-denied' }; }
+        window.STUDIO.company = { id: SLUG, ...co }; }
       catch (e) { gate.hidden = false; busy(true); sayTop(e && e.code === 'permission-denied' ? 'You’re signed in, but this account isn’t on this company’s team. Ask the company’s owner to add you.' : 'There’s no company at this address yet. Check the link you were given.', 'bad'); await auth.signOut().catch(() => {}); setTimeout(() => busy(false), 1500); return; }
     }
     gate.hidden = true;
@@ -2221,18 +2250,32 @@ async function save(col, doc) {
 const CORE = ['q', 'i', 'c', 'p', 'b', 'm', 'u', 'pl', 'sh', 'ex', 'us', 'mn'];
 const coreReady = () => CORE.every(k => state.loaded[k]);
 function skeletonHTML() {
+  // each tab's placeholder copies that tab's real layout, so nothing jumps when the records arrive
   const b = (w, h, extra = '') => `<span class="sk" style="width:${w};height:${h}px;${extra}"></span>`;
-  const head = `<div class="sk-head"><div>${b('240px', 30)}${b('min(420px,80%)', 14, 'margin-top:12px')}</div>${b('130px', 42, 'border-radius:12px')}</div>`;
+  const R = n => Array.from({ length: n });
+  const stats = (n, big) => `<div class="sk-strip" style="--n:${n}">${R(n).map(() => `<div class="sk-card">${b('60%', 10)}${b(big ? '50%' : '35%', 26, 'margin-top:14px')}${b('45%', 10, 'margin-top:10px')}</div>`).join('')}</div>`;
+  const table = (cols, rows) => { const gt = `grid-template-columns:${cols.map(w => parseFloat(w) + 'fr').join(' ')}`, pill = cols.length - 2;
+    return `<div class="sk-card sk-tbl"><div class="sk-th" style="${gt}">${cols.map(w => `<span>${b(Math.min(80, parseFloat(w) * 6) + 'px', 10)}</span>`).join('')}</div>${R(rows).map(() => `<div class="sk-tr" style="${gt}">${cols.map((w, k) => k === 2 ? `<span class="sk-2">${b('80%', 13)}${b('55%', 10)}</span>` : k === pill ? `<span>${b('72px', 22, 'border-radius:999px')}</span>` : `<span>${b(Math.min(96, parseFloat(w) * 8) + 'px', 13)}</span>`).join('')}</div>`).join('')}</div>`; };
+  const listPanel = rows => `<div class="sk-card">${b('170px', 20)}<div class="sk-list">${R(rows).map(() => `<div class="sk-li">${b('36px', 36, 'border-radius:11px;flex:none')}<span class="sk-2">${b('70%', 13)}${b('50%', 10)}</span>${b('70px', 20, 'border-radius:999px;flex:none')}</div>`).join('')}</div></div>`;
+  const formCard = rows => `<div class="sk-card sk-form"><div class="sk-fh">${b('42px', 42, 'border-radius:12px;flex:none')}<span class="sk-2">${b('160px', 18)}${b('min(360px,70%)', 11)}</span></div>${R(rows).map(() => `<div class="sk-fr">${b('30%', 13)}${b('100%', 42, 'border-radius:12px')}</div>`).join('')}</div>`;
   if (view.open) return `<div class="sk-wrap">${b('90px', 14)}${b('220px', 34, 'margin:14px 0 10px')}${b('min(480px,80%)', 14)}
     <div class="sk-ed"><div class="sk-col">${[150, 120, 260, 140].map(h => `<div class="sk-card">${b('120px', 18)}${b('100%', h - 40, 'margin-top:16px')}</div>`).join('')}</div>
-    <div class="sk-card sk-paper">${b('140px', 26)}${b('100%', 2, 'margin:22px 0')}${Array.from({ length: 9 }, (_, i) => b(i % 3 ? '100%' : '70%', 12, 'margin-top:14px')).join('')}</div></div></div>`;
+    <div class="sk-card sk-paper">${b('140px', 26)}${b('100%', 2, 'margin:22px 0')}${R(9).map((_, i) => b(i % 3 ? '100%' : '70%', 12, 'margin-top:14px')).join('')}</div></div></div>`;
   const sub = view.tab === 'home' ? view.sub : view.tab;
-  if (sub === 'calendar') return `<div class="sk-wrap">${head}<div class="sk-card" style="padding:0">${b('100%', 34, 'border-radius:0')}<div class="sk-cal">${Array.from({ length: 35 }, () => `<div>${b('18px', 12)}</div>`).join('')}</div></div></div>`;
-  if (sub === 'settings') return `<div class="sk-wrap">${head}${b('min(520px,100%)', 44, 'border-radius:14px;margin-bottom:16px')}<div class="sk-two">${[0, 1].map(() => `<div class="sk-card">${b('160px', 20)}${Array.from({ length: 5 }, () => b('100%', 44, 'margin-top:14px;border-radius:12px')).join('')}</div>`).join('')}</div></div>`;
-  const strip = ['quotes', 'invoices', 'overview'].includes(sub) ? `<div class="sk-strip">${Array.from({ length: 5 }, () => `<div class="sk-card">${b('70%', 11)}${b('55%', 26, 'margin-top:12px')}</div>`).join('')}</div>` : '';
-  if (sub === 'overview') return `<div class="sk-wrap">${head}${strip}<div class="sk-two">${[0, 1].map(() => `<div class="sk-card">${b('180px', 20)}${Array.from({ length: 5 }, () => b('100%', 52, 'margin-top:12px;border-radius:12px')).join('')}</div>`).join('')}</div></div>`;
-  return `<div class="sk-wrap">${head}${strip}<div class="sk-bar">${b('min(380px,60%)', 36, 'border-radius:999px')}${b('min(300px,30%)', 40, 'border-radius:12px')}</div>
-    <div class="sk-card" style="padding:0">${b('100%', 40, 'border-radius:0')}${Array.from({ length: 8 }, () => `<div class="sk-row">${b('12%', 14)}${b('14%', 14)}${b('26%', 14)}${b('14%', 14)}${b('10%', 20, 'border-radius:999px')}</div>`).join('')}</div></div>`;
+  let body;
+  if (sub === 'overview') body = `${stats(5)}<div class="sk-two">${listPanel(4)}${listPanel(5)}</div>`;
+  else if (sub === 'clients') body = `<div class="sk-cc">${R(6).map(() => `<div class="sk-card sk-c">${`<div class="sk-li" style="border:0;padding:0">${b('48px', 48, 'border-radius:14px;flex:none')}<span class="sk-2">${b('70%', 15)}${b('45%', 11)}</span></div>`}${b('100%', 62, 'border-radius:12px;margin-top:16px')}<div class="sk-row2">${b('60px', 12)}${b('70px', 12)}${b('92px', 22, 'border-radius:999px;margin-left:auto')}</div></div>`).join('')}</div>`;
+  else if (sub === 'quotes') body = table(['7%', '9%', '22%', '10%', '5%', '9%', '7%'], 9);
+  else if (sub === 'invoices') body = table(['8%', '9%', '22%', '10%', '10%', '5%', '9%'], 7);
+  else if (sub === 'plans') body = `${stats(3)}<div class="sk-card sk-empty">${b('220px', 20)}${b('min(360px,70%)', 11, 'margin-top:12px')}</div>`;
+  else if (sub === 'expenses') body = `${stats(3, 1)}<div class="sk-bar">${b('min(300px,55%)', 36, 'border-radius:12px')}${b('min(260px,35%)', 38, 'border-radius:12px')}</div>${b('130px', 34, 'border-radius:10px;margin-bottom:14px')}${table(['10%', '28%', '12%', '16%', '10%', '8%'], 6)}`;
+  else if (sub === 'prices') body = R(2).map(() => `${b('190px', 22, 'margin:6px 0 10px')}${b('min(420px,70%)', 11, 'margin-bottom:14px')}<div class="sk-pk">${R(3).map(() => `<div class="sk-card">${b('55%', 13)}${b('40%', 24, 'margin-top:10px')}${R(4).map(() => b('85%', 10, 'margin-top:12px')).join('')}</div>`).join('')}</div>`).join('');
+  else if (sub === 'calendar') body = `<div class="sk-calbar">${b('38px', 38, 'border-radius:12px')}${b('220px', 28)}${b('38px', 38, 'border-radius:12px')}</div><div class="sk-calwrap"><div class="sk-card" style="padding:0">${b('100%', 34, 'border-radius:0')}<div class="sk-cal">${R(35).map((_, i) => `<div>${b('18px', 12)}${i % 5 === 1 ? b('85%', 34, 'margin-top:10px;border-radius:8px') : ''}</div>`).join('')}</div></div><div class="sk-col">${listPanel(4)}<div class="sk-card">${b('150px', 18)}${b('60px', 26, 'margin-top:14px')}${b('100%', 8, 'margin-top:12px;border-radius:999px')}</div></div></div>`;
+  else if (sub === 'company') body = `<div class="sk-col">${formCard(4)}${formCard(3)}</div>`;
+  else if (sub === 'team') body = `${stats(4)}<div class="sk-cc">${R(2).map((_, k) => `<div class="sk-card sk-c"${k ? ' style="border-style:dashed"' : ''}><div class="sk-li" style="border:0;padding:0">${b('46px', 46, 'border-radius:50%;flex:none')}<span class="sk-2">${b('55%', 15)}${b('70%', 11)}</span></div>${b('85%', 12, 'margin-top:16px')}${b('90px', 22, 'border-radius:999px;margin-top:14px')}</div>`).join('')}</div>${formCard(1)}`;
+  else if (sub === 'settings') body = `<div class="sk-banner"><span class="sk sk-av"></span><span class="sk-2">${b('220px', 24, 'background:rgba(255,255,255,.28)')}${b('150px', 12, 'background:rgba(255,255,255,.22)')}${b('190px', 12, 'background:rgba(255,255,255,.22)')}</span></div><div class="sk-col">${formCard(5)}${formCard(3)}</div>`;
+  else body = table(['10%', '12%', '24%', '12%', '10%'], 8);
+  return `<div class="sk-wrap">${body}</div>`;
 }
 function paintSkeleton() { const m = $('#main'); if (!m || state.failed) return; const k = (view.open ? 'ed' : view.tab + ':' + view.sub); if (m.dataset.sk === k && m.querySelector('.sk-wrap')) return; m.dataset.sk = k; m.setAttribute('aria-busy', 'true'); m.innerHTML = skeletonHTML(); }
 /* ---------- sample data: a full, realistic Novyra Desk that lives only in memory ---------- */
