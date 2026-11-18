@@ -1,11 +1,36 @@
 {
   "hosting": {
     "public": ".",
-    "ignore": ["firebase.json", ".firebaserc", "CNAME", "README.md", ".github/**", "**/.*", "**/node_modules/**"],
+    "ignore": [
+      "firebase.json",
+      ".firebaserc",
+      "CNAME",
+      "README.md",
+      ".github/**",
+      "**/.*",
+      "**/node_modules/**",
+      "desk-site/**"
+    ],
     "cleanUrls": true,
     "headers": [
-      { "source": "**/*.html", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] },
-      { "source": "**", "headers": [{ "key": "X-Content-Type-Options", "value": "nosniff" }] }
+      {
+        "source": "**/*.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      },
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "X-Content-Type-Options",
+            "value": "nosniff"
+          }
+        ]
+      }
     ]
   }
 }

@@ -2085,7 +2085,7 @@ async function notifyAccepted(q0) {
   const title = docTitle(q), who = acceptedText(a), to = mailCfg().notifyTo || OWNER.email, now = new Date().toISOString();
   const subject = `Quote ${qRef(q)}${title ? ' – ' + title : ''} has been accepted by ${who}`;
   const text = [`${qRef(q)}${title ? ' – ' + title : ''} has been accepted.`, '', `Accepted by: ${a.by === 'client' ? (a.name || 'The customer') : `${BN()}${a.name ? ' (marked by ' + a.name + ')' : ''}`}`, `Company: ${(q.client && q.client.business) || '—'}`,
-    `Date and time: ${fmtWhen(a.at || now)}`, `Quote total: ${money(calc(q).total)}`, '', `Open it in Novyra Desk: https://www.novyra.co.za/studio/#quote-${q.id}`].join('\n');
+    `Date and time: ${fmtWhen(a.at || now)}`, `Quote total: ${money(calc(q).total)}`, '', `Open it in Novyra Desk: ${location.origin}${location.pathname}#quote-${q.id}`].join('\n');
   let res;
   try { const j = await mailCall({ action: 'notify', key, to, subject, text }); res = { ok: true, key, at: now, to, duplicate: !!j.duplicate }; }
   catch (e) { res = { ok: false, key, at: now, to, error: e.message }; }
@@ -2653,7 +2653,8 @@ function priceEditHTML() {
     </tbody></table></div>`;
 }
 /* ---------- online quote links ---------- */
-const SHARE_BASE = 'https://www.novyra.co.za/quote/#';
+// customer links use the address the app is opened on: novyradesk.com once it is live, novyra.co.za until then
+const SHARE_BASE = (/(^|\.)novyradesk\.(com|co\.za)$/.test(location.hostname) ? 'https://novyradesk.com' : 'https://www.novyra.co.za') + '/quote/#';
 const shareUrl = q => q.shareId ? SHARE_BASE + q.shareId : '';
 const newToken = () => { const a = new Uint8Array(18); crypto.getRandomValues(a); return btoa(String.fromCharCode(...a)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); };
 function sharePayload(q, prev) {
@@ -2970,7 +2971,7 @@ function setProfileHTML() {
 }
 function setSecurityHTML() {
   const S = window.STUDIO || {}, pr = S.providers || [];
-  if (!S.email) return sCard('Sign-in and password', 'How you open Novyra Desk.', '<p class="sub sempty">This preview isn’t signed in. Open Novyra Desk at novyra.co.za/studio to manage how you sign in.</p>', { ic: 'lock', id: 'set-security' });
+  if (!S.email) return sCard('Sign-in and password', 'How you open Novyra Desk.', '<p class="sub sempty">This preview isn’t signed in. Open Novyra Desk at novyradesk.com to manage how you sign in.</p>', { ic: 'lock', id: 'set-security' });
   const has = p => pr.includes(p);
   return sCard('Sign-in and password', 'You can sign in with Google, or with your email and a password.',
       sRow('Signed in as', '', `<b class="sval">${esc(S.email)}</b>`)
