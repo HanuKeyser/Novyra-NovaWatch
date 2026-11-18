@@ -98,7 +98,7 @@ const lb = kar.locator('[data-act="link"]').first();
 await kar.waitForFunction(() => { const x = document.querySelector('[data-act="link"]'); return x && !x.disabled; }, null, { timeout: 10000 }).catch(() => {});
 console.log('    link button:', await lb.count() ? JSON.stringify(await lb.evaluate(x => ({ text: x.textContent.trim(), disabled: x.disabled, title: x.title, hash: location.hash }))) : 'not on the page (' + await kar.evaluate(() => location.hash + ' ' + [...document.querySelectorAll('[data-act]')].map(x => x.dataset.act).join(',')) + ')');
 await lb.click({ timeout: 8000 }).catch(e => console.log('    could not open the link dialog:', e.message.split('\n')[0])); await W(800);
-await kar.click('[data-lk-make]', { timeout: 8000 }).catch(e => console.log('    no Create link button:', e.message.split('\n')[0])); await W(2000);
+if (await kar.locator('[data-lk-make]').count()) { await kar.click('[data-lk-make]'); await W(2000); } // a saved quote may already have its link
 const link = await kar.inputValue('#lk-url').catch(() => '');
 check('Customer link is novyradesk.com/karoo-cycles/quote/#…', /^https:\/\/novyradesk\.com\/karoo-cycles\/quote\/#[\w-]{16,}$/.test(link), link);
 const key = link.split('#')[1] || '';
