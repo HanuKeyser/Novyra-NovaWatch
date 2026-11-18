@@ -1,0 +1,12 @@
+{
+  "name": "novyra-desk-tests",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "firebase emulators:exec --project novyra-studio --only firestore,auth \"node rules.test.mjs && node e2e.mjs\"" },
+  "dependencies": {
+    "@firebase/rules-unit-testing": "3.0.4",
+    "firebase": "10.14.1",
+    "firebase-tools": "13.29.1",
+    "playwright": "1.48.2"
+  }
+}

@@ -10,7 +10,9 @@
         ".github/**",
         "**/.*",
         "**/node_modules/**",
-        "desk-site/**"
+        "desk-site/**",
+        "tests/**",
+        "firestore.rules"
       ],
       "cleanUrls": true,
       "headers": [
@@ -61,6 +63,16 @@
               "value": "nosniff"
             }
           ]
+        }
+      ],
+      "rewrites": [
+        {
+          "regex": "^/[a-z0-9-]+/quote(/.*)?$",
+          "destination": "/quote/index.html"
+        },
+        {
+          "source": "**",
+          "destination": "/index.html"
         }
       ]
     }

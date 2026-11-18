@@ -1,0 +1,85 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null && request.auth.token.email_verified == true; }
+    function myEmail() { return request.auth.token.email.lower(); }
+
+    // ── NOVYRA (novyradesk.com) ─────────────────────────────────────────────
+    // Novyra's own records sit at the top level. Only Novyra's owners and team can use them.
+    function isOwner() { return signedIn() && myEmail() in ['hanu@keysers.cc', 'hanukeyser@gmail.com']; }
+    function userDoc() { return /databases/$(database)/documents/users/$(myEmail()); }
+    function member() { return signedIn() && exists(userDoc()) && get(userDoc()).data.active == true; }
+
+    // Owner: all of Novyra's records (never other companies' records, see below)
+    match /{col}/{document=**} { allow read, write: if isOwner() && col != 'companies'; }
+
+    // Team members can see their own user record (needed later)
+    match /users/{email} { allow read: if signedIn() && myEmail() == email; }
+
+    // TEAM ACCESS – leave commented out until you add your first team member, then remove the // on the next 4 lines
+    // match /{col}/{id} {
+    //   allow read: if member() && col != 'users' && col != 'companies';
+    //   allow write: if member() && get(userDoc()).data.role in ['admin', 'staff'] && col != 'users' && col != 'companies';
+    // }
+
+    // Novyra's customer links: anyone with the link can open a quote, invoice or receipt; only quotes can be accepted, declined or changed
+    match /shares/{key} {
+      allow get: if true;
+      allow update: if customerAnswer();
+    }
+
+    // ── OTHER COMPANIES (novyradesk.com/<company>/) ─────────────────────────
+    // Each company's records live only under companies/<company>/. Only that company's owners and team can use them.
+    function company(c) { return /databases/$(database)/documents/companies/$(c); }
+    function teamDoc(c) { return /databases/$(database)/documents/companies/$(c)/users/$(myEmail()); }
+    function coOwner(c) { return signedIn() && exists(company(c)) && myEmail() in get(company(c)).data.owners; }
+    function coTeam(c) { return signedIn() && exists(teamDoc(c)) && get(teamDoc(c)).data.active == true; }
+    function coMember(c) { return coOwner(c) || coTeam(c); }
+    function coEditor(c) { return coOwner(c) || (coTeam(c) && get(teamDoc(c)).data.role in ['owner', 'admin', 'staff']); }
+    function coManager(c) { return coOwner(c) || (coTeam(c) && get(teamDoc(c)).data.role in ['owner', 'admin']); }
+
+    match /companies/{c} {
+      // Novyra's owner sets a company up (name, address, owner's email) and can see the list of companies, nothing inside them
+      allow get: if coMember(c) || isOwner();
+      allow list: if isOwner();
+      allow create: if isOwner()
+        && c.matches('^[a-z0-9][a-z0-9-]{1,38}[a-z0-9]$')
+        && request.resource.data.name is string && request.resource.data.name.size() > 0
+        && request.resource.data.owners is list && request.resource.data.owners.size() > 0;
+      // the company's own owners can rename it or change its owners
+      allow update: if coOwner(c) && request.resource.data.owners is list && request.resource.data.owners.size() > 0;
+
+      // the company's team list: everyone on the team can see it, only owners and admins change it
+      match /users/{email} {
+        allow read: if coMember(c) || (signedIn() && myEmail() == email);
+        allow write: if coManager(c);
+      }
+
+      // the company's customer links: anyone with the link can open one; customers can only answer a quote
+      match /shares/{key} {
+        allow get: if true;
+        allow list: if coMember(c);
+        allow create, delete: if coEditor(c);
+        allow update: if coEditor(c) || customerAnswer();
+      }
+
+      // everything else the company keeps: customers, quotes, invoices, settings, calendar, expenses…
+      match /{col}/{document=**} {
+        allow read: if coMember(c) && col != 'shares';
+        allow write: if coEditor(c) && col != 'users' && col != 'shares';
+      }
+    }
+
+    // A customer answering a quote: only an open, unexpired quote; only the answer can change
+    function customerAnswer() {
+      return resource.data.get('kind', 'quote') == 'quote'
+        && resource.data.status == 'Open' && request.time < resource.data.validTs
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'response'])
+        && request.resource.data.status in ['Accepted', 'Changes requested', 'Declined']
+        && request.resource.data.response.keys().hasOnly(['name', 'note', 'at', 'rev'])
+        && request.resource.data.response.name is string && request.resource.data.response.name.size() >= 2 && request.resource.data.response.name.size() <= 99
+        && request.resource.data.response.note is string && request.resource.data.response.note.size() < 2000
+        && request.resource.data.response.rev == resource.data.rev;
+    }
+  }
+}
