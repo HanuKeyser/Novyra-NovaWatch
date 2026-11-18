@@ -1,3 +1,17 @@
 {
-  "projects": { "default": "novyra-studio" }
+  "projects": {
+    "default": "novyra-studio"
+  },
+  "targets": {
+    "novyra-studio": {
+      "hosting": {
+        "website": [
+          "novyra-studio"
+        ],
+        "desk": [
+          "novyradesk"
+        ]
+      }
+    }
+  }
 }
