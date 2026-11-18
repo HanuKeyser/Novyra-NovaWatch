@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=Syne:wght@600;700;800&amp;display=swap">
-<link rel="stylesheet" href="assets/site.css?v=20261117a">
+<link rel="stylesheet" href="assets/site.css?v=20261118a">
 </head>
 <body>
 <a class="sr-skip" href="#main">Skip to content</a>
@@ -35,19 +35,40 @@
 </header>
 <main id="main">
 <section class="hero">
-  <canvas data-lightfield aria-hidden="true"></canvas>
   <div class="wrap">
-    <p class="eyebrow">New era of creation</p>
-    <h1>Brands that <span class="glow">stop the scroll.</span></h1>
-    <p class="lead">Logos, brand identities, social media and websites for businesses that want to look established from day one. You work directly with the designer, with clear prices and no jargon.</p>
-    <div class="hero-actions">
-      <a class="btn btn-spark" href="/services">Build your quote</a>
-      <a class="btn btn-ghost" href="/work">See the work</a>
-    </div>
-    <div class="hero-meta">
-      <span><i class="spark" aria-hidden="true"></i>Based in Johannesburg</span>
-      <span><i class="spark" aria-hidden="true"></i>Clients anywhere in the world</span>
-      <span><i class="spark" aria-hidden="true"></i>Replies within 1 working day</span>
+    <div class="hero-card">
+      <div class="hero-main">
+        <p class="eyebrow">New era of creation</p>
+        <h1>Brands that <span class="glow">stop the scroll.</span></h1>
+        <p class="lead">Logos, brand identities, social media and websites for businesses that want to look established from day one. You work directly with the designer, with clear prices and no jargon.</p>
+        <ul class="ticks">
+          <li><i aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></i>Every price on the site, in rand</li>
+          <li><i aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></i>A written quote within 1 working day</li>
+          <li><i aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></i>All your files are yours once it's paid</li>
+        </ul>
+        <div class="hero-actions">
+          <a class="btn btn-spark" href="/services">Build your quote</a>
+          <a class="btn btn-ghost" href="/work">See the work</a>
+        </div>
+      </div>
+      <div class="hero-side">
+        <a class="mock" href="/services" aria-label="Build your quote on the services page">
+          <div class="mock-top"><img class="for-light" src="/assets/img/novyra-identity-light.png" alt="" width="900" height="268"><img class="for-dark" src="/assets/img/novyra-identity-dark.png" alt="" width="900" height="268"><b>Quote</b></div>
+          <div class="mock-tabs" aria-hidden="true"><span class="on">Branding</span><span>Social</span><span>Web</span></div>
+          <ul class="mock-rows">
+            <li class="on"><i></i><span><strong>Logo Pack 2</strong><small>4 concepts, 1 final logo</small></span><b>R2,200</b></li>
+            <li class="on"><i></i><span><strong>HTML Email Signature</strong><small>Works in Gmail, Outlook and Apple Mail</small></span><b>R350</b></li>
+            <li><i></i><span><strong>Social Starter</strong><small>Monthly posts, designed and scheduled</small></span><b>R1,350</b></li>
+          </ul>
+          <div class="mock-total"><span>Total</span><b>R2,550</b></div>
+          <div class="mock-foot"><span class="btn btn-spark">Send on WhatsApp</span></div>
+        </a>
+        <div class="hero-meta">
+          <span><i class="spark" aria-hidden="true"></i>Based in Johannesburg</span>
+          <span><i class="spark" aria-hidden="true"></i>Clients anywhere in the world</span>
+          <span><i class="spark" aria-hidden="true"></i>Replies within 1 working day</span>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -69,22 +90,22 @@
       <a class="tile" href="/services">
         <h3>Branding</h3>
         <p>Logo concepts, a final logo in every format you need, and identity packs with letterheads and email signatures.</p>
-        <span class="from">From R1,200</span>
+        <span class="go" aria-hidden="true"></span><span class="from">From R1,200</span>
       </a>
       <a class="tile" href="/services">
         <h3>Social media</h3>
         <p>Monthly posts designed, written and scheduled across your platforms, with a report on how they performed.</p>
-        <span class="from">From R1,350 per month</span>
+        <span class="go" aria-hidden="true"></span><span class="from">From R1,350 per month</span>
       </a>
       <a class="tile" href="/services">
         <h3>Content</h3>
         <p>On-brand posts and captions you publish yourself, for when you want the design without handing over your pages.</p>
-        <span class="from">From R850 per month</span>
+        <span class="go" aria-hidden="true"></span><span class="from">From R850 per month</span>
       </a>
       <a class="tile" href="/services">
         <h3>Websites &amp; print</h3>
         <p>Fast, mobile-friendly websites, plus business cards, flyers and brochures ready for the printer.</p>
-        <span class="from">From R350</span>
+        <span class="go" aria-hidden="true"></span><span class="from">From R350</span>
       </a>
     </div>
   </div>
@@ -149,6 +170,33 @@
   </div>
 </section>
 
+<section class="section band" id="desk">
+  <div class="wrap desk-row">
+    <div class="desk-text">
+      <img class="desk-logo for-light" src="/assets/img/brand/novyra-desk-logo-light-theme.svg" alt="Novyra Desk" width="420" height="124"><img class="desk-logo for-dark" src="/assets/img/brand/novyra-desk-logo-dark-theme.svg" alt="Novyra Desk" width="420" height="124">
+      <h2>Every quote you get comes from <span class="glow">Novyra Desk.</span></h2>
+      <p class="lead">Novyra Desk is the app Novyra runs on: customers, quotes, invoices and the content calendar in one place. You get a link to view your quote, accept it online and see what's paid.</p>
+      <div class="chips"><span class="chip">Accept quotes online</span><span class="chip">Clear invoices</span><span class="chip">Content calendar</span></div>
+      <a class="btn btn-ghost" href="https://novyradesk.com">Run your business on Novyra Desk</a>
+    </div>
+    <div class="app" aria-hidden="true">
+      <div class="app-side">
+        <img class="for-light" src="/assets/img/brand/novyra-desk-logo-light-theme.svg" alt="" width="420" height="124"><img class="for-dark" src="/assets/img/brand/novyra-desk-logo-dark-theme.svg" alt="" width="420" height="124">
+        <span>Overview</span><small>Sales</small><span>Customers</span><span class="on">Quotes</span><small>Finances</small><span>Invoices</span><span>Expenses</span>
+      </div>
+      <div class="app-main">
+        <div class="app-stats"><div><small>Open quotes</small><b>R18,450</b></div><div><small>Owed</small><b>R6,200</b></div><div><small>Paid this month</small><b>R24,900</b></div></div>
+        <div class="app-list">
+          <div><span class="av" style="background:#4a86f7">F</span><b>Fern &amp; Field Studio</b><em class="ok">Accepted</em><i>R4,000</i></div>
+          <div><span class="av" style="background:#0e9f6e">R</span><b>Rooftop Coffee</b><em class="sent">Sent</em><i>R2,550</i></div>
+          <div><span class="av" style="background:#b45309">M</span><b>Marula Interiors</b><em class="open">Viewed</em><i>R3,200</i></div>
+          <div><span class="av" style="background:#7c3aed">K</span><b>Karoo Cycles</b><em class="sent">Sent</em><i>R1,350</i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="section">
   <div class="wrap">
     <div class="cta">
@@ -157,7 +205,7 @@
         <p>Pick your packages, see the total instantly and send your quote request on WhatsApp in one tap.</p>
       </div>
       <div class="hero-actions">
-        <a class="btn btn-spark" style="background:#fff;color:#07080e" href="/services">Build your quote</a>
+        <a class="btn btn-spark" href="/services">Build your quote</a>
         <a class="btn btn-wa" href="https://wa.me/27638863779">Message on WhatsApp</a>
       </div>
     </div>
@@ -168,7 +216,7 @@
   <div class="wrap">
     <div class="foot-grid">
       <div>
-        <img class="foot-logo for-light" src="assets/img/novyra-complete-light.png" alt="Novyra, new era of creation" width="900" height="600"><img class="foot-logo for-dark" src="assets/img/novyra-complete-dark.png" alt="Novyra, new era of creation" width="900" height="600">
+        <img class="foot-logo for-light" src="/assets/img/novyra-complete-light.png" alt="Novyra, new era of creation" width="900" height="600"><img class="foot-logo for-dark" src="/assets/img/novyra-complete-dark.png" alt="Novyra, new era of creation" width="900" height="600">
         <p>Design studio for brands, social media and websites. Based in Johannesburg, working with businesses anywhere.</p>
       </div>
       <div>
@@ -196,6 +244,10 @@
         </ul>
       </div>
     </div>
+    <div class="foot-group">
+      <img class="for-light" src="/assets/img/brand/novyra-group-logo-light-theme.svg" alt="Novyra Group" width="420" height="124"><img class="for-dark" src="/assets/img/brand/novyra-group-logo-dark-theme.svg" alt="Novyra Group" width="420" height="124">
+      <p>Novyra is part of Novyra Group, together with <a href="https://novyradesk.com">Novyra Desk</a>, the app for quotes, invoices and customers.</p>
+    </div>
     <div class="foot-base">
       <span>&copy; <span data-year>2026</span> Novyra. New era of creation.</span>
       <span class="foot-links"><a href="/privacy">Privacy policy</a></span>
@@ -203,7 +255,7 @@
   </div>
 </footer>
 <a class="wa-float" href="https://wa.me/27638863779" aria-label="Message Novyra on WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg><span>WhatsApp</span></a>
-<script src="assets/site.js?v=20261117a"></script>
+<script src="assets/site.js?v=20261118a"></script>
 
 </body>
 </html>

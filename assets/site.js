@@ -125,7 +125,14 @@
   });
 
   /* Hero light field: drifting stars and light streaks that lean toward the pointer */
+  /* The sky behind every page (same as the Novyra Desk sign-in): created here so every page gets it */
   var canvas = document.querySelector("[data-lightfield]");
+  if (!canvas) {
+    var sky = document.createElement("div"); sky.className = "sky"; sky.setAttribute("aria-hidden", "true");
+    sky.innerHTML = '<canvas data-lightfield></canvas><div class="nova"></div>';
+    document.body.insertBefore(sky, document.body.firstChild);
+    canvas = sky.querySelector("canvas");
+  }
   if (canvas && canvas.getContext) {
     var ctx = canvas.getContext("2d");
     var w = 0, h = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -199,7 +206,7 @@
     size();
     var rz = 0;
     window.addEventListener("resize", function () { cancelAnimationFrame(rz); rz = requestAnimationFrame(function () { size(); if (reduce) draw(0); }); });
-    canvas.parentElement.addEventListener("pointermove", function (e) {
+    window.addEventListener("pointermove", function (e) {
       var r = canvas.getBoundingClientRect();
       mx += ((e.clientX - r.left) / r.width * 0.5 + 0.45 - mx) * 0.08;
       my += ((e.clientY - r.top) / r.height * 0.5 + 0.1 - my) * 0.08;
