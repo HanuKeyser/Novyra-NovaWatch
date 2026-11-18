@@ -1,14 +1,14 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Two ways in: an account the owner or a team manager created (matched by its account id, so people can change
-    // their sign-in email any time), or an older team entry matched by a confirmed email address.
+    // Two ways in: an account the owner or a team manager created (matched by its account id; it has a username and an
+    // email address that stays with the profile), or an older team entry matched by a confirmed email address.
     function authed() { return request.auth != null; }
     function signedIn() { return authed() && request.auth.token.email_verified == true; }
     function myEmail() { return request.auth.token.email.lower(); }
     function me() { return request.auth.uid; }
-    // a person may only tick off their own first-sign-in setup and keep their own email up to date
-    function selfUpdate() { return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['mustChange', 'email', 'login', 'lastSeen']) && request.resource.data.get('mustChange', false) == false; }
+    // a person may only tick off their own first-sign-in setup; their username, email and role stay as they were made
+    function selfUpdate() { return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['mustChange', 'lastSeen']) && request.resource.data.get('mustChange', false) == false; }
 
     // ── NOVYRA (novyradesk.com) ─────────────────────────────────────────────
     // Novyra's own records sit at the top level. Only Novyra's owners and team can use them.
@@ -22,9 +22,18 @@ service cloud.firestore {
 
     // Novyra's team: accounts the owner created. Viewers read, admins and staff also write. Only the owner changes the team.
     match /{col}/{document=**} {
-      allow read: if member() && !(col in ['users', 'companies']);
-      allow write: if editor() && !(col in ['users', 'companies']);
+      allow read: if member() && !(col in ['users', 'companies', 'usernames']);
+      allow write: if editor() && !(col in ['users', 'companies', 'usernames']);
     }
+    // Usernames: the sign-in page looks one up to find the email it signs in with. One name at a time, never a list.
+    // Each desk (novyra, or a company's address) has its own usernames; whoever manages that desk's team claims them.
+    match /usernames/{desk}/names/{name} {
+      allow get: if true;
+      allow create: if (isOwner() || coManager(desk)) && name.matches('^[a-z0-9][a-z0-9._-]{2,29}$')
+        && request.resource.data.keys().hasOnly(['email', 'uid']) && request.resource.data.email is string && request.resource.data.uid is string;
+      allow delete: if (desk == 'novyra' && isOwner()) || coManager(desk);
+    }
+
     match /users/{u} {
       allow read: if member() || (authed() && u == me());
       allow update: if authed() && u == me() && selfUpdate();

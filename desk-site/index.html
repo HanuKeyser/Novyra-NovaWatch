@@ -1677,15 +1677,14 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
       <button class="gbtn google" id="gate-btn" type="button"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>Continue with Google</button>
       <div class="gor" aria-hidden="true"><span>or use your sign-in details</span></div>
       <form id="g-form" novalidate>
-        <label class="gf"><span>Email or username</span><input id="g-email" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="you@example.com or your username" required></label>
+        <label class="gf"><span>Username or email</span><input id="g-email" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Your username or email address" required></label>
         <label class="gf"><span class="gf-l">Password<button type="button" class="glink" id="g-forgot">Forgot password?</button></span><span class="gpw"><input id="g-pass" type="password" autocomplete="current-password" placeholder="Your password" required><button type="button" class="geye" id="g-eye" aria-label="Show password" aria-pressed="false">Show</button></span>
 </label>
         <p class="gmsg" id="g-msg" role="status" aria-live="polite"></p>
         <button class="gbtn primary" id="g-submit" type="submit">Sign in</button>
       </form>
       <form id="g-setup" novalidate hidden>
-        <label class="gf"><span>Your email address <em class="gopt">optional</em></span><input id="s-email" type="email" autocomplete="email" inputmode="email" spellcheck="false" placeholder="you@example.com"></label>
-        <p class="g-note" id="s-email-note">Add your own email to sign in with it from now on, and to reset your password if you ever forget it. We’ll send a link to confirm it.</p>
+        <p class="g-note" id="s-who"></p>
         <label class="gf"><span>New password</span><span class="gpw"><input id="s-pass" type="password" autocomplete="new-password" placeholder="Choose a password" required><button type="button" class="geye" data-eye="s-pass" aria-label="Show password" aria-pressed="false">Show</button></span></label>
         <ul class="g-rules" id="s-rules" aria-label="Password rules"><li data-r="len"><i class="g-dot"></i>8 or more characters</li><li data-r="up"><i class="g-dot"></i>A capital letter</li><li data-r="num"><i class="g-dot"></i>A number</li><li data-r="sym"><i class="g-dot"></i>A symbol, like ! or #</li></ul>
         <label class="gf"><span>Type it again</span><input id="s-pass2" type="password" autocomplete="new-password" placeholder="The same password" required></label>
@@ -1801,10 +1800,13 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
   const $g = id => document.getElementById(id);
   const gate = $g('gate'), btn = $g('gate-btn');
   const EMU = /^(127\.0\.0\.1|localhost)$/.test(location.hostname) && /[?&]emu\b/.test(location.search);
-  // usernames sign in as <username>@<desk>.desk.novyradesk.com behind the scenes; real email addresses are used as they are
-  const SUFFIX = '.desk.novyradesk.com';
-  const toAuth = (login, slug) => { const v = String(login || '').trim().toLowerCase(); return v.includes('@') ? v : `${v}@${slug || 'novyra'}${SUFFIX}`; };
-  const shown = e => { const m = String(e || '').match(/^([^@]+)@[a-z0-9-]+\.desk\.novyradesk\.com$/); return m ? m[1] : String(e || ''); };
+  // every account has a username and an email address; people sign in with either. Usernames belong to one desk
+  // (usernames/<desk>/names/<username> holds the email it signs in with)
+  const DESK = SLUG || 'novyra';
+  const nameDoc = (u, desk) => raw.doc(`usernames/${desk || DESK}/names/${String(u).trim().toLowerCase()}`);
+  const toAuth = async login => { const v = String(login || '').trim().toLowerCase(); if (v.includes('@')) return v;
+    const d = await nameDoc(v).get().catch(() => null); if (!d || !d.exists) throw { code: 'auth/no-username' }; return String(d.data().email || '').toLowerCase(); };
+  const shown = e => String(e || '');
   const okUser = v => /^[a-z0-9][a-z0-9._-]{2,29}$/.test(v);
   const okMail = v => /^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/.test(v);
   const PW = { len: p => p.length >= 8, up: p => /[A-Z]/.test(p), num: p => /\d/.test(p), sym: p => /[^A-Za-z0-9]/.test(p) };
@@ -1826,8 +1828,10 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
   const why = e => { const c = (e && e.code) || '';
     if (/invalid-credential|wrong-password|user-not-found|invalid-login/.test(c)) return 'Those sign-in details don’t match. Check them and try again.';
     if (/too-many-requests/.test(c)) return 'Too many tries for now. Wait a few minutes and try again.';
-    if (/email-already-in-use/.test(c)) return 'That username or email is already used for another account. Choose a different one.';
-    if (/weak-password|password-does-not-meet/.test(c)) return 'That password is too simple. Use 8 or more characters with a capital letter, a number and a symbol.';
+    if (/no-username/.test(c)) return 'There’s no account with that username here. Check it, or sign in with your email address.';
+    if (/username-taken/.test(c)) return 'That username is already used on this desk. Choose another one.';
+    if (/email-already-in-use/.test(c)) return 'That email address already has a Novyra Desk account. Use a different email address.';
+    if (/weak-password|password-does-not-meet/.test(c)) return 'That password is too short or simple. Firebase needs at least 6 characters.';
     if (/invalid-email|invalid-new-email/.test(c)) return 'That email address doesn’t look quite right.';
     if (/requires-recent-login/.test(c)) return 'For your safety, sign out and sign in again, then try once more.';
     if (/network/.test(c)) return 'You seem to be offline. Check your internet and try again.';
@@ -1837,14 +1841,18 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
   window.STUDIO = { slug: SLUG, company: null, raw, email: '', uid: '', login: '', providers: [], toAuth, shown, okUser, okMail, PW, pwOk, why,
     signOut: () => auth.signOut().then(() => location.reload()),
     resetPassword: () => auth.sendPasswordResetEmail(auth.currentUser.email),
-    // makes a sign-in for someone else without signing the current person out (a second, temporary Firebase connection)
-    createLogin: async (login, pass, slug) => {
-      const email = toAuth(login, slug === undefined ? SLUG : slug), app2 = firebase.initializeApp({"apiKey": "AIzaSyBaFNF3r8iehEU00BRO0XKnal0THv9pXs4", "authDomain": "novyra-studio.firebaseapp.com", "projectId": "novyra-studio", "storageBucket": "novyra-studio.firebasestorage.app", "messagingSenderId": "277400731071", "appId": "1:277400731071:web:70871b84494b7a6d9a750a"}, 'mk' + Date.now());
+    // makes someone's account (username + email + starting password) without signing the current person out,
+    // using a second, temporary Firebase connection; then claims the username on that desk
+    createLogin: async (username, email, pass, slug) => {
+      const desk = slug || DESK, un = String(username).trim().toLowerCase(), em = String(email).trim().toLowerCase();
+      const taken = await nameDoc(un, desk).get().catch(() => null); if (taken && taken.exists) throw { code: 'username-taken' };
+      const app2 = firebase.initializeApp({"apiKey": "AIzaSyBaFNF3r8iehEU00BRO0XKnal0THv9pXs4", "authDomain": "novyra-studio.firebaseapp.com", "projectId": "novyra-studio", "storageBucket": "novyra-studio.firebasestorage.app", "messagingSenderId": "277400731071", "appId": "1:277400731071:web:70871b84494b7a6d9a750a"}, 'mk' + Date.now()); let id;
       try { const a2 = app2.auth(); if (EMU) a2.useEmulator('http://127.0.0.1:9099');
-        const r = await a2.createUserWithEmailAndPassword(email, pass); const id = r.user.uid; await a2.signOut(); return { uid: id, email }; }
-      finally { app2.delete().catch(() => {}); } },
-    changePassword: async (cur, next) => { const u = await reauth(cur); await u.updatePassword(next); },
-    changeEmail: async (cur, next) => { const u = await reauth(cur); await u.verifyBeforeUpdateEmail(next); } };
+        const r = await a2.createUserWithEmailAndPassword(em, pass); id = r.user.uid; await a2.signOut(); }
+      finally { app2.delete().catch(() => {}); }
+      return { uid: id, email: em, username: un, claim: () => nameDoc(un, desk).set({ email: em, uid: id }) }; },
+    sendReset: email => auth.sendPasswordResetEmail(String(email).trim().toLowerCase()),
+    changePassword: async (cur, next) => { const u = await reauth(cur); await u.updatePassword(next); } };
   // a slow field of stars and the odd sparkle, drawn only while the sign-in screen shows
   (function sky() {
     const c = $g('g-stars'), x = c.getContext('2d'), still = matchMedia('(prefers-reduced-motion: reduce)').matches; let W, H, S = [], raf;
@@ -1864,14 +1872,13 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
     inp.type = show ? 'text' : 'password'; b.textContent = show ? 'Hide' : 'Show'; b.setAttribute('aria-pressed', String(show)); b.setAttribute('aria-label', show ? 'Hide password' : 'Show password'); });
   $g('g-form').addEventListener('submit', async e => { e.preventDefault();
     const v = em.value.trim().toLowerCase(), p = pw.value;
-    if (!v || (v.includes('@') ? !okMail(v) : !okUser(v))) { say(msg, 'Type your email address or username.', 'bad'); em.focus(); return; }
+    if (!v || (v.includes('@') ? !okMail(v) : !okUser(v))) { say(msg, 'Type your username or email address.', 'bad'); em.focus(); return; }
     if (!p) { say(msg, 'Please enter your password.', 'bad'); pw.focus(); return; }
     busy(true); say(msg, 'Signing you in…');
-    try { await auth.signInWithEmailAndPassword(toAuth(v, SLUG), p); } catch (err) { busy(false); say(msg, why(err), 'bad'); } });
+    try { await auth.signInWithEmailAndPassword(await toAuth(v), p); } catch (err) { busy(false); say(msg, why(err), 'bad'); } });
   $g('g-forgot').addEventListener('click', async () => { const v = em.value.trim();
-    if (v && !v.includes('@')) { say(msg, 'A username can’t get a reset email. Ask the person who set up your account for new sign-in details. Once you’re in, add your own email so you can reset it yourself next time.', 'bad'); return; }
-    if (!okMail(v)) { say(msg, 'Type your email address above, then tap Forgot password.', 'bad'); em.focus(); return; }
-    try { await auth.sendPasswordResetEmail(v); say(msg, `Check your inbox. If ${v} has an account, we’ve sent a link to choose a new password.`, 'good'); } catch (err) { say(msg, why(err), 'bad'); } });
+    if (!v || (v.includes('@') ? !okMail(v) : !okUser(v.toLowerCase()))) { say(msg, 'Type your username or email address above, then tap Forgot password.', 'bad'); em.focus(); return; }
+    try { const to = await toAuth(v).catch(() => ''); if (to) await auth.sendPasswordResetEmail(to); say(msg, 'Check your inbox. If that account exists, we’ve sent a link to its email address to choose a new password.', 'good'); } catch (err) { say(msg, why(err), 'bad'); } });
   btn.addEventListener('click', async () => {
     const p = new firebase.auth.GoogleAuthProvider(); p.setCustomParameters({ prompt: 'select_account' });
     busy(true); sayTop('Signing in…');
@@ -1886,29 +1893,19 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
     gate.hidden = false; gate.classList.add('setup'); busy(false);
     $g('g-title').textContent = 'Set up your account';
     $g('g-sub').textContent = 'Welcome! Choose your own password before you start. The one you were given stops working.';
-    const f = $g('g-setup'), se = $g('s-email'), sp = $g('s-pass'), sp2 = $g('s-pass2'), sm = $g('s-msg'), sb = $g('s-submit'); f.hidden = false;
-    se.value = u.email && !shown(u.email).includes('@') ? '' : (u.email || '');
-    if (se.value) $g('s-email-note').textContent = 'This is the email you sign in with. Change it if you’d rather use another one; we’ll send a link to confirm it.';
+    const f = $g('g-setup'), sp = $g('s-pass'), sp2 = $g('s-pass2'), sm = $g('s-msg'), sb = $g('s-submit'); f.hidden = false;
+    $g('s-who').textContent = `Signed in as ${window.STUDIO.login && window.STUDIO.login !== u.email ? window.STUDIO.login + ' · ' : ''}${u.email}`;
     const paint = () => $$g('#s-rules [data-r]').forEach(li => li.classList.toggle('ok', PW[li.dataset.r](sp.value)));
-    sp.addEventListener('input', paint); paint(); setTimeout(() => (se.value ? sp : se).focus(), 50);
+    sp.addEventListener('input', paint); paint(); setTimeout(() => sp.focus(), 50);
     $g('s-out').onclick = () => auth.signOut().then(() => location.reload());
     f.onsubmit = async ev => { ev.preventDefault();
-      const ne = se.value.trim().toLowerCase(), np = sp.value;
-      if (ne && !okMail(ne)) { say(sm, 'That email address doesn’t look quite right.', 'bad'); se.focus(); return; }
+      const np = sp.value;
       if (!pwOk(np)) { say(sm, 'Your password needs 8 or more characters, a capital letter, a number and a symbol.', 'bad'); sp.focus(); return; }
       if (np !== sp2.value) { say(sm, 'The two passwords aren’t the same.', 'bad'); sp2.focus(); return; }
       sb.disabled = true; say(sm, 'Saving…');
       try {
-        await u.updatePassword(np);
-        let sent = '';
-        if (ne && ne !== (u.email || '').toLowerCase()) { try { await u.verifyBeforeUpdateEmail(ne); sent = ne; } catch (err) { say(sm, why(err), 'bad'); sb.disabled = false; return; } }
-        await done();
-        if (sent) { $g('g-title').textContent = 'Check your inbox'; $g('g-sub').textContent = 'Your new password is saved.';
-          [...f.children].forEach(el => { if (el !== sm && el !== sb) el.hidden = true; });
-          say(sm, `We sent a link to ${sent}. Open it to start signing in with that address. Until then, keep signing in with ${shown(u.email)}.`, 'good');
-          sb.disabled = false; sb.textContent = 'Open my desk'; f.onsubmit = ev2 => { ev2.preventDefault(); gate.classList.remove('setup'); f.hidden = true; gate.hidden = true; if (!started) { started = true; resolveReady(); } }; sb.focus(); return; }
-        gate.classList.remove('setup'); f.hidden = true;
-        gate.hidden = true; if (!started) { started = true; resolveReady(); }
+        await u.updatePassword(np); await done();
+        gate.classList.remove('setup'); f.hidden = true; gate.hidden = true; if (!started) { started = true; resolveReady(); }
       } catch (err) { sb.disabled = false; say(sm, why(err), 'bad'); if (err && /requires-recent-login/.test(err.code)) setTimeout(() => auth.signOut().then(() => location.reload()), 2500); } };
   }
   const $$g = q => [...document.querySelectorAll(q)];
@@ -1926,21 +1923,20 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
         const owner = (co.ownerUids || []).includes(u.uid) || (u.emailVerified && low(co.owners).includes(me));
         if (owner) {
           if ((co.mustChange || []).includes(u.uid)) setup = () => raw.doc('companies/' + SLUG).update({ mustChange: FV.arrayRemove(u.uid) });
-          if (me && !low(co.owners).includes(me) && (co.ownerUids || []).includes(u.uid)) raw.doc('companies/' + SLUG).update({ owners: FV.arrayUnion(me) }).catch(() => {});
         } else {
           let t = await raw.doc(`companies/${SLUG}/users/${u.uid}`).get();
           if (!t.exists && u.emailVerified) t = await raw.doc(`companies/${SLUG}/users/${me}`).get();
           if (!t.exists || t.data().active !== true) throw { code: 'permission-denied' };
           if (t.data().mustChange) setup = () => t.ref.update({ mustChange: false });
-          if (t.id === u.uid && (t.data().email || '') !== me) t.ref.update({ email: me, login: shown(me) }).catch(() => {});
+          if (t.data().login) S.login = t.data().login;
         }
-        S.company = { id: SLUG, ...co };
+        S.company = { id: SLUG, ...co }; if (owner && co.ownerLogin) S.login = co.ownerLogin;
       } else {
         const t = await raw.doc('users/' + u.uid).get().catch(() => null);
         if (t && t.exists) {
           if (t.data().active !== true) throw { code: 'permission-denied' };
           if (t.data().mustChange) setup = () => t.ref.update({ mustChange: false });
-          if ((t.data().email || '') !== me) t.ref.update({ email: me, login: shown(me) }).catch(() => {});
+          if (t.data().login) S.login = t.data().login;
         }
       }
     } catch (e) { gate.hidden = false; busy(true); sayTop(e && e.code === 'permission-denied' ? (SLUG ? 'You’re signed in, but this account isn’t on this company’s team. Ask the company’s owner to add you.' : 'You’re signed in, but this account doesn’t have access. Ask the owner to add you to the team.') : 'There’s no company at this address yet. Check the link you were given.', 'bad'); await auth.signOut().catch(() => {}); setTimeout(() => busy(false), 1500); return; }
@@ -2007,16 +2003,27 @@ const pwPaint = (inp, ul) => { const v = inp.value; $$('[data-r]', ul).forEach(l
 const genPassword = () => { const pick = (s, n) => Array.from({ length: n }, () => s[crypto.getRandomValues(new Uint32Array(1))[0] % s.length]).join('');
   const a = [...pick('ABCDEFGHJKLMNPQRSTUVWXYZ', 2), ...pick('abcdefghjkmnpqrstuvwxyz', 6), ...pick('23456789', 3), ...pick('!#$%&*?', 1)];
   for (let i = a.length - 1; i > 0; i--) { const j = crypto.getRandomValues(new Uint32Array(1))[0] % (i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a.join(''); };
-const okLogin = v => v.includes('@') ? /^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/.test(v) : /^[a-z0-9][a-z0-9._-]{2,29}$/.test(v);
-// makes the person's sign-in without signing you out (in a preview, nothing is created)
-const makeLogin = (login, pass, slug) => window.STUDIO && window.STUDIO.createLogin ? window.STUDIO.createLogin(login, pass, slug) : Promise.resolve({ uid: 'preview-' + Date.now().toString(36), email: login.includes('@') ? login : `${login}@${slug || 'novyra'}.desk.novyradesk.com` });
+const okUser = v => /^[a-z0-9][a-z0-9._-]{2,29}$/.test(v);
+const okMail = v => /^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/.test(v);
+// the starting password is the business's name in small letters, without spaces (Firebase needs 6 or more characters)
+const startPassword = name => { const p = String(name || '').toLowerCase().replace(/[^a-z0-9]/g, ''); return p.length >= 6 ? p : (p + 'desk').padEnd(6, '1'); };
+const deskName = () => SLUG ? ((COMPANY() || {}).name || BN()) : 'Novyra';
+// makes the person's account without signing you out (in a preview, nothing is created)
+const makeLogin = (username, email, pass, slug) => window.STUDIO && window.STUDIO.createLogin ? window.STUDIO.createLogin(username, email, pass, slug)
+  : Promise.resolve({ uid: 'preview-' + Date.now().toString(36), email, username, claim: async () => {} });
 const loginErr = e => (window.STUDIO && window.STUDIO.why) ? window.STUDIO.why(e) : 'Not created. Try again.';
+// the account fields shared by Team and Companies
+const accountFieldsHTML = (pre, pw) => `<div class="grid2"><label class="field"><span>Username</span><input id="${pre}-user" type="text" autocapitalize="none" spellcheck="false" placeholder="e.g. pieter"><span class="sub">3 to 30 small letters or numbers. They can sign in with it.</span></label>
+    <label class="field"><span>Email address</span><input id="${pre}-email" type="email" autocapitalize="none" spellcheck="false" placeholder="name@company.co.za"><span class="sub">Tied to their profile and can’t be changed later.</span></label></div>
+    <label class="field"><span>Starting password</span><input id="${pre}-pass" type="text" autocomplete="off" spellcheck="false" value="${esc(pw)}"><span class="sub">The business’s name in small letters. They choose their own password the first time they sign in.</span></label>`;
+const readAccount = (m, pre) => ({ username: $(`#${pre}-user`, m).value.trim().toLowerCase(), email: $(`#${pre}-email`, m).value.trim().toLowerCase(), pass: $(`#${pre}-pass`, m).value });
+const accountProblem = a => !okUser(a.username) ? ['Type a username: 3 to 30 small letters or numbers (dots, dashes and underscores are fine).', 'user']
+  : !okMail(a.email) ? ['Type their email address.', 'email'] : a.pass.length < 6 ? ['The starting password needs at least 6 characters.', 'pass'] : null;
 // shows the sign-in details once, so they can be passed on
-function loginDetailsDialog(title, who, login, pass, slug) {
-  const addr = `novyradesk.com/${slug ? slug + '/' : ''}`, txt = `Your Novyra Desk sign-in\nAddress: https://${addr}\nSign-in: ${login}\nPassword: ${pass}\nYou’ll choose your own password the first time you sign in.`;
-  openModal(dlg(title, `<p class="lead">Give these details to <b>${esc(who)}</b>. They’ll choose their own password the first time they sign in, and can add their own email address.</p>
-    <div class="login-card"><div><span class="label">Address</span><b>${esc(addr)}</b></div><div><span class="label">Sign-in</span><b>${esc(login)}</b></div><div><span class="label">Password</span><b class="num">${esc(pass)}</b></div></div>
-    <p class="sub">This is the only time the password is shown. If it gets lost, give them new sign-in details from the Team page.</p>`,
+function loginDetailsDialog(title, who, acc, pass, slug) {
+  const addr = `novyradesk.com/${slug ? slug + '/' : ''}`, txt = `Your Novyra Desk sign-in\nAddress: https://${addr}\nUsername: ${acc.username}\nEmail: ${acc.email}\nStarting password: ${pass}\nSign in with your username or email. You’ll choose your own password the first time you sign in.`;
+  openModal(dlg(title, `<p class="lead">Give these details to <b>${esc(who)}</b>. They sign in with the username or the email address, and choose their own password the first time.</p>
+    <div class="login-card"><div><span class="label">Address</span><b>${esc(addr)}</b></div><div><span class="label">Username</span><b>${esc(acc.username)}</b></div><div><span class="label">Email</span><b>${esc(acc.email)}</b></div><div><span class="label">Starting password</span><b class="num">${esc(pass)}</b></div></div>`,
     '<button class="btn ghost" data-close>Done</button><button class="btn primary" data-copy-login>Copy details</button>', 'small'), m => {
     $('[data-copy-login]', m).addEventListener('click', async () => { try { await navigator.clipboard.writeText(txt); toast('Sign-in details copied'); } catch { toast('Select the details and copy them.'); } }); });
 }
@@ -3162,64 +3169,46 @@ function activityHTML(n) {
 }
 function userDialog(u) {
   const isNew = !u; let x = { email: '', name: '', role: 'staff', access: { quotes: true, invoices: true, clients: true }, active: true, ...(u || {}) };
-  const shownAs = x.login || shownLogin(x.email);
-  const body = () => `<div class="grid2"><label class="field"><span>Name</span><input id="us-name" value="${esc(x.name)}" ${isNew ? 'autofocus' : ''}></label>
-      ${isNew ? `<label class="field"><span>Sign-in (username or email)</span><input id="us-email" type="text" autocapitalize="none" spellcheck="false" placeholder="e.g. pieter or pieter@company.co.za"></label>`
-        : `<div class="field"><span>Signs in with</span><div class="ro">${esc(shownAs)}</div></div>`}</div>
-    ${isNew ? `<div class="field"><span>Starting password</span><div class="pw-row"><input id="us-pass" type="text" autocomplete="off" spellcheck="false" value="${esc(genPassword())}"><button type="button" class="btn small" data-us-gen>New password</button></div>${pwRulesHTML('us-rules')}<span class="sub">They choose their own password the first time they sign in.</span></div>` : ''}
+  const body = () => `<label class="field"><span>Name</span><input id="us-name" value="${esc(x.name)}" ${isNew ? 'autofocus' : ''}></label>
+    ${isNew ? accountFieldsHTML('us', startPassword(deskName()))
+      : `<div class="grid2"><div class="field"><span>Username</span><div class="ro">${esc(x.login || '—')}</div></div><div class="field"><span>Email address</span><div class="ro">${esc(x.email)}</div></div></div>`}
     <div class="field"><span>Role</span><div class="roles">${Object.entries(ROLES).filter(([k]) => k !== 'owner').map(([k, [l, d]]) => `<label class="rolecard"><input type="radio" name="us-role" value="${k}" ${x.role === k ? 'checked' : ''}><span><b>${l}</b><span class="sub">${d}</span></span></label>`).join('')}</div></div>
     <div class="field" ${x.role === 'admin' ? 'hidden' : ''} id="us-acc"><span>Can open</span><div class="acc-grid">${ACCESS.map(([k, l]) => `<label class="chk"><input type="checkbox" data-acc="${k}" ${x.access[k] ? 'checked' : ''}><span>${l}</span></label>`).join('')}</div></div>
     ${isNew ? '' : `<label class="chk"><input type="checkbox" id="us-active" ${x.active !== false ? 'checked' : ''}><span>Can sign in (untick to disable without removing)</span></label>
-      <div class="us-reset"><div><b>Forgot their password?</b><span class="sub">Give them new sign-in details. The old ones stop working.</span></div><button type="button" class="btn small" data-us-new>New sign-in details</button></div>`}`;
+      <div class="us-reset"><div><b>Forgot their password?</b><span class="sub">We email ${esc(x.email)} a link to choose a new one.</span></div><button type="button" class="btn small" data-us-reset>Send reset email</button></div>`}`;
   const read = m => ({ name: $('#us-name', m).value.trim(), role: ($('[name=us-role]:checked', m) || {}).value || 'staff', access: Object.fromEntries($$('[data-acc]', m).map(c => [c.dataset.acc, c.checked])) });
   openModal(dlg(isNew ? 'Add a team member' : 'Team member', body(), `${isNew ? '' : '<button class="btn ghost danger" data-us-del style="margin-right:auto">Remove</button>'}<button class="btn ghost" data-close>Cancel</button><button class="btn primary" data-us-save>${isNew ? 'Add person' : 'Save'}</button>`), m => {
     $$('[name=us-role]', m).forEach(r => r.addEventListener('change', () => { $('#us-acc', m).hidden = r.value === 'admin' && r.checked; }));
-    const pw = $('#us-pass', m); if (pw) { const ul = $('#us-rules', m); pw.addEventListener('input', () => pwPaint(pw, ul)); pwPaint(pw, ul); $('[data-us-gen]', m).addEventListener('click', () => { pw.value = genPassword(); pwPaint(pw, ul); }); }
     $('[data-us-save]', m).addEventListener('click', async e => {
       const r = read(m), now = new Date().toISOString();
       if (!isNew) {
         const v = { ...r, active: $('#us-active', m).checked, updatedAt: now };
-        try { await db.collection('users').doc(x.id).update(v); closeModal(); toast('Saved'); logActivity('team', `Updated team member ${v.name || shownAs} (${ROLES[v.role][0]}${v.active ? '' : ', disabled'})`, ''); } catch { toast('Not saved. Check your connection.'); }
+        try { await db.collection('users').doc(x.id).update(v); closeModal(); toast('Saved'); logActivity('team', `Updated team member ${v.name || x.login || x.email} (${ROLES[v.role][0]}${v.active ? '' : ', disabled'})`, ''); } catch { toast('Not saved. Check your connection.'); }
         return;
       }
-      const login = $('#us-email', m).value.trim().toLowerCase(), pass = pw.value;
+      const a = readAccount(m, 'us');
       if (!r.name) { toast('Type their name.'); $('#us-name', m).focus(); return; }
-      if (!okLogin(login)) { toast('Type a username (3 to 30 letters or numbers) or an email address.'); $('#us-email', m).focus(); return; }
-      if (state.users.some(o => (o.login || shownLogin(o.email)) === login)) { toast('Someone on the team already uses that sign-in.'); return; }
-      if (!pwGood(pass)) { toast('The starting password needs 8 or more characters, a capital letter, a number and a symbol.'); pw.focus(); return; }
-      const btn = e.currentTarget; btn.disabled = true;
-      let acc; try { acc = await makeLogin(login, pass, SLUG); } catch (err) { btn.disabled = false; toast(loginErr(err)); return; }
-      const v = { uid: acc.uid, email: acc.email, login: shownLogin(acc.email), ...r, active: true, mustChange: true, addedAt: now, addedBy: ME.name || OWNER.name, updatedAt: now };
-      try { await db.collection('users').doc(acc.uid).set(v); } catch { btn.disabled = false; toast('The sign-in was made, but the team list couldn’t be saved. Check your connection.'); return; }
+      const bad = accountProblem(a); if (bad) { toast(bad[0]); $('#us-' + bad[1], m).focus(); return; }
+      const btn = e.currentTarget;
+      // someone removed earlier comes back with the account they already have
+      const back = state.users.find(o => o.removed && (o.email || '').toLowerCase() === a.email);
+      if (back) { btn.disabled = true;
+        try { await db.collection('users').doc(back.id).update({ ...r, active: true, removed: false, updatedAt: now }); closeModal(); toast(`${r.name} is back on the team. They sign in with their existing password.`); logActivity('team', `Added team member ${r.name} (${ROLES[r.role][0]})`, ''); }
+        catch { btn.disabled = false; toast('Not saved. Check your connection.'); } return; }
+      if (state.users.some(o => !o.removed && ((o.email || '').toLowerCase() === a.email || (o.login || '') === a.username))) { toast('Someone on the team already uses that username or email.'); return; }
+      btn.disabled = true;
+      let acc; try { acc = await makeLogin(a.username, a.email, a.pass, SLUG); } catch (err) { btn.disabled = false; toast(loginErr(err)); return; }
+      const v = { uid: acc.uid, email: acc.email, login: acc.username, ...r, active: true, mustChange: true, addedAt: now, addedBy: ME.name || OWNER.name, updatedAt: now };
+      try { await db.collection('users').doc(acc.uid).set(v); await acc.claim(); } catch { btn.disabled = false; toast('The account was made, but the team list couldn’t be saved. Check your connection.'); return; }
       logActivity('team', `Added team member ${v.name} (${ROLES[v.role][0]})`, '');
-      loginDetailsDialog('Team member added', v.name, v.login, pass, SLUG);
+      loginDetailsDialog('Team member added', v.name, acc, a.pass, SLUG);
     });
-    const nw = $('[data-us-new]', m); if (nw) nw.addEventListener('click', () => newLoginDialog(x));
-    const del = $('[data-us-del]', m); if (del) del.addEventListener('click', () => openModal(dlg('Remove team member', `<p class="lead">Remove <b>${esc(x.name || shownAs)}</b> from the team?</p><p class="sub">They can’t sign in any more. Everything they made stays, with their name on it.</p>`,
+    const rs = $('[data-us-reset]', m); if (rs) rs.addEventListener('click', async () => {
+      if (!(window.STUDIO && window.STUDIO.sendReset)) { toast('Open Novyra Desk at novyradesk.com to send reset emails.'); return; }
+      rs.disabled = true; try { await window.STUDIO.sendReset(x.email); toast(`Reset email sent to ${x.email}`); } catch (err) { toast(loginErr(err)); } rs.disabled = false; });
+    const del = $('[data-us-del]', m); if (del) del.addEventListener('click', () => openModal(dlg('Remove team member', `<p class="lead">Remove <b>${esc(x.name || x.login || x.email)}</b> from the team?</p><p class="sub">They can’t sign in to this desk any more. Everything they made stays, with their name on it. Adding them again later with the same email gives their access back.</p>`,
       '<button class="btn ghost" data-close>Keep</button><button class="btn danger-solid" data-yes>Remove</button>', 'small'), m2 => $('[data-yes]', m2).addEventListener('click', async () => {
-        try { await db.collection('users').doc(x.id).delete(); closeModal(); toast('Removed'); logActivity('team', `Removed team member ${x.name || shownAs}`, ''); } catch { toast('Not removed. Check your connection.'); } })));
-  });
-}
-// new sign-in details for someone who lost theirs: a fresh account takes over their place on the team
-function newLoginDialog(x) {
-  const old = x.login || shownLogin(x.email);
-  openModal(dlg('New sign-in details', `<p class="lead">Make new sign-in details for <b>${esc(x.name || old)}</b>. Their old sign-in (${esc(old)}) stops working.</p>
-    <label class="field"><span>New sign-in (username or email)</span><input id="nl-login" type="text" autocapitalize="none" spellcheck="false" placeholder="A username or email not used before"></label>
-    <div class="field"><span>Starting password</span><div class="pw-row"><input id="nl-pass" type="text" autocomplete="off" spellcheck="false" value="${esc(genPassword())}"><button type="button" class="btn small" data-nl-gen>New password</button></div>${pwRulesHTML('nl-rules')}</div>`,
-    '<button class="btn ghost" data-close>Cancel</button><button class="btn primary" data-nl-save>Make sign-in</button>', 'small'), m => {
-    const pw = $('#nl-pass', m), ul = $('#nl-rules', m); pw.addEventListener('input', () => pwPaint(pw, ul)); pwPaint(pw, ul); $('[data-nl-gen]', m).addEventListener('click', () => { pw.value = genPassword(); pwPaint(pw, ul); });
-    $('[data-nl-save]', m).addEventListener('click', async e => {
-      const login = $('#nl-login', m).value.trim().toLowerCase(), pass = pw.value;
-      if (!okLogin(login)) { toast('Type a username (3 to 30 letters or numbers) or an email address.'); return; }
-      if (!pwGood(pass)) { toast('The starting password needs 8 or more characters, a capital letter, a number and a symbol.'); return; }
-      const btn = e.currentTarget; btn.disabled = true;
-      let acc; try { acc = await makeLogin(login, pass, SLUG); } catch (err) { btn.disabled = false; toast(loginErr(err)); return; }
-      const { id, ...rest } = x, now = new Date().toISOString();
-      try { await db.collection('users').doc(acc.uid).set({ ...rest, uid: acc.uid, email: acc.email, login: shownLogin(acc.email), mustChange: true, updatedAt: now }); await db.collection('users').doc(id).delete(); }
-      catch { btn.disabled = false; toast('Not saved. Check your connection.'); return; }
-      logActivity('team', `New sign-in details for ${x.name || old}`, '');
-      loginDetailsDialog('New sign-in details', x.name || old, shownLogin(acc.email), pass, SLUG);
-    });
+        try { await db.collection('users').doc(x.id).update({ active: false, removed: true, removedAt: new Date().toISOString() }); closeModal(); toast('Removed'); logActivity('team', `Removed team member ${x.name || x.login || x.email}`, ''); } catch { toast('Not removed. Check your connection.'); } })));
   });
 }
 const CHEV_UP = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg>';
@@ -3284,22 +3273,18 @@ function setProfileHTML() {
 function setSecurityHTML() {
   const S = window.STUDIO || {}, pr = S.providers || [];
   if (!S.email) return sCard('Sign-in and password', 'How you open Novyra Desk.', '<p class="sub sempty">This preview isn’t signed in. Open Novyra Desk at novyradesk.com to manage how you sign in.</p>', { ic: 'lock', id: 'set-security' });
-  const has = p => pr.includes(p), login = shownLogin(S.email), isUser = !login.includes('@');
-  if (!has('password')) return sCard('Sign-in and password', 'You sign in with Google.',
-      sRow('Signed in as', '', `<b class="sval">${esc(S.email)}</b>`)
+  const has = p => pr.includes(p), user = S.login && S.login !== S.email ? S.login : '';
+  const who = (user ? sRow('Username', 'You can sign in with this or your email.', `<b class="sval">${esc(user)}</b>`) : '')
+    + sRow('Email address', 'Tied to your profile, so it can’t be changed.', `<b class="sval">${esc(S.email)}</b>`);
+  if (!has('password')) return sCard('Sign-in and password', 'You sign in with Google.', who
       + sRow('Set a password', `We email a secure link to ${esc(S.email)}. Open it and choose a password.`, `<button class="btn" data-set-pass>Email me a link</button><p class="sub sout" id="pw-out"></p>`),
     { ic: 'lock', id: 'set-security' });
-  return sCard('Sign-in and password', 'Change your password or the email address you sign in with.',
-      sRow('Signed in as', isUser ? 'A username. Add your own email below so you can reset your password yourself.' : '', `<b class="sval">${esc(login)}</b>`)
+  return sCard('Sign-in and password', 'Who you sign in as, and your password.', who
       + sRow('Change your password', 'Type your current password, then the new one twice.',
         `<div class="sec-form"><input id="sc-cur" type="password" autocomplete="current-password" placeholder="Current password" aria-label="Current password">
           <input id="sc-new" type="password" autocomplete="new-password" placeholder="New password" aria-label="New password">${pwRulesHTML('sc-rules')}
           <input id="sc-new2" type="password" autocomplete="new-password" placeholder="New password again" aria-label="New password again">
-          <button class="btn" data-sc-pass>Change password</button><p class="sub sout" id="sc-pass-out"></p></div>`)
-      + sRow(isUser ? 'Add your own email' : 'Change your sign-in email', 'We send a link to the new address. Your sign-in changes once you open it.',
-        `<div class="sec-form"><input id="sc-email" type="email" autocomplete="email" placeholder="${isUser ? 'you@example.com' : 'New email address'}" aria-label="New email address">
-          <input id="sc-cur2" type="password" autocomplete="current-password" placeholder="Current password" aria-label="Current password">
-          <button class="btn" data-sc-email>Send confirmation link</button><p class="sub sout" id="sc-email-out"></p></div>`),
+          <button class="btn" data-sc-pass>Change password</button><p class="sub sout" id="sc-pass-out"></p></div>`),
     { ic: 'lock', id: 'set-security' });
 }
 function setBusinessHTML() {
@@ -3346,13 +3331,14 @@ function setCompaniesHTML() {
   if (!companiesOn()) return '';
   if (!state.companies) { loadCompanies(); }
   const list = state.companies || [];
-  const rows = list.length ? list.map(c => sRow(esc(c.name || c.id), `${esc(c.ownerLogin || (c.owners || []).map(shownLogin).join(', '))}`, `<span class="co-link">novyradesk.com/${esc(c.id)}/</span><button class="btn sm" data-co-copy="${esc(c.id)}">Copy link</button>`)).join('')
+  const rows = list.length ? list.map(c => sRow(esc(c.name || c.id), `${esc([c.ownerLogin, (c.owners || [])[0]].filter(Boolean).join(' · '))}`, `<span class="co-link">novyradesk.com/${esc(c.id)}/</span><button class="btn sm" data-co-copy="${esc(c.id)}">Copy link</button>`)).join('')
     : `<p class="note" style="margin:0">${state.companies ? 'No companies yet. Add the first one below.' : 'Loading…'}</p>`;
   const form = `<div class="co-form">
       ${sRow('Company name', '', '<input id="co-name" type="text" placeholder="e.g. Fern & Field Studio" aria-label="Company name">')}
       ${sRow('Web address', 'Lowercase letters, numbers and dashes.', '<div class="co-addr"><span>novyradesk.com/</span><input id="co-slug" type="text" placeholder="fern-and-field" aria-label="Web address" autocapitalize="none" spellcheck="false"><span>/</span></div>')}
-      ${sRow('Owner’s sign-in', 'A username or an email address. They can switch to their own email after signing in.', '<input id="co-owner" type="text" autocapitalize="none" spellcheck="false" placeholder="e.g. johan or johan@theircompany.co.za" aria-label="Owner’s sign-in">')}
-      ${sRow('Starting password', 'They choose their own the first time they sign in.', `<div class="pw-row"><input id="co-pass" type="text" autocomplete="off" spellcheck="false" value="${esc(genPassword())}" aria-label="Starting password"><button type="button" class="btn small" data-co-gen>New password</button></div>${pwRulesHTML('co-rules')}`)}
+      ${sRow('Owner’s username', '3 to 30 small letters or numbers. They can sign in with it.', '<input id="co-user" type="text" autocapitalize="none" spellcheck="false" placeholder="e.g. johan" aria-label="Owner’s username">')}
+      ${sRow('Owner’s email', 'Tied to their profile and can’t be changed later.', '<input id="co-owner" type="email" autocapitalize="none" spellcheck="false" placeholder="owner@theircompany.co.za" aria-label="Owner’s email">')}
+      ${sRow('Starting password', 'The company’s name in small letters. They choose their own the first time they sign in.', '<input id="co-pass" type="text" autocomplete="off" spellcheck="false" aria-label="Starting password">')}
     </div>`;
   return sCard('Companies', 'Businesses using Novyra Desk. Each one gets its own private desk at its own address, and only its own team can see its records.',
     rows + form, { ic: 'globe', id: 'set-companies', foot: '<button class="btn primary" data-co-add>Add company</button>' });
@@ -3364,22 +3350,22 @@ function bindCompanies(main) {
   nm.addEventListener('input', () => { if (!touched) sl.value = slugify(nm.value); });
   sl.addEventListener('input', () => { touched = true; });
   $$('[data-co-copy]', main).forEach(b => b.addEventListener('click', async () => { const u = `https://novyradesk.com/${b.dataset.coCopy}/`; try { await navigator.clipboard.writeText(u); toast('Link copied'); } catch { toast(u); } }));
-  const cp = $('#co-pass', main), cul = $('#co-rules', main); cp.addEventListener('input', () => pwPaint(cp, cul)); pwPaint(cp, cul);
-  $('[data-co-gen]', main).addEventListener('click', () => { cp.value = genPassword(); pwPaint(cp, cul); });
+  const cp = $('#co-pass', main), cu = $('#co-user', main); let pwEdited = false;
+  cp.addEventListener('input', () => { pwEdited = true; }); nm.addEventListener('input', () => { if (!pwEdited) cp.value = nm.value.trim() ? startPassword(nm.value) : ''; });
   $('[data-co-add]', main).addEventListener('click', async e => {
-    const name = nm.value.trim(), slug = slugify(sl.value || name), owner = ow.value.trim().toLowerCase(), pass = cp.value;
+    const name = nm.value.trim(), slug = slugify(sl.value || name), owner = ow.value.trim().toLowerCase(), pass = cp.value, user = cu.value.trim().toLowerCase();
     if (!name) { toast('Type the company’s name.'); nm.focus(); return; }
     if (!/^[a-z0-9][a-z0-9-]{1,38}[a-z0-9]$/.test(slug)) { toast('Choose a web address of 3 to 40 letters, numbers or dashes.'); sl.focus(); return; }
     if (CO_RESERVED.includes(slug)) { toast('That address is reserved. Choose another one.'); sl.focus(); return; }
-    if (!okLogin(owner)) { toast('Type the owner’s username (3 to 30 letters or numbers) or email address.'); ow.focus(); return; }
-    if (!pwGood(pass)) { toast('The starting password needs 8 or more characters, a capital letter, a number and a symbol.'); cp.focus(); return; }
+    const bad = accountProblem({ username: user, email: owner, pass }); if (bad) { toast(bad[0].replace('their', 'the owner’s')); ({ user: cu, email: ow, pass: cp })[bad[1]].focus(); return; }
     if ((state.companies || []).some(c => c.id === slug)) { toast('That address is already taken.'); sl.focus(); return; }
     const btn = e.currentTarget; btn.disabled = true;
-    let acc; try { acc = await makeLogin(owner, pass, slug); } catch (err) { btn.disabled = false; toast(loginErr(err)); return; }
+    let acc; try { acc = await makeLogin(user, owner, pass, slug); } catch (err) { btn.disabled = false; toast(loginErr(err)); return; }
     try {
-      await window.STUDIO.raw.doc('companies/' + slug).set({ name, owners: [acc.email], ownerUids: [acc.uid], ownerLogin: shownLogin(acc.email), mustChange: [acc.uid], createdAt: new Date().toISOString(), createdBy: loginEmail().toLowerCase() });
+      await window.STUDIO.raw.doc('companies/' + slug).set({ name, owners: [acc.email], ownerUids: [acc.uid], ownerLogin: acc.username, mustChange: [acc.uid], createdAt: new Date().toISOString(), createdBy: loginEmail().toLowerCase() });
+      await acc.claim();
       state.companies = null; logActivity('settings', `Added company ${name} (novyradesk.com/${slug}/)`, '');
-      loadCompanies(); loginDetailsDialog(`${name} is set up`, `${name}’s owner`, shownLogin(acc.email), pass, slug);
+      loadCompanies(); loginDetailsDialog(`${name} is set up`, `${name}’s owner`, acc, pass, slug);
     } catch { btn.disabled = false; toast('The owner’s sign-in was made, but the company couldn’t be saved. That address may already be taken, or check your connection.'); }
   });
 }
@@ -3408,18 +3394,18 @@ function setCompanyHTML() {
     + `<div class="ssave"><span class="sub">Changes are kept when you press Save.</span><button class="btn primary" data-save-biz>Save changes</button></div>`;
 }
 function setTeamHTML() {
-  const us = [...state.users].sort((a, b) => (a.active === false) - (b.active === false) || (a.name || a.email).localeCompare(b.name || b.email));
+  const us = state.users.filter(u => !u.removed).sort((a, b) => (a.active === false) - (b.active === false) || String(a.name || a.login || a.email || '').localeCompare(String(b.name || b.login || b.email || '')));
   const chips = u => u.role === 'admin' ? '<span class="tm-chip all">All areas</span>' : (() => { const l = ACCESS.filter(([k]) => (u.access || {})[k]).map(([, n]) => n); return l.length ? l.map(n => `<span class="tm-chip">${esc(n)}</span>`).join('') : '<span class="tm-chip none">No areas yet</span>'; })();
   const card = u => { const off = u.active === false, r = ROLES[u.role] || ROLES.staff;
     return `<article class="tm-card ${off ? 'off' : ''}" data-user="${esc(u.id)}" tabindex="0" role="button" aria-label="Edit ${esc(u.name || u.email)}">
       <header><span class="tm-av" style="background:${clientColor({ business: u.email })}">${esc(initials(u.name || u.email).toUpperCase().slice(0, 2))}</span>
-        <div class="tm-who"><b>${esc(u.name || u.login || shownLogin(u.email))}</b><span>${esc(u.login || shownLogin(u.email))}</span></div>
+        <div class="tm-who"><b>${esc(u.name || u.login || u.email || 'Team member')}</b><span>${esc([u.login, u.email].filter(Boolean).join(' · '))}</span></div>
         <span class="pill ${off ? 'cancelled' : u.role === 'admin' ? 'accepted' : 'open'}">${off ? 'Disabled' : esc(r[0])}</span></header>
       <p class="tm-role">${esc(r[1])}</p>
       <div class="tm-chips">${chips(u)}</div>
       <footer><span class="sub">${u.addedAt ? `Added ${fmtDate(u.addedAt.slice(0, 10))}${u.addedBy ? ' by ' + esc(u.addedBy) : ''}` : ''}</span><span class="tm-edit">Edit</span></footer></article>`; };
   const owner = `<article class="tm-card tm-owner"><header><span class="tm-av" style="background:${esc(OWNER.color || AV_COLORS[0])}">${esc(userInitials(OWNER))}</span>
-      <div class="tm-who"><b>${esc(OWNER.name)}</b><span>${esc(SLUG ? ((COMPANY() || {}).ownerLogin || ownerLogins().map(shownLogin).join(', ')) : OWNER_LOGIN)}</span></div><span class="pill accepted">Owner</span></header>
+      <div class="tm-who"><b>${esc(OWNER.name)}</b><span>${esc(SLUG ? ([(COMPANY() || {}).ownerLogin, ((COMPANY() || {}).owners || [])[0]].filter(Boolean).join(' · ')) : OWNER_LOGIN)}</span></div><span class="pill accepted">Owner</span></header>
       <p class="tm-role">${esc(ROLES.owner[1])}</p><div class="tm-chips"><span class="tm-chip all">Everything</span></div><footer><span class="sub">That’s you</span></footer></article>`;
   const invite = can('team') ? `<button type="button" class="tm-card tm-add" data-user-add><span class="tm-plus">${sicon('plus')}</span><b>Add a team member</b><span class="sub">Give someone their own sign-in and choose what they can open.</span></button>` : '';
   const roles = `<section class="scard"><header class="scard-h"><span class="scard-ic">${sicon('lock')}</span><div class="scard-t"><h3>Roles</h3><p>What each role can do.</p></div></header>
@@ -3514,12 +3500,6 @@ function bindList(main) {
       scp.disabled = true; o.textContent = 'Saving…';
       try { await window.STUDIO.changePassword(cur, nx); o.textContent = 'Password changed. Use it next time you sign in.'; toast('Password changed'); ['#sc-cur', '#sc-new', '#sc-new2'].forEach(q => $(q, main).value = ''); pwPaint(n1, ul); }
       catch (e) { o.textContent = loginErr(e); } scp.disabled = false; }); }
-  const sce = $('[data-sc-email]', main); if (sce) sce.addEventListener('click', async () => { const o = $('#sc-email-out', main), ne = $('#sc-email', main).value.trim().toLowerCase(), cur = $('#sc-cur2', main).value;
-    if (!/^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/.test(ne)) { o.textContent = 'Type the email address you want to use.'; return; }
-    if (!cur) { o.textContent = 'Type your current password.'; return; }
-    sce.disabled = true; o.textContent = 'Sending…';
-    try { await window.STUDIO.changeEmail(cur, ne); o.textContent = `Link sent to ${ne}. Open it, then sign in with that address.`; toast('Confirmation link sent'); }
-    catch (e) { o.textContent = loginErr(e); } sce.disabled = false; });
   const spw = $('[data-set-pass]', main); if (spw) spw.addEventListener('click', async () => { const o = $('#pw-out', main); spw.disabled = true; o.textContent = 'Sending…';
     try { await window.STUDIO.resetPassword(); o.textContent = `Link sent to ${window.STUDIO.email}. Check your inbox (and spam).`; toast('Password link sent'); } catch (e) { o.textContent = 'Not sent. Try again in a minute.'; } spw.disabled = false; });
   const lrow = $('[data-bz-logo-row]', main);

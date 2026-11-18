@@ -179,15 +179,19 @@ await step('Add a post', async () => {
 console.log('7. Team');
 await step('Add a team member with their own sign-in', async () => {
   await go('team'); await pg.locator('[data-user-add]').first().click(); await W(600);
-  await pg.fill('#us-name', 'Pieter Test'); await pg.fill('#us-email', 'pieter');
+  await pg.fill('#us-name', 'Pieter Test'); await pg.fill('#us-user', 'pieter');
   const startPw = await pg.inputValue('#us-pass');
-  check('A starting password is filled in that follows the rule', /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(startPw), startPw);
-  await pg.click('[data-us-save]'); await W(1800);
-  check('Sign-in details are shown to pass on', (await pg.locator('#modal .login-card').innerText().catch(() => '')).includes('pieter'));
+  check('The starting password is the company’s name in small letters', startPw === (MOCK ? 'novyra' : 'karoocycles'), startPw);
+  await pg.click('[data-us-save]'); await W(800);
+  check('An email address is needed too', await pg.locator('#modal #us-email').isVisible());
+  await pg.fill('#us-email', 'Pieter@Karoo.test'); await pg.click('[data-us-save]'); await W(1800);
+  const card = await pg.locator('#modal .login-card').innerText().catch(() => '');
+  check('Sign-in details show the username, email and starting password', card.includes('pieter') && card.includes('pieter@karoo.test') && card.includes(startPw), card.replace(/\s+/g, ' '));
   await pg.click('#modal [data-close]'); await W(500);
   check('Team member shows on the Team page', (await text()).includes('Pieter Test'));
   const us = MOCK ? null : await list(CO + 'users'); if (us) { const pu = us.find(u => u.login === 'pieter');
-    check('Team member is saved by account, waiting to choose a password', !!pu && pu.id === pu.uid && pu.mustChange === true, JSON.stringify(pu || {})); }
+    check('Team member is saved by account with their email, waiting to choose a password', !!pu && pu.id === pu.uid && pu.email === 'pieter@karoo.test' && pu.mustChange === true, JSON.stringify(pu || {}));
+    const un = await list('usernames/karoo-cycles/names'); check('Their username is claimed on the company’s desk', (un || []).some(d => d.id === 'pieter' && d.email === 'pieter@karoo.test')); }
   if (!MOCK) {
     const c2 = await b.newContext({ viewport: { width: 390, height: 844 } }), p2 = await c2.newPage(); p2.on('pageerror', e => errors.push('pieter: ' + e.message));
     await p2.goto(`http://127.0.0.1:${PORT}/karoo-cycles/?emu=1`); await p2.waitForSelector('#g-email', { state: 'visible', timeout: 30000 });
@@ -200,7 +204,17 @@ await step('Add a team member with their own sign-in', async () => {
     await W(2000); await p2.evaluate(() => location.hash = '#clients'); await W(1200);
     check('Team member sees the company’s customers', (await p2.evaluate(() => document.getElementById('main').innerText)).includes('Function Test Co'));
     const us = await list(CO + 'users'); check('Team member’s setup is ticked off', (us.find(u => u.login === 'pieter') || {}).mustChange === false);
-    await p2.screenshot({ path: 'shots/fn-pieter.png' }); await c2.close();
+    await c2.close();
+    // removing and adding back
+    await go('team'); await pg.click('[data-user]:has-text("Pieter Test")'); await W(500); await pg.click('[data-us-del]'); await W(400); await pg.click('#modal [data-yes]'); await W(1500);
+    check('Removed team member leaves the Team page', !(await text()).includes('Pieter Test'));
+    const c3 = await b.newContext(), p3 = await c3.newPage(); await p3.goto(`http://127.0.0.1:${PORT}/karoo-cycles/?emu=1`); await p3.waitForSelector('#g-email', { state: 'visible', timeout: 30000 });
+    await p3.fill('#g-email', 'pieter'); await p3.fill('#g-pass', 'Pieter-Own3!'); await p3.click('#g-submit'); await W(4000);
+    check('Removed team member can’t get in', /isn’t on this company’s team/.test(await p3.locator('#g-msg').innerText().catch(() => '')));
+    await c3.close();
+    await pg.locator('[data-user-add]').first().click(); await W(600);
+    await pg.fill('#us-name', 'Pieter Test'); await pg.fill('#us-user', 'pieter'); await pg.fill('#us-email', 'pieter@karoo.test'); await pg.click('[data-us-save]'); await W(1800);
+    check('Adding them again with the same email gives their access back', (await text()).includes('Pieter Test') && ((await list(CO + 'users')).find(u => u.login === 'pieter') || {}).active === true);
   }
 });
 

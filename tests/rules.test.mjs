@@ -94,7 +94,9 @@ await t('Username owner cannot read another company', assertFails(getDoc(doc(acm
 await t('Username owner cannot read Novyra', assertFails(getDoc(doc(acmeBoss, 'clients/n1'))));
 await t('Company owner adds a team member by account', assertSucceeds(setDoc(doc(acmeBoss, 'companies/acme/users/acme-new'), { uid: 'acme-new', role: 'staff', active: true, mustChange: true })));
 await t('Staff account writes quotes', assertSucceeds(setDoc(doc(acmeStaff, 'companies/acme/quotes/q1'), { n: 1 })));
-await t('Staff account ticks off its own setup and keeps its email up to date', assertSucceeds(updateDoc(doc(acmeStaff, 'companies/acme/users/acme-staff'), { mustChange: false, email: 'sam@gmail.test', login: 'sam@gmail.test' })));
+await t('Staff account ticks off its own first-sign-in setup', assertSucceeds(updateDoc(doc(acmeStaff, 'companies/acme/users/acme-staff'), { mustChange: false })));
+await t('Staff account cannot change the email on its profile', assertFails(updateDoc(doc(acmeStaff, 'companies/acme/users/acme-staff'), { email: 'sam@gmail.test' })));
+await t('Staff account cannot change its username', assertFails(updateDoc(doc(acmeStaff, 'companies/acme/users/acme-staff'), { login: 'boss' })));
 await t('Staff account cannot make itself an admin', assertFails(updateDoc(doc(acmeStaff, 'companies/acme/users/acme-staff'), { role: 'admin' })));
 await t('Staff account cannot change someone else on the team', assertFails(updateDoc(doc(acmeStaff, 'companies/acme/users/acme-viewer'), { mustChange: false })));
 await t('Staff account cannot undo its setup to skip it', assertFails(updateDoc(doc(acmeStaff, 'companies/acme/users/acme-staff'), { mustChange: true })));
@@ -109,6 +111,20 @@ await t('Novyra staff cannot list companies', assertFails(getDocs(collection(nov
 await t('Novyra viewer reads but cannot write', assertFails(setDoc(doc(novViewer, 'quotes/nq2'), { n: 2 })));
 await t('Turned-off Novyra team member cannot get in', assertFails(getDoc(doc(novOff, 'clients/n1'))));
 await t('Company staff cannot read Novyra', assertFails(getDoc(doc(acmeStaff, 'clients/n1'))));
+
+console.log('Usernames');
+await t('Company owner claims a username on its own desk', assertSucceeds(setDoc(doc(acmeBoss, 'usernames/acme/names/sam'), { email: 'sam@acme.test', uid: 'acme-staff' })));
+await t('Anyone can look up one username (the sign-in page needs it)', assertSucceeds(getDoc(doc(anon, 'usernames/acme/names/sam'))));
+await t('Nobody can list the usernames', assertFails(getDocs(collection(anon, 'usernames/acme/names'))));
+await t('A username that’s taken cannot be overwritten', assertFails(setDoc(doc(acmeBoss, 'usernames/acme/names/sam'), { email: 'other@acme.test', uid: 'x' })));
+await t('Staff cannot claim usernames', assertFails(setDoc(doc(acmeStaff, 'usernames/acme/names/sneaky'), { email: 's@acme.test', uid: 'x' })));
+await t('A stranger cannot claim a username on a company desk', assertFails(setDoc(doc(stranger, 'usernames/acme/names/boss2'), { email: 's@else.test', uid: 'x' })));
+await t('A company cannot claim usernames on Novyra’s desk', assertFails(setDoc(doc(acmeBoss, 'usernames/novyra/names/boss'), { email: 'b@acme.test', uid: 'acme-boss' })));
+await t('A company cannot claim usernames on another company’s desk', assertFails(setDoc(doc(acmeBoss, 'usernames/karoo/names/boss'), { email: 'b@acme.test', uid: 'acme-boss' })));
+await t('Novyra team staff cannot claim usernames', assertFails(setDoc(doc(novStaff, 'usernames/novyra/names/sneaky'), { email: 's@n.test', uid: 'x' })));
+await t('Novyra’s owner claims a username on Novyra’s desk', assertSucceeds(setDoc(doc(hanu, 'usernames/novyra/names/thandi'), { email: 'thandi@n.test', uid: 'nov-staff' })));
+await t('Novyra’s owner claims the owner’s username for a new company', assertSucceeds(setDoc(doc(hanu, 'usernames/newer-co/names/johan'), { email: 'johan@newer.test', uid: 'newer-uid' })));
+await t('A username with odd characters is refused', assertFails(setDoc(doc(acmeBoss, 'usernames/acme/names/Bad Name'), { email: 'b@acme.test', uid: 'x' })));
 
 console.log('Customers opening links');
 await t('Customer opens a Novyra link', assertSucceeds(getDoc(doc(anon, 'shares/novkey1234567890ab'))));
