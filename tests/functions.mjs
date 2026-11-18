@@ -164,6 +164,7 @@ await step('Add an expense', async () => {
   await pg.fill('#ex-desc', 'Printer ink'); await pg.fill('#ex-amount', '450'); if (await pg.locator('#ex-sup').count()) await pg.fill('#ex-sup', 'Takealot');
   await pg.click('[data-ex-save]'); await W(1300);
   check('Expense shows in the list', (await text()).includes('Printer ink'));
+  check('Expenses page has no period buttons or search box', !(await pg.locator('#main [data-filter], #main .toolbar input').count()));
   const es = await list(CO + 'expenses'); if (es) check('Expense is saved', es.some(e => e.desc === 'Printer ink' || e.description === 'Printer ink'));
 });
 
@@ -188,6 +189,9 @@ console.log('8. Search and settings');
 await step('Search finds the customer', async () => {
   await pg.click('#top-q'); await pg.keyboard.type('Function Test'); await W(800);
   check('Search shows the customer', (await pg.evaluate(() => document.body.innerText)).includes(NAME));
+  await pg.keyboard.press('Escape'); await W(300);
+  await pg.click('#top-q'); await pg.keyboard.type('Printer'); await W(800);
+  check('Search finds the expense', (await pg.locator('#spop-res .sp-it', { hasText: 'Printer ink' }).count()) === 1);
   await pg.keyboard.press('Escape'); await W(300);
 });
 await step('Save the profile', async () => {
