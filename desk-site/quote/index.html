@@ -64,6 +64,7 @@ h1{margin:0;font:800 30px/1.1 var(--display);letter-spacing:-.01em}
 .paper{width:794px;height:1123px;background:#fff;color:#1f2433;font:400 11px/1.45 var(--body);position:relative;overflow:hidden;display:flex;flex-direction:column}
 .paper .band{background:#f4f6fb;height:96px;display:flex;align-items:center;justify-content:space-between;padding:0 34px;border-bottom:4px solid #4a86f7}
 .paper .band img{height:42px}
+.paper .band img.co{height:52px;max-width:180px;object-fit:contain}
 .paper .band .bn{font:800 26px/1.1 var(--display);color:#0b0f1e;max-width:60%}
 .paper .band .t{text-align:right;color:#0b0f1e}
 .paper .band .t h2{margin:0;font:800 30px/1 var(--display);color:#0b0f1e;letter-spacing:.01em}
@@ -162,7 +163,7 @@ h1{margin:0;font:800 30px/1.1 var(--display);letter-spacing:-.01em}
   if (/^(127\.0\.0\.1|localhost)$/.test(location.hostname) && /[?&]emu\b/.test(location.search)) firebase.firestore().useEmulator('127.0.0.1', 8085);
   const ref = firebase.firestore().collection(SLUG ? `companies/${SLUG}/shares` : 'shares').doc(key);
   let q = null;
-  ref.get().then(s => { if (!s.exists) return fail('This link is no longer active', 'It may have been replaced or turned off. Ask the business that sent it for the latest link.'); q = s.data(); { const bz = (q.from || {}).business, w = (q.from || {}).website, h = document.getElementById('bz-head'); if (bz && bz !== 'Novyra' && h) { h.innerHTML = '<b style="font:800 20px var(--display,Syne,sans-serif);color:inherit"></b>'; h.firstChild.textContent = bz; h.setAttribute('aria-label', bz); h.href = w ? 'https://' + w.replace(/^https?:\/\//, '') : '#'; } if (h) h.style.visibility = ''; } (q.kind && q.kind !== 'quote') ? drawDoc() : draw(); })
+  ref.get().then(s => { if (!s.exists) return fail('This link is no longer active', 'It may have been replaced or turned off. Ask the business that sent it for the latest link.'); q = s.data(); { const bz = (q.from || {}).business, w = (q.from || {}).website, h = document.getElementById('bz-head'); if (bz && bz !== 'Novyra' && h) { const lg = (q.from || {}).logo; if (lg && /^data:image\//.test(lg)) { h.innerHTML = '<img alt="" style="height:40px;width:auto;max-width:160px;object-fit:contain;display:block">'; h.firstChild.src = lg; h.firstChild.alt = bz; } else { h.innerHTML = '<b style="font:800 20px var(--display,Syne,sans-serif);color:inherit"></b>'; h.firstChild.textContent = bz; } h.setAttribute('aria-label', bz); h.href = w ? 'https://' + w.replace(/^https?:\/\//, '') : '#'; } if (h) h.style.visibility = ''; } (q.kind && q.kind !== 'quote') ? drawDoc() : draw(); })
     .catch(() => fail('This link is no longer active', 'It may have been replaced or turned off. Ask the business that sent it for the latest link.'));
   function drawDoc() {
     const R = q.kind === 'receipt', f = q.from || {}, b = q.bank || {}, BZ = f.business || 'Novyra';

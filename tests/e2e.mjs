@@ -53,6 +53,9 @@ console.log('1. Novyra’s own desk (novyradesk.com)');
 const nov = await open('/?emu=1', 'novyra');
 await signIn(nov, 'hanu@keysers.cc', PW);
 check('Novyra owner opens novyradesk.com', await inApp(nov));
+await W(1500);
+check('Novyra’s tab is named “Novyra Desk”', (await nov.title()) === 'Novyra Desk', await nov.title());
+check('Novyra’s menu footer keeps the Novyra icon', (await nov.locator('.sfoot .sm img:not(.co)').count()) === 1);
 check('Novyra customer links use novyradesk.com/quote/', (await nov.evaluate(() => window.NOVYRA_DESK.shareBase)) === 'https://novyradesk.com/quote/#');
 await nov.evaluate(() => location.hash = '#settings'); await W(2500);
 check('Settings shows the Companies card', await nov.locator('#set-companies').count() === 1);
@@ -75,6 +78,19 @@ check('Business info starts with the company’s name', kb && kb.name === 'Karoo
 check('Company customer links use novyradesk.com/karoo-cycles/quote/', (await kar.evaluate(() => window.NOVYRA_DESK.shareBase)) === 'https://novyradesk.com/karoo-cycles/quote/#');
 check('Company desk does not show Novyra’s customers', !(await kar.evaluate(() => document.body.innerText)).includes('Novyra Customer'));
 check('Company desk has no Companies card', await kar.evaluate(async () => { location.hash = '#settings'; await new Promise(r => setTimeout(r, 1200)); return !document.getElementById('set-companies'); }));
+check('Browser tab is named “Karoo Cycles Desk”', (await kar.title()) === 'Karoo Cycles Desk', await kar.title());
+check('Menu footer shows the company’s name', /Karoo Cycles/.test(await kar.locator('.sfoot').innerText()));
+check('Menu footer shows the company’s letter until a logo is added', (await kar.locator('.sfoot .sm .lt').count()) === 1);
+// upload a logo in Business info
+await kar.evaluate(() => location.hash = '#company'); await W(1000);
+const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAHUlEQVR4nGNgGAWjYBSMglEwCkbBKBgFo2AUDAMABBAAAQ3dSUQAAAAASUVORK5CYII=', 'base64');
+await kar.setInputFiles('[data-bz-logo]', { name: 'logo.png', mimeType: 'image/png', buffer: png }); await W(1200);
+if (await kar.locator('[data-crop-ok]').count()) await kar.click('[data-crop-ok]'); await W(600);
+await kar.click('[data-save-biz]'); await W(1500);
+const kb2 = await get('companies/karoo-cycles/settings/business');
+check('Company logo is saved in the company’s business info', !!(kb2 && /^data:image\//.test(kb2.logo || '')), kb2 && String(kb2.logo).slice(0, 30));
+check('Menu footer now shows the company’s logo', (await kar.locator('.sfoot .sm img.co').count()) === 1);
+check('Novyra’s business info has no Karoo logo', !(((await get('settings/business')) || {}).logo));
 // make a quote the normal way
 await kar.evaluate(() => location.hash = '#quotes'); await W(800);
 await kar.click('[data-new]'); await W(400);
@@ -109,6 +125,7 @@ console.log('3. The customer opens the link');
 const cus = await open(`/karoo-cycles/quote/?emu=1#${key}`, 'customer');
 await cus.waitForSelector('[data-open="accept"]', { timeout: 30000 }).catch(() => {});
 check('Customer sees the quote', await cus.locator('[data-open="accept"]').count() === 1);
+check('Customer page shows the company’s logo at the top', (await cus.locator('#bz-head img[alt="Karoo Cycles"]').count()) === 1);
 check('Quote shows the company’s name', (await cus.evaluate(() => document.body.innerText)).includes('Karoo Cycles'));
 await cus.click('[data-open="accept"]'); await W(300);
 await cus.fill('#a-name', 'Thabo Mokoena'); await cus.check('#a-ok'); await cus.click('[data-send="Accepted"]'); await W(3000);
