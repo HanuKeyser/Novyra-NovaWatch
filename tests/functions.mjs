@@ -42,7 +42,7 @@ if (MOCK) { await pg.goto('file://' + MOCK); await W(2500); }
 else {
   await pg.goto(`http://127.0.0.1:${PORT}/karoo-cycles/?emu=1`);
   await pg.waitForSelector('#g-email', { state: 'visible', timeout: 30000 });
-  await pg.fill('#g-email', 'owner@karoo.test'); await pg.fill('#g-pass', 'test-pass-123'); await pg.click('#g-submit');
+  await pg.fill('#g-email', 'owner@karoo.test'); await pg.fill('#g-pass', 'Karoo-Owner2!'); await pg.click('#g-submit');
   await pg.waitForFunction(() => document.getElementById('gate').hidden && document.querySelector('.appbar'), null, { timeout: 30000 });
   await W(2500);
 }
@@ -177,12 +177,31 @@ await step('Add a post', async () => {
 });
 
 console.log('7. Team');
-await step('Add a team member', async () => {
+await step('Add a team member with their own sign-in', async () => {
   await go('team'); await pg.locator('[data-user-add]').first().click(); await W(600);
-  await pg.fill('#us-name', 'Pieter Test'); await pg.fill('#us-email', 'pieter@karoo.test');
-  await pg.click('[data-us-save]'); await W(1500);
+  await pg.fill('#us-name', 'Pieter Test'); await pg.fill('#us-email', 'pieter');
+  const startPw = await pg.inputValue('#us-pass');
+  check('A starting password is filled in that follows the rule', /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(startPw), startPw);
+  await pg.click('[data-us-save]'); await W(1800);
+  check('Sign-in details are shown to pass on', (await pg.locator('#modal .login-card').innerText().catch(() => '')).includes('pieter'));
+  await pg.click('#modal [data-close]'); await W(500);
   check('Team member shows on the Team page', (await text()).includes('Pieter Test'));
-  const us = MOCK ? null : await list(CO + 'users'); if (us) check('Team member is saved in the company’s team', us.some(u => u.id === 'pieter@karoo.test'));
+  const us = MOCK ? null : await list(CO + 'users'); if (us) { const pu = us.find(u => u.login === 'pieter');
+    check('Team member is saved by account, waiting to choose a password', !!pu && pu.id === pu.uid && pu.mustChange === true, JSON.stringify(pu || {})); }
+  if (!MOCK) {
+    const c2 = await b.newContext({ viewport: { width: 390, height: 844 } }), p2 = await c2.newPage(); p2.on('pageerror', e => errors.push('pieter: ' + e.message));
+    await p2.goto(`http://127.0.0.1:${PORT}/karoo-cycles/?emu=1`); await p2.waitForSelector('#g-email', { state: 'visible', timeout: 30000 });
+    await p2.fill('#g-email', 'pieter'); await p2.fill('#g-pass', startPw); await p2.click('#g-submit');
+    await p2.waitForSelector('#g-setup:not([hidden])', { timeout: 30000 }).catch(() => {});
+    check('Team member signs in with their username and is asked to set up', await p2.locator('#g-setup').isVisible());
+    await p2.fill('#s-pass', 'Pieter-Own3!'); await p2.fill('#s-pass2', 'Pieter-Own3!'); await p2.click('#s-submit');
+    const ok = await p2.waitForFunction(() => document.getElementById('gate').hidden && document.querySelector('.appbar'), null, { timeout: 30000 }).then(() => true, () => false);
+    check('Team member opens the company desk after choosing a password', ok);
+    await W(2000); await p2.evaluate(() => location.hash = '#clients'); await W(1200);
+    check('Team member sees the company’s customers', (await p2.evaluate(() => document.getElementById('main').innerText)).includes('Function Test Co'));
+    const us = await list(CO + 'users'); check('Team member’s setup is ticked off', (us.find(u => u.login === 'pieter') || {}).mustChange === false);
+    await p2.screenshot({ path: 'shots/fn-pieter.png' }); await c2.close();
+  }
 });
 
 console.log('8. Search and settings');

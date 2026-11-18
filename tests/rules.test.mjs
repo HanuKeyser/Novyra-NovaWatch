@@ -22,7 +22,16 @@ await env.withSecurityRulesDisabled(async c => {
   await setDoc(doc(db, 'companies/karoo/shares/karkey1234567890ab'), openQuote);
   await setDoc(doc(db, 'companies/fern'), { name: 'Fern & Field', owners: ['owner@fern.test'] });
   await setDoc(doc(db, 'companies/fern/clients/f1'), { business: 'Fern customer' });
+  // accounts made by an owner or manager: matched by account id, whatever their email is now
+  await setDoc(doc(db, 'companies/acme'), { name: 'Acme', owners: ['boss@acme.desk.novyradesk.com'], ownerUids: ['acme-boss'], mustChange: ['acme-boss'] });
+  await setDoc(doc(db, 'companies/acme/clients/a1'), { business: 'Acme customer' });
+  await setDoc(doc(db, 'companies/acme/users/acme-staff'), { uid: 'acme-staff', email: 'sam@acme.desk.novyradesk.com', role: 'staff', active: true, mustChange: true });
+  await setDoc(doc(db, 'companies/acme/users/acme-viewer'), { uid: 'acme-viewer', role: 'viewer', active: true });
+  await setDoc(doc(db, 'users/nov-staff'), { uid: 'nov-staff', email: 'thandi@novyra.desk.novyradesk.com', role: 'staff', active: true, mustChange: true });
+  await setDoc(doc(db, 'users/nov-viewer'), { uid: 'nov-viewer', role: 'viewer', active: true });
+  await setDoc(doc(db, 'users/nov-off'), { uid: 'nov-off', role: 'staff', active: false });
 });
+const acct = (uid, email) => env.authenticatedContext(uid, { email, email_verified: false }).firestore();
 
 const hanu = as('hanu@keysers.cc'), hanuG = as('HanuKeyser@gmail.com'), karoo = as('owner@karoo.test'), fern = as('owner@fern.test');
 const staff = as('staff@karoo.test'), viewer = as('viewer@karoo.test'), gone = as('gone@karoo.test'), unverified = as('owner@karoo.test', false), stranger = as('someone@else.test');
@@ -71,6 +80,35 @@ await t('Staff cannot read Novyra', assertFails(getDoc(doc(staff, 'clients/n1'))
 await t('Viewer reads customers', assertSucceeds(getDoc(doc(viewer, 'companies/karoo/clients/k1'))));
 await t('Viewer cannot write', assertFails(setDoc(doc(viewer, 'companies/karoo/quotes/q3'), { n: 3 })));
 await t('Turned-off team member cannot get in', assertFails(getDoc(doc(gone, 'companies/karoo/clients/k1'))));
+
+console.log('Accounts made by an owner or manager (usernames, emails that change)');
+const acmeBoss = acct('acme-boss', 'boss@acme.desk.novyradesk.com'), acmeBossNew = acct('acme-boss', 'boss@gmail.test');
+const acmeStaff = acct('acme-staff', 'sam@acme.desk.novyradesk.com'), acmeViewer = acct('acme-viewer', 'v@acme.desk.novyradesk.com');
+const novStaff = acct('nov-staff', 'thandi@novyra.desk.novyradesk.com'), novViewer = acct('nov-viewer', 'v@novyra.desk.novyradesk.com'), novOff = acct('nov-off', 'off@novyra.desk.novyradesk.com');
+const lookalike = acct('someone-else', 'boss@acme.desk.novyradesk.com');
+await t('Company owner (username account) reads its customers', assertSucceeds(getDoc(doc(acmeBoss, 'companies/acme/clients/a1'))));
+await t('Company owner still gets in after changing their email', assertSucceeds(getDoc(doc(acmeBossNew, 'companies/acme/clients/a1'))));
+await t('Company owner ticks off their first-sign-in setup', assertSucceeds(updateDoc(doc(acmeBoss, 'companies/acme'), { mustChange: [] })));
+await t('Another account with the owner’s old sign-in cannot get in', assertFails(getDoc(doc(lookalike, 'companies/acme/clients/a1'))));
+await t('Username owner cannot read another company', assertFails(getDoc(doc(acmeBoss, 'companies/karoo/clients/k1'))));
+await t('Username owner cannot read Novyra', assertFails(getDoc(doc(acmeBoss, 'clients/n1'))));
+await t('Company owner adds a team member by account', assertSucceeds(setDoc(doc(acmeBoss, 'companies/acme/users/acme-new'), { uid: 'acme-new', role: 'staff', active: true, mustChange: true })));
+await t('Staff account writes quotes', assertSucceeds(setDoc(doc(acmeStaff, 'companies/acme/quotes/q1'), { n: 1 })));
+await t('Staff account ticks off its own setup and keeps its email up to date', assertSucceeds(updateDoc(doc(acmeStaff, 'companies/acme/users/acme-staff'), { mustChange: false, email: 'sam@gmail.test', login: 'sam@gmail.test' })));
+await t('Staff account cannot make itself an admin', assertFails(updateDoc(doc(acmeStaff, 'companies/acme/users/acme-staff'), { role: 'admin' })));
+await t('Staff account cannot change someone else on the team', assertFails(updateDoc(doc(acmeStaff, 'companies/acme/users/acme-viewer'), { mustChange: false })));
+await t('Staff account cannot undo its setup to skip it', assertFails(updateDoc(doc(acmeStaff, 'companies/acme/users/acme-staff'), { mustChange: true })));
+await t('Viewer account cannot write', assertFails(setDoc(doc(acmeViewer, 'companies/acme/quotes/q2'), { n: 2 })));
+await t('Novyra owner can set up a company with an owner account', assertSucceeds(setDoc(doc(hanu, 'companies/newer-co'), { name: 'Newer', owners: ['x@newer-co.desk.novyradesk.com'], ownerUids: ['newer-uid'], mustChange: ['newer-uid'] })));
+await t('Novyra team member reads Novyra customers', assertSucceeds(getDoc(doc(novStaff, 'clients/n1'))));
+await t('Novyra staff writes quotes', assertSucceeds(setDoc(doc(novStaff, 'quotes/nq1'), { n: 1 })));
+await t('Novyra staff ticks off its own setup', assertSucceeds(updateDoc(doc(novStaff, 'users/nov-staff'), { mustChange: false })));
+await t('Novyra staff cannot change the team', assertFails(setDoc(doc(novStaff, 'users/sneaky'), { role: 'admin', active: true })));
+await t('Novyra staff cannot see any company', assertFails(getDoc(doc(novStaff, 'companies/karoo/clients/k1'))));
+await t('Novyra staff cannot list companies', assertFails(getDocs(collection(novStaff, 'companies'))));
+await t('Novyra viewer reads but cannot write', assertFails(setDoc(doc(novViewer, 'quotes/nq2'), { n: 2 })));
+await t('Turned-off Novyra team member cannot get in', assertFails(getDoc(doc(novOff, 'clients/n1'))));
+await t('Company staff cannot read Novyra', assertFails(getDoc(doc(acmeStaff, 'clients/n1'))));
 
 console.log('Customers opening links');
 await t('Customer opens a Novyra link', assertSucceeds(getDoc(doc(anon, 'shares/novkey1234567890ab'))));

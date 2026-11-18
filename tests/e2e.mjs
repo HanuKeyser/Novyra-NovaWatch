@@ -45,7 +45,9 @@ const W = ms => new Promise(r => setTimeout(r, ms));
 
 // people
 const PW = 'test-pass-123';
-for (const e of ['hanu@keysers.cc', 'owner@karoo.test', 'staff@karoo.test', 'stranger@else.test']) await account(e, PW);
+for (const e of ['hanu@keysers.cc', 'staff@karoo.test', 'stranger@else.test']) await account(e, PW);
+// the company owner's sign-in is made by Novyra's owner in the app: a username and a starting password
+const OWNER_USER = 'karoo-owner', OWNER_AUTH = 'karoo-owner@karoo-cycles.desk.novyradesk.com', START_PW = 'Karoo-Start1!', OWNER_PW = 'Karoo-Owner2!';
 await put('users/placeholder@novyra.test', { email: 'placeholder@novyra.test', role: 'staff', active: false }); // Novyra team list exists, as it does live
 await put('clients/nov1', { business: 'Novyra Customer (Pty) Ltd' });
 
@@ -61,17 +63,32 @@ await nov.evaluate(() => location.hash = '#settings'); await W(2500);
 check('Settings shows the Companies card', await nov.locator('#set-companies').count() === 1);
 await nov.fill('#co-name', 'Karoo Cycles'); await W(150);
 check('Web address fills in from the name', (await nov.inputValue('#co-slug')) === 'karoo-cycles');
-await nov.fill('#co-owner', 'Owner@Karoo.test'); await nov.click('[data-co-add]'); await W(3000);
+check('A starting password is filled in for the owner', /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(await nov.inputValue('#co-pass')));
+await nov.fill('#co-owner', 'Karoo-Owner'); await nov.fill('#co-pass', 'weak'); await nov.click('[data-co-add]'); await W(800);
+check('A weak starting password is refused', !(await get('companies/karoo-cycles')));
+await nov.fill('#co-pass', START_PW); await nov.click('[data-co-add]'); await W(3500);
 const co = await get('companies/karoo-cycles');
-check('Company is set up with its owner', co && co.name === 'Karoo Cycles' && (co.owners || []).join() === 'owner@karoo.test', JSON.stringify(co));
+check('Company is set up with its owner’s account', co && co.name === 'Karoo Cycles' && (co.ownerUids || []).length === 1 && (co.owners || []).join() === OWNER_AUTH && (co.mustChange || []).join() === (co.ownerUids || []).join(), JSON.stringify(co));
+check('Novyra’s owner is shown the owner’s sign-in details to pass on', /karoo-owner/.test(await nov.locator('#modal .login-card').innerText().catch(() => '')) && (await nov.locator('#modal .login-card').innerText()).includes(START_PW));
+await nov.click('#modal [data-close]'); await W(500);
+check('Novyra’s owner is still signed in as themselves', await nov.evaluate(() => window.STUDIO.email) === 'hanu@keysers.cc');
 check('Company appears in the list with its link', (await nov.locator('#set-companies').innerText()).includes('novyradesk.com/karoo-cycles/'));
 await nov.screenshot({ path: 'shots/1-novyra-companies.png', fullPage: true });
 
 console.log('2. The company’s own desk (novyradesk.com/karoo-cycles/)');
 const kar = await open('/karoo-cycles/?emu=1', 'karoo');
 check('Sign-in page names the company, not Novyra', /karoo cycles/i.test(await kar.locator('.g-tag').innerText()) && !/novyra’s/i.test(await kar.locator('.g-bt').innerText()));
-await signIn(kar, 'owner@karoo.test', PW);
+check('The sign-in page has no Create account option', !(await kar.locator('[data-mode=up], #t-up').count()));
+await signIn(kar, OWNER_USER, START_PW);
+await kar.waitForSelector('#g-setup:not([hidden])', { timeout: 30000 }).catch(() => {});
+check('First sign-in asks the owner to set up their account', await kar.locator('#g-setup').isVisible());
+await kar.fill('#s-pass', 'password1'); await kar.fill('#s-pass2', 'password1'); await kar.click('#s-submit'); await W(600);
+check('A password that breaks the rule is refused', /capital letter/.test(await kar.locator('#s-msg').innerText()));
+await kar.fill('#s-pass', OWNER_PW); await kar.fill('#s-pass2', OWNER_PW); await kar.click('#s-submit');
 check('Company owner opens their desk', await inApp(kar));
+check('The first-sign-in setup is ticked off', ((await get('companies/karoo-cycles')).mustChange || []).length === 0);
+const old = await open('/karoo-cycles/?emu=1', 'old-password'); await signIn(old, OWNER_USER, START_PW);
+const mo = await gateMsg(old); check('The starting password no longer works', mo.shown && /don’t match/.test(mo.msg), mo.msg);
 await W(2500);
 const kb = await get('companies/karoo-cycles/settings/business');
 check('Business info starts with the company’s name', kb && kb.name === 'Karoo Cycles', JSON.stringify(kb));
@@ -147,17 +164,30 @@ await W(2500);
 check('Team member sees the company’s customer', (await stf.evaluate(async () => { location.hash = '#clients'; await new Promise(r => setTimeout(r, 1200)); return document.body.innerText; })).includes('Desert Bikes'));
 
 console.log('5. Nobody gets into a desk that isn’t theirs');
-const x1 = await open('/?emu=1', 'karoo-at-novyra'); await signIn(x1, 'owner@karoo.test', PW);
+const x1 = await open('/?emu=1', 'karoo-at-novyra'); await signIn(x1, OWNER_AUTH, OWNER_PW);
 const m1 = await gateMsg(x1); check('Company owner is turned away from Novyra’s desk', m1.shown && /access/.test(m1.msg), m1.msg);
 const x2 = await open('/karoo-cycles/?emu=1', 'novyra-at-karoo'); await signIn(x2, 'hanu@keysers.cc', PW);
 const m2 = await gateMsg(x2); check('Novyra owner is turned away from the company’s desk', m2.shown && /isn’t on this company’s team/.test(m2.msg), m2.msg);
 const x3 = await open('/karoo-cycles/?emu=1', 'stranger'); await signIn(x3, 'stranger@else.test', PW);
 const m3 = await gateMsg(x3); check('A stranger is turned away from the company’s desk', m3.shown && /isn’t on this company’s team/.test(m3.msg), m3.msg);
-const x4 = await open('/no-such-co/?emu=1', 'nobody'); await signIn(x4, 'owner@karoo.test', PW);
+const x4 = await open('/no-such-co/?emu=1', 'nobody'); await signIn(x4, OWNER_AUTH, OWNER_PW);
 const m4 = await gateMsg(x4); check('An address with no company says so', m4.shown && /team|no company/.test(m4.msg), m4.msg);
 await x4.screenshot({ path: 'shots/5-turned-away.png' });
 
-console.log('6. Pages load in Novyra’s desk and the company’s desk');
+console.log('6. The owner switches to their own email address');
+await kar.evaluate(() => location.hash = '#settings-security'); await W(1200);
+check('Security shows the username they sign in with', (await kar.locator('#set-security').innerText()).includes(OWNER_USER));
+await kar.fill('#sc-email', 'owner@karoo.test'); await kar.fill('#sc-cur2', OWNER_PW); await kar.click('[data-sc-email]'); await W(2000);
+check('A confirmation link is sent to the new address', /Link sent/.test(await kar.locator('#sc-email-out').innerText()), await kar.locator('#sc-email-out').innerText());
+const codes = (await (await fetch(`${AUTH}/emulator/v1/projects/${P}/oobCodes`)).json()).oobCodes || [];
+const vlink = codes.filter(c => c.requestType === 'VERIFY_AND_CHANGE_EMAIL').pop();
+if (vlink) { const r = await fetch(vlink.oobLink.replace(/^https?:\/\/[^/]+/, AUTH)); if (!r.ok) await fetch(`${AUTH}/identitytoolkit.googleapis.com/v1/accounts:update?key=test`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ oobCode: vlink.oobCode }) }); }
+check('Opening the link changes the sign-in email', !!vlink, JSON.stringify(codes.map(c => c.requestType)));
+const nm = await open('/karoo-cycles/?emu=1', 'new-email'); await signIn(nm, 'owner@karoo.test', OWNER_PW);
+check('Owner signs in with their own email and still has their desk', await inApp(nm));
+await W(2000); check('The company now lists the new email for its owner', ((await get('companies/karoo-cycles')).owners || []).includes('owner@karoo.test'));
+
+console.log('7. Pages load in Novyra’s desk and the company’s desk');
 for (const [pg, who] of [[nov, 'Novyra'], [kar, 'Karoo']]) for (const h of ['overview', 'clients', 'quotes', 'prices', 'invoices', 'plans', 'expenses', 'calendar', 'company', 'team', 'settings']) {
   const before = errors.length; await pg.evaluate(x => location.hash = '#' + x, h); await W(700);
   check(`${who}: ${h} opens without errors`, errors.length === before, errors.slice(before).join(' | '));
