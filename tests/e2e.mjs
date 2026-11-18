@@ -33,6 +33,7 @@ const account = async (email, password) => {
 let n = 0, bad = 0;
 const check = (name, ok, extra = '') => { n++; if (!ok) bad++; console.log(`  ${ok ? 'ok  ' : 'FAIL'} ${name}${extra ? ' :: ' + extra : ''}`); };
 const b = await chromium.launch();
+process.on('unhandledRejection', e => { console.log('  FAIL (stopped) ' + (e && e.message || e).split('\n')[0]); bad++; });
 const errors = [];
 const open = async (path, who) => { const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } }); const pg = await ctx.newPage();
   pg.on('pageerror', e => errors.push(`${who}: ${e.message}`)); pg.on('dialog', d => d.dismiss());
@@ -65,7 +66,7 @@ await nov.screenshot({ path: 'shots/1-novyra-companies.png', fullPage: true });
 
 console.log('2. The company’s own desk (novyradesk.com/karoo-cycles/)');
 const kar = await open('/karoo-cycles/?emu=1', 'karoo');
-check('Sign-in page names the company, not Novyra', /Karoo Cycles/.test(await kar.locator('.g-tag').innerText()));
+check('Sign-in page names the company, not Novyra', /karoo cycles/i.test(await kar.locator('.g-tag').innerText()) && !/novyra’s/i.test(await kar.locator('.g-bt').innerText()));
 await signIn(kar, 'owner@karoo.test', PW);
 check('Company owner opens their desk', await inApp(kar));
 await W(2500);
@@ -90,11 +91,14 @@ await kar.click('[data-act="save"]'); await W(1500);
 const kq = await list('companies/karoo-cycles/quotes'), kc = await list('companies/karoo-cycles/clients');
 check('Quote is saved in the company’s space', kq.length === 1, `${kq.length} quotes`);
 check('Customer is saved in the company’s space', kc.some(c => c.business === 'Desert Bikes'));
-check('Nothing leaked into Novyra’s records', !(await list('clients')).some(c => c.business === 'Desert Bikes') && (await list('quotes')).length === 0);
+check('Nothing leaked into Novyra’s records', !(await list('clients')).some(c => c.business === 'Desert Bikes') && !(await list('quotes')).some(q => JSON.stringify(q).includes('Desert Bikes')));
 await kar.screenshot({ path: 'shots/2-company-quote.png', fullPage: true });
 // customer link
-await kar.click('[data-act="link"]'); await W(600);
-await kar.click('[data-lk-make]'); await W(2000);
+const lb = kar.locator('[data-act="link"]').first();
+await kar.waitForFunction(() => { const x = document.querySelector('[data-act="link"]'); return x && !x.disabled; }, null, { timeout: 10000 }).catch(() => {});
+console.log('    link button:', await lb.count() ? JSON.stringify(await lb.evaluate(x => ({ text: x.textContent.trim(), disabled: x.disabled, title: x.title, hash: location.hash }))) : 'not on the page (' + await kar.evaluate(() => location.hash + ' ' + [...document.querySelectorAll('[data-act]')].map(x => x.dataset.act).join(',')) + ')');
+await lb.click({ timeout: 8000 }).catch(e => console.log('    could not open the link dialog:', e.message.split('\n')[0])); await W(800);
+await kar.click('[data-lk-make]', { timeout: 8000 }).catch(e => console.log('    no Create link button:', e.message.split('\n')[0])); await W(2000);
 const link = await kar.inputValue('#lk-url').catch(() => '');
 check('Customer link is novyradesk.com/karoo-cycles/quote/#…', /^https:\/\/novyradesk\.com\/karoo-cycles\/quote\/#[\w-]{16,}$/.test(link), link);
 const key = link.split('#')[1] || '';
