@@ -19,7 +19,7 @@ jobs:
       - run: npm install --no-audit --no-fund
       - run: npx playwright install --with-deps chromium
       - run: cp ../firestore.rules firestore.rules
-      - run: npx firebase emulators:exec --project novyra-studio --only firestore,auth "node rules.test.mjs && node e2e.mjs"
+      - run: npx firebase emulators:exec --project novyra-studio --only firestore,auth "node rules.test.mjs && node e2e.mjs && node functions.mjs"
       - uses: actions/upload-artifact@v4
         if: always()
         with: { name: screenshots, path: tests/shots }

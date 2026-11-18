@@ -508,6 +508,11 @@ textarea{scrollbar-gutter:auto}
 .cc-c svg{flex:none;color:#7b86a3}
 .cc-v{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cc-none{color:var(--muted)}
+.cc.off{background:var(--ink,#f6f8fc)}.cc.off .cc-h,.cc.off .cc-c{opacity:.62}
+.cc-tag{font:700 10.5px var(--body);font-style:normal;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--ink3,#eef1f7);border:1px solid var(--line2);border-radius:999px;padding:2px 8px;vertical-align:3px;margin-left:6px;white-space:nowrap}
+.cl-bar{display:flex;margin:0 0 16px}
+.cl-seg button .num{font-weight:600;opacity:.65;margin-left:3px}
+.cl-act{margin-top:4px}.cl-act-sub{display:block;font-size:12.5px;color:var(--muted);margin-top:-2px}
 .cc-f{display:flex;align-items:center;gap:16px;font-size:13px;color:var(--muted);margin-top:auto}
 .cc-f b{color:var(--text);font-weight:700;font-size:14px;margin-right:2px}
 .cc-owed,.cc-ok{margin-left:auto;font-weight:700;font-size:12.5px;border-radius:999px;padding:5px 11px;white-space:nowrap}
@@ -2745,21 +2750,26 @@ function invoicesHTML() {
       : emptyBox('No invoices yet', 'When a customer accepts a quote, you can invoice them from it.')}</div>${pg.more}`;
 }
 function clientsHTML() {
-  const cs = state.clients.slice().sort((a, b) => clientName(a).localeCompare(clientName(b), 'en', { sensitivity: 'base' }));
+  const f = view.clShow || 'active', nAct = state.clients.filter(c => !c.inactive).length, nIn = state.clients.length - nAct;
+  const cs = state.clients.filter(c => f === 'all' || (f === 'inactive' ? c.inactive : !c.inactive)).sort((a, b) => clientName(a).localeCompare(clientName(b), 'en', { sensitivity: 'base' }));
   const pg = pageOf(cs);
   const ic = { mail: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
     phone: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>' };
   const cards = pg.rows.map(c => { const { quotes, invoices } = docsFor(c), ppl = contactsOf(c), p0 = ppl[0] || {};
     const owed = invoices.filter(v => v.status === 'Sent').reduce((a, v) => a + Math.max(0, calc(v).due), 0);
     const names = ppl.map(p => p.name).filter(Boolean);
-    return `<article class="cc" data-client="${c.id}" tabindex="0" role="button" aria-label="Open ${esc(c.business)}">
-      <header class="cc-h">${avHTML(c)}<div class="cc-n"><h3>${esc(c.business)}</h3><p>${names.length ? esc(names[0]) + (names.length > 1 ? ` <span>+${names.length - 1} more</span>` : '') : 'No contact person yet'}</p></div></header>
+    return `<article class="cc ${c.inactive ? 'off' : ''}" data-client="${c.id}" tabindex="0" role="button" aria-label="Open ${esc(c.business)}${c.inactive ? ' (inactive)' : ''}">
+      <header class="cc-h">${avHTML(c)}<div class="cc-n"><h3>${esc(c.business)}${c.inactive ? ' <em class="cc-tag">Inactive</em>' : ''}</h3><p>${names.length ? esc(names[0]) + (names.length > 1 ? ` <span>+${names.length - 1} more</span>` : '') : 'No contact person yet'}</p></div></header>
       <div class="cc-c">${p0.email ? `<span>${ic.mail}<span class="cc-v">${esc(p0.email)}</span></span>` : ''}${p0.phone ? `<span>${ic.phone}<span class="cc-v num">${esc(p0.phone)}</span></span>` : ''}${!p0.email && !p0.phone ? '<span class="cc-none">No email or phone saved</span>' : ''}</div>
       <footer class="cc-f"><span><b class="num">${quotes.length}</b> ${quotes.length === 1 ? 'quote' : 'quotes'}</span><span><b class="num">${invoices.length}</b> ${invoices.length === 1 ? 'invoice' : 'invoices'}</span>${owed ? `<span class="cc-owed">${money(owed)} owed</span>` : '<span class="cc-ok">Nothing owed</span>'}</footer>
     </article>`; }).join('');
+  const seg = state.clients.length ? `<div class="seg cl-seg" role="group" aria-label="Show customers">${[['active', 'Active', nAct], ['inactive', 'Inactive', nIn], ['all', 'All', state.clients.length]].map(([k, l, n]) => `<button type="button" data-cl-show="${k}" aria-pressed="${f === k}">${l} <span class="num">${n}</span></button>`).join('')}</div>` : '';
+  const none = !state.clients.length ? emptyBox('No customers yet', 'Add the businesses you work with and they’ll be ready for every quote.')
+    : f === 'inactive' ? emptyBox('No inactive customers', 'Customers you mark as inactive show up here. Open a customer to change it.')
+    : emptyBox('No active customers', 'All your customers are marked inactive. Open one to make it active again.');
   return `<div class="head">
       <button class="btn primary" data-add-client>Add customer</button></div>
-    ${cs.length ? `<div class="cc-grid">${cards}</div>` : emptyBox('No customers yet', 'Add the businesses you work with and they’ll be ready for every quote.')}${pg.more}`;
+    ${seg ? `<div class="cl-bar">${seg}</div>` : ''}${cs.length ? `<div class="cc-grid">${cards}</div>` : none}${pg.more}`;
 }
 const sheetPrice = (name, fallback) => { const p = prices().find(x => x.item === name); return p ? Number(p.price) || 0 : fallback; };
 const rr = n => 'R' + Math.round(n).toLocaleString('en-US');
@@ -3260,6 +3270,7 @@ function bindList(main) {
   $$('[data-more]', main).forEach(b => b.addEventListener('click', () => { view.limit = (view.limit === 'all' ? 0 : (view.limit || PAGE)) + PAGE; render(); }));
   $$('[data-all]', main).forEach(b => b.addEventListener('click', () => { view.limit = 'all'; render(); }));
   $$('[data-new]', main).forEach(b => b.addEventListener('click', () => newQuoteDialog()));
+  $$('[data-cl-show]', main).forEach(b => b.addEventListener('click', () => { view.clShow = b.dataset.clShow; render(); }));
   $$('[data-client]', main).forEach(tr => { const open = () => clientDialog(state.clients.find(c => c.id === tr.dataset.client)); tr.addEventListener('click', open); tr.addEventListener('keydown', e => { if (e.key === 'Enter') open(); }); });
   $$('[data-add-client]', main).forEach(b => b.addEventListener('click', () => clientDialog(null)));
   const ls = $('#list-search', main); if (ls) ls.addEventListener('input', () => { view.q = ls.value; view.limit = PAGE; render(); });
@@ -3562,7 +3573,7 @@ function bindCombo(root, onPick, onAdd) {
   let items = [], active = -1;
   const draw = () => {
     const q = norm(inp.value);
-    items = state.clients.filter(c => !q || [c.business, ...contactsOf(c).flatMap(p => [p.name, p.email])].some(x => norm(x).includes(q))).slice(0, 7).map(c => ({ c }));
+    items = state.clients.filter(c => !c.inactive).filter(c => !q || [c.business, ...contactsOf(c).flatMap(p => [p.name, p.email])].some(x => norm(x).includes(q))).slice(0, 7).map(c => ({ c }));
     if (q && !state.clients.some(c => norm(c.business) === q)) items.push({ add: inp.value.trim() });
     if (!items.length) list.innerHTML = `<li class="none">${state.clients.length ? 'No saved customer matches.' : 'No customers saved yet. Press + to add one.'}</li>`;
     else list.innerHTML = items.map((x, i) => x.c
@@ -3710,7 +3721,8 @@ function clientDialog(c, onSaved, onCancel) {
     <section class="cbox"><label class="field"><span>Business name</span><input id="cl-business" value="${esc(x.business)}" ${isNew ? 'autofocus' : ''}></label>
       <div class="addr-grid">${ADDR_KEYS.map(([k, l]) => `<label class="field ${k === 'street' ? 'wide' : ''}"><span>${l}</span><input data-addr="${k}" value="${esc(x.addr[k])}" ${k === 'country' ? 'placeholder="South Africa"' : k === 'code' ? 'inputmode="numeric"' : ''} autocomplete="${{ street: 'address-line1', suburb: 'address-line2', city: 'address-level2', province: 'address-level1', code: 'postal-code', country: 'country-name' }[k]}"></label>`).join('')}</div>
       <label class="field"><span>Registration or VAT no. (optional)</span><input id="cl-reg" value="${esc(x.reg)}"></label>
-      <label class="field"><span>Private notes (never printed)</span><textarea id="cl-notes" rows="2">${esc(x.notes)}</textarea></label></section>
+      <label class="field"><span>Private notes (never printed)</span><textarea id="cl-notes" rows="2">${esc(x.notes)}</textarea></label>
+      <label class="chk switch cl-act"><input type="checkbox" id="cl-active" ${x.inactive ? '' : 'checked'}><span>Active customer</span></label><span class="sub cl-act-sub">Inactive customers are hidden from new quotes and the main list. Their quotes and invoices stay.</span></section>
 
     ${isNew ? '' : `<section class="cbox"><div class="sec-h"><span class="label">Quotes and invoices</span></div>${list.length ? `<div class="doclist">${list.map(l => `<a href="#${l.h}" data-go><b class="num">${esc(l.n)}</b><span class="sub">${fmtDate(l.d)}</span><span class="num">${money(l.t)}</span><span class="pill ${pillClass(l.s)}">${stLabel(l.s)}</span></a>`).join('')}</div>` : '<p class="sub" style="margin:0">Nothing yet.</p>'}</section>`}
     </div><div class="ccol">
@@ -3724,7 +3736,7 @@ function clientDialog(c, onSaved, onCancel) {
   const canRemove = !isNew && !list.length;
   const foot = `${canRemove ? '<button class="btn ghost danger" data-remove-client style="margin-right:auto">Remove customer</button>' : ''}${isNew || onSaved ? '' : '<button class="btn" data-quote-client style="margin-right:auto">New quote for this customer</button>'}<button class="btn ghost" data-cancel>Cancel</button><button class="btn primary" data-save-client>${isNew ? 'Save customer' : 'Save changes'}</button>`;
   const readAll = m => {
-    x.business = $('#cl-business', m).value.trim(); x.reg = $('#cl-reg', m).value.trim(); x.notes = $('#cl-notes', m).value.trim();
+    x.business = $('#cl-business', m).value.trim(); x.reg = $('#cl-reg', m).value.trim(); x.notes = $('#cl-notes', m).value.trim(); { const a = $('#cl-active', m); if (a) x.inactive = !a.checked; }
     $$('[data-addr]', m).forEach(i => { x.addr[i.dataset.addr] = i.value.trim(); }); x.address = addrOf({ addr: x.addr });
     fin = Object.fromEntries($$('[data-fin]', m).map(i => [i.dataset.fin, i.value.trim()]));
     people = $$('.pcard', m).map(card => Object.fromEntries($$('[data-pf]', card).map(inp => [inp.dataset.pf, inp.value.trim()])));
@@ -3752,7 +3764,7 @@ function clientDialog(c, onSaved, onCancel) {
       if (fin.email && !/^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/.test(fin.email)) { toast('The finance email address doesn’t look right.'); $('[data-fin=email]', m).focus(); return; }
       const btn = e.currentTarget; btn.disabled = true;
       const now = new Date().toISOString(), id = x.id || uid();
-      const rec = { business: x.business, avColor: x.avColor || (isNew ? CLIENT_COLORS[Math.floor(Math.random() * CLIENT_COLORS.length)] : clientColor(x)), logo: x.logo || '', logoSrc: x.logoSrc || '', logoCrop: x.logoCrop || null, finance: fin, contacts: ppl, address: x.address, addr: x.addr, reg: x.reg, notes: x.notes, createdAt: x.createdAt || now, updatedAt: now, createdBy: x.createdBy || OWNER.name };
+      const rec = { business: x.business, avColor: x.avColor || (isNew ? CLIENT_COLORS[Math.floor(Math.random() * CLIENT_COLORS.length)] : clientColor(x)), logo: x.logo || '', logoSrc: x.logoSrc || '', logoCrop: x.logoCrop || null, finance: fin, contacts: ppl, address: x.address, addr: x.addr, reg: x.reg, notes: x.notes, inactive: !!x.inactive, createdAt: x.createdAt || now, updatedAt: now, createdBy: x.createdBy || OWNER.name };
       try { await db.collection('clients').doc(id).set(rec); }
       catch { btn.disabled = false; toast('Not saved. Check your connection and try again.'); return; }
       const saved = { id, ...rec };
