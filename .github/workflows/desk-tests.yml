@@ -8,7 +8,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
     defaults: { run: { working-directory: tests } }
     steps:
       - uses: actions/checkout@v4
@@ -17,9 +17,9 @@ jobs:
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: 21 }
       - run: npm install --no-audit --no-fund
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps chromium firefox webkit
       - run: cp ../firestore.rules firestore.rules
-      - run: npx firebase emulators:exec --project novyra-studio --only firestore,auth "node rules.test.mjs && node e2e.mjs && node functions.mjs"
+      - run: npx firebase emulators:exec --project novyra-studio --only firestore,auth "node rules.test.mjs && node e2e.mjs && node functions.mjs && node browsers.mjs"
       - uses: actions/upload-artifact@v4
         if: always()
         with: { name: screenshots, path: tests/shots }
