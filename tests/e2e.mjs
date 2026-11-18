@@ -85,7 +85,7 @@ check('Menu footer shows the company’s letter until a logo is added', (await k
 await kar.evaluate(() => location.hash = '#company'); await W(1000);
 const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAHUlEQVR4nGNgGAWjYBSMglEwCkbBKBgFo2AUDAMABBAAAQ3dSUQAAAAASUVORK5CYII=', 'base64');
 await kar.setInputFiles('[data-bz-logo]', { name: 'logo.png', mimeType: 'image/png', buffer: png }); await W(1200);
-if (await kar.locator('[data-crop-ok]').count()) await kar.click('[data-crop-ok]'); await W(600);
+await kar.waitForSelector('[data-crop-ok]', { timeout: 15000 }); await W(300); await kar.click('[data-crop-ok]'); await kar.waitForSelector('#modal [data-crop-ok]', { state: 'detached', timeout: 10000 }).catch(() => {}); await W(600);
 await kar.click('[data-save-biz]'); await W(1500);
 const kb2 = await get('companies/karoo-cycles/settings/business');
 check('Company logo is saved in the company’s business info', !!(kb2 && /^data:image\//.test(kb2.logo || '')), kb2 && String(kb2.logo).slice(0, 30));
