@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Your document | Novyra</title><meta name="robots" content="noindex, nofollow"><meta name="referrer" content="no-referrer">
+<title>Your document</title><meta name="robots" content="noindex, nofollow"><meta name="referrer" content="no-referrer">
 <link rel="icon" href="/favicon.ico"><meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&display=swap">
@@ -155,12 +155,15 @@ h1{margin:0;font:800 30px/1.1 var(--display);letter-spacing:-.01em}
   const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
   const app = $('#app'), key = decodeURIComponent((location.hash || '').slice(1));
   const fail = (h, p) => { app.innerHTML = `<div class="msg"><h1>${h}</h1><p>${p}</p></div>`; };
-  if (!/^[A-Za-z0-9_-]{16,}$/.test(key)) return fail('This link isn’t complete', 'Please open the full link from the email or WhatsApp message, or ask Novyra to send it again.');
+  if (!/^[A-Za-z0-9_-]{16,}$/.test(key)) return fail('This link isn’t complete', 'Please open the full link from the email or WhatsApp message, or ask the business that sent it for a new one.');
   firebase.initializeApp({"apiKey": "AIzaSyBaFNF3r8iehEU00BRO0XKnal0THv9pXs4", "authDomain": "novyra-studio.firebaseapp.com", "projectId": "novyra-studio", "storageBucket": "novyra-studio.firebasestorage.app", "messagingSenderId": "277400731071", "appId": "1:277400731071:web:70871b84494b7a6d9a750a"});
-  const ref = firebase.firestore().collection('shares').doc(key);
+  // novyradesk.com/quote/#key is Novyra's; novyradesk.com/<company>/quote/#key is another company's, kept in that company's space
+  const seg = (location.pathname.split('/')[1] || '').toLowerCase(), SLUG = seg !== 'quote' && /^[a-z0-9][a-z0-9-]{1,38}[a-z0-9]$/.test(seg) ? seg : '';
+  if (/^(127\.0\.0\.1|localhost)$/.test(location.hostname) && /[?&]emu\b/.test(location.search)) firebase.firestore().useEmulator('127.0.0.1', 8085);
+  const ref = firebase.firestore().collection(SLUG ? `companies/${SLUG}/shares` : 'shares').doc(key);
   let q = null;
   ref.get().then(s => { if (!s.exists) return fail('This link is no longer active', 'It may have been replaced or turned off. Ask the business that sent it for the latest link.'); q = s.data(); { const bz = (q.from || {}).business, w = (q.from || {}).website, h = document.getElementById('bz-head'); if (bz && bz !== 'Novyra' && h) { h.innerHTML = '<b style="font:800 20px var(--display,Syne,sans-serif);color:inherit"></b>'; h.firstChild.textContent = bz; h.setAttribute('aria-label', bz); h.href = w ? 'https://' + w.replace(/^https?:\/\//, '') : '#'; } if (h) h.style.visibility = ''; } (q.kind && q.kind !== 'quote') ? drawDoc() : draw(); })
-    .catch(() => fail('This link is no longer active', 'It may have been replaced or turned off. Ask Novyra for the latest link.'));
+    .catch(() => fail('This link is no longer active', 'It may have been replaced or turned off. Ask the business that sent it for the latest link.'));
   function drawDoc() {
     const R = q.kind === 'receipt', f = q.from || {}, b = q.bank || {}, BZ = f.business || 'Novyra';
     document.title = `${R ? 'Receipt' : 'Invoice'} ${q.ref} | ${BZ}`; $('#kindlbl').textContent = R ? 'Your receipt' : 'Your invoice';
@@ -170,7 +173,7 @@ h1{margin:0;font:800 30px/1.1 var(--display);letter-spacing:-.01em}
           <div class="kv">${R ? `<div class="big"><span>Amount received</span><b>${money(q.amount)}</b></div><div><span>Date paid</span><b>${fmtDate(q.date)}</b></div><div><span>For invoice</span><b>${esc(q.invoiceRef)}</b></div>${q.remaining > 0 ? `<div><span>Still owing on the invoice</span><b>${money(q.remaining)}</b></div>` : ''}`
             : `<div><span>Invoice total</span><b>${money(q.total)}</b></div>${q.paid ? `<div><span>Paid so far</span><b>${money(q.paid)}</b></div>` : ''}${st !== 'Cancelled' ? `<div class="big"><span>${st === 'Paid' ? 'Nothing owing' : 'Amount due'}</span><b>${money(q.due)}</b></div>` : ''}${q.dueDate && st !== 'Paid' && st !== 'Cancelled' ? `<div><span>Due by</span><b>${fmtDate(q.dueDate)}</b></div>` : ''}`}</div></div>
         ${!R && st !== 'Paid' && st !== 'Cancelled' && b.accountNumber ? `<div class="card"><span class="eyebrow">How to pay</span><div class="kv"><div><span>Bank</span><b>${esc(b.bank)}</b></div><div><span>Account type</span><b>${esc(b.accountType)}</b></div><div><span>Account number</span><b>${esc(b.accountNumber)}</b></div><div><span>Reference</span><b>${esc(b.reference)}</b></div></div></div>` : ''}
-        ${st === 'Cancelled' ? '<div class="card"><b>This invoice was cancelled</b><p class="note">Nothing is owed on it. Ask Novyra if you have any questions.</p></div>' : ''}
+        ${st === 'Cancelled' ? '<div class="card"><b>This invoice was cancelled</b><p class="note">Nothing is owed on it. Ask the business that sent it if you have any questions.</p></div>' : ''}
         <button class="btn primary" data-pdf>Download PDF</button>
         <div class="card contact"><span class="eyebrow">Questions?</span><div><b>${esc(f.name || BZ)}</b>${f.title ? ' · ' + esc(f.title) : ''}</div>
           ${f.email ? `<a href="mailto:${esc(f.email)}">${esc(f.email)}</a>` : ''}${f.phone ? `<div>${esc(f.phone)} <span class="note" style="display:inline">(WhatsApp messages only)</span></div>` : ''}</div>
