@@ -52,7 +52,7 @@ console.log('1. Novyra’s own desk (novyradesk.com)');
 const nov = await open('/?emu=1', 'novyra');
 await signIn(nov, 'hanu@keysers.cc', PW);
 check('Novyra owner opens novyradesk.com', await inApp(nov));
-check('Novyra customer links use novyradesk.com/quote/', (await nov.evaluate('SHARE_BASE')) === 'https://novyradesk.com/quote/#');
+check('Novyra customer links use novyradesk.com/quote/', (await nov.evaluate(() => window.NOVYRA_DESK.shareBase)) === 'https://novyradesk.com/quote/#');
 await nov.evaluate(() => location.hash = '#settings'); await W(2500);
 check('Settings shows the Companies card', await nov.locator('#set-companies').count() === 1);
 await nov.fill('#co-name', 'Karoo Cycles'); await W(150);
@@ -71,7 +71,7 @@ check('Company owner opens their desk', await inApp(kar));
 await W(2500);
 const kb = await get('companies/karoo-cycles/settings/business');
 check('Business info starts with the company’s name', kb && kb.name === 'Karoo Cycles', JSON.stringify(kb));
-check('Company customer links use novyradesk.com/karoo-cycles/quote/', (await kar.evaluate('SHARE_BASE')) === 'https://novyradesk.com/karoo-cycles/quote/#');
+check('Company customer links use novyradesk.com/karoo-cycles/quote/', (await kar.evaluate(() => window.NOVYRA_DESK.shareBase)) === 'https://novyradesk.com/karoo-cycles/quote/#');
 check('Company desk does not show Novyra’s customers', !(await kar.evaluate(() => document.body.innerText)).includes('Novyra Customer'));
 check('Company desk has no Companies card', await kar.evaluate(async () => { location.hash = '#settings'; await new Promise(r => setTimeout(r, 1200)); return !document.getElementById('set-companies'); }));
 // make a quote the normal way
