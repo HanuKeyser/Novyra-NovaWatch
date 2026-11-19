@@ -511,6 +511,10 @@ textarea{scrollbar-gutter:auto}
 .cc.off{background:var(--ink,#f6f8fc)}.cc.off .cc-h,.cc.off .cc-c{opacity:.62}
 .cc-tag{font:700 10.5px var(--body);font-style:normal;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--ink3,#eef1f7);border:1px solid var(--line2);border-radius:999px;padding:2px 8px;vertical-align:3px;margin-left:6px;white-space:nowrap}
 .cl-bar{display:flex;margin:0 0 16px}
+.cc-m{display:flex;align-items:center;gap:8px;margin:0;font-size:12.5px;color:var(--muted);min-width:0}.cc-m b{color:var(--text,inherit);font-weight:600}
+.cc-m>span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.cc-m-av{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#fff;font:700 9.5px var(--body);letter-spacing:.02em}
+.us-reset+.us-reset{margin-top:-4px}
 .pw-row{display:flex;gap:8px;align-items:center}.pw-row input{flex:1;min-width:0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 .pw-rules{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
 .pw-rules li{font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--ink3,#eef1f7);color:var(--muted);border:1px solid var(--line2)}
@@ -2052,6 +2056,23 @@ view.calView = 'month';
 const initials = n => String(n || '').replace(/\(.*?\)/g, '').split(/[\s-]+/).filter(w => /^[A-Za-z0-9]/.test(w) && !/^(pty|ltd|cc|the|and|of)$/i.test(w)).slice(0, 2).map(w => w[0].toUpperCase()).join('') || '?';
 const ageDays = s => s ? Math.max(0, Math.round((new Date(todayIso() + 'T00:00:00') - new Date(s + 'T00:00:00')) / 864e5)) : null;
 const ownerOf = d => d.createdBy || OWNER.name;
+// the owner's account id (a company desk) or 'owner' (Novyra's own desk)
+const ownerKey = () => (SLUG && ((COMPANY() || {}).ownerUids || [])[0]) || 'owner';
+// everyone who can look after a customer: the owner and the active team
+const deskPeople = () => [{ id: ownerKey(), name: OWNER.name || 'Owner' }, ...state.users.filter(u => !u.removed && u.active !== false).map(u => ({ id: u.id, name: u.name || u.login || u.email }))];
+const myKey = () => isOwnerLogin() ? ownerKey() : (ME && ME.id) || ownerKey();
+const managerOf = c => c && c.manager && c.manager.name ? c.manager : null;
+// moves everything that was person A's (made by, or looked after by) over to person B
+async function handOverRecords(from, to) {
+  const same = d => (from.id && d.createdByUid === from.id) || (!!from.name && norm(d.createdBy || '') === norm(from.name));
+  const ops = [];
+  for (const [col, list] of [['quotes', state.quotes], ['invoices', state.invoices], ['plans', state.plans || []], ['expenses', state.expenses || []]])
+    list.filter(same).forEach(d => ops.push([col, d.id, { createdBy: to.name, createdByUid: to.id }]));
+  state.clients.filter(c => c.manager && (c.manager.id === from.id || (!!from.name && norm(c.manager.name) === norm(from.name))))
+    .forEach(c => ops.push(['clients', c.id, { manager: { id: to.id, name: to.name } }]));
+  for (let i = 0; i < ops.length; i += 25) await Promise.all(ops.slice(i, i + 25).map(([col, id, v]) => db.collection(col).doc(id).update(v)));
+  return ops.length;
+}
 const firstName = s => String(s || '').trim().split(/\s+/)[0] || '';
 const listAnd = a => a.length <= 1 ? (a[0] || '') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1];
 const ICON_SEARCH = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>';
@@ -2877,6 +2898,7 @@ function clientsHTML() {
     return `<article class="cc ${c.inactive ? 'off' : ''}" data-client="${c.id}" tabindex="0" role="button" aria-label="Open ${esc(c.business)}${c.inactive ? ' (inactive)' : ''}">
       <header class="cc-h">${avHTML(c)}<div class="cc-n"><h3>${esc(c.business)}${c.inactive ? ' <em class="cc-tag">Inactive</em>' : ''}</h3><p>${names.length ? esc(names[0]) + (names.length > 1 ? ` <span>+${names.length - 1} more</span>` : '') : 'No contact person yet'}</p></div></header>
       <div class="cc-c">${p0.email ? `<span>${ic.mail}<span class="cc-v">${esc(p0.email)}</span></span>` : ''}${p0.phone ? `<span>${ic.phone}<span class="cc-v num">${esc(p0.phone)}</span></span>` : ''}${!p0.email && !p0.phone ? '<span class="cc-none">No email or phone saved</span>' : ''}</div>
+      ${managerOf(c) ? `<p class="cc-m"><span class="cc-m-av" style="background:${esc(AV_COLORS[[...managerOf(c).name].reduce((a, ch) => a + ch.charCodeAt(0), 0) % AV_COLORS.length])}">${esc(initials(managerOf(c).name))}</span><span>Looked after by <b>${esc(managerOf(c).name)}</b></span></p>` : ''}
       <footer class="cc-f"><span><b class="num">${quotes.length}</b> ${quotes.length === 1 ? 'quote' : 'quotes'}</span><span><b class="num">${invoices.length}</b> ${invoices.length === 1 ? 'invoice' : 'invoices'}</span>${owed ? `<span class="cc-owed">${money(owed)} owed</span>` : '<span class="cc-ok">Nothing owed</span>'}</footer>
     </article>`; }).join('');
   const seg = state.clients.length ? `<div class="seg cl-seg" role="group" aria-label="Show customers">${[['active', 'Active', nAct], ['inactive', 'Inactive', nIn], ['all', 'All', state.clients.length]].map(([k, l, n]) => `<button type="button" data-cl-show="${k}" aria-pressed="${f === k}">${l} <span class="num">${n}</span></button>`).join('')}</div>` : '';
@@ -3175,6 +3197,7 @@ function userDialog(u) {
     <div class="field"><span>Role</span><div class="roles">${Object.entries(ROLES).filter(([k]) => k !== 'owner').map(([k, [l, d]]) => `<label class="rolecard"><input type="radio" name="us-role" value="${k}" ${x.role === k ? 'checked' : ''}><span><b>${l}</b><span class="sub">${d}</span></span></label>`).join('')}</div></div>
     <div class="field" ${x.role === 'admin' ? 'hidden' : ''} id="us-acc"><span>Can open</span><div class="acc-grid">${ACCESS.map(([k, l]) => `<label class="chk"><input type="checkbox" data-acc="${k}" ${x.access[k] ? 'checked' : ''}><span>${l}</span></label>`).join('')}</div></div>
     ${isNew ? '' : `<label class="chk"><input type="checkbox" id="us-active" ${x.active !== false ? 'checked' : ''}><span>Can sign in (untick to disable without removing)</span></label>
+      <div class="us-reset"><div><b>Someone else taking over?</b><span class="sub">Change the name, username and email to a new person. They get a fresh sign-in, and everything that was ${esc(firstName(x.name) || 'theirs')}’s moves to them.</span></div><button type="button" class="btn small" data-us-hand>Change person</button></div>
       <div class="us-reset"><div><b>Forgot their password?</b><span class="sub">We email ${esc(x.email)} a link to choose a new one.</span></div><button type="button" class="btn small" data-us-reset>Send reset email</button></div>`}`;
   const read = m => ({ name: $('#us-name', m).value.trim(), role: ($('[name=us-role]:checked', m) || {}).value || 'staff', access: Object.fromEntries($$('[data-acc]', m).map(c => [c.dataset.acc, c.checked])) });
   openModal(dlg(isNew ? 'Add a team member' : 'Team member', body(), `${isNew ? '' : '<button class="btn ghost danger" data-us-del style="margin-right:auto">Remove</button>'}<button class="btn ghost" data-close>Cancel</button><button class="btn primary" data-us-save>${isNew ? 'Add person' : 'Save'}</button>`), m => {
@@ -3183,7 +3206,9 @@ function userDialog(u) {
       const r = read(m), now = new Date().toISOString();
       if (!isNew) {
         const v = { ...r, active: $('#us-active', m).checked, updatedAt: now };
-        try { await db.collection('users').doc(x.id).update(v); closeModal(); toast('Saved'); logActivity('team', `Updated team member ${v.name || x.login || x.email} (${ROLES[v.role][0]}${v.active ? '' : ', disabled'})`, ''); } catch { toast('Not saved. Check your connection.'); }
+        try { await db.collection('users').doc(x.id).update(v);
+          if (v.name && x.name && norm(v.name) !== norm(x.name)) await handOverRecords({ id: x.id, name: x.name }, { id: x.id, name: v.name });
+          closeModal(); toast('Saved'); logActivity('team', `Updated team member ${v.name || x.login || x.email} (${ROLES[v.role][0]}${v.active ? '' : ', disabled'})`, ''); } catch { toast('Not saved. Check your connection.'); }
         return;
       }
       const a = readAccount(m, 'us');
@@ -3203,12 +3228,50 @@ function userDialog(u) {
       logActivity('team', `Added team member ${v.name} (${ROLES[v.role][0]})`, '');
       loginDetailsDialog('Team member added', v.name, acc, a.pass, SLUG);
     });
+    const hb = $('[data-us-hand]', m); if (hb) hb.addEventListener('click', () => handOverDialog(x));
     const rs = $('[data-us-reset]', m); if (rs) rs.addEventListener('click', async () => {
       if (!(window.STUDIO && window.STUDIO.sendReset)) { toast('Open Novyra Desk at novyradesk.com to send reset emails.'); return; }
       rs.disabled = true; try { await window.STUDIO.sendReset(x.email); toast(`Reset email sent to ${x.email}`); } catch (err) { toast(loginErr(err)); } rs.disabled = false; });
     const del = $('[data-us-del]', m); if (del) del.addEventListener('click', () => openModal(dlg('Remove team member', `<p class="lead">Remove <b>${esc(x.name || x.login || x.email)}</b> from the team?</p><p class="sub">They can’t sign in to this desk any more. Everything they made stays, with their name on it. Adding them again later with the same email gives their access back.</p>`,
       '<button class="btn ghost" data-close>Keep</button><button class="btn danger-solid" data-yes>Remove</button>', 'small'), m2 => $('[data-yes]', m2).addEventListener('click', async () => {
         try { await db.collection('users').doc(x.id).update({ active: false, removed: true, removedAt: new Date().toISOString() }); closeModal(); toast('Removed'); logActivity('team', `Removed team member ${x.name || x.login || x.email}`, ''); } catch { toast('Not removed. Check your connection.'); } })));
+  });
+}
+// change person: a new account (fresh set-up for them) takes over this seat and everything the previous person had
+function handOverDialog(x, isOwnerSeat) {
+  const prev = x.name || x.login || x.email || 'the previous person';
+  openModal(dlg(isOwnerSeat ? 'Hand the business over' : 'Change person', `<p class="lead">${isOwnerSeat ? `The new owner gets their own sign-in and sets up their account from scratch. Everything that was <b>${esc(prev)}</b>’s moves to them, and <b>you’ll be signed out</b> for good.` : `The new person gets their own sign-in and sets up their account from scratch. ${esc(prev)} can’t sign in any more.`}</p>
+    <p class="sub">${esc(firstName(prev) || prev)}’s quotes, invoices, monthly billing, expenses and customers move to the new person.</p>
+    <label class="field"><span>New person’s name</span><input id="ho-name" autofocus></label>
+    ${accountFieldsHTML('ho', startPassword(deskName()))}`,
+    `<button class="btn ghost" data-close>Cancel</button><button class="btn primary" data-ho-go>${isOwnerSeat ? 'Hand over' : 'Change person'}</button>`), m => {
+    $('[data-ho-go]', m).addEventListener('click', async e => {
+      const name = $('#ho-name', m).value.trim(), a = readAccount(m, 'ho');
+      if (!name) { toast('Type the new person’s name.'); $('#ho-name', m).focus(); return; }
+      const bad = accountProblem(a); if (bad) { toast(bad[0]); $('#ho-' + bad[1], m).focus(); return; }
+      if (a.email === (x.email || '').toLowerCase()) { toast('That’s the same email address. Use the new person’s own email.'); return; }
+      const btn = e.currentTarget; btn.disabled = true; btn.textContent = 'Working…';
+      let acc; try { acc = await makeLogin(a.username, a.email, a.pass, SLUG); } catch (err) { btn.disabled = false; btn.textContent = isOwnerSeat ? 'Hand over' : 'Change person'; toast(loginErr(err)); return; }
+      const now = new Date().toISOString(), from = { id: isOwnerSeat ? ownerKey() : x.id, name: x.name || '' }, to = { id: acc.uid, name };
+      try {
+        await acc.claim();
+        const moved = await handOverRecords(from, to);
+        if (isOwnerSeat) {
+          await db.doc('settings/profile').set({ name, email: acc.email, phone: '', title: '', initials: initials(name), color: OWNER.color || AV_COLORS[0], updatedAt: now });
+          await window.STUDIO.raw.doc('companies/' + SLUG).update({ owners: [acc.email], ownerUids: [acc.uid], ownerLogin: acc.username, mustChange: [acc.uid], handedOverAt: now });
+          logActivity('team', `Handed the business over from ${from.name || 'the previous owner'} to ${name}`, '');
+          loginDetailsDialog('Business handed over', name, acc, a.pass, SLUG);
+          const d = $('#modal .dialog > footer'); if (d) d.insertAdjacentHTML('afterbegin', '<span class="sub" style="margin-right:auto">Copy the details now. You’ll be signed out when you close this.</span>');
+          $$('#modal [data-close]').forEach(b => b.addEventListener('click', () => setTimeout(() => window.STUDIO.signOut(), 100)));
+          return;
+        }
+        const { id, ...rest } = x;
+        await db.collection('users').doc(acc.uid).set({ ...rest, uid: acc.uid, name, email: acc.email, login: acc.username, active: true, removed: false, mustChange: true, takesOverFrom: id, addedAt: now, addedBy: ME.name || OWNER.name, updatedAt: now });
+        await db.collection('users').doc(id).update({ active: false, removed: true, removedAt: now, handedOverTo: acc.uid });
+        logActivity('team', `${name} took over from ${from.name || 'a team member'}${moved ? ` (${moved} records moved)` : ''}`, '');
+        loginDetailsDialog(`${name} has taken over`, name, acc, a.pass, SLUG);
+      } catch { btn.disabled = false; btn.textContent = isOwnerSeat ? 'Hand over' : 'Change person'; toast('Not finished. Check your connection and try again.'); }
+    });
   });
 }
 const CHEV_UP = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg>';
@@ -3406,7 +3469,7 @@ function setTeamHTML() {
       <footer><span class="sub">${u.addedAt ? `Added ${fmtDate(u.addedAt.slice(0, 10))}${u.addedBy ? ' by ' + esc(u.addedBy) : ''}` : ''}</span><span class="tm-edit">Edit</span></footer></article>`; };
   const owner = `<article class="tm-card tm-owner"><header><span class="tm-av" style="background:${esc(OWNER.color || AV_COLORS[0])}">${esc(userInitials(OWNER))}</span>
       <div class="tm-who"><b>${esc(OWNER.name)}</b><span>${esc(SLUG ? ([(COMPANY() || {}).ownerLogin, ((COMPANY() || {}).owners || [])[0]].filter(Boolean).join(' · ')) : OWNER_LOGIN)}</span></div><span class="pill accepted">Owner</span></header>
-      <p class="tm-role">${esc(ROLES.owner[1])}</p><div class="tm-chips"><span class="tm-chip all">Everything</span></div><footer><span class="sub">That’s you</span></footer></article>`;
+      <p class="tm-role">${esc(ROLES.owner[1])}</p><div class="tm-chips"><span class="tm-chip all">Everything</span></div><footer><span class="sub">${isOwnerLogin() ? 'That’s you' : ''}</span>${SLUG && isOwnerLogin() && window.STUDIO && window.STUDIO.createLogin ? '<button type="button" class="btn small" data-owner-hand>Hand over</button>' : ''}</footer></article>`;
   const invite = can('team') ? `<button type="button" class="tm-card tm-add" data-user-add><span class="tm-plus">${sicon('plus')}</span><b>Add a team member</b><span class="sub">Give someone their own sign-in and choose what they can open.</span></button>` : '';
   const roles = `<section class="scard"><header class="scard-h"><span class="scard-ic">${sicon('lock')}</span><div class="scard-t"><h3>Roles</h3><p>What each role can do.</p></div></header>
       <div class="tm-roles">${Object.entries(ROLES).map(([k, [l, d]]) => `<div><span class="pill ${k === 'owner' || k === 'admin' ? 'accepted' : 'open'}">${esc(l)}</span><p>${esc(d)}</p></div>`).join('')}</div>
@@ -3480,6 +3543,7 @@ function bindList(main) {
       o.textContent = `Sent to ${mailCfg().notifyTo || OWNER.email}.${j.quota != null ? ` ${j.quota} emails left today.` : ''}`; if (j.quota != null) db.doc('settings/email').set({ ...mailCfg(), quota: j.quota }).catch(() => {}); }
     catch (e) { o.textContent = 'Not sent: ' + e.message; } et.disabled = false; });
   $$('[data-user-add]', main).forEach(ua => ua.addEventListener('click', () => userDialog(null)));
+  const oh = $('[data-owner-hand]', main); if (oh) oh.addEventListener('click', () => handOverDialog({ name: OWNER.name, email: ((COMPANY() || {}).owners || [])[0] || OWNER.email, login: (COMPANY() || {}).ownerLogin }, true));
   $$('[data-user]', main).forEach(r => { const o = () => userDialog(state.users.find(u => u.id === r.dataset.user)); r.addEventListener('click', o); r.addEventListener('keydown', e => { if (e.key === 'Enter') o(); }); });
   const aa = $('[data-act-all]', main); if (aa) aa.addEventListener('click', () => { view.actAll = true; render(); });
   const saveMenu = async groups => { const v = { v: MENU_V, groups: groups.map(g => ({ k: g.k, items: g.items.map(i => i[0]) })), hidden: groups.flatMap(g => g.items.filter(i => i[3]).map(i => i[0])) }; state.menu = v; render(); try { await db.doc('menus/' + menuKey()).set(v); } catch { toast('Not saved. Check your connection.'); } };
@@ -3672,12 +3736,12 @@ async function restoreDialog(file) {
 
 /* ---------- create ---------- */
 async function newDoc(kind, from, client, chosen) {
-  const id = uid(), now = new Date().toISOString(), d = todayIso(), by = ME.name;
+  const id = uid(), now = new Date().toISOString(), d = todayIso(), by = ME.name, byUid = myKey();
   let doc;
   if (kind === 'quote') {
     const cl = client ? clientSnap(client, chosen) : from ? clone(from.client) : {};
     doc = { id, number: nextQuote(), rev: 1, status: 'Draft', date: d, validUntil: addDays(d, 30), clientId: client ? client.id : from ? from.clientId || null : null, client: cl,
-      items: [{ item: '', details: '', qty: 1, rate: 0, discount: 0 }], rush: 0, notes: '', createdBy: by, createdAt: now, updatedAt: now, shareId: newToken(),
+      items: [{ item: '', details: '', qty: 1, rate: 0, discount: 0 }], rush: 0, notes: '', createdBy: by, createdByUid: byUid, createdAt: now, updatedAt: now, shareId: newToken(),
       history: [{ at: now, rev: 1, title: from ? `Created by ${by} for extra work on ${qRef(from)}` : `Quote created by ${by}`, changes: [] }] };
   } else {
     if (!from || from.status !== 'Accepted') { toast('Invoices are made from an accepted quote.'); return; }
@@ -3877,6 +3941,10 @@ function clientDialog(c, onSaved, onCancel) {
       <div class="actions"><label class="btn small">${x.logo ? 'Replace' : 'Upload logo'}<input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" data-logo hidden></label>${x.logo ? '<button type="button" class="btn small" data-logo-crop>Crop and adjust</button><button type="button" class="btn small ghost danger" data-logo-del>Remove</button>' : ''}</div></div></div></section>
     <section class="cbox"><label class="field"><span>Business name</span><input id="cl-business" value="${esc(x.business)}" ${isNew ? 'autofocus' : ''}></label>
       <div class="addr-grid">${ADDR_KEYS.map(([k, l]) => `<label class="field ${k === 'street' ? 'wide' : ''}"><span>${l}</span><input data-addr="${k}" value="${esc(x.addr[k])}" ${k === 'country' ? 'placeholder="South Africa"' : k === 'code' ? 'inputmode="numeric"' : ''} autocomplete="${{ street: 'address-line1', suburb: 'address-line2', city: 'address-level2', province: 'address-level1', code: 'postal-code', country: 'country-name' }[k]}"></label>`).join('')}</div>
+      <label class="field"><span>Account manager / sales consultant</span><select id="cl-mgr">${(() => { const ppl = deskPeople(), cur = managerOf(x) || (isNew ? { id: myKey() } : null);
+        const has = cur && ppl.some(p => p.id === cur.id); return (cur && !has && cur.name ? `<option value="${esc(cur.id)}" selected>${esc(cur.name)} (no longer on the team)</option>` : '')
+          + (isNew ? '' : `<option value="" ${cur ? '' : 'selected'}>Nobody yet</option>`) + ppl.map(p => `<option value="${esc(p.id)}" ${cur && cur.id === p.id ? 'selected' : ''}>${esc(p.name)}</option>`).join(''); })()}</select>
+        <span class="sub">The person who looks after this customer.</span></label>
       <label class="field"><span>Registration or VAT no. (optional)</span><input id="cl-reg" value="${esc(x.reg)}"></label>
       <label class="field"><span>Private notes (never printed)</span><textarea id="cl-notes" rows="2">${esc(x.notes)}</textarea></label>
       <label class="chk switch cl-act"><input type="checkbox" id="cl-active" ${x.inactive ? '' : 'checked'}><span>Active customer</span></label><span class="sub cl-act-sub">Inactive customers are hidden from new quotes and the main list. Their quotes and invoices stay.</span></section>
@@ -3893,6 +3961,7 @@ function clientDialog(c, onSaved, onCancel) {
   const canRemove = !isNew && !list.length;
   const foot = `${canRemove ? '<button class="btn ghost danger" data-remove-client style="margin-right:auto">Remove customer</button>' : ''}${isNew || onSaved ? '' : '<button class="btn" data-quote-client style="margin-right:auto">New quote for this customer</button>'}<button class="btn ghost" data-cancel>Cancel</button><button class="btn primary" data-save-client>${isNew ? 'Save customer' : 'Save changes'}</button>`;
   const readAll = m => {
+    { const sel = $('#cl-mgr', m); if (sel) { const p = deskPeople().find(o => o.id === sel.value); x.manager = p ? { id: p.id, name: p.name } : sel.value && managerOf(x) && managerOf(x).id === sel.value ? x.manager : null; } }
     x.business = $('#cl-business', m).value.trim(); x.reg = $('#cl-reg', m).value.trim(); x.notes = $('#cl-notes', m).value.trim(); { const a = $('#cl-active', m); if (a) x.inactive = !a.checked; }
     $$('[data-addr]', m).forEach(i => { x.addr[i.dataset.addr] = i.value.trim(); }); x.address = addrOf({ addr: x.addr });
     fin = Object.fromEntries($$('[data-fin]', m).map(i => [i.dataset.fin, i.value.trim()]));
@@ -3921,7 +3990,7 @@ function clientDialog(c, onSaved, onCancel) {
       if (fin.email && !/^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/.test(fin.email)) { toast('The finance email address doesn’t look right.'); $('[data-fin=email]', m).focus(); return; }
       const btn = e.currentTarget; btn.disabled = true;
       const now = new Date().toISOString(), id = x.id || uid();
-      const rec = { business: x.business, avColor: x.avColor || (isNew ? CLIENT_COLORS[Math.floor(Math.random() * CLIENT_COLORS.length)] : clientColor(x)), logo: x.logo || '', logoSrc: x.logoSrc || '', logoCrop: x.logoCrop || null, finance: fin, contacts: ppl, address: x.address, addr: x.addr, reg: x.reg, notes: x.notes, inactive: !!x.inactive, createdAt: x.createdAt || now, updatedAt: now, createdBy: x.createdBy || OWNER.name };
+      const rec = { business: x.business, avColor: x.avColor || (isNew ? CLIENT_COLORS[Math.floor(Math.random() * CLIENT_COLORS.length)] : clientColor(x)), logo: x.logo || '', logoSrc: x.logoSrc || '', logoCrop: x.logoCrop || null, finance: fin, contacts: ppl, address: x.address, addr: x.addr, reg: x.reg, notes: x.notes, inactive: !!x.inactive, manager: x.manager || null, createdAt: x.createdAt || now, updatedAt: now, createdBy: x.createdBy || OWNER.name };
       try { await db.collection('clients').doc(id).set(rec); }
       catch { btn.disabled = false; toast('Not saved. Check your connection and try again.'); return; }
       const saved = { id, ...rec };

@@ -56,6 +56,7 @@ await step('Add a customer', async () => {
   await pg.locator('#modal .pcard').nth(0).locator('[data-pf=email]').fill('lindiwe@functiontest.test');
   await pg.click('[data-save-client]'); await W(1200);
   check('New customer shows in the Active list', (await text()).includes(NAME));
+  check('A new customer is looked after by whoever added it', /Looked after by/.test(await pg.locator(`.cc:has-text("${NAME}")`).innerText()));
   const cs = await list(CO + 'clients'); if (cs) check('Customer is saved in the company’s space', cs.some(c => c.business === NAME));
 });
 await step('Mark a customer inactive', async () => {
@@ -215,6 +216,45 @@ await step('Add a team member with their own sign-in', async () => {
     await pg.locator('[data-user-add]').first().click(); await W(600);
     await pg.fill('#us-name', 'Pieter Test'); await pg.fill('#us-user', 'pieter'); await pg.fill('#us-email', 'pieter@karoo.test'); await pg.click('[data-us-save]'); await W(1800);
     check('Adding them again with the same email gives their access back', (await text()).includes('Pieter Test') && ((await list(CO + 'users')).find(u => u.login === 'pieter') || {}).active === true);
+
+    console.log('7b. Account manager and changing the person');
+    const pieterUid = ((await list(CO + 'users')).find(u => u.login === 'pieter') || {}).id;
+    // a quote Pieter made, written straight into the company's records
+    await fetch(`${FS}/${CO}quotes?documentId=pieterq`, { method: 'POST', headers: adminH, body: JSON.stringify({ fields: { number: { integerValue: 7001 }, status: { stringValue: 'Draft' }, rev: { integerValue: 1 }, date: { stringValue: '2026-11-19' }, createdBy: { stringValue: 'Pieter Test' }, createdByUid: { stringValue: pieterUid }, client: { mapValue: { fields: { business: { stringValue: 'Function Test Co' } } } }, items: { arrayValue: { values: [] } } } }) });
+    await go('clients'); await pg.click(`.cc:has-text("${'Function Test Co'}")`); await W(600);
+    check('Customer form offers the team as account managers', (await pg.locator('#cl-mgr option').allInnerTexts()).some(t => t.includes('Pieter Test')));
+    await pg.selectOption('#cl-mgr', { label: 'Pieter Test' }); await pg.click('[data-save-client]'); await W(1500);
+    check('Customer card shows who looks after them', /Looked after by\s*Pieter Test/.test(await pg.locator('.cc:has-text("Function Test Co")').innerText()));
+    let fc = ((await list(CO + 'clients')).find(c => c.business === 'Function Test Co') || {});
+    check('Account manager is saved on the customer', (fc.manager || {}).id === pieterUid, JSON.stringify(fc.manager));
+    await go('team'); await pg.click('[data-user]:has-text("Pieter Test")'); await W(500); await pg.click('[data-us-hand]'); await W(500);
+    check('Change person starts with the company-name password', (await pg.inputValue('#ho-pass')) === 'karoocycles');
+    await pg.fill('#ho-name', 'Lerato Test'); await pg.fill('#ho-user', 'lerato'); await pg.fill('#ho-email', 'lerato@karoo.test'); await pg.click('[data-ho-go]'); await W(4000);
+    const hcard = await pg.locator('#modal .login-card').innerText().catch(() => '');
+    check('New person’s sign-in details are shown', hcard.includes('lerato') && hcard.includes('lerato@karoo.test'), hcard.replace(/\s+/g, ' '));
+    await pg.click('#modal [data-close]'); await W(800);
+    check('Team page shows the new person, not the old one', (await text()).includes('Lerato Test') && !(await text()).includes('Pieter Test'));
+    const us2 = await list(CO + 'users'), le = us2.find(u => u.login === 'lerato'), pi = us2.find(u => u.login === 'pieter');
+    check('New person gets a fresh account that must be set up', !!le && le.id !== pieterUid && le.mustChange === true && le.role === 'staff' && le.email === 'lerato@karoo.test', JSON.stringify(le || {}));
+    check('Old person is switched off', pi && pi.active === false && pi.removed === true);
+    const pq = (await list(CO + 'quotes')).find(q => q.id === 'pieterq') || {};
+    check('Pieter’s quote now falls under Lerato', pq.createdBy === 'Lerato Test' && pq.createdByUid === (le || {}).id, JSON.stringify({ by: pq.createdBy }));
+    fc = ((await list(CO + 'clients')).find(c => c.business === 'Function Test Co') || {});
+    check('Pieter’s customers are now looked after by Lerato', (fc.manager || {}).name === 'Lerato Test' && (fc.manager || {}).id === (le || {}).id);
+    const c4 = await b.newContext(), p4 = await c4.newPage(); p4.on('pageerror', e => errors.push('lerato: ' + e.message));
+    await p4.goto(`http://127.0.0.1:${PORT}/karoo-cycles/?emu=1`); await p4.waitForSelector('#g-email', { state: 'visible', timeout: 30000 });
+    await p4.fill('#g-email', 'lerato'); await p4.fill('#g-pass', 'karoocycles'); await p4.click('#g-submit');
+    await p4.waitForSelector('#g-setup:not([hidden])', { timeout: 30000 }).catch(() => {});
+    check('The new person sets up their account from scratch', await p4.locator('#g-setup').isVisible());
+    await p4.fill('#s-pass', 'Lerato-Own4!'); await p4.fill('#s-pass2', 'Lerato-Own4!'); await p4.click('#s-submit');
+    check('…and opens the desk', await p4.waitForFunction(() => document.getElementById('gate').hidden && document.querySelector('.appbar'), null, { timeout: 30000 }).then(() => true, () => false));
+    await W(2000); await p4.evaluate(() => location.hash = '#quotes'); await W(1200);
+    check('The new person sees the quote they took over', (await p4.evaluate(() => document.getElementById('main').innerText)).includes('7001'));
+    await c4.close();
+    const c5 = await b.newContext(), p5 = await c5.newPage(); await p5.goto(`http://127.0.0.1:${PORT}/karoo-cycles/?emu=1`); await p5.waitForSelector('#g-email', { state: 'visible', timeout: 30000 });
+    await p5.fill('#g-email', 'pieter'); await p5.fill('#g-pass', 'Pieter-Own3!'); await p5.click('#g-submit'); await W(4000);
+    check('The old person can’t get in any more', /isn’t on this company’s team/.test(await p5.locator('#g-msg').innerText().catch(() => '')));
+    await c5.close();
   }
 });
 
