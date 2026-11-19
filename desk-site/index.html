@@ -2056,8 +2056,14 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
           if (t.data().mustChange) setup = () => t.ref.update({ mustChange: false });
           if (t.data().login) S.login = t.data().login;
         }
+        // Novyra's owner gets in by their email address, so it has to be confirmed first (an account added in Firebase isn't)
+        else if (!u.emailVerified && providers.includes('password')) throw { code: 'unverified' };
       }
-    } catch (e) { showGate(); busy(true); sayTop(e && e.code === 'permission-denied' ? (SLUG ? 'You’re signed in, but this account isn’t on this company’s team. Ask the company’s owner to add you.' : 'You’re signed in, but this account doesn’t have access. Ask the owner to add you to the team.') : 'There’s no company at this address yet. Check the link you were given.', 'bad'); await auth.signOut().catch(() => {}); setTimeout(() => busy(false), 1500); return; }
+    } catch (e) {
+      if (e && e.code === 'unverified') { showGate(); busy(true); let sent = true; try { await u.sendEmailVerification(); } catch { sent = false; }
+        sayTop(sent ? `Confirm your email address first. We’ve sent a link to ${u.email}. Open it, then sign in again.` : `Confirm your email address first. Open the confirmation link we sent to ${u.email}, then sign in again.`, 'good');
+        await auth.signOut().catch(() => {}); setTimeout(() => busy(false), 1500); return; }
+      showGate(); busy(true); sayTop(e && e.code === 'permission-denied' ? (SLUG ? 'You’re signed in, but this account isn’t on this company’s team. Ask the company’s owner to add you.' : 'You’re signed in, but this account doesn’t have access. Ask the owner to add you to the team.') : 'There’s no company at this address yet. Check the link you were given.', 'bad'); await auth.signOut().catch(() => {}); setTimeout(() => busy(false), 1500); return; }
     if (setup) return firstSetup(u, setup);
     hideGate();
     if (!started) { started = true; resolveReady(); }

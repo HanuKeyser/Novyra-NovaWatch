@@ -187,6 +187,10 @@ const x2 = await open('/karoo-cycles/?emu=1', 'novyra-at-karoo'); await forceSig
 const m2 = await gateMsg(x2); check('Novyra owner is turned away from the company’s desk', m2.shown && /isn’t on this company’s team/.test(m2.msg), m2.msg);
 const x3 = await open('/karoo-cycles/?emu=1', 'stranger'); await signIn(x3, 'stranger@else.test', PW);
 const m3 = await gateMsg(x3); check('A stranger is turned away from the company’s desk', m3.shown && /isn’t on this company’s team/.test(m3.msg), m3.msg);
+// an account added straight in Firebase (email not confirmed yet) is asked to confirm it before Novyra's desk opens
+await fetch(`${AUTH}/identitytoolkit.googleapis.com/v1/accounts:signUp?key=test`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: 'fresh@else.test', password: PW, returnSecureToken: true }) });
+const x4u = await open('/?emu=1', 'unconfirmed'); await signIn(x4u, 'fresh@else.test', PW);
+const m4u = await gateMsg(x4u); check('An unconfirmed email is asked to confirm it first, and isn’t let in', m4u.shown && /Confirm your email address first/.test(m4u.msg), m4u.msg);
 const x4 = await open('/no-such-co/?emu=1', 'nobody'); await W(2500);
 check('A mistyped business address says it doesn’t exist and still offers email sign-in', /doesn’t exist/.test(await x4.locator('#g-title').innerText()) && await x4.locator('#g-email').isVisible());
 await x4.fill('#g-email', OWNER_EMAIL); await x4.click('#g-next'); await x4.waitForURL(/\/karoo-cycles\//, { timeout: 15000 }).catch(() => {});
