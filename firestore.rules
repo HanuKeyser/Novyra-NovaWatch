@@ -12,7 +12,7 @@ service cloud.firestore {
 
     // ── NOVYRA (novyradesk.com) ─────────────────────────────────────────────
     // Novyra's own records sit at the top level. Only Novyra's owners and team can use them.
-    function isOwner() { return signedIn() && myEmail() in ['hanu@keysers.cc', 'hanukeyser@gmail.com']; }
+    function isOwner() { return signedIn() && myEmail() == 'hanu@keysers.cc'; }
     function userDoc() { return /databases/$(database)/documents/users/$(me()); }
     function member() { return authed() && exists(userDoc()) && get(userDoc()).data.active == true; }
     function editor() { return member() && get(userDoc()).data.role in ['admin', 'staff']; }

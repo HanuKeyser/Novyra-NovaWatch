@@ -40,7 +40,8 @@ const t = async (name, p) => { n++; try { await p; console.log('  ok  ' + name);
 
 console.log('Novyra (novyradesk.com)');
 await t('Novyra owner reads Novyra customers', assertSucceeds(getDoc(doc(hanu, 'clients/n1'))));
-await t('Novyra owner (Gmail login, any letter case) reads Novyra customers', assertSucceeds(getDoc(doc(hanuG, 'clients/n1'))));
+await t('The old Gmail login is no longer Novyra’s owner', assertFails(getDoc(doc(hanuG, 'clients/n1'))));
+await t('Novyra owner (any letter case) reads Novyra customers', assertSucceeds(getDoc(doc(as('Hanu@Keysers.cc'), 'clients/n1'))));
 await t('Novyra owner writes Novyra records', assertSucceeds(setDoc(doc(hanu, 'quotes/q1'), { n: 1 })));
 await t('Novyra owner cannot read a company’s customers', assertFails(getDoc(doc(hanu, 'companies/karoo/clients/k1'))));
 await t('Novyra owner cannot list a company’s customers', assertFails(getDocs(collection(hanu, 'companies/karoo/clients'))));
