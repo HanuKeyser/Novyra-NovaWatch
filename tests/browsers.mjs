@@ -47,7 +47,7 @@ for (const [label, type] of MOCK ? [['Chrome', 'chromium']] : [['Chrome', 'chrom
   await pg.goto(URLB + '/karoo-cycles/?emu=1'); await pg.waitForSelector('#g-email', { state: 'visible', timeout: 30000 });
   for (const [sz, w, h] of SIZES) { await pg.setViewportSize({ width: w, height: h }); await W(300); const L = await pg.evaluate(() => { const se = document.scrollingElement; return se.scrollWidth > se.clientWidth + 1; }); check(`${label} ${sz}: sign-in page fits`, !L); }
   await pg.setViewportSize({ width: 1440, height: 900 });
-  await pg.fill('#g-email', 'owner@karoo.test'); await pg.fill('#g-pass', 'Karoo-Owner2!'); await pg.click('#g-submit');
+  await pg.fill('#g-email', 'owner@karoo.test'); await pg.click('#g-next'); await pg.waitForSelector('#g-pass', { state: 'visible', timeout: 15000 }); await pg.fill('#g-pass', 'Karoo-Owner2!'); await pg.click('#g-submit');
   const inApp = await pg.waitForFunction(() => document.getElementById('gate').hidden && document.querySelector('.appbar'), null, { timeout: 30000 }).then(() => true, () => false);
   check(`${label}: signs in`, inApp); if (!inApp) { await br.close(); continue; }
   await W(2500); }

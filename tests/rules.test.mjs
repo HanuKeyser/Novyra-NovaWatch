@@ -137,6 +137,18 @@ await t('Brand cards only hold a name and logo', assertFails(setDoc(doc(acmeBoss
 await t('Novyra’s team cannot change brand cards', assertFails(setDoc(doc(novStaff, 'brands/acme'), { name: 'Hacked' })));
 await t('Novyra’s owner writes the first brand card for a new company', assertSucceeds(setDoc(doc(hanu, 'brands/newer-co'), { name: 'Newer', logo: '', updatedAt: 'now' })));
 
+console.log('Email-to-desk lookup (sign-in step 1)');
+await t('Company owner records which desk a new account signs in to', assertSucceeds(setDoc(doc(acmeBoss, 'accounts/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), { desk: 'acme', uid: 'acme-new' })));
+await t('Anyone can look up one email (step 1 of signing in needs it)', assertSucceeds(getDoc(doc(anon, 'accounts/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'))));
+await t('Nobody can list the accounts', assertFails(getDocs(collection(anon, 'accounts'))));
+await t('A team member records their own desk after signing in', assertSucceeds(setDoc(doc(acmeStaff, 'accounts/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'), { desk: 'acme', uid: 'acme-staff' })));
+await t('Nobody can point their account at a desk they aren’t on', assertFails(setDoc(doc(acmeStaff, 'accounts/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc'), { desk: 'novyra', uid: 'acme-staff' })));
+await t('A stranger cannot point someone at a company’s desk', assertFails(setDoc(doc(stranger, 'accounts/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc'), { desk: 'acme', uid: 'x' })));
+await t('Staff cannot record accounts for other people', assertFails(setDoc(doc(acmeStaff, 'accounts/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc'), { desk: 'acme', uid: 'someone-else' })));
+await t('Only scrambled email keys are allowed', assertFails(setDoc(doc(acmeBoss, 'accounts/boss@acme.test'), { desk: 'acme', uid: 'x' })));
+await t('Accounts only hold a desk and an account id', assertFails(setDoc(doc(acmeBoss, 'accounts/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc'), { desk: 'acme', uid: 'x', email: 'e@x.test' })));
+await t('Novyra team member records their own desk', assertSucceeds(setDoc(doc(novStaff, 'accounts/dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd'), { desk: 'novyra', uid: 'nov-staff' })));
+
 console.log('Customers opening links');
 await t('Customer opens a Novyra link', assertSucceeds(getDoc(doc(anon, 'shares/novkey1234567890ab'))));
 await t('Customer opens a company link', assertSucceeds(getDoc(doc(anon, 'companies/karoo/shares/karkey1234567890ab'))));

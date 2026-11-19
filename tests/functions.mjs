@@ -42,7 +42,7 @@ if (MOCK) { await pg.goto('file://' + MOCK); await W(2500); }
 else {
   await pg.goto(`http://127.0.0.1:${PORT}/karoo-cycles/?emu=1`);
   await pg.waitForSelector('#g-email', { state: 'visible', timeout: 30000 });
-  await pg.fill('#g-email', 'owner@karoo.test'); await pg.fill('#g-pass', 'Karoo-Owner2!'); await pg.click('#g-submit');
+  await pg.fill('#g-email', 'owner@karoo.test'); await pg.click('#g-next'); await pg.waitForSelector('#g-pass', { state: 'visible', timeout: 15000 }); await pg.fill('#g-pass', 'Karoo-Owner2!'); await pg.click('#g-submit');
   await pg.waitForFunction(() => document.getElementById('gate').hidden && document.querySelector('.appbar'), null, { timeout: 30000 });
   await W(2500);
 }
@@ -68,7 +68,9 @@ await step('Mark a customer inactive', async () => {
   const cs = await list(CO + 'clients'); if (cs) check('Inactive is saved', (cs.find(c => c.business === NAME) || {}).inactive === true);
   await go('quotes'); await pg.click('[data-new]'); await W(500);
   await pg.fill('#modal .cust', 'Function'); await W(400);
-  check('Inactive customer isn’t offered for a new quote', !(await pg.locator('#modal .combo-list li:not(.add)', { hasText: NAME }).count()));
+  check('Inactive customer still shows when searched for, tagged Inactive', (await pg.locator('#modal .combo-list li:not(.add)', { hasText: NAME }).locator('.cc-tag').count()) === 1);
+  await pg.fill('#modal .cust', ''); await W(300);
+  check('…but isn’t in the list before you search', !(await pg.locator('#modal .combo-list li:not(.add)', { hasText: NAME }).count()));
   await pg.keyboard.press('Escape'); await W(300); if (await modal().isVisible().catch(() => false)) await pg.click('#modal [data-close]').catch(() => {});
   await go('clients');
   await pg.click(`.cc:has-text("${NAME}")`); await W(500); await pg.check('#cl-active'); await pg.click('[data-save-client]'); await W(1200);
@@ -196,7 +198,7 @@ await step('Add a team member with their own sign-in', async () => {
   if (!MOCK) {
     const c2 = await b.newContext({ viewport: { width: 390, height: 844 } }), p2 = await c2.newPage(); p2.on('pageerror', e => errors.push('pieter: ' + e.message));
     await p2.goto(`http://127.0.0.1:${PORT}/karoo-cycles/?emu=1`); await p2.waitForSelector('#g-email', { state: 'visible', timeout: 30000 });
-    await p2.fill('#g-email', 'pieter'); await p2.fill('#g-pass', startPw); await p2.click('#g-submit');
+    await p2.fill('#g-email', 'pieter@karoo.test'); await p2.click('#g-next'); await p2.waitForSelector('#g-pass', { state: 'visible', timeout: 15000 }); await p2.fill('#g-pass', startPw); await p2.click('#g-submit');
     await p2.waitForSelector('#g-setup:not([hidden])', { timeout: 30000 }).catch(() => {});
     check('Team member signs in with their username and is asked to set up', await p2.locator('#g-setup').isVisible());
     await p2.fill('#s-pass', 'Pieter-Own3!'); await p2.fill('#s-pass2', 'Pieter-Own3!'); await p2.click('#s-submit');
@@ -210,7 +212,7 @@ await step('Add a team member with their own sign-in', async () => {
     await go('team'); await pg.click('[data-user]:has-text("Pieter Test")'); await W(500); await pg.click('[data-us-del]'); await W(400); await pg.click('#modal [data-yes]'); await W(1500);
     check('Removed team member leaves the Team page', !(await text()).includes('Pieter Test'));
     const c3 = await b.newContext(), p3 = await c3.newPage(); await p3.goto(`http://127.0.0.1:${PORT}/karoo-cycles/?emu=1`); await p3.waitForSelector('#g-email', { state: 'visible', timeout: 30000 });
-    await p3.fill('#g-email', 'pieter'); await p3.fill('#g-pass', 'Pieter-Own3!'); await p3.click('#g-submit'); await W(4000);
+    await p3.fill('#g-email', 'pieter@karoo.test'); await p3.click('#g-next'); await p3.waitForSelector('#g-pass', { state: 'visible', timeout: 15000 }); await p3.fill('#g-pass', 'Pieter-Own3!'); await p3.click('#g-submit'); await W(4000);
     check('Removed team member can’t get in', /isn’t on this company’s team/.test(await p3.locator('#g-msg').innerText().catch(() => '')));
     await c3.close();
     await pg.locator('[data-user-add]').first().click(); await W(600);
@@ -243,7 +245,7 @@ await step('Add a team member with their own sign-in', async () => {
     check('Pieter’s customers are now looked after by Lerato', (fc.manager || {}).name === 'Lerato Test' && (fc.manager || {}).id === (le || {}).id);
     const c4 = await b.newContext(), p4 = await c4.newPage(); p4.on('pageerror', e => errors.push('lerato: ' + e.message));
     await p4.goto(`http://127.0.0.1:${PORT}/karoo-cycles/?emu=1`); await p4.waitForSelector('#g-email', { state: 'visible', timeout: 30000 });
-    await p4.fill('#g-email', 'lerato'); await p4.fill('#g-pass', 'karoocycles'); await p4.click('#g-submit');
+    await p4.fill('#g-email', 'lerato@karoo.test'); await p4.click('#g-next'); await p4.waitForSelector('#g-pass', { state: 'visible', timeout: 15000 }); await p4.fill('#g-pass', 'karoocycles'); await p4.click('#g-submit');
     await p4.waitForSelector('#g-setup:not([hidden])', { timeout: 30000 }).catch(() => {});
     check('The new person sets up their account from scratch', await p4.locator('#g-setup').isVisible());
     await p4.fill('#s-pass', 'Lerato-Own4!'); await p4.fill('#s-pass2', 'Lerato-Own4!'); await p4.click('#s-submit');
@@ -252,7 +254,7 @@ await step('Add a team member with their own sign-in', async () => {
     check('The new person sees the quote they took over', (await p4.evaluate(() => document.getElementById('main').innerText)).includes('7001'));
     await c4.close();
     const c5 = await b.newContext(), p5 = await c5.newPage(); await p5.goto(`http://127.0.0.1:${PORT}/karoo-cycles/?emu=1`); await p5.waitForSelector('#g-email', { state: 'visible', timeout: 30000 });
-    await p5.fill('#g-email', 'pieter'); await p5.fill('#g-pass', 'Pieter-Own3!'); await p5.click('#g-submit'); await W(4000);
+    await p5.fill('#g-email', 'pieter@karoo.test'); await p5.click('#g-next'); await p5.waitForSelector('#g-pass', { state: 'visible', timeout: 15000 }); await p5.fill('#g-pass', 'Pieter-Own3!'); await p5.click('#g-submit'); await W(4000);
     check('The old person can’t get in any more', /isn’t on this company’s team/.test(await p5.locator('#g-msg').innerText().catch(() => '')));
     await c5.close();
   }
