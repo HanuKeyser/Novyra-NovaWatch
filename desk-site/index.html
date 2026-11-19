@@ -1775,8 +1775,11 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
 .gf input{width:100%;height:50px;border:1px solid var(--line2);border-radius:13px;padding:0 15px;font:500 16px var(--body,system-ui);color:var(--text);background:#fff;outline:none;transition:border-color .15s,box-shadow .15s}
 .gf input::placeholder{color:#9aa2bb}
 .gf input:focus{border-color:var(--spark);box-shadow:0 0 0 4px rgba(74,134,247,.16)}
-.gpw{position:relative;display:block}.gpw input{padding-right:72px}
-.geye{position:absolute;right:7px;top:7px;height:36px;padding:0 11px;border:0;border-radius:9px;background:none;color:var(--soft);font:600 13.5px var(--body,system-ui);cursor:pointer}.geye:hover{background:#eef3ff}
+.gpw{position:relative;display:block}
+.geye{position:absolute;right:10px;top:50%;transform:translateY(-50%);height:30px;min-width:56px;padding:0 10px;border:0;border-radius:8px;background:transparent;color:#2a5fd6;font:700 13px var(--body,system-ui);letter-spacing:.01em;cursor:pointer;transition:background-color .15s,color .15s}
+.geye:hover{background:#eef3ff;color:#1d4fc4}.geye:active{background:#e1eafd}
+.geye:focus-visible{outline:2px solid #4a86f7;outline-offset:1px}
+.gpw input{padding-right:78px}.gpw input::-ms-reveal,.gpw input::-ms-clear{display:none}
 .g-hint{display:flex;align-items:center;gap:8px;font-weight:500;font-size:13px;color:var(--muted)}
 .g-dot{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--line2);display:grid;place-items:center;transition:background-color .15s,border-color .15s}
 .g-hint.ok{color:var(--good)}.g-hint.ok .g-dot{background:var(--good);border-color:var(--good)}
