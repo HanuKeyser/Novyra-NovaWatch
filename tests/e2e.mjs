@@ -227,6 +227,25 @@ await kar.evaluate(() => location.hash = '#calendar'); await W(600);
 check('Calendar has no List view or status buttons', !(await kar.locator('[data-cal-v], [data-cal-f]').count()));
 await kar.screenshot({ path: 'shots/6-calendar.png', fullPage: true });
 
+console.log('8. Novyra pauses and resumes a company’s desk');
+await nov.evaluate(() => location.hash = '#settings'); await W(2500);
+check('Each company shows whether it’s active', /Active/.test(await nov.locator('#set-companies .co-row').first().innerText()));
+check('…and a choice of which customer pays for it', await nov.locator('[data-co-bill="karoo-cycles"]').count() === 1);
+await nov.selectOption('[data-co-bill="karoo-cycles"]', { index: 1 }).catch(() => {}); await W(1500);
+check('Linking the paying customer shows its billing status', /Paid up|Invoice waiting|Payment overdue|No invoices yet/.test(await nov.locator('#set-companies .co-row').first().innerText()));
+await nov.click('[data-co-pause="karoo-cycles"]'); await W(400);
+check('Pausing explains what happens first', /Nobody at Karoo Cycles can sign in/.test(await nov.locator('#modal').innerText()));
+await nov.click('[data-cp-go]'); await W(4000);
+check('The company shows as paused', /Paused/.test(await nov.locator('#set-companies').innerText()));
+check('Paused desk is stored', ((await get('companies/karoo-cycles')) || {}).paused === true);
+const kp = await kar.evaluate(() => ({ gate: !document.getElementById('gate').hidden, msg: (document.getElementById('g-msg') || {}).textContent || '' })).catch(() => ({}));
+check('Someone using the desk is signed out and told it’s paused', kp.gate && /desk is paused/.test(kp.msg), JSON.stringify(kp));
+const xp = await open('/karoo-cycles/?emu=1', 'paused'); await signIn(xp, OWNER_EMAIL, OWNER_PW);
+const mp = await gateMsg(xp); check('Signing in to a paused desk says so, and how to fix it', mp.shown && /paused because payment wasn’t received.*contact Novyra/.test(mp.msg), mp.msg);
+await nov.click('[data-co-pause="karoo-cycles"]'); await W(400); await nov.click('[data-cp-go]'); await W(2500);
+check('Resuming the desk', ((await get('companies/karoo-cycles')) || {}).paused === false);
+await xp.reload(); await W(1500); await signIn(xp, OWNER_EMAIL, OWNER_PW); check('…and the owner can sign in again', await inApp(xp));
+
 console.log(`\nApp: ${n - bad} of ${n} checks passed`);
 if (errors.length) console.log('Page errors:\n  ' + errors.join('\n  '));
 await b.close(); process.exit(bad ? 1 : 0);

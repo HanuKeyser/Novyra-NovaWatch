@@ -162,6 +162,27 @@ await t('Customer cannot answer twice', assertFails(updateDoc(doc(anon, 'compani
 await t('Customer accepts a Novyra quote', assertSucceeds(updateDoc(doc(anon, 'shares/novkey1234567890ab'), { status: 'Accepted', response: { name: 'Lerato', note: '', at: new Date().toISOString(), rev: 1 } })));
 await t('Customer cannot delete a link', assertFails(deleteDoc(doc(anon, 'companies/karoo/shares/abcabcabcabcabcabc'))));
 
+console.log('Pausing a company’s desk');
+await env.withSecurityRulesDisabled(async c => { const db = c.firestore();
+  await setDoc(doc(db, 'companies/stall'), { name: 'Stall Co', owners: ['owner@stall.test'] });
+  await setDoc(doc(db, 'companies/stall/clients/s1'), { business: 'Stall customer' });
+  await setDoc(doc(db, 'companies/stall/users/staff@stall.test'), { email: 'staff@stall.test', role: 'staff', active: true }); });
+const stallO = as('owner@stall.test'), stallS = as('staff@stall.test');
+await t('Novyra owner links a company to the customer who pays', assertSucceeds(updateDoc(doc(hanu, 'companies/stall'), { billingClient: 'n1', updatedAt: 'now' })));
+await t('Novyra owner pauses a company’s desk', assertSucceeds(updateDoc(doc(hanu, 'companies/stall'), { paused: true, pausedAt: 'now', pausedReason: 'unpaid' })));
+await t('Novyra owner still can’t rename a company or change its owners', assertFails(updateDoc(doc(hanu, 'companies/stall'), { name: 'Mine', owners: ['hanu@keysers.cc'] })));
+await t('Paused: the owner can still read that the desk is paused', assertSucceeds(getDoc(doc(stallO, 'companies/stall'))));
+await t('Paused: the owner can’t read customers', assertFails(getDoc(doc(stallO, 'companies/stall/clients/s1'))));
+await t('Paused: the owner can’t write records', assertFails(setDoc(doc(stallO, 'companies/stall/quotes/q1'), { n: 1 })));
+await t('Paused: the team can’t read customers', assertFails(getDocs(collection(stallS, 'companies/stall/clients'))));
+await t('Paused: the owner can’t resume it themselves', assertFails(updateDoc(doc(stallO, 'companies/stall'), { paused: false })));
+await t('Paused: the owner can’t add people', assertFails(setDoc(doc(stallO, 'companies/stall/users/x@stall.test'), { email: 'x@stall.test', role: 'staff', active: true })));
+await t('Novyra owner resumes the desk', assertSucceeds(updateDoc(doc(hanu, 'companies/stall'), { paused: false, pausedAt: '', pausedReason: '' })));
+await t('Resumed: the owner reads customers again', assertSucceeds(getDoc(doc(stallO, 'companies/stall/clients/s1'))));
+await t('A company owner can’t pause or relink their own billing', assertFails(updateDoc(doc(stallO, 'companies/stall'), { billingClient: 'x' })));
+await t('A company owner still renames their company', assertSucceeds(updateDoc(doc(stallO, 'companies/stall'), { name: 'Stall Company' })));
+await t('Another company can’t pause this one', assertFails(updateDoc(doc(karoo, 'companies/stall'), { paused: true })));
+
 await env.cleanup();
 console.log(`\nRules: ${n - bad} of ${n} checks passed`);
 if (bad) process.exit(1);
