@@ -1701,6 +1701,11 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
         <button class="gbtn primary" id="s-submit" type="submit">Save and open my desk</button>
         <button class="glink g-out" type="button" id="s-out">Sign out</button>
       </form>
+      <ol class="g-first" id="g-first" aria-label="First time signing in?">
+        <li><b>Your email</b><span>The one your company set up for you.</span></li>
+        <li><b>Your starting password</b><span>From the person who added you.</span></li>
+        <li><b>Your own password</b><span>You choose it the first time you sign in.</span></li>
+      </ol>
       <p class="g-fine" id="g-fine">No account yet? Your business sets it up for you and sends you your details.</p>
     </section>
   </div>
@@ -1718,7 +1723,7 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
 @keyframes gStreak{from{stroke-dashoffset:4000}to{stroke-dashoffset:0}}
 .g-mark{position:absolute;right:max(6vw,40px);top:max(8vh,48px);width:clamp(60px,9vw,130px);fill:#4a86f7;filter:drop-shadow(0 0 22px rgba(74,134,247,.55));animation:gTwinkle 5s ease-in-out infinite}
 @keyframes gTwinkle{0%,100%{opacity:.9;transform:scale(1) rotate(0)}50%{opacity:.6;transform:scale(.86) rotate(12deg)}}
-.g-wrap{margin-block:auto;width:100%;max-width:980px;display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);border-radius:28px;background:#fff;overflow:hidden;box-shadow:0 40px 90px -40px rgba(16,24,48,.45),0 0 0 1px rgba(16,24,48,.06),0 0 0 8px rgba(74,134,247,.07)}
+.g-wrap{margin-block:auto;width:100%;max-width:980px;min-height:560px;display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);border-radius:28px;background:#fff;overflow:hidden;box-shadow:0 40px 90px -40px rgba(16,24,48,.45),0 0 0 1px rgba(16,24,48,.06),0 0 0 8px rgba(74,134,247,.07)}
 .g-brand{position:relative;overflow:hidden;display:flex;flex-direction:column;gap:22px;padding:44px 40px;color:#fff;background:radial-gradient(120% 120% at 100% 0,#7fb0ff 0%,#4a86f7 38%,#1d3a8a 100%)}
 .g-brand .gate-logo{align-self:flex-start;transition:transform .2s}
 .g-brand .gate-logo:hover{transform:translateY(-2px)}
@@ -1792,6 +1797,11 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
 .g-rules .g-dot{flex:none}.g-rules li.ok .g-dot::after{content:"";width:7px;height:4px;border:2px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
 .g-out{justify-self:center}
 @media (max-width:420px){.g-rules{grid-template-columns:1fr}}
+.g-first{display:none;margin:4px 0 0;padding:14px 16px;list-style:none;counter-reset:gf;border-radius:14px;background:var(--ink);border:1px solid var(--line2);gap:10px}
+.gate.co[data-step="email"]:not([data-nf]):not(.setup) .g-first{display:grid}
+.g-first li{counter-increment:gf;display:grid;grid-template-columns:22px minmax(0,1fr);column-gap:10px;font-size:13px;line-height:1.35}
+.g-first li::before{content:counter(gf);grid-row:span 2;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:#e3ecfe;color:#2a5fd6;font:700 11.5px var(--body,system-ui)}
+.g-first b{font-weight:600;color:var(--text)}.g-first span{color:var(--muted)}
 .g-fine{margin:0;text-align:center;font-size:12.5px;line-height:1.5;color:var(--dim)}
 @media (max-width:860px){
   .g-wrap{grid-template-columns:minmax(0,1fr);max-width:480px;border-radius:24px}
@@ -1800,12 +1810,15 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
   .g-co-tile{min-width:56px;height:56px;padding:8px;border-radius:14px;font-size:24px}.g-co-tile img{max-height:40px;max-width:140px}
   .g-bt{width:100%;min-width:0}.g-bt h1{font-size:24px}.g-bt h1 span{display:inline}.g-bt p{font-size:14px;margin-top:4px}
   .g-pow{padding-top:4px;gap:6px}.g-pow img{height:26px}
-  .g-wrap{max-width:520px}
+  .g-wrap{max-width:520px;min-height:0}
+  .g-panel{min-height:480px;justify-content:flex-start}
+  .g-panel>.g-fine{margin-top:auto;padding-top:8px}
+  .g-brand{min-height:236px;justify-content:center}
   .g-ticks,.g-tag{display:none}
   .g-bspark{width:140px;right:-24px;bottom:-40px}
   .g-panel{padding:24px 22px 24px}
 }
-@media (max-width:420px){.gate{padding-top:12px;padding-bottom:12px}.g-brand{padding:20px 20px 22px;gap:12px}.g-panel{padding:20px 18px 22px;gap:14px}.g-hd h2{font-size:22px}.g-hd p{font-size:14px}.g-bt h1{font-size:22px}}
+@media (max-width:420px){.g-panel{min-height:516px}.g-brand{min-height:244px}.gate{padding-top:12px;padding-bottom:12px}.g-brand{padding:20px 20px 22px;gap:12px}.g-panel{padding:20px 18px 22px;gap:14px}.g-hd h2{font-size:22px}.g-hd p{font-size:14px}.g-bt h1{font-size:22px}}
 @media (prefers-reduced-motion:reduce){.g-nova,.g-streaks path,.g-mark{animation:none}}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
