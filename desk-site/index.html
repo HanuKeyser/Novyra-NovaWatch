@@ -3923,6 +3923,8 @@ async function restoreDialog(file) {
   if (!state.prices && data.prices && Array.isArray(data.prices.items)) extra.push(['settings/prices', data.prices, 'your price list']);
   if (!state.bank && data.bank && data.bank.accountNumber) extra.push(['settings/bank', data.bank, 'your payment details']);
   if (!state.profile && data.profile && data.profile.name) extra.push(['settings/profile', data.profile, 'your details']);
+  // business info: put back unless it has been edited since this desk was emptied (a fresh desk only has the starting details)
+  if (data.business && data.business.name && (!state.biz || !state.biz.updatedAt)) extra.push(['settings/business', { ...data.business, updatedAt: new Date().toISOString() }, 'your business info']);
   const n = add.clients.length + add.quotes.length + add.invoices.length + add.plans.length + add.expenses.length + extra.length;
   openModal(dlg('Restore from backup', `<p class="lead">Backup made <b>${esc(fmtWhen(data.made))}</b>.</p>
       ${n ? `<p>This puts back <b>${add.clients.length} customer${add.clients.length === 1 ? '' : 's'}</b>, <b>${add.quotes.length} quote${add.quotes.length === 1 ? '' : 's'}</b> and <b>${add.invoices.length} invoice${add.invoices.length === 1 ? '' : 's'}</b>${(() => { const more = [add.plans.length ? `${add.plans.length} monthly billing plan${add.plans.length === 1 ? '' : 's'}` : '', add.expenses.length ? `${add.expenses.length} expense${add.expenses.length === 1 ? '' : 's'}` : '', ...extra.map(x => x[2])].filter(Boolean); return more.length ? ', plus ' + listAnd(more) : ''; })()} that are missing now.</p><p class="sub">Nothing you have now is changed or replaced; only missing records are added back.</p>`
@@ -3931,7 +3933,13 @@ async function restoreDialog(file) {
     const b = $('[data-do-restore]', m); if (!b) return;
     b.addEventListener('click', async () => {
       b.disabled = true;
-      try { for (const [colName, list] of Object.entries(add)) for (const d of list) await save(colName, d); for (const [p, v] of extra) await db.doc(p).set(JSON.parse(JSON.stringify(v))); closeModal(); toast(`${n} record${n === 1 ? '' : 's'} restored`); }
+      try { for (const [colName, list] of Object.entries(add)) for (const d of list) await save(colName, d); for (const [p, v] of extra) await db.doc(p).set(JSON.parse(JSON.stringify(v)));
+        // numbering carries on from the restored quotes and invoices
+        const top = (l, k) => Math.max(0, ...l.map(x => Number(x[k]) || 0));
+        await setMeta({ lastQuote: Math.max(Number((state.meta || {}).lastQuote) || 0, top(data.quotes || [], 'number')), lastInvoice: Math.max(Number((state.meta || {}).lastInvoice) || 0, top(data.invoices || [], 'number')) });
+        // the customer links to restored quotes, invoices and receipts work again
+        for (const q of add.quotes) await syncDocShares(q, 'quote'); for (const v of add.invoices) await syncDocShares(v, 'invoice');
+        closeModal(); toast(`${n} record${n === 1 ? '' : 's'} restored`); }
       catch { b.disabled = false; toast('Restoring stopped part-way. Check your connection and try again; nothing is overwritten.'); }
     });
   });
