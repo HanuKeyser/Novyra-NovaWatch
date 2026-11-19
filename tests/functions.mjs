@@ -69,8 +69,8 @@ await step('Mark a customer inactive', async () => {
   await go('quotes'); await pg.click('[data-new]'); await W(500);
   await pg.fill('#modal .cust', 'Function'); await W(400);
   check('Inactive customer still shows when searched for, tagged Inactive', (await pg.locator('#modal .combo-list li:not(.add)', { hasText: NAME }).locator('.cc-tag').count()) === 1);
-  await pg.fill('#modal .cust', ''); await W(300);
-  check('…but isn’t in the list before you search', !(await pg.locator('#modal .combo-list li:not(.add)', { hasText: NAME }).count()));
+  await pg.fill('#modal .cust', ''); await pg.click('#modal .cust'); await W(400);
+  check('…but isn’t in the list before you search', !(await pg.locator('#modal .combo-list:not([hidden]) li:not(.add)', { hasText: NAME }).count()));
   await pg.keyboard.press('Escape'); await W(300); if (await modal().isVisible().catch(() => false)) await pg.click('#modal [data-close]').catch(() => {});
   await go('clients');
   await pg.click(`.cc:has-text("${NAME}")`); await W(500); await pg.check('#cl-active'); await pg.click('[data-save-client]'); await W(1200);
