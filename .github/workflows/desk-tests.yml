@@ -5,6 +5,8 @@ on:
   workflow_dispatch:
   push:
     paths: ['desk-site/**', 'firestore.rules', 'tests/**', '.github/workflows/desk-tests.yml']
+# a newer push replaces a run that's still going
+concurrency: { group: desk-tests, cancel-in-progress: true }
 jobs:
   test:
     runs-on: ubuntu-24.04
@@ -17,7 +19,11 @@ jobs:
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: 21 }
       - run: npm install --no-audit --no-fund
-      - run: npx playwright install --with-deps chromium firefox webkit
+      - name: Install browsers (retries if Ubuntu's download servers are slow)
+        timeout-minutes: 15
+        run: |
+          echo 'Acquire::Retries "5"; Acquire::http::Timeout "30";' | sudo tee /etc/apt/apt.conf.d/80-retries >/dev/null
+          for i in 1 2 3; do timeout 270 npx playwright install --with-deps chromium firefox webkit && exit 0; echo "Browser install attempt $i didn't finish, trying again"; sleep 15; done; exit 1
       - run: cp ../firestore.rules firestore.rules
       - run: npx firebase emulators:exec --project novyra-studio --only firestore,auth "node rules.test.mjs && node e2e.mjs && node functions.mjs && node browsers.mjs"
       - uses: actions/upload-artifact@v4
