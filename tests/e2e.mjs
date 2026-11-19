@@ -81,12 +81,8 @@ const br0 = await get('brands/karoo-cycles'); check('The company gets a public b
 await nov.screenshot({ path: 'shots/1-novyra-companies.png', fullPage: true });
 
 console.log('2. The company’s own desk (novyradesk.com/karoo-cycles/)');
-const fnd = await open('/?emu=1', 'find'); await fnd.click('#g-find-open'); await fnd.fill('#g-find-in', 'https://novyradesk.com/Karoo-Cycles/'); await fnd.click('#g-find-go');
-await fnd.waitForURL(/\/karoo-cycles\//, { timeout: 15000 }).catch(() => {});
-check('Typing the company’s link on novyradesk.com opens its own sign-in page', new URL(fnd.url()).pathname === '/karoo-cycles/', fnd.url());
-await fnd.waitForTimeout(1500); check('…which greets them with the company’s name', /Welcome to\s*Karoo Cycles/.test(await fnd.locator('.g-bt h1').innerText()));
-await fnd.goto(`http://127.0.0.1:${PORT}/?emu=1`); await fnd.waitForSelector('#g-find-open'); await fnd.click('#g-find-open'); await fnd.fill('#g-find-in', 'nope-not-here'); await fnd.click('#g-find-go'); await W(2500);
-check('A link with no business behind it says so', /couldn’t find a business/.test(await fnd.locator('#g-find-msg').innerText()));
+const fnd = await open('/?emu=1', 'no-link-step'); await fnd.waitForSelector('#g-email', { state: 'visible', timeout: 30000 });
+check('Nobody has to type a business link: there is no link step', !(await fnd.locator('#g-find-open, #g-find-in').count()));
 const kar = await open('/karoo-cycles/?emu=1', 'karoo'); await W(1500);
 check('Sign-in page names the company, not Novyra', /Karoo Cycles/.test(await kar.locator('.g-bt h1').innerText()) && !/novyra’s/i.test(await kar.locator('.g-bt').innerText()));
 check('Sign-in page shows “Powered by Novyra Desk”, not Novyra’s own branding', await kar.locator('#g-pow').isVisible() && !(await kar.locator('.gate-logo').isVisible()));
@@ -185,9 +181,6 @@ console.log('5. Nobody gets into a desk that isn’t theirs');
 // skips step 1's lookup (which would send them to their own desk) to prove the desk itself still says no
 const forceSignIn = async (pg, email, pw) => { await pg.waitForSelector('#g-email', { state: 'visible', timeout: 30000 }); await pg.evaluate(e => sessionStorage.setItem('nd-email', e), email); await pg.reload();
   await pg.waitForSelector('#g-pass', { state: 'visible', timeout: 30000 }); await pg.fill('#g-pass', pw); await pg.click('#g-submit'); };
-const x0 = await open('/karoo-cycles/?emu=1', 'novyra-email-at-karoo'); await x0.waitForSelector('#g-email', { state: 'visible', timeout: 30000 });
-await x0.fill('#g-email', 'hanu@keysers.cc'); await x0.click('#g-next'); await x0.waitForURL(u => new URL(u).pathname === '/', { timeout: 15000 }).catch(() => {});
-check('Novyra’s email typed on a company’s page is sent to Novyra’s own desk', new URL(x0.url()).pathname === '/', x0.url());
 const x1 = await open('/?emu=1', 'karoo-at-novyra'); await forceSignIn(x1, OWNER_EMAIL, OWNER_PW);
 const m1 = await gateMsg(x1); check('Company owner is turned away from Novyra’s desk', m1.shown && /access/.test(m1.msg), m1.msg);
 const x2 = await open('/karoo-cycles/?emu=1', 'novyra-at-karoo'); await forceSignIn(x2, 'hanu@keysers.cc', PW);
@@ -195,7 +188,9 @@ const m2 = await gateMsg(x2); check('Novyra owner is turned away from the compan
 const x3 = await open('/karoo-cycles/?emu=1', 'stranger'); await signIn(x3, 'stranger@else.test', PW);
 const m3 = await gateMsg(x3); check('A stranger is turned away from the company’s desk', m3.shown && /isn’t on this company’s team/.test(m3.msg), m3.msg);
 const x4 = await open('/no-such-co/?emu=1', 'nobody'); await W(2500);
-check('An address with no company says so and offers to find the right one', /No business at this address/.test(await x4.locator('#g-title').innerText()) && await x4.locator('#g-find-in').isVisible() && !(await x4.locator('#g-form').isVisible()));
+check('A mistyped business address says it doesn’t exist and still offers email sign-in', /doesn’t exist/.test(await x4.locator('#g-title').innerText()) && await x4.locator('#g-email').isVisible());
+await x4.fill('#g-email', OWNER_EMAIL); await x4.click('#g-next'); await x4.waitForURL(/\/karoo-cycles\//, { timeout: 15000 }).catch(() => {});
+check('…and their email still takes them to their own business', new URL(x4.url()).pathname === '/karoo-cycles/', x4.url());
 await x4.screenshot({ path: 'shots/5-turned-away.png' });
 
 console.log('6. Username and email both sign in; the email stays with the profile');

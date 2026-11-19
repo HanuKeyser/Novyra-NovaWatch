@@ -22,8 +22,8 @@ service cloud.firestore {
 
     // Novyra's team: accounts the owner created. Viewers read, admins and staff also write. Only the owner changes the team.
     match /{col}/{document=**} {
-      allow read: if member() && !(col in ['users', 'companies', 'usernames', 'brands', 'accounts']);
-      allow write: if editor() && !(col in ['users', 'companies', 'usernames', 'brands', 'accounts']);
+      allow read: if member() && !(col in ['users', 'companies', 'usernames', 'brands', 'signin']);
+      allow write: if editor() && !(col in ['users', 'companies', 'usernames', 'brands', 'signin']);
     }
     // Usernames: the sign-in page looks one up to find the email it signs in with. One name at a time, never a list.
     // Each desk (novyra, or a company's address) has its own usernames; whoever manages that desk's team claims them.
@@ -44,15 +44,14 @@ service cloud.firestore {
         && request.resource.data.get('logo', '') is string && request.resource.data.get('logo', '').size() < 400000;
     }
 
-    // Accounts: which desk an email address signs in to, so step 1 of signing in opens the right business's page.
-    // Kept under a scrambled (SHA-256) copy of the email, so the list of emails is never readable. One at a time, never a list.
-    // Written by whoever made the account, or by the person themselves once they've signed in to that desk.
-    function deskOk(d) { return (d == 'novyra' && (isOwner() || member())) || (d != 'novyra' && coMember(d)); }
-    match /accounts/{h} {
+    // Sign-in lookup: which desk an email address belongs to, so step 1 of signing in opens the right business's page.
+    // Kept under a scrambled (SHA-256) copy of the email, so no email list is ever readable. One at a time, never a list.
+    // Only written when an owner or manager adds someone; nothing is saved when people sign in.
+    match /signin/{h} {
       allow get: if true;
       allow create, update: if h.matches('^[0-9a-f]{64}$') && request.resource.data.keys().hasOnly(['desk', 'uid'])
         && request.resource.data.desk is string && request.resource.data.uid is string
-        && (isOwner() || coManager(request.resource.data.desk) || (authed() && request.resource.data.uid == me() && deskOk(request.resource.data.desk)));
+        && (isOwner() || coManager(request.resource.data.desk));
     }
 
     match /users/{u} {

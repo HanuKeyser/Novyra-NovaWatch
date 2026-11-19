@@ -1702,14 +1702,6 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
         <button class="glink g-out" type="button" id="s-out">Sign out</button>
       </form>
       <p class="g-fine" id="g-fine">No account yet? Your business sets it up for you and sends you your details.</p>
-      <div class="g-find" id="g-find">
-        <button type="button" class="glink" id="g-find-open" aria-expanded="false" aria-controls="g-find-form">Have your business’s link instead?</button>
-        <form id="g-find-form" novalidate hidden>
-          <label class="gf"><span>Your business’s link</span><span class="g-url"><span class="g-url-pre" aria-hidden="true">novyradesk.com/</span><input id="g-find-in" type="text" autocapitalize="none" spellcheck="false" placeholder="yourbusiness" aria-label="Your business’s link, after novyradesk.com/"></span></label>
-          <p class="gmsg" id="g-find-msg" role="status" aria-live="polite"></p>
-          <button class="gbtn" id="g-find-go" type="submit">Go to my sign-in</button>
-        </form>
-      </div>
     </section>
   </div>
 </div>
@@ -1743,16 +1735,7 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
 .g-pow{margin:auto 0 0;padding-top:12px;display:flex;align-items:center;gap:10px;font:600 11px var(--body,system-ui);letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.75)}
 .g-pow[hidden]{display:none}.g-pow img{display:block;height:26px;width:auto}
 .gate.co .gate-logo{display:none}.gate.co .g-tag{display:none}
-.g-find{display:grid;gap:12px;margin-top:2px;padding-top:16px;border-top:1px solid var(--line,#e6e9f2)}
-.g-find .glink{justify-self:center;text-align:center}
-#g-find-form{display:grid;gap:12px}
-#g-find-go{background:#fff;color:#2a5fd6;border:1.5px solid #4a86f7;box-shadow:none}#g-find-go:hover{background:#f2f6ff}#g-find-form[hidden]{display:none}
-.g-url{display:flex;align-items:stretch;border:1px solid var(--line,#d8deea);border-radius:12px;overflow:hidden;background:#fff}
-.g-url:focus-within{border-color:#4a86f7;box-shadow:0 0 0 3px rgba(74,134,247,.18)}
-.g-url-pre{display:flex;align-items:center;padding:0 2px 0 12px;color:var(--muted,#5b6478);font-weight:600;white-space:nowrap;background:var(--ink,#f6f8fc)}
-.g-url input{flex:1;min-width:0;border:0 !important;box-shadow:none !important;outline:0;border-radius:0 !important}
-.gate.co .g-find,.gate.setup .g-find{display:none}
-.g-tag{margin:auto 0 0;padding-top:12px;font:600 11.5px var(--body,system-ui);letter-spacing:.24em;text-transform:uppercase;color:rgba(255,255,255,.75)}
+.gate.co .g-tag{margin:auto 0 0;padding-top:12px;font:600 11.5px var(--body,system-ui);letter-spacing:.24em;text-transform:uppercase;color:rgba(255,255,255,.75)}
 .g-bspark{position:absolute;right:-30px;bottom:-30px;width:220px;fill:#fff;opacity:.12;pointer-events:none}
 .g-panel{display:flex;flex-direction:column;gap:16px;padding:36px 40px 32px;min-width:0}
 .g-tabs{position:relative;display:grid;grid-template-columns:1fr 1fr;padding:4px;border-radius:14px;background:var(--ink3);box-shadow:inset 0 0 0 1px var(--line)}
@@ -1789,8 +1772,7 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
 #g-form{display:grid;gap:16px}
 .g-s-email,.g-s-pass{display:grid;gap:16px}
 .gate[data-step="email"] .g-s-pass,.gate[data-step="email"] #g-submit{display:none}
-.gate[data-step="pass"] .g-s-email,.gate[data-step="pass"] #g-next,.gate[data-step="pass"] .g-alt,.gate[data-step="pass"] .g-find{display:none}
-.g-alt{display:grid;gap:14px}.g-alt[hidden]{display:none}
+.gate[data-step="pass"] .g-s-email,.gate[data-step="pass"] #g-next,.gate[data-step="pass"] .g-alt,.gate[data-step="pass"] .g-alt{display:grid;gap:14px}.g-alt[hidden]{display:none}
 .g-who{display:flex;align-items:center;gap:12px;padding:10px 12px 10px 10px;border:1px solid var(--line2);border-radius:14px;background:var(--ink);min-width:0}
 .g-who-av{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:#fff;font:700 14px var(--body,system-ui);background:linear-gradient(135deg,#5b93fa,#2a5fd6)}
 .g-who-t{display:grid;min-width:0;flex:1}.g-who-l{font-size:11.5px;font-weight:600;color:var(--muted);letter-spacing:.02em}
@@ -1879,22 +1861,12 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
   const brandDoc = slug => raw.doc('brands/' + slug).get();
   if (SLUG) brandDoc(SLUG).then(d => {
     if (d.exists) { const b = d.data() || {}; brandIn(String(b.name || '').slice(0, 80) || document.title.replace(/ Desk$/, ''), b.logo || ''); }
-    else { gate.classList.remove('co'); $g('g-find').hidden = false; $g('g-find-form').hidden = false; $g('g-find-open').hidden = true; $g('g-form').hidden = true;
-      $g('g-co').hidden = true; $g('g-pow').hidden = true; document.querySelector('.gate-logo').style.display = 'block';
-      $g('g-title').textContent = 'No business at this address'; $g('g-fine').hidden = true; document.querySelector('.g-tag').style.display = 'none';
-      const h = document.querySelector('.g-bt h1'); h.innerHTML = 'Welcome to <span>Novyra Desk</span>'; document.title = 'Novyra Desk'; window.STUDIO.brandName = ''; $g('g-sub').textContent = `We couldn’t find novyradesk.com/${SLUG}/. Check the link you were given, or type it below.`;
-      const st = document.createElement('style'); st.textContent = '#gate .g-find{display:grid!important}'; document.head.appendChild(st); }
+    else { gate.classList.remove('co'); $g('g-co').hidden = true; $g('g-pow').hidden = true; document.querySelector('.gate-logo').style.display = 'block';
+      document.querySelector('.g-bt h1').innerHTML = 'Welcome to <span>Novyra Desk</span>'; document.querySelector('.g-tag').style.display = 'none'; document.title = 'Novyra Desk'; window.STUDIO.brandName = '';
+      $g('g-title').textContent = 'This business doesn’t exist'; $g('g-sub').textContent = `There’s no business at novyradesk.com/${SLUG}/. The link may be mistyped. Sign in with your email and we’ll open the right desk.`;
+      say(msg, ''); gate.dataset.nf = '1'; }
   }).catch(() => {});
-  $g('g-find-open').addEventListener('click', e => { const f = $g('g-find-form'), open = f.hidden; f.hidden = !open; e.currentTarget.setAttribute('aria-expanded', String(open)); if (open) $g('g-find-in').focus(); });
-  $g('g-find-form').addEventListener('submit', async e => { e.preventDefault();
-    const m = $g('g-find-msg'), slug = slugOf($g('g-find-in').value);
-    if (!slug || slug.length < 3) { say(m, 'Type the link you were given, like novyradesk.com/yourbusiness.', 'bad'); $g('g-find-in').focus(); return; }
-    if (slug === 'novyra') { location.href = '/'; return; }
-    say(m, 'Looking for your business…'); $g('g-find-go').disabled = true;
-    try { const d = await brandDoc(slug); if (d.exists) { say(m, `Opening ${(d.data() || {}).name || slug}’s sign-in…`, 'good'); location.href = '/' + slug + '/' + (EMU ? location.search : ''); return; }
-      say(m, `We couldn’t find a business at novyradesk.com/${slug}/. Check the link you were given.`, 'bad'); }
-    catch { say(m, 'You seem to be offline. Check your internet and try again.', 'bad'); }
-    $g('g-find-go').disabled = false; });
+
   const sayTop = (t, tone) => say($g('g-msg'), t, tone);
   const all = () => [btn, $g('g-submit')];
   const busy = on => all().forEach(b => b.disabled = on);
@@ -1945,11 +1917,11 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
   // Step 1 is always the email address: it's unique across Novyra Desk, so it always finds the right person.
   // If the email belongs to another business's desk, this takes them to that business's own sign-in page.
   const hashOf = async e => { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(String(e).trim().toLowerCase())); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join(''); };
-  const accountDoc = async e => raw.doc('accounts/' + await hashOf(e));
+  const accountDoc = async e => raw.doc('signin/' + await hashOf(e));
   const step = (k, focus) => { gate.dataset.step = k; say(msg, '');
     if (k === 'pass') { const e = em.value.trim().toLowerCase(); $g('g-who-e').textContent = e; $g('g-who-av').textContent = (e[0] || '?').toUpperCase();
       $g('g-title').textContent = 'Welcome back'; $g('g-sub').textContent = 'Type your password to open your desk.'; if (focus !== false) setTimeout(() => pw.focus(), 30); }
-    else { $g('g-title').textContent = SLUG && gate.classList.contains('co') ? 'Sign in' : 'Sign in'; $g('g-sub').textContent = 'Start with your email address.'; pw.value = ''; if (focus !== false) setTimeout(() => em.focus(), 30); } };
+    else { if (!gate.dataset.nf) { $g('g-title').textContent = 'Sign in'; $g('g-sub').textContent = 'Start with your email address.'; } pw.value = ''; if (focus !== false) setTimeout(() => em.focus(), 30); } };
   step('email', false);
   try { const saved = sessionStorage.getItem('nd-email'); if (saved) { sessionStorage.removeItem('nd-email'); em.value = saved; step('pass'); } } catch {}
   $g('g-change').addEventListener('click', () => step('email'));
@@ -2038,8 +2010,6 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
         }
       }
     } catch (e) { gate.hidden = false; busy(true); sayTop(e && e.code === 'permission-denied' ? (SLUG ? 'You’re signed in, but this account isn’t on this company’s team. Ask the company’s owner to add you.' : 'You’re signed in, but this account doesn’t have access. Ask the owner to add you to the team.') : 'There’s no company at this address yet. Check the link you were given.', 'bad'); await auth.signOut().catch(() => {}); setTimeout(() => busy(false), 1500); return; }
-    // remember which desk this email belongs to, so step 1 of signing in can send them straight here next time
-    if (me) accountDoc(me).then(r => r.get().then(d => { if (!d.exists || d.data().desk !== DESK || d.data().uid !== u.uid) return r.set({ desk: DESK, uid: u.uid }); })).catch(() => {});
     if (setup) return firstSetup(u, setup);
     gate.hidden = true;
     if (!started) { started = true; resolveReady(); }
