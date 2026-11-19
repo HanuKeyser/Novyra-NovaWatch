@@ -55,25 +55,25 @@ await step('Add a customer', async () => {
   await pg.locator('#modal .pcard').nth(0).locator('[data-pf=name]').fill('Lindiwe Dube');
   await pg.locator('#modal .pcard').nth(0).locator('[data-pf=email]').fill('lindiwe@functiontest.test');
   await pg.click('[data-save-client]'); await W(1200);
-  check('New customer shows in the Active list', (await text()).includes(NAME));
+  check('New customer shows on the Customers tab', (await text()).includes(NAME));
   check('A new customer is looked after by whoever added it', /Looked after by/.test(await pg.locator(`.cc:has-text("${NAME}")`).innerText()));
   const cs = await list(CO + 'clients'); if (cs) check('Customer is saved in the company’s space', cs.some(c => c.business === NAME));
 });
 await step('Mark a customer inactive', async () => {
   await pg.click(`.cc:has-text("${NAME}")`); await W(500);
   await pg.uncheck('#cl-active'); await pg.click('[data-save-client]'); await W(1200);
-  check('Inactive customer leaves the Active list', !(await text()).includes(NAME));
-  await pg.click('[data-cl-show=inactive]'); await W(400);
-  check('Inactive customer is in the Inactive list, marked Inactive', (await pg.locator(`.cc.off:has-text("${NAME}") .cc-tag`).count()) === 1);
+  check('Customers tab has no Active / Inactive / All buttons', !(await pg.locator('[data-cl-show], .cl-seg').count()));
+  check('Inactive customer stays on the Customers tab, marked Inactive', (await pg.locator(`.cc.off:has-text("${NAME}") .cc-tag`).count()) === 1);
+  check('Inactive customers are listed after the active ones', await pg.evaluate(() => { const c = [...document.querySelectorAll('.cc')]; const i = c.findIndex(x => x.classList.contains('off')); return i === -1 || c.slice(i).every(x => x.classList.contains('off')); }));
   const cs = await list(CO + 'clients'); if (cs) check('Inactive is saved', (cs.find(c => c.business === NAME) || {}).inactive === true);
   await go('quotes'); await pg.click('[data-new]'); await W(500);
   await pg.fill('#modal .cust', 'Function'); await W(400);
   check('Inactive customer isn’t offered for a new quote', !(await pg.locator('#modal .combo-list li:not(.add)', { hasText: NAME }).count()));
   await pg.keyboard.press('Escape'); await W(300); if (await modal().isVisible().catch(() => false)) await pg.click('#modal [data-close]').catch(() => {});
-  await go('clients'); await pg.click('[data-cl-show=inactive]'); await W(400);
+  await go('clients');
   await pg.click(`.cc:has-text("${NAME}")`); await W(500); await pg.check('#cl-active'); await pg.click('[data-save-client]'); await W(1200);
-  await pg.click('[data-cl-show=active]'); await W(400);
-  check('Customer can be made active again', (await text()).includes(NAME));
+  await W(200);
+  check('Customer can be made active again', (await pg.locator(`.cc:not(.off):has-text("${NAME}")`).count()) === 1);
 });
 
 console.log('2. Price list');
