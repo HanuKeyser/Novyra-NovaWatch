@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<style>*,*::before,*::after{box-sizing:border-box}html{color-scheme:dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style><style>
+<style>*,*::before,*::after{box-sizing:border-box}html{color-scheme:dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}html.nd-out body{background:#eef3ff}html.nd-out body>:not(#gate){visibility:hidden}</style><script>(function(h){try{if(localStorage.getItem("nd-in")==="1")return}catch(e){}h.classList.add("nd-out")})(document.documentElement)</script><style>
 /* Layout: a light Novyra studio desk under a dark Novyra band — top bar, a summary strip, then lists; the editor puts the form beside a live A4 preview. */
 :root{
   --ink:#f4f6fb; --ink2:#ffffff; --ink3:#edf1fa; --line:#d5dcea; --line2:#c0c9df;
@@ -87,7 +87,8 @@ html.side-mini .side h4{color:transparent} html.side-mini .side h4::after{opacit
   .appbar .grow{display:none}
   .side{position:fixed;z-index:35;left:0;top:var(--bar);bottom:0;height:auto;width:min(290px,86vw);transform:translateX(-102%);transition:transform .25s var(--ease);box-shadow:20px 0 50px rgba(16,24,48,.14)}
   html.nav-open .side{transform:none}
-  html.nav-open .scrim{display:block;position:fixed;inset:var(--bar) 0 0 0;z-index:34;background:rgba(11,15,30,.28)}
+  .scrim{display:block;position:fixed;inset:var(--bar) 0 0 0;z-index:34;background:rgba(11,15,30,.28);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .25s var(--ease),visibility 0s .25s}
+  html.nav-open .scrim{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .25s var(--ease),visibility 0s}
   html.side-mini .side h4{color:var(--dim)} html.side-mini .side h4::after{opacity:0}
   html.side-mini .side a.it span,html.side-mini .side a.it em,html.side-mini .side .new span,html.side-mini .side .sfoot .st{opacity:1;pointer-events:auto}
   .page{padding:20px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px))}
@@ -640,11 +641,11 @@ body:has(#modal:not([hidden])) .toast{bottom:calc(92px + env(safe-area-inset-bot
   .overlay:not([hidden]) .dialog{animation:enter .24s var(--ease)}
   .toast:not([hidden]){animation:toastin .22s var(--ease)}
   .side a.it,.side .new,.ib,.btn,.chipbtn,.avatar,.pill,table.list tr,.doclist a,.todo-i{transition:background-color .15s,color .15s,box-shadow .15s,border-color .15s,filter .15s,transform .12s}
-  html.nav-open .scrim{animation:fade .25s var(--ease)}
 }
 @keyframes enter{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @keyframes toastin{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
 @keyframes fade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:no-preference){#main.reveal{animation:fade .3s ease}}
 @media (prefers-reduced-motion:reduce){.shell,.appbar .brand,.appbar .brand img,.side,.side *,.overlay{transition:none !important}}
 .owner{line-height:1;padding-top:2px;letter-spacing:0;box-sizing:border-box}
 /* pages opened from lists use the full width, lined up with the page */
@@ -1034,8 +1035,8 @@ details.more-menu[open] .mm{animation:mmin .16s cubic-bezier(.2,.7,.2,1);transfo
 .more-menu summary svg{transition:transform .18s}.more-menu[open] summary svg{transform:rotate(180deg)}
 details.hch[open] ul,details.adv[open]>*:not(summary){animation:fadein .18s ease}
 @keyframes fadein{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
-#toast{transition:opacity .2s,transform .2s}
-@media (prefers-reduced-motion:reduce){#modal,#modal.closing .dialog{transition:none}details.more-menu[open] .mm,details.hch[open] ul{animation:none}}
+#toast{transition:opacity .2s ease,transform .2s ease}#toast.out{opacity:0;transform:translate(-50%,8px)}
+@media (prefers-reduced-motion:reduce){#modal,#modal.closing .dialog,#toast,.scrim{transition:none}details.more-menu[open] .mm,details.hch[open] ul{animation:none}}
 
 /* lists on small screens become cards */
 .list td.r,.list th.r{white-space:nowrap}
@@ -1662,6 +1663,7 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
 
 
 <div id="gate" class="gate" hidden>
+  <script>(function(g){try{if(localStorage.getItem('nd-in')==='1')return}catch(e){}g.hidden=false})(document.currentScript.parentNode)</script>
   <div class="g-sky" aria-hidden="true"><canvas id="g-stars"></canvas><div class="g-nova"></div>
     <svg class="g-streaks" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="gst" x1="0" x2="1"><stop offset="0" stop-color="#4a86f7" stop-opacity="0"/><stop offset=".55" stop-color="#4a86f7" stop-opacity=".45"/><stop offset="1" stop-color="#2a5fd6" stop-opacity="0"/></linearGradient></defs>
       <path d="M-100 760 C 400 620 900 520 1700 160"/><path d="M-100 820 C 500 700 1000 600 1700 260"/><path d="M-100 700 C 300 560 800 430 1700 60"/><path d="M-100 880 C 600 780 1100 690 1700 380"/></svg>
@@ -1819,7 +1821,25 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
   .g-panel{padding:24px 22px 24px}
 }
 @media (max-width:420px){.g-panel{min-height:516px}.g-brand{min-height:244px}.gate{padding-top:12px;padding-bottom:12px}.g-brand{padding:20px 20px 22px;gap:12px}.g-panel{padding:20px 18px 22px;gap:14px}.g-hd h2{font-size:22px}.g-hd p{font-size:14px}.g-bt h1{font-size:22px}}
-@media (prefers-reduced-motion:reduce){.g-nova,.g-streaks path,.g-mark{animation:none}}
+@keyframes gUp{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes gFade{from{opacity:0}to{opacity:1}}
+@keyframes gFwd{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+@keyframes gBack{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:none}}
+@keyframes gMsg{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.gate:not([hidden]) .g-wrap{animation:gUp .55s cubic-bezier(.2,.7,.2,1) both}
+.gate:not([hidden]) .g-sky{animation:gFade .6s ease both}
+.gate.fwd .g-panel>:not([hidden]){animation:gFwd .3s cubic-bezier(.2,.7,.2,1) both}
+.gate.back .g-panel>:not([hidden]){animation:gBack .3s cubic-bezier(.2,.7,.2,1) both}
+.gate.swap .g-panel>:not([hidden]){animation:gFade .3s ease both}
+.gate.swap .g-brand>*{animation:gFade .35s ease both}
+.gmsg:not(:empty){animation:gMsg .22s cubic-bezier(.2,.7,.2,1) both}
+.g-co-tile img{animation:gFade .35s ease both}
+.gate{transition:opacity .32s ease,visibility 0s}
+.gate .g-wrap{transition:transform .32s cubic-bezier(.4,0,.2,1)}
+.gate.leaving{opacity:0;pointer-events:none}
+.gate.leaving .g-wrap{transform:scale(.97)}
+@media (prefers-reduced-motion:reduce){.g-nova,.g-streaks path,.g-mark{animation:none}
+  .gate,.gate .g-wrap{transition:none}.gate:not([hidden]) .g-wrap,.gate:not([hidden]) .g-sky,.gate .g-panel>*,.gate .g-brand>*,.gmsg,.g-co-tile img{animation:none !important}}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -1855,9 +1875,10 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
   const pwOk = p => Object.values(PW).every(f => f(p));
   const brandIn = (name, logo) => {
     const h = document.querySelector('.g-bt h1'); h.textContent = 'Welcome to '; const sp = document.createElement('span'); sp.textContent = name; h.appendChild(sp);
-    const t = $g('g-co-tile'); t.textContent = '';
+    const t = $g('g-co-tile');
+    if (t.dataset.logo !== (logo || '') || !t.firstChild) { t.textContent = ''; t.dataset.logo = logo || '';
     if (logo && /^data:image\/(png|jpe?g|webp|svg\+xml);base64,/.test(logo)) { const im = new Image(); im.alt = name; im.src = logo; t.appendChild(im); }
-    else t.textContent = (name[0] || 'B').toUpperCase();
+    else t.textContent = (name[0] || 'B').toUpperCase(); }
     $g('g-co').hidden = false; $g('g-pow').hidden = false; document.title = name + ' Desk'; if (window.STUDIO) window.STUDIO.brandName = name;
   };
   if (SLUG) { // another company's desk: its own name and logo, with Novyra Desk only as the product it runs on
@@ -1866,19 +1887,28 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
     document.querySelector('.g-bt p').textContent = 'Your quotes, invoices and customers, all in one place.';
     $g('g-fine').textContent = 'Your sign-in details come from your company’s owner.';
     $g('g-alt').hidden = true;
-    brandIn(nice, '');
+    let cached = null; try { cached = JSON.parse(localStorage.getItem('nd-brand:' + SLUG) || 'null'); } catch {}
+    brandIn(cached && cached.name || nice, cached && cached.logo || '');
     // keep company desks out of search engines
     const rb = document.querySelector('meta[name=robots]') || document.head.appendChild(Object.assign(document.createElement('meta'), { name: 'robots' })); rb.content = 'noindex, nofollow';
     const cn = document.querySelector('link[rel=canonical]'); if (cn) cn.remove();
   }
   const say = (el, t, tone) => { el.textContent = t || ''; el.className = 'gmsg ' + (tone || ''); };
+  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // replays the panel's entrance: 'fwd' (next step), 'back' (previous step) or 'swap' (different content)
+  const play = k => { if (calm || gate.hidden) return; gate.classList.remove('fwd', 'back', 'swap'); void gate.offsetWidth; gate.classList.add(k); clearTimeout(play.t); play.t = setTimeout(() => gate.classList.remove(k), 420); };
+  let leaveT = 0;
+  const showGate = () => { clearTimeout(leaveT); gate.classList.remove('leaving'); gate.hidden = false; };
+  const hideGate = () => { document.documentElement.classList.remove('nd-out'); if (gate.hidden) return; if (calm) { gate.hidden = true; return; } gate.classList.add('leaving'); clearTimeout(leaveT);
+    leaveT = setTimeout(() => { gate.hidden = true; gate.classList.remove('leaving'); }, 330); };
   const slugOf = v => { let x = String(v || '').trim().toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '');
     if (x.startsWith('novyradesk.com')) x = x.slice('novyradesk.com'.length); x = x.replace(/^\/+/, '').split(/[/?#]/)[0];
     return x.replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, ''); };
   const brandDoc = slug => raw.doc('brands/' + slug).get();
   if (SLUG) brandDoc(SLUG).then(d => {
-    if (d.exists) { const b = d.data() || {}; brandIn(String(b.name || '').slice(0, 80) || document.title.replace(/ Desk$/, ''), b.logo || ''); }
-    else { gate.classList.remove('co'); $g('g-co').hidden = true; $g('g-pow').hidden = true; document.querySelector('.gate-logo').style.display = 'block';
+    if (d.exists) { const b = d.data() || {}, nm = String(b.name || '').slice(0, 80) || document.title.replace(/ Desk$/, ''); brandIn(nm, b.logo || '');
+      try { localStorage.setItem('nd-brand:' + SLUG, JSON.stringify({ name: nm, logo: b.logo || '' })); } catch {} }
+    else { try { localStorage.removeItem('nd-brand:' + SLUG); } catch {} play('swap'); gate.classList.remove('co'); $g('g-co').hidden = true; $g('g-pow').hidden = true; document.querySelector('.gate-logo').style.display = 'block';
       document.querySelector('.g-bt h1').innerHTML = 'Welcome to <span>Novyra Desk</span>'; document.querySelector('.g-tag').style.display = 'none'; document.title = 'Novyra Desk'; window.STUDIO.brandName = '';
       $g('g-fine').textContent = 'No account yet? Your business sets it up for you and sends you your details.'; $g('g-title').textContent = 'This business doesn’t exist'; $g('g-sub').textContent = `There’s no business at novyradesk.com/${SLUG}/. The link may be mistyped. Sign in with your email and we’ll open the right desk.`;
       say(msg, ''); gate.dataset.nf = '1'; }
@@ -1935,7 +1965,7 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
   // If the email belongs to another business's desk, this takes them to that business's own sign-in page.
   const hashOf = async e => { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(String(e).trim().toLowerCase())); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join(''); };
   const accountDoc = async e => raw.doc('signin/' + await hashOf(e));
-  const step = (k, focus) => { gate.dataset.step = k; say(msg, '');
+  const step = (k, focus) => { const was = gate.dataset.step; gate.dataset.step = k; say(msg, ''); if (was && was !== k) play(k === 'pass' ? 'fwd' : 'back');
     if (k === 'pass') { const e = em.value.trim().toLowerCase(); $g('g-who-e').textContent = e; $g('g-who-av').textContent = (e[0] || '?').toUpperCase();
       $g('g-title').textContent = 'Welcome back'; $g('g-sub').textContent = 'Type your password to open your desk.'; if (focus !== false) setTimeout(() => pw.focus(), 30); }
     else { if (!gate.dataset.nf) { $g('g-title').textContent = 'Sign in'; $g('g-sub').textContent = 'Start with your email address.'; } pw.value = ''; if (focus !== false) setTimeout(() => em.focus(), 30); } };
@@ -1977,7 +2007,7 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
   });
   // first sign-in on an account someone else made: choose your own password, and optionally your own email
   function firstSetup(u, done) {
-    gate.hidden = false; gate.classList.add('setup'); busy(false);
+    const wasOpen = !gate.hidden; showGate(); gate.classList.add('setup'); busy(false); if (wasOpen) play('fwd');
     $g('g-title').textContent = 'Set up your account';
     $g('g-sub').textContent = 'Welcome! Choose your own password before you start. The one you were given stops working.';
     const f = $g('g-setup'), sp = $g('s-pass'), sp2 = $g('s-pass2'), sm = $g('s-msg'), sb = $g('s-submit'); f.hidden = false;
@@ -1992,13 +2022,14 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
       sb.disabled = true; say(sm, 'Saving…');
       try {
         await u.updatePassword(np); await done();
-        gate.classList.remove('setup'); f.hidden = true; gate.hidden = true; if (!started) { started = true; resolveReady(); }
+        hideGate(); setTimeout(() => { gate.classList.remove('setup'); f.hidden = true; }, calm ? 0 : 340); if (!started) { started = true; resolveReady(); }
       } catch (err) { sb.disabled = false; say(sm, why(err), 'bad'); if (err && /requires-recent-login/.test(err.code)) setTimeout(() => auth.signOut().then(() => location.reload()), 2500); } };
   }
   const $$g = q => [...document.querySelectorAll(q)];
   let started = false;
   auth.onAuthStateChanged(async u => {
-    if (!u) { gate.hidden = false; busy(false); return; }
+    try { if (u) localStorage.setItem('nd-in', '1'); else localStorage.removeItem('nd-in'); } catch {}
+    if (!u) { showGate(); busy(false); return; }
     const providers = u.providerData.map(x => x.providerId);
     const S = window.STUDIO; S.email = u.email || ''; S.providers = providers; S.uid = u.uid; S.login = shown(u.email);
     const me = (u.email || '').toLowerCase(), FV = firebase.firestore.FieldValue;
@@ -2026,12 +2057,12 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
           if (t.data().login) S.login = t.data().login;
         }
       }
-    } catch (e) { gate.hidden = false; busy(true); sayTop(e && e.code === 'permission-denied' ? (SLUG ? 'You’re signed in, but this account isn’t on this company’s team. Ask the company’s owner to add you.' : 'You’re signed in, but this account doesn’t have access. Ask the owner to add you to the team.') : 'There’s no company at this address yet. Check the link you were given.', 'bad'); await auth.signOut().catch(() => {}); setTimeout(() => busy(false), 1500); return; }
+    } catch (e) { showGate(); busy(true); sayTop(e && e.code === 'permission-denied' ? (SLUG ? 'You’re signed in, but this account isn’t on this company’s team. Ask the company’s owner to add you.' : 'You’re signed in, but this account doesn’t have access. Ask the owner to add you to the team.') : 'There’s no company at this address yet. Check the link you were given.', 'bad'); await auth.signOut().catch(() => {}); setTimeout(() => busy(false), 1500); return; }
     if (setup) return firstSetup(u, setup);
-    gate.hidden = true;
+    hideGate();
     if (!started) { started = true; resolveReady(); }
     fs.doc('settings/meta').get({ source: 'server' }).catch(async e => {
-      if (e && e.code === 'permission-denied') { gate.hidden = false; busy(true); sayTop('You’re signed in, but this account doesn’t have access yet. Ask the owner to add you to the team.', 'bad'); await auth.signOut().catch(() => {}); setTimeout(() => busy(false), 1500); }
+      if (e && e.code === 'permission-denied') { showGate(); busy(true); sayTop('You’re signed in, but this account doesn’t have access yet. Ask the owner to add you to the team.', 'bad'); await auth.signOut().catch(() => {}); setTimeout(() => busy(false), 1500); }
     });
   });
   const downloads = { save: async ({ filename, data }) => {
@@ -2207,7 +2238,9 @@ const docsFor = c => {
   return { quotes: state.quotes.filter(mine), invoices: state.invoices.filter(mine) };
 };
 
-function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 3600); }
+function toast(msg) { const t = $('#toast'); clearTimeout(toast.t); clearTimeout(toast.h);
+  t.classList.remove('out'); t.hidden = true; void t.offsetWidth; t.textContent = msg; t.hidden = false;
+  toast.t = setTimeout(() => { t.classList.add('out'); toast.h = setTimeout(() => { t.hidden = true; t.classList.remove('out'); }, 220); }, 3600); }
 
 /* ---------- money maths ---------- */
 const unitOf = it => it.unit || (prices().find(x => x.item === it.item) || {}).unit || 'once-off';
@@ -2582,7 +2615,8 @@ function boot() {
     if (!db) { state.failed = true; $('#main').innerHTML = `<div class="notice bad">We couldn’t open your records. Reload the page and sign in again.</div>`; return; }
     if (!DEMO) try { const user = await claude.use('user'); if (user && !(await user.isOwner())) { db = null; state.failed = true; $('#main').innerHTML = `<div class="notice bad">This account can’t open Novyra Desk.</div>`; return; } } catch {}
     const timer = setTimeout(() => { if (!coreReady()) $('#main').innerHTML = `<div class="notice warn">Your records are taking long to load. Check your connection; the page fills in as soon as they arrive. Nothing has been lost.</div>`; }, 10000);
-    const done = k => { const was = coreReady(); state.loaded[k] = true; if (coreReady()) { clearTimeout(timer); $('#main').removeAttribute('aria-busy'); } if (coreReady() || was) render(); };
+    const done = k => { const was = coreReady(); state.loaded[k] = true; if (coreReady()) { clearTimeout(timer); $('#main').removeAttribute('aria-busy'); } if (coreReady() || was) render();
+      if (!was && coreReady()) { const mm = $('#main'); mm.classList.remove('enter', 'reveal'); void mm.offsetWidth; mm.classList.add('reveal'); } };
     const fail = e => { clearTimeout(timer); state.failed = true; $('#main').innerHTML = `<div class="notice bad">Your records couldn’t be loaded right now (${esc(e && e.code || 'connection')}). They are still saved. Reload the page to try again.</div>`; };
     const col = (name, key, sort) => db.collection(name).onSnapshot(s => { state[name] = s.docs.map(x => ({ id: x.id, ...x.data() })); if (sort) state[name].sort(sort); done(key); }, fail);
     col('quotes', 'q'); col('invoices', 'i'); col('clients', 'c', (a, b) => norm(a.business).localeCompare(norm(b.business)));
