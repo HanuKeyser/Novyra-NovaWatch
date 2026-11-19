@@ -63,6 +63,24 @@
               "value": "nosniff"
             }
           ]
+        },
+        {
+          "regex": "^/[a-z0-9-]+/.*$",
+          "headers": [
+            {
+              "key": "X-Robots-Tag",
+              "value": "noindex, nofollow"
+            }
+          ]
+        },
+        {
+          "source": "/quote/**",
+          "headers": [
+            {
+              "key": "X-Robots-Tag",
+              "value": "noindex, nofollow"
+            }
+          ]
         }
       ],
       "rewrites": [

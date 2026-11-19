@@ -126,6 +126,17 @@ await t('Novyra’s owner claims a username on Novyra’s desk', assertSucceeds(
 await t('Novyra’s owner claims the owner’s username for a new company', assertSucceeds(setDoc(doc(hanu, 'usernames/newer-co/names/johan'), { email: 'johan@newer.test', uid: 'newer-uid' })));
 await t('A username with odd characters is refused', assertFails(setDoc(doc(acmeBoss, 'usernames/acme/names/Bad Name'), { email: 'b@acme.test', uid: 'x' })));
 
+console.log('Brand cards (sign-in pages)');
+await t('Company owner writes its brand card', assertSucceeds(setDoc(doc(acmeBoss, 'brands/acme'), { name: 'Acme', logo: 'data:image/png;base64,AAAA', updatedAt: 'now' })));
+await t('Anyone can read one brand card (the sign-in page needs it)', assertSucceeds(getDoc(doc(anon, 'brands/acme'))));
+await t('Nobody can list the brand cards', assertFails(getDocs(collection(anon, 'brands'))));
+await t('Staff cannot change the brand card', assertFails(setDoc(doc(acmeStaff, 'brands/acme'), { name: 'Hacked' })));
+await t('A stranger cannot change a brand card', assertFails(setDoc(doc(stranger, 'brands/acme'), { name: 'Hacked' })));
+await t('A company cannot change another company’s brand card', assertFails(setDoc(doc(acmeBoss, 'brands/karoo'), { name: 'Hacked' })));
+await t('Brand cards only hold a name and logo', assertFails(setDoc(doc(acmeBoss, 'brands/acme'), { name: 'Acme', owner: 'x' })));
+await t('Novyra’s team cannot change brand cards', assertFails(setDoc(doc(novStaff, 'brands/acme'), { name: 'Hacked' })));
+await t('Novyra’s owner writes the first brand card for a new company', assertSucceeds(setDoc(doc(hanu, 'brands/newer-co'), { name: 'Newer', logo: '', updatedAt: 'now' })));
+
 console.log('Customers opening links');
 await t('Customer opens a Novyra link', assertSucceeds(getDoc(doc(anon, 'shares/novkey1234567890ab'))));
 await t('Customer opens a company link', assertSucceeds(getDoc(doc(anon, 'companies/karoo/shares/karkey1234567890ab'))));

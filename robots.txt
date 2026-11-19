@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
+Disallow: /quote/
+Disallow: /desk/
+Disallow: /studio/
+Disallow: /novawatch-test/
 
 Sitemap: https://www.novyra.co.za/sitemap.xml

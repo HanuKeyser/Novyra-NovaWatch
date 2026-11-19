@@ -22,8 +22,8 @@ service cloud.firestore {
 
     // Novyra's team: accounts the owner created. Viewers read, admins and staff also write. Only the owner changes the team.
     match /{col}/{document=**} {
-      allow read: if member() && !(col in ['users', 'companies', 'usernames']);
-      allow write: if editor() && !(col in ['users', 'companies', 'usernames']);
+      allow read: if member() && !(col in ['users', 'companies', 'usernames', 'brands']);
+      allow write: if editor() && !(col in ['users', 'companies', 'usernames', 'brands']);
     }
     // Usernames: the sign-in page looks one up to find the email it signs in with. One name at a time, never a list.
     // Each desk (novyra, or a company's address) has its own usernames; whoever manages that desk's team claims them.
@@ -32,6 +32,16 @@ service cloud.firestore {
       allow create: if (isOwner() || coManager(desk)) && name.matches('^[a-z0-9][a-z0-9._-]{2,29}$')
         && request.resource.data.keys().hasOnly(['email', 'uid']) && request.resource.data.email is string && request.resource.data.uid is string;
       allow delete: if (desk == 'novyra' && isOwner()) || coManager(desk);
+    }
+
+    // Brand cards: a company's name and logo, shown on its sign-in page before anyone signs in. One at a time, never a list.
+    // The company's owner or admins keep it up to date; Novyra's owner writes the first one when setting the company up.
+    match /brands/{c} {
+      allow get: if true;
+      allow create, update: if (isOwner() || coManager(c))
+        && request.resource.data.keys().hasOnly(['name', 'logo', 'updatedAt'])
+        && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 100
+        && request.resource.data.get('logo', '') is string && request.resource.data.get('logo', '').size() < 400000;
     }
 
     match /users/{u} {

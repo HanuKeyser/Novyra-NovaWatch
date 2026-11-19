@@ -77,11 +77,21 @@ check('Novyra’s owner is shown the owner’s sign-in details to pass on', /kar
 await nov.click('#modal [data-close]'); await W(500);
 check('Novyra’s owner is still signed in as themselves', await nov.evaluate(() => window.STUDIO.email) === 'hanu@keysers.cc');
 check('Company appears in the list with its link', (await nov.locator('#set-companies').innerText()).includes('novyradesk.com/karoo-cycles/'));
+const br0 = await get('brands/karoo-cycles'); check('The company gets a public brand card for its sign-in page', br0 && br0.name === 'Karoo Cycles', JSON.stringify(br0));
 await nov.screenshot({ path: 'shots/1-novyra-companies.png', fullPage: true });
 
 console.log('2. The company’s own desk (novyradesk.com/karoo-cycles/)');
-const kar = await open('/karoo-cycles/?emu=1', 'karoo');
-check('Sign-in page names the company, not Novyra', /karoo cycles/i.test(await kar.locator('.g-tag').innerText()) && !/novyra’s/i.test(await kar.locator('.g-bt').innerText()));
+const fnd = await open('/?emu=1', 'find'); await fnd.click('#g-find-open'); await fnd.fill('#g-find-in', 'https://novyradesk.com/Karoo-Cycles/'); await fnd.click('#g-find-go');
+await fnd.waitForURL(/\/karoo-cycles\//, { timeout: 15000 }).catch(() => {});
+check('Typing the company’s link on novyradesk.com opens its own sign-in page', new URL(fnd.url()).pathname === '/karoo-cycles/', fnd.url());
+await fnd.waitForTimeout(1500); check('…which greets them with the company’s name', /Welcome to\s*Karoo Cycles/.test(await fnd.locator('.g-bt h1').innerText()));
+await fnd.goto(`http://127.0.0.1:${PORT}/?emu=1`); await fnd.waitForSelector('#g-find-open'); await fnd.click('#g-find-open'); await fnd.fill('#g-find-in', 'nope-not-here'); await fnd.click('#g-find-go'); await W(2500);
+check('A link with no business behind it says so', /couldn’t find a business/.test(await fnd.locator('#g-find-msg').innerText()));
+const kar = await open('/karoo-cycles/?emu=1', 'karoo'); await W(1500);
+check('Sign-in page names the company, not Novyra', /Karoo Cycles/.test(await kar.locator('.g-bt h1').innerText()) && !/novyra’s/i.test(await kar.locator('.g-bt').innerText()));
+check('Sign-in page shows “Powered by Novyra Desk”, not Novyra’s own branding', await kar.locator('#g-pow').isVisible() && !(await kar.locator('.gate-logo').isVisible()));
+check('Company sign-in page is kept out of search engines', (await kar.getAttribute('meta[name=robots]', 'content')) === 'noindex, nofollow');
+check('Company sign-in tab is named after the company', (await kar.title()) === 'Karoo Cycles Desk', await kar.title());
 check('The sign-in page has no Create account option', !(await kar.locator('[data-mode=up], #t-up').count()));
 await signIn(kar, OWNER_USER, START_PW);
 await kar.waitForSelector('#g-setup:not([hidden])', { timeout: 30000 }).catch(() => {});
@@ -111,6 +121,10 @@ await kar.click('[data-save-biz]'); await W(1500);
 const kb2 = await get('companies/karoo-cycles/settings/business');
 check('Company logo is saved in the company’s business info', !!(kb2 && /^data:image\//.test(kb2.logo || '')), kb2 && String(kb2.logo).slice(0, 30));
 check('Menu footer now shows the company’s logo', (await kar.locator('.sfoot .sm img.co').count()) === 1);
+await W(1500); const br1 = await get('brands/karoo-cycles'); check('The logo goes onto the company’s sign-in page too', br1 && /^data:image\//.test(br1.logo || ''));
+const lg = await open('/karoo-cycles/?emu=1', 'logo-gate'); await W(2000);
+check('Company sign-in page shows its logo before signing in', (await lg.locator('#g-co-tile img').count()) === 1);
+await lg.screenshot({ path: 'shots/2-branded-sign-in.png' });
 check('Novyra’s business info has no Karoo logo', !(((await get('settings/business')) || {}).logo));
 // make a quote the normal way
 await kar.evaluate(() => location.hash = '#quotes'); await W(800);
@@ -174,8 +188,8 @@ const x2 = await open('/karoo-cycles/?emu=1', 'novyra-at-karoo'); await signIn(x
 const m2 = await gateMsg(x2); check('Novyra owner is turned away from the company’s desk', m2.shown && /isn’t on this company’s team/.test(m2.msg), m2.msg);
 const x3 = await open('/karoo-cycles/?emu=1', 'stranger'); await signIn(x3, 'stranger@else.test', PW);
 const m3 = await gateMsg(x3); check('A stranger is turned away from the company’s desk', m3.shown && /isn’t on this company’s team/.test(m3.msg), m3.msg);
-const x4 = await open('/no-such-co/?emu=1', 'nobody'); await signIn(x4, OWNER_EMAIL, OWNER_PW);
-const m4 = await gateMsg(x4); check('An address with no company says so', m4.shown && /team|no company/.test(m4.msg), m4.msg);
+const x4 = await open('/no-such-co/?emu=1', 'nobody'); await W(2500);
+check('An address with no company says so and offers to find the right one', /No business at this address/.test(await x4.locator('#g-title').innerText()) && await x4.locator('#g-find-in').isVisible() && !(await x4.locator('#g-form').isVisible()));
 await x4.screenshot({ path: 'shots/5-turned-away.png' });
 
 console.log('6. Username and email both sign in; the email stays with the profile');
