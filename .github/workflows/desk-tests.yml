@@ -18,6 +18,9 @@ jobs:
         with: { node-version: 20 }
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: 21 }
+      - name: AeroStack's email signature files are untouched (they must never change or be deleted)
+        working-directory: .
+        run: sha256sum -c tests/aerostack.sha256
       - run: npm install --no-audit --no-fund
       - name: Install browsers (retries if Ubuntu's download servers are slow)
         timeout-minutes: 15
