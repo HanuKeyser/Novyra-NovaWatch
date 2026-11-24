@@ -4,7 +4,7 @@ name: Novyra Desk tests
 on:
   workflow_dispatch:
   push:
-    paths: ['desk-site/**', 'firestore.rules', 'tests/**', '.github/workflows/desk-tests.yml']
+    paths: ['desk-site/**', 'firestore.rules', 'tests/**', '.github/workflows/desk-tests.yml', '**/AeroStack*', 'assets/img/aerostack-*']
 # a newer push replaces a run that's still going
 concurrency: { group: desk-tests, cancel-in-progress: true }
 jobs:
