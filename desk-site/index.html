@@ -2040,11 +2040,15 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
       sb.disabled = true; say(sm, 'Saving…');
       try {
         await u.updatePassword(np); await done();
-        hideGate(); setTimeout(() => { gate.classList.remove('setup'); f.hidden = true; }, calm ? 0 : 340); if (!started) { started = true; resolveReady(); }
+        hideGate(); watchCo(); setTimeout(() => { gate.classList.remove('setup'); f.hidden = true; }, calm ? 0 : 340); if (!started) { started = true; resolveReady(); }
       } catch (err) { sb.disabled = false; say(sm, why(err), 'bad'); if (err && /requires-recent-login/.test(err.code)) setTimeout(() => auth.signOut().then(() => location.reload()), 2500); } };
   }
   const $$g = q => [...document.querySelectorAll(q)];
   let started = false, watchPause = null;
+  // if Novyra pauses this desk while someone is using it, they're signed out and told why
+  const watchCo = () => { if (!SLUG || watchPause) return; watchPause = raw.doc('companies/' + SLUG).onSnapshot(d => { const co = d.exists ? d.data() || {} : {};
+      if (co.paused !== true) return; try { sessionStorage.setItem('nd-msg', pausedMsg(co.name || SLUG, co.pausedReason || '')); } catch {}
+      auth.signOut().finally(() => location.reload()); }, () => {}); };
   const pausedMsg = (name, reason) => `${name}’s desk is paused${reason === 'unpaid' ? ' because payment wasn’t received' : ''}. To get it running again, contact Novyra at novyra.co.za/contact.`;
   try { const m = sessionStorage.getItem('nd-msg'); if (m) { sessionStorage.removeItem('nd-msg'); setTimeout(() => sayTop(m, 'bad'), 0); } } catch {}
   auth.onAuthStateChanged(async u => {
@@ -2078,7 +2082,7 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
           if (t.data().login) S.login = t.data().login;
         }
         // Novyra's owner gets in by their email address, so it has to be confirmed first (an account added in Firebase isn't)
-        else if (!u.emailVerified && providers.includes('password')) throw { code: 'unverified' };
+        else if (!u.emailVerified && providers.includes('password') && me === 'hanu@keysers.cc') throw { code: 'unverified' };
       }
     } catch (e) {
       if (e && e.code === 'paused') { showGate(); busy(true); sayTop(pausedMsg(e.name, e.reason), 'bad'); await auth.signOut().catch(() => {}); setTimeout(() => busy(false), 1500); return; }
@@ -2087,11 +2091,7 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
         await auth.signOut().catch(() => {}); setTimeout(() => busy(false), 1500); return; }
       showGate(); busy(true); sayTop(e && e.code === 'permission-denied' ? (SLUG ? 'You’re signed in, but this account isn’t on this company’s team. Ask the company’s owner to add you.' : 'You’re signed in, but this account doesn’t have access. Ask the owner to add you to the team.') : 'There’s no company at this address yet. Check the link you were given.', 'bad'); await auth.signOut().catch(() => {}); setTimeout(() => busy(false), 1500); return; }
     if (setup) return firstSetup(u, setup);
-    hideGate();
-    // if Novyra pauses this desk while someone is using it, they're signed out and told why
-    if (SLUG && !watchPause) watchPause = raw.doc('companies/' + SLUG).onSnapshot(d => { const co = d.exists ? d.data() || {} : {};
-      if (co.paused !== true) return; try { sessionStorage.setItem('nd-msg', pausedMsg(co.name || SLUG, co.pausedReason || '')); } catch {}
-      auth.signOut().finally(() => location.reload()); }, () => {});
+    hideGate(); watchCo();
     if (!started) { started = true; resolveReady(); }
     fs.doc('settings/meta').get({ source: 'server' }).catch(async e => {
       if (e && e.code === 'permission-denied') { showGate(); busy(true); sayTop('You’re signed in, but this account doesn’t have access yet. Ask the owner to add you to the team.', 'bad'); await auth.signOut().catch(() => {}); setTimeout(() => busy(false), 1500); }

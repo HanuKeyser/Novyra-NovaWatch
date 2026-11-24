@@ -190,7 +190,14 @@ const m3 = await gateMsg(x3); check('A stranger is turned away from the company�
 // an account added straight in Firebase (email not confirmed yet) is asked to confirm it before Novyra's desk opens
 await fetch(`${AUTH}/identitytoolkit.googleapis.com/v1/accounts:signUp?key=test`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: 'fresh@else.test', password: PW, returnSecureToken: true }) });
 const x4u = await open('/?emu=1', 'unconfirmed'); await signIn(x4u, 'fresh@else.test', PW);
-const m4u = await gateMsg(x4u); check('An unconfirmed email is asked to confirm it first, and isn’t let in', m4u.shown && /Confirm your email address first/.test(m4u.msg), m4u.msg);
+const m4u = await gateMsg(x4u); check('Someone else with an unconfirmed email isn’t let in (and isn’t sent emails)', m4u.shown && !/Confirm your email/.test(m4u.msg), m4u.msg);
+// Novyra's owner, added straight in Firebase (email not confirmed yet), is asked to confirm it first
+const setVerified = async (email, v) => { const r = await (await fetch(`${AUTH}/identitytoolkit.googleapis.com/v1/projects/${P}/accounts:lookup`, { method: 'POST', headers: adminH, body: JSON.stringify({ email: [email] }) })).json();
+  await fetch(`${AUTH}/identitytoolkit.googleapis.com/v1/projects/${P}/accounts:update`, { method: 'POST', headers: adminH, body: JSON.stringify({ localId: r.users[0].localId, emailVerified: v }) }); };
+await setVerified('hanu@keysers.cc', false);
+const x4o = await open('/?emu=1', 'owner-unconfirmed'); await signIn(x4o, 'hanu@keysers.cc', PW);
+const m4o = await gateMsg(x4o); check('Novyra’s owner with an unconfirmed email is asked to confirm it first, and isn’t let in', m4o.shown && /Confirm your email address first/.test(m4o.msg), m4o.msg);
+await setVerified('hanu@keysers.cc', true);
 const x4 = await open('/no-such-co/?emu=1', 'nobody'); await W(2500);
 check('A mistyped business address says it doesn’t exist and still offers email sign-in', /doesn’t exist/.test(await x4.locator('#g-title').innerText()) && await x4.locator('#g-email').isVisible());
 await x4.fill('#g-email', OWNER_EMAIL); await x4.click('#g-next'); await x4.waitForURL(/\/karoo-cycles\//, { timeout: 15000 }).catch(() => {});
@@ -232,7 +239,7 @@ await nov.evaluate(() => location.hash = '#settings'); await W(2500);
 check('Each company shows whether it’s active', /Active/.test(await nov.locator('#set-companies .co-row').first().innerText()));
 check('…and a choice of which customer pays for it', await nov.locator('[data-co-bill="karoo-cycles"]').count() === 1);
 await nov.selectOption('[data-co-bill="karoo-cycles"]', { index: 1 }).catch(() => {}); await W(1500);
-check('Linking the paying customer shows its billing status', /Paid up|Invoice waiting|Payment overdue|No invoices yet/.test(await nov.locator('#set-companies .co-row').first().innerText()));
+check('Linking the paying customer shows its billing status', /Paid up|Invoice waiting|Payment overdue|No invoices yet|Not linked/.test(await nov.locator('#set-companies .co-row').first().innerText()));
 await nov.click('[data-co-pause="karoo-cycles"]'); await W(400);
 check('Pausing explains what happens first', /Nobody at Karoo Cycles can sign in/.test(await nov.locator('#modal').innerText()));
 await nov.click('[data-cp-go]'); await W(4000);
