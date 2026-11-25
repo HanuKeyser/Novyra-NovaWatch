@@ -1,0 +1,28 @@
+# Puts the database rules (firestore.rules) live on Firebase, so Firebase always matches GitHub.
+# Runs after the Novyra Desk tests pass on main (the tests check these exact rules), or by hand.
+name: Deploy database rules
+on:
+  workflow_run:
+    workflows: ["Novyra Desk tests"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+concurrency: { group: firestore-rules, cancel-in-progress: false }
+jobs:
+  deploy:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Deploy firestore.rules
+        env:
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_NOVYRA_STUDIO }}
+        run: |
+          printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
+          npx --yes firebase-tools@13 deploy --only firestore:rules --project novyra-studio --non-interactive
+          rm -f "$RUNNER_TEMP/sa.json"
