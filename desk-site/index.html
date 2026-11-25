@@ -2516,7 +2516,13 @@ const qRef = q => qBase(q) + ((q.rev || 1) > 1 ? ` Rev ${q.rev}` : '');
 const docNo = (d, kind) => kind === 'quote' ? qRef(d) : (d.number ? `INV-${d.number}` : 'New invoice');
 const nextQuote = () => Math.max(1000, Number((state.meta || {}).lastQuote) || 0, ...state.quotes.map(q => Number(q.number) || 0)) + 1;
 const nextInvoice = () => Math.max(1000, Number((state.meta || {}).lastInvoice) || 0, ...state.invoices.filter(v => v.number).map(v => Number(v.number) || 0)) + 1;
-const prices = () => (state.prices && state.prices.items) || (SLUG || DEMO ? [] : DEFAULT_PRICES);
+// Novyra's own price list always carries the Novyra Desk plans: a list saved before they existed gets them added
+const prices = () => {
+  const saved = state.prices && state.prices.items;
+  if (!saved) return SLUG || DEMO ? [] : DEFAULT_PRICES;
+  if (SLUG || DEMO || saved.some(p => norm(p.cat) === 'novyra desk')) return saved;
+  return [...DEFAULT_PRICES.filter(p => norm(p.cat) === 'novyra desk'), ...saved];
+};
 const bank = () => ({ ...DEFAULT_BANK, ...(state.bank || {}) });
 
 /* ---------- change capture ---------- */
