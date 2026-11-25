@@ -17,19 +17,26 @@ service cloud.firestore {
     function member() { return authed() && exists(userDoc()) && get(userDoc()).data.active == true; }
     function editor() { return member() && get(userDoc()).data.role in ['admin', 'staff']; }
 
-    // Owner: all of Novyra's records (never other companies' records, see below)
-    match /{col}/{document=**} { allow read, write: if isOwner() && col != 'companies'; }
+    // Owner: all of Novyra's own records. Never anything of another company's, and never the shared sign-in lookups
+    // (usernames, sign-in lookup, brand cards), which have their own rules below.
+    match /{col}/{document=**} { allow read, write: if isOwner() && !(col in ['companies', 'usernames', 'signin', 'brands']); }
 
     // Novyra's team: accounts the owner created. Viewers read, admins and staff also write. Only the owner changes the team.
     match /{col}/{document=**} {
-      allow read: if member() && !(col in ['users', 'companies', 'usernames', 'brands', 'signin']);
-      allow write: if editor() && !(col in ['users', 'companies', 'usernames', 'brands', 'signin']);
+      allow read: if member() && !(col in ['users', 'companies', 'usernames', 'brands', 'signin', 'deskCompanies']);
+      allow write: if editor() && !(col in ['users', 'companies', 'usernames', 'brands', 'signin', 'deskCompanies']);
     }
+    // deskCompanies/<address>: Novyra's own note of each company it set up (name, date, who for, pause, who pays).
+    // Kept by Novyra's owner only (the rule above). A company never sees it.
+
+    // Who may write a desk's sign-in lookups: Novyra's owner for Novyra's desk, or for a company address that isn't set up
+    // yet (while setting it up); after that only that company's owners and admins.
+    function deskBoss(d) { return (d == 'novyra' && isOwner()) || (isOwner() && d != 'novyra' && !exists(company(d))) || coManager(d); }
     // Usernames: the sign-in page looks one up to find the email it signs in with. One name at a time, never a list.
     // Each desk (novyra, or a company's address) has its own usernames; whoever manages that desk's team claims them.
     match /usernames/{desk}/names/{name} {
       allow get: if true;
-      allow create: if (isOwner() || coManager(desk)) && name.matches('^[a-z0-9][a-z0-9._-]{2,29}$')
+      allow create: if deskBoss(desk) && name.matches('^[a-z0-9][a-z0-9._-]{2,29}$')
         && request.resource.data.keys().hasOnly(['email', 'uid']) && request.resource.data.email is string && request.resource.data.uid is string;
       allow delete: if (desk == 'novyra' && isOwner()) || coManager(desk);
     }
@@ -38,20 +45,24 @@ service cloud.firestore {
     // The company's owner or admins keep it up to date; Novyra's owner writes the first one when setting the company up.
     match /brands/{c} {
       allow get: if true;
-      allow create, update: if (isOwner() || coManager(c))
-        && request.resource.data.keys().hasOnly(['name', 'logo', 'updatedAt'])
-        && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 100
-        && request.resource.data.get('logo', '') is string && request.resource.data.get('logo', '').size() < 400000;
+      allow create: if deskBoss(c) && brandOk();
+      allow update: if coManager(c) && brandOk();
     }
+    function brandOk() { return request.resource.data.keys().hasOnly(['name', 'logo', 'updatedAt'])
+        && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 100
+        && request.resource.data.get('logo', '') is string && request.resource.data.get('logo', '').size() < 400000; }
 
     // Sign-in lookup: which desk an email address belongs to, so step 1 of signing in opens the right business's page.
     // Kept under a scrambled (SHA-256) copy of the email, so no email list is ever readable. One at a time, never a list.
     // Only written when an owner or manager adds someone; nothing is saved when people sign in.
     match /signin/{h} {
       allow get: if true;
-      allow create, update: if h.matches('^[0-9a-f]{64}$') && request.resource.data.keys().hasOnly(['desk', 'uid'])
-        && request.resource.data.desk is string && request.resource.data.uid is string
-        && (isOwner() || coManager(request.resource.data.desk));
+      allow create: if signinOk(h) && deskBoss(request.resource.data.desk);
+      // an existing lookup can only be changed by whoever looks after the desk it points to now (no taking other desks' people)
+      allow update: if signinOk(h) && deskBoss(resource.data.desk) && deskBoss(request.resource.data.desk);
+    }
+    function signinOk(h) { return h.matches('^[0-9a-f]{64}$') && request.resource.data.keys().hasOnly(['desk', 'uid'])
+        && request.resource.data.desk is string && request.resource.data.uid is string;
     }
 
     match /users/{u} {
@@ -86,10 +97,10 @@ service cloud.firestore {
     function hasOwner(d) { return (d.get('owners', []) is list && d.get('owners', []).size() > 0) || (d.get('ownerUids', []) is list && d.get('ownerUids', []).size() > 0); }
 
     match /companies/{c} {
-      // Novyra's owner sets a company up (name, address, the owner's account) and can see the list of companies, nothing inside them.
+      // Novyra's owner sets a company up (name, address, the owner's account) and can pause it. After set-up Novyra can't read
+      // this record or anything inside the company; it keeps its own note in deskCompanies instead.
       // The company's own people can always read this one document, so a paused desk can tell them it's paused.
-      allow get: if coIn(c) || isOwner();
-      allow list: if isOwner();
+      allow get: if coIn(c);
       allow create: if isOwner()
         && c.matches('^[a-z0-9][a-z0-9-]{1,38}[a-z0-9]$')
         && request.resource.data.name is string && request.resource.data.name.size() > 0
@@ -97,7 +108,7 @@ service cloud.firestore {
       // the company's own owners can rename it or change its owners, but never its pause or billing
       allow update: if coOwner(c) && live(c) && hasOwner(request.resource.data)
         && !request.resource.data.diff(resource.data).affectedKeys().hasAny(novyraOnly());
-      // Novyra's owner pauses or resumes the desk and links it to the customer who pays for it, nothing else
+      // Novyra's owner pauses or resumes the desk (and clears the old billing link), nothing else
       allow update: if isOwner() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(novyraOnly().concat(['updatedAt']))
         && request.resource.data.get('paused', false) is bool;
 
@@ -120,6 +131,7 @@ service cloud.firestore {
       match /{col}/{document=**} {
         allow read: if coMember(c) && col != 'shares';
         allow write: if coEditor(c) && col != 'users' && col != 'shares';
+        // Novyra's owner has no way in: nothing here mentions isOwner()
       }
     }
 

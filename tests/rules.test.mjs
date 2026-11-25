@@ -47,7 +47,17 @@ await t('Novyra owner cannot read a company’s customers', assertFails(getDoc(d
 await t('Novyra owner cannot list a company’s customers', assertFails(getDocs(collection(hanu, 'companies/karoo/clients'))));
 await t('Novyra owner cannot write inside a company', assertFails(setDoc(doc(hanu, 'companies/karoo/clients/x'), { a: 1 })));
 await t('Novyra owner cannot read a company’s settings', assertFails(getDoc(doc(hanu, 'companies/karoo/settings/business'))));
-await t('Novyra owner can list companies', assertSucceeds(getDocs(collection(hanu, 'companies'))));
+await t('Novyra owner cannot list companies', assertFails(getDocs(collection(hanu, 'companies'))));
+await t('Novyra owner cannot read a company’s record after set-up', assertFails(getDoc(doc(hanu, 'companies/karoo'))));
+await t('Novyra owner keeps its own note of the companies it set up', assertSucceeds(setDoc(doc(hanu, 'deskCompanies/karoo'), { name: 'Karoo Cycles', createdAt: 'now', billingClient: 'n1' })));
+await t('Novyra owner reads its own company notes', assertSucceeds(getDocs(collection(hanu, 'deskCompanies'))));
+await t('A company cannot read Novyra’s company notes', assertFails(getDoc(doc(karoo, 'deskCompanies/karoo'))));
+await t('A company cannot list Novyra’s company notes', assertFails(getDocs(collection(karoo, 'deskCompanies'))));
+await t('A company cannot read Novyra’s customers', assertFails(getDoc(doc(karoo, 'clients/n1'))));
+await t('A company cannot read Novyra’s settings', assertFails(getDoc(doc(karoo, 'settings/bank'))));
+await t('Novyra owner cannot list a company’s usernames', assertFails(getDocs(collection(hanu, 'usernames/karoo/names'))));
+await t('Novyra owner cannot list the sign-in lookups', assertFails(getDocs(collection(hanu, 'signin'))));
+await t('Novyra owner cannot list the brand cards', assertFails(getDocs(collection(hanu, 'brands'))));
 await t('Novyra owner can set up a company', assertSucceeds(setDoc(doc(hanu, 'companies/new-co'), { name: 'New Co', owners: ['boss@new.test'] })));
 await t('Company address must be valid', assertFails(setDoc(doc(hanu, 'companies/Bad Name'), { name: 'X', owners: ['a@b.test'] })));
 await t('A company needs an owner', assertFails(setDoc(doc(hanu, 'companies/no-owner'), { name: 'X', owners: [] })));
@@ -109,6 +119,7 @@ await t('Novyra staff ticks off its own setup', assertSucceeds(updateDoc(doc(nov
 await t('Novyra staff cannot change the team', assertFails(setDoc(doc(novStaff, 'users/sneaky'), { role: 'admin', active: true })));
 await t('Novyra staff cannot see any company', assertFails(getDoc(doc(novStaff, 'companies/karoo/clients/k1'))));
 await t('Novyra staff cannot list companies', assertFails(getDocs(collection(novStaff, 'companies'))));
+await t('Novyra staff cannot read Novyra’s company notes', assertFails(getDocs(collection(novStaff, 'deskCompanies'))));
 await t('Novyra viewer reads but cannot write', assertFails(setDoc(doc(novViewer, 'quotes/nq2'), { n: 2 })));
 await t('Turned-off Novyra team member cannot get in', assertFails(getDoc(doc(novOff, 'clients/n1'))));
 await t('Company staff cannot read Novyra', assertFails(getDoc(doc(acmeStaff, 'clients/n1'))));
@@ -124,7 +135,8 @@ await t('A company cannot claim usernames on Novyra’s desk', assertFails(setDo
 await t('A company cannot claim usernames on another company’s desk', assertFails(setDoc(doc(acmeBoss, 'usernames/karoo/names/boss'), { email: 'b@acme.test', uid: 'acme-boss' })));
 await t('Novyra team staff cannot claim usernames', assertFails(setDoc(doc(novStaff, 'usernames/novyra/names/sneaky'), { email: 's@n.test', uid: 'x' })));
 await t('Novyra’s owner claims a username on Novyra’s desk', assertSucceeds(setDoc(doc(hanu, 'usernames/novyra/names/thandi'), { email: 'thandi@n.test', uid: 'nov-staff' })));
-await t('Novyra’s owner claims the owner’s username for a new company', assertSucceeds(setDoc(doc(hanu, 'usernames/newer-co/names/johan'), { email: 'johan@newer.test', uid: 'newer-uid' })));
+await t('Novyra’s owner claims the owner’s username for a company being set up', assertSucceeds(setDoc(doc(hanu, 'usernames/fresh-co/names/johan'), { email: 'johan@fresh.test', uid: 'fresh-uid' })));
+await t('Once a company is set up, Novyra can’t add usernames to it', assertFails(setDoc(doc(hanu, 'usernames/newer-co/names/sneaky'), { email: 's@n.test', uid: 'x' })));
 await t('A username with odd characters is refused', assertFails(setDoc(doc(acmeBoss, 'usernames/acme/names/Bad Name'), { email: 'b@acme.test', uid: 'x' })));
 
 console.log('Brand cards (sign-in pages)');
@@ -136,7 +148,8 @@ await t('A stranger cannot change a brand card', assertFails(setDoc(doc(stranger
 await t('A company cannot change another company’s brand card', assertFails(setDoc(doc(acmeBoss, 'brands/karoo'), { name: 'Hacked' })));
 await t('Brand cards only hold a name and logo', assertFails(setDoc(doc(acmeBoss, 'brands/acme'), { name: 'Acme', owner: 'x' })));
 await t('Novyra’s team cannot change brand cards', assertFails(setDoc(doc(novStaff, 'brands/acme'), { name: 'Hacked' })));
-await t('Novyra’s owner writes the first brand card for a new company', assertSucceeds(setDoc(doc(hanu, 'brands/newer-co'), { name: 'Newer', logo: '', updatedAt: 'now' })));
+await t('Novyra’s owner writes the first brand card for a company being set up', assertSucceeds(setDoc(doc(hanu, 'brands/fresh-co'), { name: 'Fresh', logo: '', updatedAt: 'now' })));
+await t('Novyra’s owner can’t change a company’s brand card later', assertFails(setDoc(doc(hanu, 'brands/acme'), { name: 'Hacked', logo: '', updatedAt: 'now' })));
 
 console.log('Email-to-desk lookup (sign-in step 1)');
 await t('Company owner records which desk a new person signs in to', assertSucceeds(setDoc(doc(acmeBoss, 'signin/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), { desk: 'acme', uid: 'acme-new' })));
@@ -148,6 +161,8 @@ await t('A stranger cannot point someone at a company’s desk', assertFails(set
 await t('Staff cannot record accounts for other people', assertFails(setDoc(doc(acmeStaff, 'signin/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc'), { desk: 'acme', uid: 'someone-else' })));
 await t('Only scrambled email keys are allowed', assertFails(setDoc(doc(acmeBoss, 'signin/boss@acme.test'), { desk: 'acme', uid: 'x' })));
 await t('Sign-in entries only hold a desk and an account id', assertFails(setDoc(doc(acmeBoss, 'signin/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc'), { desk: 'acme', uid: 'x', email: 'e@x.test' })));
+await t('A company can’t take over someone from another desk', assertFails(setDoc(doc(karoo, 'signin/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), { desk: 'karoo', uid: 'acme-new' })));
+await t('Novyra can’t move someone off a company’s desk', assertFails(setDoc(doc(hanu, 'signin/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), { desk: 'novyra', uid: 'acme-new' })));
 await t('Novyra’s team can’t save sign-in entries either', assertFails(setDoc(doc(novStaff, 'signin/dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd'), { desk: 'novyra', uid: 'nov-staff' })));
 
 console.log('Customers opening links');

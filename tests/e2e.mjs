@@ -77,6 +77,12 @@ check('Novyra’s owner is shown the owner’s sign-in details to pass on', /kar
 await nov.click('#modal [data-close]'); await W(500);
 check('Novyra’s owner is still signed in as themselves', await nov.evaluate(() => window.STUDIO.email) === 'hanu@keysers.cc');
 check('Company appears in the list with its link', (await nov.locator('#set-companies').innerText()).includes('novyradesk.com/karoo-cycles/'));
+const note = await get('deskCompanies/karoo-cycles');
+check('Novyra keeps its own note of what it set up', note && note.name === 'Karoo Cycles' && note.setUpFor === OWNER_EMAIL && note.setUpLogin === OWNER_USER, JSON.stringify(note));
+check('After set-up, Novyra can’t read the company’s record', await nov.evaluate(async () => { try { await window.STUDIO.raw.doc('companies/karoo-cycles').get(); return false; } catch { return true; } }));
+check('…or list the companies', await nov.evaluate(async () => { try { await window.STUDIO.raw.collection('companies').get(); return false; } catch { return true; } }));
+const page = await (await fetch(URLB + '/')).text();
+check('The desk page holds none of Novyra’s private details', !/12687680212|hanu@keysers\.cc|Keyser|Discovery Bank/.test(page));
 const br0 = await get('brands/karoo-cycles'); check('The company gets a public brand card for its sign-in page', br0 && br0.name === 'Karoo Cycles', JSON.stringify(br0));
 await nov.screenshot({ path: 'shots/1-novyra-companies.png', fullPage: true });
 
@@ -239,6 +245,7 @@ await nov.evaluate(() => location.hash = '#settings'); await W(2500);
 check('Each company shows whether it’s active', /Active/.test(await nov.locator('#set-companies .co-row').first().innerText()));
 check('…and a choice of which customer pays for it', await nov.locator('[data-co-bill="karoo-cycles"]').count() === 1);
 await nov.selectOption('[data-co-bill="karoo-cycles"]', { index: 1 }).catch(() => {}); await W(1500);
+check('The paying customer is kept in Novyra’s own note, not on the company', !!((await get('deskCompanies/karoo-cycles')) || {}).billingClient && !((await get('companies/karoo-cycles')) || {}).billingClient);
 check('Linking the paying customer shows its billing status', /Paid up|Invoice waiting|Payment overdue|No invoices yet|Not linked/.test(await nov.locator('#set-companies .co-row').first().innerText()));
 await nov.click('[data-co-pause="karoo-cycles"]'); await W(400);
 check('Pausing explains what happens first', /Nobody at Karoo Cycles can sign in/.test(await nov.locator('#modal').innerText()));
