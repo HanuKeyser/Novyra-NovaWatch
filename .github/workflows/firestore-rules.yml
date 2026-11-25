@@ -1,11 +1,9 @@
 # Puts the database rules (firestore.rules) live on Firebase, so Firebase always matches GitHub.
-# Runs after the Novyra Desk tests pass on main (the tests check these exact rules), or by hand.
+# Runs by hand for now (Actions → Deploy database rules → Run workflow). It needs the GitHub service account to have the
+# "Firebase Rules Admin" role; until then the rules are pasted into Firebase by hand. To run it automatically after the
+# tests pass, add back:  workflow_run: { workflows: ["Novyra Desk tests"], types: [completed], branches: [main] }
 name: Deploy database rules
 on:
-  workflow_run:
-    workflows: ["Novyra Desk tests"]
-    types: [completed]
-    branches: [main]
   workflow_dispatch:
 concurrency: { group: firestore-rules, cancel-in-progress: false }
 jobs:
