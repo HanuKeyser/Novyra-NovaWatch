@@ -28,14 +28,14 @@ h1,h2,h3{font-family:var(--display);font-weight:800;margin:0;text-wrap:balance;l
 
 /* app shell: white top bar, sidebar menu, page */
 :root{--side:252px;--bar:62px;--ease:cubic-bezier(.22,.7,.2,1)}
-html.side-mini{--side:72px}
+html.side-mini{--side:90px}
 .appbar{position:sticky;top:0;z-index:30;height:var(--bar);display:flex;align-items:center;gap:4px;padding:0 max(28px,env(safe-area-inset-right,0px)) 0 0;background:#fff;border-bottom:1px solid var(--line)}
 .appbar .brand{flex:0 0 var(--side);position:relative;align-self:stretch;overflow:hidden;border-right:1px solid var(--line);margin-right:11px;transition:flex-basis .25s var(--ease)}
 .appbar .brand a{position:absolute;inset:0}
 .appbar .brand img{position:absolute;left:max(26px,env(safe-area-inset-left,0px));top:50%;height:28px;width:auto;transform:translateY(-50%);transition:opacity .2s var(--ease)}
 .appbar .brand .full{height:44px}
-.appbar .brand .mark{opacity:0;height:34px !important;width:auto}
-html.side-mini .appbar .brand .full{opacity:0} html.side-mini .appbar .brand .mark{opacity:1;height:44px !important;left:calc((var(--side) - 46px) / 2)}
+.appbar .brand .mark{opacity:0;height:44px !important;width:auto}
+html.side-mini .appbar .brand .full{opacity:0} html.side-mini .appbar .brand .mark{opacity:1}
 .appbar .grow{flex:1}
 .ib{width:38px;height:38px;border:0;border-radius:11px;display:grid;place-items:center;background:none;color:var(--muted);cursor:pointer;text-decoration:none;flex:none}
 .ib:hover{background:var(--ink3);color:var(--text)}
@@ -1501,8 +1501,8 @@ html:has(.demo-bar:not([hidden])) .side{top:calc(var(--bar) + 44px);height:calc(
 #set-companies .srow-c{grid-auto-flow:column;align-items:center;justify-content:start;gap:10px}
 #set-companies .co-link{font-weight:600;color:var(--blue-ink,#2a5fd6);word-break:break-all}
 #set-companies .co-form .srow-c{display:block}
-.co-list{display:grid;gap:12px;margin-bottom:18px}
-.co-new{margin:6px 0 2px;font:700 11px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.co-list{display:grid;gap:12px;margin:18px 24px 6px}
+.co-new{display:flex;align-items:center;gap:12px;margin:18px 24px 4px;font:700 11px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
 .co-row{display:grid;gap:12px;padding:16px;border-radius:16px;background:#fff;box-shadow:inset 0 0 0 1px var(--line);min-width:0;transition:box-shadow .15s,background-color .15s}
 .co-row.off{background:#fffafa;box-shadow:inset 0 0 0 1px #f3d4d0}
 .co-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;min-width:0}
@@ -1802,6 +1802,59 @@ button.un-i{cursor:pointer}button.un-i:hover{border-color:#c9d8f8;box-shadow:0 8
 .sk-un{display:flex;gap:12px;margin-top:16px}.sk-un>.sk-card{flex:1;min-width:0;box-shadow:none}
 @media (max-width:1100px){.sk-set{grid-template-columns:1fr}.sk-snav{display:flex;gap:10px;overflow:hidden;position:static}.sk-snav .sk-li{flex:none;width:130px}}
 @media (max-width:620px){.sk-un{flex-direction:column}}
+.co-new::after{content:"";flex:1;height:1px;background:var(--line)}
+.scard-b>.note{margin:18px 24px 6px !important}
+@media (max-width:640px){.co-list,.co-new{margin-inline:16px}}
+.set-stack .co-form>.srow:first-child::before{display:none}
+.mnu{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:24px;margin:20px 24px 24px;align-items:start}
+.mnu-list{display:grid;gap:14px;min-width:0}
+.mnu-g{border:1px solid var(--line);border-radius:16px;background:#fff;overflow:hidden}
+.mnu-gh{display:flex;align-items:center;gap:10px;padding:10px 12px 10px 16px;background:linear-gradient(180deg,#fbfcff,#f5f7fc);border-bottom:1px solid var(--line)}
+.mnu-gl{font:700 11.5px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--text)}
+.mnu-gc{flex:1;font-size:12px;color:var(--dim)}
+.mnu-r{display:grid;grid-template-columns:36px minmax(0,1fr) auto 36px;align-items:center;gap:14px;padding:10px 14px 10px 16px;transition:background-color .15s}
+.mnu-r+.mnu-r{border-top:1px solid var(--line)}
+.mnu-r:hover{background:#fafbff}
+.mnu-ic{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:#fdf3e3;color:#c2410c;transition:background-color .2s,color .2s}
+.mnu-ic svg{width:18px;height:18px}
+.mnu-n{display:grid;gap:1px;min-width:0}.mnu-n b{font-size:14.5px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mnu-n em{font-style:normal;font-size:12px;color:var(--dim)}
+.mnu-r.off .mnu-ic{background:var(--ink);color:var(--dim)}.mnu-r.off .mnu-n b{color:var(--dim)}
+.mnu-st{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.mnu-st button{display:grid;place-items:center;width:32px;height:30px;border:0;background:none;color:var(--muted);cursor:pointer;transition:background-color .15s,color .15s}
+.mnu-st button+button{border-left:1px solid var(--line)}
+.mnu-st button:not(:disabled):hover{background:#eef3ff;color:var(--soft)}
+.mnu-st button:disabled{color:var(--line2);cursor:default}
+.mnu-st button:focus-visible{outline:2px solid var(--spark);outline-offset:-2px}
+.mnu-st svg{width:15px;height:15px}
+.mnu-gh .mnu-st{background:transparent}
+.mnu-prev{position:sticky;top:84px;display:grid;gap:10px}
+.mnu-ph{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.mnu-ph span{font:700 11px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}.mnu-ph em{font-style:normal;font-size:12px;color:var(--dim)}
+.mnu-prev .mprev{margin:0 !important;box-shadow:none}
+@media (max-width:1000px){.mnu{grid-template-columns:minmax(0,1fr)}.mnu-prev{display:none}}
+@media (max-width:640px){.mnu{margin:16px}.mnu-r{grid-template-columns:32px minmax(0,1fr) auto 36px;gap:10px;padding:10px 12px}.mnu-ic{width:32px;height:32px}.mnu-n em{display:none}.mnu-gh{padding-left:12px}}
+@media (max-width:640px){.set-stack .scard-h{flex-wrap:wrap}.set-stack .scard-t{flex:1 1 calc(100% - 64px)}.set-stack .scard-h>.btn{margin-left:54px}}
+.appbar .avatar[aria-current]{box-shadow:0 0 0 3px #fff,0 0 0 5px var(--spark)}
+@media (max-width:900px){.appbar .brand .mark{height:34px !important}}
+/* the collapsed menu is 90px wide so its icons sit centred under the N, which never moves */
+.side{transition:padding .25s var(--ease)}
+@media (min-width:901px){html.side-mini .side{padding-left:max(23px,env(safe-area-inset-left,0px));padding-right:23px}html.side-mini .side a.it[aria-current="page"]::before{left:-23px}}
+.catpick3{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.catpick3 button{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:9px;min-height:104px;padding:16px 8px 12px;border-radius:16px;border:1px solid var(--line2);background:#fff;color:var(--text);text-align:center;cursor:pointer;font:inherit;transition:border-color .15s,background-color .15s,box-shadow .15s,transform .15s}
+.catpick3 button:hover{border-color:color-mix(in srgb,var(--c) 45%,#fff);transform:translateY(-1px)}
+.catpick3 button:focus-visible{outline:2px solid var(--c);outline-offset:2px}
+.catpick3 .cp-ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none;background:color-mix(in srgb,var(--c) 11%,#fff);color:var(--c);transition:background-color .15s,color .15s}
+.catpick3 .cp-ic svg{width:20px;height:20px}
+.catpick3 .cp-t{font-size:12.5px;font-weight:600;line-height:1.3;color:var(--muted);text-wrap:balance;overflow-wrap:anywhere}
+.catpick3 .cp-ok{position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:var(--c);color:#fff;opacity:0;transform:scale(.6);transition:opacity .15s,transform .15s}
+.catpick3 .cp-ok svg{width:11px;height:11px}
+.catpick3 button[aria-pressed=true]{border-color:var(--c);background:color-mix(in srgb,var(--c) 6%,#fff);box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 16%,transparent)}
+.catpick3 button[aria-pressed=true] .cp-ic{background:var(--c);color:#fff}
+.catpick3 button[aria-pressed=true] .cp-t{color:var(--text)}
+.catpick3 button[aria-pressed=true] .cp-ok{opacity:1;transform:none}
+@media (max-width:520px){.catpick3{grid-template-columns:repeat(2,minmax(0,1fr))}.catpick3 button{flex-direction:row;justify-content:flex-start;min-height:60px;padding:10px 12px;text-align:left;gap:10px}.catpick3 .cp-ic{width:34px;height:34px;border-radius:10px}}
+@media (max-width:520px){.catpick3 button{padding-right:28px}}
 </style></head><body>
 
 <header class="appbar">
@@ -1820,7 +1873,7 @@ button.un-i{cursor:pointer}button.un-i:hover{border-color:#c9d8f8;box-shadow:0 8
     <svg class="i-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M9 4v16"/><path d="m13.5 10 2 2-2 2"/></svg>
     <svg class="i-burger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
   <span class="sep" aria-hidden="true"></span>
-  <a class="avatar" href="#settings-profile" title="Your details" aria-label="Your details"></a>
+  <a class="avatar" data-top="profile" href="#profile" title="Your details" aria-label="Your details"></a>
 </header>
 <div class="demo-bar" id="demo-bar" hidden><span class="demo-ic">✦</span><span id="demo-msg"><b>You’re looking at sample data.</b> Try anything you like. Nothing here is saved or sent.</span><button type="button" class="btn small" data-demo-off>Back to my records</button></div>
 <div class="shell">
@@ -2718,7 +2771,8 @@ function skeletonHTML() {
   else if (sub === 'calendar') body = `<div class="sk-calbar">${b('38px', 38, 'border-radius:12px')}${b('220px', 28)}${b('38px', 38, 'border-radius:12px')}</div><div class="sk-calwrap"><div class="sk-card" style="padding:0">${b('100%', 34, 'border-radius:0')}<div class="sk-cal">${R(35).map((_, i) => `<div>${b('18px', 12)}${i % 5 === 1 ? b('85%', 34, 'margin-top:10px;border-radius:8px') : ''}</div>`).join('')}</div></div><div class="sk-col">${listPanel(4)}<div class="sk-card">${b('150px', 18)}${b('60px', 26, 'margin-top:14px')}${b('100%', 8, 'margin-top:12px;border-radius:999px')}</div></div></div>`;
   else if (sub === 'company') body = `<div class="sk-col">${formCard(4)}${formCard(3)}</div>`;
   else if (sub === 'team') body = `${stats(4)}<div class="sk-cc">${R(2).map((_, k) => `<div class="sk-card sk-c"${k ? ' style="border-style:dashed"' : ''}><div class="sk-li" style="border:0;padding:0">${b('46px', 46, 'border-radius:50%;flex:none')}<span class="sk-2">${b('55%', 15)}${b('70%', 11)}</span></div>${b('85%', 12, 'margin-top:16px')}${b('90px', 22, 'border-radius:999px;margin-top:14px')}</div>`).join('')}</div>${formCard(1)}`;
-  else if (sub === 'settings') body = `<div class="sk-banner"><span class="sk sk-av"></span><span class="sk-2">${b('220px', 24, 'background:rgba(255,255,255,.28)')}${b('150px', 12, 'background:rgba(255,255,255,.22)')}${b('190px', 12, 'background:rgba(255,255,255,.22)')}</span></div><div class="sk-set"><div class="sk-card sk-snav">${R(7).map(() => `<div class="sk-li" style="border:0;padding:6px 0">${b('30px', 30, 'border-radius:10px;flex:none')}${b('70%', 12)}</div>`).join('')}</div><div class="sk-col">${[5, 3, 4, 3, 4, 2, 2].map(formCard).join('')}</div></div>`;
+  else if (sub === 'settings') body = `<div class="sk-col">${[3, 4, 6, 2, 1].map(formCard).join('')}</div>`;
+  else if (sub === 'profile') body = `<div class="sk-banner"><span class="sk sk-av"></span><span class="sk-2">${b('220px', 24, 'background:rgba(255,255,255,.28)')}${b('150px', 12, 'background:rgba(255,255,255,.22)')}${b('190px', 12, 'background:rgba(255,255,255,.22)')}</span></div><div class="sk-col">${formCard(8)}</div>`;
   else body = table(['10%', '12%', '24%', '12%', '10%'], 8);
   return `<div class="sk-wrap">${body}</div>`;
 }
@@ -2882,11 +2936,11 @@ function route() {
   if (m) { view.tab = m[1] + 's'; view.open = { kind: m[1], id: m[2] }; }
   else {
     if (h === 'search') { history.replaceState(null, '', '#home'); setTimeout(() => openSearch(), 50); }
-    const SUBS = { home: 'overview', clients: 'clients', prices: 'prices', settings: 'settings', bank: 'settings', search: 'overview', profile: 'settings', plans: 'plans', expenses: 'expenses', calendar: 'calendar', company: 'company', team: 'team', trash: 'trash' };
-    const moved = { 'settings-company': 'company', 'settings-team': 'team', 'settings-deleted': 'home', trash: 'home' };
+    const SUBS = { home: 'overview', clients: 'clients', prices: 'prices', settings: 'settings', bank: 'settings', search: 'overview', profile: 'profile', plans: 'plans', expenses: 'expenses', calendar: 'calendar', company: 'company', team: 'team', trash: 'trash' };
+    const moved = { 'settings-profile': 'profile', 'settings-company': 'company', 'settings-team': 'team', 'settings-deleted': 'home', trash: 'home' };
     if (moved[h]) { history.replaceState(null, '', '#' + moved[h]); return route(); }
     const sm = h.match(/^settings-([a-z]+)$/);
-    if (sm || h === 'profile' || h === 'bank' || h === 'settings') view.stab = sm ? sm[1] : h === 'profile' ? 'profile' : h === 'bank' ? 'business' : '';
+    if (sm || h === 'bank' || h === 'settings') view.stab = sm ? sm[1] : h === 'bank' ? 'business' : '';
     const key = sm ? 'settings' : h;
     const t = key in SUBS ? 'home' : ['quotes', 'invoices'].includes(key) ? key : 'home', sub = SUBS[key] || 'overview';
     if (t !== view.tab || sub !== view.sub || view.open) { view.filter = sub === 'expenses' ? 'month' : 'all'; view.q = ''; view.limit = PAGE; }
@@ -2957,7 +3011,7 @@ function render() {
   if (state.failed) return;
   if (!db || !coreReady()) { paintSkeleton(); return; }
   runPlans(); applyShares();
-  { const h = (location.hash || '#home').slice(1); $$('.appbar [data-top]').forEach(a => a.toggleAttribute('aria-current', a.dataset.top === 'settings' ? /^(settings|profile|bank)/.test(h) : h === 'home' || h === '')); }
+  { const h = (location.hash || '#home').slice(1); $$('.appbar [data-top]').forEach(a => a.toggleAttribute('aria-current', a.dataset.top === 'settings' ? /^(settings|bank)/.test(h) : a.dataset.top === 'profile' ? h === 'profile' : h === 'home' || h === '')); }
   const main = $('#main');
   if (view.open) {
     const list = view.open.kind === 'quote' ? state.quotes : state.invoices;
@@ -3019,7 +3073,7 @@ const SUB_ICONS = {
   prices: '<path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/>',
   settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>' };
 function portalHTML() {
-  return ({ overview: homeHTML, clients: clientsHTML, prices: pricesHTML, settings: settingsHTML, company: companyPageHTML, team: teamPageHTML, search: searchHTML, plans: plansHTML, expenses: expensesHTML, calendar: calendarHTML }[view.sub || 'overview'])();
+  return ({ overview: homeHTML, clients: clientsHTML, prices: pricesHTML, settings: settingsHTML, profile: profilePageHTML, company: companyPageHTML, team: teamPageHTML, search: searchHTML, plans: plansHTML, expenses: expensesHTML, calendar: calendarHTML }[view.sub || 'overview'])();
 }
 const SIDE_ICONS = { ...SUB_ICONS,
   profile: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.2-4 4.3-6 8-6s6.8 2 8 6"/>',
@@ -3523,6 +3577,7 @@ function planDialog(plan, fromQuote) {
 }
 
 /* ---------- expenses ---------- */
+const EXP_TINT = { 'Printing': '#2563eb', 'Software and subscriptions': '#7c3aed', 'Domains and hosting': '#0891b2', 'Fonts, photos and assets': '#db2777', 'Equipment': '#ea580c', 'Advertising': '#dc2626', 'Transport': '#059669', 'Other': '#64748b' };
 const EXP_CATS = ['Printing', 'Software and subscriptions', 'Domains and hosting', 'Fonts, photos and assets', 'Equipment', 'Advertising', 'Transport', 'Other'];
 const EXP_ICONS = {"Printing": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.9\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M6 9V3h12v6\"/><rect x=\"3\" y=\"9\" width=\"18\" height=\"8\" rx=\"2\"/><path d=\"M6 14h12v7H6z\"/></svg>", "Software and subscriptions": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.9\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3\" y=\"4\" width=\"18\" height=\"12\" rx=\"2\"/><path d=\"M8 20h8M12 16v4\"/></svg>", "Domains and hosting": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.9\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18\"/></svg>", "Fonts, photos and assets": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.9\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"3\"/><circle cx=\"9\" cy=\"9\" r=\"2\"/><path d=\"m21 15-5-5L5 21\"/></svg>", "Equipment": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.9\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"2\" y=\"7\" width=\"20\" height=\"13\" rx=\"2\"/><path d=\"M8 7l1.5-3h5L16 7\"/><circle cx=\"12\" cy=\"13.5\" r=\"3.5\"/></svg>", "Advertising": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.9\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 11v2a1 1 0 0 0 1 1h3l5 4V6L7 10H4a1 1 0 0 0-1 1z\"/><path d=\"M16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12\"/></svg>", "Transport": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.9\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 17h14M6 17l1.5-6h9L18 17\"/><circle cx=\"8\" cy=\"18\" r=\"1.6\"/><circle cx=\"16\" cy=\"18\" r=\"1.6\"/><path d=\"M7.5 11 9 7h6l1.5 4\"/></svg>", "Other": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.9\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"6\" cy=\"12\" r=\"1.3\"/><circle cx=\"12\" cy=\"12\" r=\"1.3\"/><circle cx=\"18\" cy=\"12\" r=\"1.3\"/></svg>"};
 const inPeriod = (date, f) => { const t = todayIso(), m = ym(t), y = t.slice(0, 4); return f === 'month' ? ym(date) === m : f === 'last' ? ym(date) === addMonths(m, -1) : f === 'year' ? String(date).slice(0, 4) === y : true; };
@@ -3547,7 +3602,7 @@ function expenseDialog(e) {
   openModal(dlg(isNew ? 'Add expense' : 'Expense', `<div class="cgrid"><div class="ccol"><section class="cbox">
       <div class="grid2"><label class="field"><span>Date</span><input id="ex-date" type="date" value="${esc(x.date)}"></label><label class="field"><span>Amount (R)</span><input id="ex-amount" type="number" min="0" step="0.01" value="${esc(x.amount)}" placeholder="0.00" ${isNew ? 'autofocus' : ''}></label></div>
       <label class="field"><span>What was it for?</span><input id="ex-desc" value="${esc(x.description)}" placeholder="For example: 500 business cards"></label>
-      <div class="field"><span>Category</span><div class="catpick2">${EXP_CATS.map(c => `<button type="button" data-cat="${esc(c)}" aria-pressed="${x.category === c}"><span class="cp-ic">${EXP_ICONS[c] || ''}</span><span class="cp-t">${esc(c)}</span></button>`).join('')}</div></div></section></div>
+      <div class="field"><span>Category</span><div class="catpick3" role="group" aria-label="Category">${EXP_CATS.map(c => `<button type="button" data-cat="${esc(c)}" aria-pressed="${x.category === c}" style="--c:${EXP_TINT[c] || '#64748b'}"><span class="cp-ic">${EXP_ICONS[c] || ''}</span><span class="cp-t">${esc(c.replace(/ and /g, ' & '))}</span><span class="cp-ok" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span></button>`).join('')}</div></div></section></div>
     <div class="ccol"><section class="cbox"><label class="field"><span>Supplier (optional)</span><input id="ex-sup" value="${esc(x.supplier)}" placeholder="For example: Print shop, Adobe, Afrihost"></label>
       <label class="field"><span>For a customer (optional)</span><select id="ex-client"><option value="">Not for a specific customer</option>${[...state.clients].sort((a, b) => clientName(a).localeCompare(clientName(b), 'en', { sensitivity: 'base' })).map(c => `<option value="${c.id}" ${x.clientId === c.id ? 'selected' : ''}>${esc(c.business)}</option>`).join('')}</select></label>
       <label class="field"><span>Note (optional)</span><textarea id="ex-note" rows="3">${esc(x.note)}</textarea></label></section></div></div>`,
@@ -3690,23 +3745,21 @@ function teamPageHTML() {
     + `<section class="strip tm-strip" aria-label="Summary">${stat('People', us.length + 1, 'Including you')}${stat('Admins', us.filter(u => u.role === 'admin' && u.active !== false).length, 'Everything but the team')}${stat('Staff and viewers', on.filter(u => u.role !== 'admin').length, 'Only the areas you tick')}${stat('Disabled', us.length - on.length, 'Can’t sign in')}</section>`
     + `<div class="pg-stack">${setTeamHTML()}</div>`;
 }
-// settings: a side list of the sections (sticky on big screens, a scrolling row on small ones) next to the cards
-function setLayout(cards) {
-  const items = [...cards.matchAll(/id="set-([a-z]+)"><header class="scard-h">(?:<span class="scard-ic">([\s\S]*?)<\/span>)?<div class="scard-t"><h3>([^<]*)/g)];
-  const nav = items.map(([, id, ic, t]) => `<a href="#settings-${id}" data-setnav="${id}" class="sn-${id}"><span class="ni">${ic || ''}</span><span>${esc(t)}</span></a>`).join('');
-  return `<div class="set-layout"><nav class="set-nav" aria-label="Settings sections"><h4>Settings</h4>${nav}</nav><div class="set-stack">${cards}</div></div>`;
-}
-function settingsHTML() {
+// Your details has its own page (the profile picture in the top bar opens it)
+function profilePageHTML() {
   const S = window.STUDIO || {}, pr = S.providers || [], em = S.email || OWNER.email || '';
   const methods = S.email ? `${pr.includes('google.com') ? '<span class="pill accepted">Google</span>' : ''}${pr.includes('password') ? '<span class="pill accepted">Email and password</span>' : ''}` : '';
   const hero = `<section class="set-hero">
       <div class="set-hero-av" id="pf-av" style="background:${esc(OWNER.color || AV_COLORS[0])}">${esc(userInitials(OWNER))}</div>
       <div class="set-hero-id"><h2 id="pf-nm">${esc(OWNER.name)}</h2><p><span id="pf-tt">${esc(OWNER.title || '')}</span><span class="dotsep">${esc(biz().name)}</span></p><div class="set-hero-meta"><span>${esc(em)}</span><span class="pill accepted">${isOwnerLogin() ? 'Owner' : esc((ROLES[ME.role] || ROLES.staff)[0])}</span>${methods}</div></div>
       ${S.email ? '<button class="btn set-hero-out" data-signout>Sign out</button>' : ''}</section>`;
+  return `<div class="set-page">${hero}<div class="set-stack">${setProfileHTML()}</div></div>`;
+}
+function settingsHTML() {
   return `
-    <div class="set-page">${hero}${setLayout(setProfileHTML() + setSecurityHTML() + setBusinessHTML() + setMenuHTML() + setDataHTML() + setCompaniesHTML()
+    <div class="set-page"><div class="set-stack">${setSecurityHTML() + setBusinessHTML() + setMenuHTML() + setDataHTML() + setCompaniesHTML()
       // sample data is only for Novyra's own main account
-      + (!SLUG && isOwnerLogin() && !PUBLIC_DEMO ? sCard('Sample data', 'Explore Novyra Desk with example customers, quotes, invoices and posts. Your own records stay exactly as they are.', sRow(DEMO ? 'You’re looking at sample data' : 'Try it with sample data', DEMO ? 'Nothing you do here is saved.' : 'Great for trying things out or taking screenshots.', DEMO ? '<button class="btn primary" data-demo-off>Back to my records</button>' : '<button class="btn" data-demo-on>Show sample data</button>'), { ic: 'share', id: 'set-sample' }) : ''))}</div>`;
+      + (!SLUG && isOwnerLogin() && !PUBLIC_DEMO ? sCard('Sample data', 'Explore Novyra Desk with example customers, quotes, invoices and posts. Your own records stay exactly as they are.', sRow(DEMO ? 'You’re looking at sample data' : 'Try it with sample data', DEMO ? 'Nothing you do here is saved.' : 'Great for trying things out or taking screenshots.', DEMO ? '<button class="btn primary" data-demo-off>Back to my records</button>' : '<button class="btn" data-demo-on>Show sample data</button>'), { ic: 'share', id: 'set-sample' }) : '')}</div></div>`;
 }
 function setProfileHTML() {
   const u = { ...OWNER }, sg = { ...SIGN_DEFAULT, ...(OWNER.sign || {}) };
@@ -3752,14 +3805,22 @@ function setBusinessHTML() {
 }
 function setMenuHTML() {
   const groups = menuGroups();
-  const mvb = (attr, dir, on, label) => `<button type="button" class="ib sm" ${attr} data-dir="${dir}" ${on ? '' : 'disabled'} aria-label="${label}">${dir < 0 ? CHEV_UP : CHEV_DN}</button>`;
+  const step = (attr, a, b, name) => `<span class="mnu-st"><button type="button" ${attr} data-dir="-1" ${a ? '' : 'disabled'} aria-label="Move ${name} up" title="Move up">${CHEV_UP}</button><button type="button" ${attr} data-dir="1" ${b ? '' : 'disabled'} aria-label="Move ${name} down" title="Move down">${CHEV_DN}</button></span>`;
+  const shown = groups.reduce((n, g) => n + g.items.filter(i => !i[3]).length, 0), all = groups.reduce((n, g) => n + g.items.length, 0);
   const preview = groups.map(g => ({ ...g, items: g.items.filter(i => !i[3]) })).filter(g => g.items.length);
-  return sCard('Menu', 'Move sections and pages up or down, and switch off pages you don’t use. Overview and Settings always stay. Changes save straight away.', `<div class="smenu"><div class="mlist">${groups.map((g, gi) => `<div class="mgrp">
-        <div class="mrow mhead"><span class="mlabel">${esc(g.l)}</span><span class="mv">${mvb(`data-mg="${gi}"`, -1, gi > 0, `Move ${esc(g.l)} up`)}${mvb(`data-mg="${gi}"`, 1, gi < groups.length - 1, `Move ${esc(g.l)} down`)}</span><span class="tglsp"></span></div>
-        ${g.items.map((i, ii) => `<div class="mrow ${i[3] ? 'off' : ''}"><span class="mname">${sicon(i[0])}<span>${esc(i[2])}</span></span><span class="mv">${mvb(`data-mi="${gi}:${ii}"`, -1, ii > 0, `Move ${esc(i[2])} up`)}${mvb(`data-mi="${gi}:${ii}"`, 1, ii < g.items.length - 1, `Move ${esc(i[2])} down`)}</span>
-          <label class="tgl" title="${i[0] === 'settings' ? 'Settings is always shown' : i[3] ? 'Hidden' : 'Shown'}"><input type="checkbox" data-mshow="${i[0]}" ${i[3] ? '' : 'checked'} ${i[0] === 'settings' ? 'disabled' : ''} aria-label="Show ${esc(i[2])}"><span></span></label></div>`).join('')}</div>`).join('')}</div>
-      <div class="smenu-prev"><span class="label">Preview</span><div class="mprev"><div class="mp-new">${sicon('plus')}<span>New quote</span></div><div class="mp-it">${sicon('overview')}<span>Overview</span></div>
-        ${preview.map(g => `<div class="mp-h">${esc(g.l)}</div>${g.items.map(i => `<div class="mp-it">${sicon(i[0])}<span>${esc(i[2])}</span></div>`).join('')}`).join('')}<div class="mp-h"></div><div class="mp-it">${sicon('settings')}<span>Settings</span></div></div></div></div>`,
+  const list = groups.map((g, gi) => `<section class="mnu-g">
+      <header class="mnu-gh"><span class="mnu-gl">${esc(g.l)}</span><span class="mnu-gc">${g.items.filter(i => !i[3]).length} of ${g.items.length} shown</span>${step(`data-mg="${gi}"`, gi > 0, gi < groups.length - 1, esc(g.l))}</header>
+      ${g.items.map((i, ii) => `<div class="mnu-r ${i[3] ? 'off' : ''}">
+        <span class="mnu-ic">${sicon(i[0])}</span>
+        <span class="mnu-n"><b>${esc(i[2])}</b><em>${i[3] ? 'Hidden' : 'Shown in the menu'}</em></span>
+        ${step(`data-mi="${gi}:${ii}"`, ii > 0, ii < g.items.length - 1, esc(i[2]))}
+        <label class="tgl" title="${i[3] ? 'Show' : 'Hide'} ${esc(i[2])}"><input type="checkbox" data-mshow="${i[0]}" ${i[3] ? '' : 'checked'} aria-label="Show ${esc(i[2])}"><span></span></label>
+      </div>`).join('')}</section>`).join('');
+  return sCard('Menu', 'Choose which pages show in the side menu and put them in the order you like. Overview and Settings always stay. Changes save straight away.',
+    `<div class="mnu"><div class="mnu-list">${list}</div>
+      <aside class="mnu-prev" aria-label="Preview of your menu"><div class="mnu-ph"><span>Preview</span><em>${shown} of ${all} pages</em></div>
+        <div class="mprev"><div class="mp-new">${sicon('plus')}<span>New quote</span></div><div class="mp-it">${sicon('overview')}<span>Overview</span></div>
+        ${preview.map(g => `<div class="mp-h">${esc(g.l)}</div>${g.items.map(i => `<div class="mp-it">${sicon(i[0])}<span>${esc(i[2])}</span></div>`).join('')}`).join('')}<div class="mp-h"></div><div class="mp-it">${sicon('settings')}<span>Settings</span></div></div></aside></div>`,
     { ic: 'menu', id: 'set-menu', act: '<button class="btn small ghost" data-menu-reset>Reset to default</button>' });
 }
 function setDataHTML() {
@@ -3995,10 +4056,6 @@ function bindList(main) {
   const sh = $('[data-start-hide]', main); if (sh) sh.addEventListener('click', () => { try { localStorage.setItem('nd-start-hide', '1'); } catch {} render(); });
   if (view.sub === 'settings' && view.stab && settingsHTML.jump !== location.hash) { settingsHTML.jump = location.hash; const t = $('#set-' + view.stab, main); if (t) requestAnimationFrame(() => scrollTo({ top: t.getBoundingClientRect().top + scrollY - 84, behavior: 'auto' })); }
   if (view.sub !== 'settings') settingsHTML.jump = '';
-  if (view.sub === 'settings') { const links = $$('[data-setnav]', main), cards = links.map(a => $('#set-' + a.dataset.setnav, main)).filter(Boolean);
-    const spy = () => { let on = cards[0]; for (const c of cards) if (c.getBoundingClientRect().top < 140) on = c; links.forEach(a => a.classList.toggle('on', on && a.dataset.setnav === on.id.slice(4))); };
-    removeEventListener('scroll', settingsHTML.spy); settingsHTML.spy = spy; addEventListener('scroll', spy, { passive: true }); spy(); }
-  else if (settingsHTML.spy) { removeEventListener('scroll', settingsHTML.spy); settingsHTML.spy = null; }
   const scp = $('[data-sc-pass]', main); if (scp) { const n1 = $('#sc-new', main), ul = $('#sc-rules', main); n1.addEventListener('input', () => pwPaint(n1, ul)); pwPaint(n1, ul);
     scp.addEventListener('click', async () => { const o = $('#sc-pass-out', main), cur = $('#sc-cur', main).value, nx = n1.value;
       if (!cur) { o.textContent = 'Type your current password.'; return; }
